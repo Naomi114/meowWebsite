@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>浪途 - 流浪貓結紮協助</title>
+    <link rel="stylesheet" href="/jf-openhuninn-2.1.ttf">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        @font-face {
+            font-family: 'jf-openhuninn';
+            src: url('/fonts/jf-openhuninn-2.1.ttf') format('truetype');
+            font-weight: normal;
+        }
+
+        body {
+            font-family: 'jf-openhuninn', sans-serif;
+            /* background-color: #f5f5f5; */
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #ffffff;
+            padding: 30px;
+            /* border-bottom: 1px solid #ddd; */
+        }
+
+        .navbar {
+            background-color: #f0f0f0;
+            display: flex;
+            /*啟用 flex 布局模式，開始後此div變為一個容器，裏頭元素們就可使用很多方便的屬性座位置編排*/
+            align-items: center;
+            /*設定元素垂直於主軸的排列方式，center可居中對齊，flex-start可將元素置頂對齊，flex-end可將元素置尾對齊*/
+            justify-content: space-between;
+            /*設置元素延主軸排列的方式，center可居中對齊，space-between可均勻分布且首尾對齊，space-around可讓元素間距相同*/
+            flex-direction: row
+                /*設置元素排列主軸方向，預設為水平排列row，可改為垂直column*/
+                /*flex-wrap:可控制子元素是否換行，nowrap不換行，所有項目將顯示在同一行，wrap換行，wrap-reverse換行並反向*/
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-left: 50px;
+        }
+
+        .logo img {
+            height: 90px;
+            margin-right: 3px;
+        }
+
+        .logo h1 {
+            font-size: 30px;
+            color: #333;
+            margin: 0;
+            font-weight: 560;
+        }
+
+        .nav-links {
+            display: flex;
+            /*將nav設為容器，可以讓每個子項目並排成一列*/
+            list-style: none;
+            margin-right: 70px;
+            padding: 0;
+        }
+
+        .nav-links li {
+            margin-left: 50px;
+            /*才能把每個並列的list分開*/
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            /*去除超連結底線*/
+            color: #2f3133;
+            font-size: 16px;
+        }
+
+        .nav-links a:hover {
+            color: #71bca3;
+            /* text-decoration: underline; */
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            /*warp讓元素在空間不足時自動換行，nowrap不換行*/
+            width: 80%;
+            max-width: 1100px;
+            margin: 20px auto;
+            /* background: #ffffff; */
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .second-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .post {
+            display: flex;
+            flex: 0 0 70%;
+        }
+
+        .post-header {
+            width: 100%;
+            /* border-bottom: 1px solid #ddd; */
+            padding-bottom: 10px;
+            margin-bottom: 50px;
+        }
+
+        .post-header h2 {
+            font-size: 28px;
+            color: #444;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .views {
+            color: #333
+        }
+
+        .info {
+            /* margin-top: 5px; */
+            color: #71bca3;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .info-2 {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .info-3 {
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .info-3 p {
+            margin: 0px;
+        }
+
+        .post-image {
+            flex: 1 1 45%;
+            max-width: 45%;
+            /*元素最小寬度，即使空間不足，元素也不會縮小到低於這個值*/
+            text-align: center;
+            order: -1;
+            /* This moves the image to the left of the details */
+        }
+
+        .post-image img {
+            max-width: 100%;
+            border-radius: 8px;
+            /* margin: 10px 0; */
+        }
+
+        .tag {
+            margin: 35px 0 25px 0;
+        }
+
+        .post-details p {
+            margin: 12px 0;
+        }
+
+
+        .post-details {
+            flex: 0 0 40%;
+            /*flex 是一個簡寫屬性，用於設置 flex-grow(控制元素如何根據剩餘空間進行增長的優先級、比例，設為0則寬度固定)、flex-shrink(控制元素如何在空間不足時縮小的優先級、比例，值越大優先級越高) 和 flex-basis(定義元素的初始大小)*/
+            width: 150px;
+            padding-left: 40px;
+        }
+
+        .post-details h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            border-left: 4px solid #71bca3;
+            padding-left: 10px;
+            color: #333;
+        }
+
+        .post-details-p {
+            margin-top: 25px;
+            color: #555;
+            border-left: 2px solid #dbdddc;
+            padding-left: 10px;
+        }
+
+        .info-4 {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .sidebar {
+            flex: 1 1 20%;
+            max-width: 100%;
+            margin-left: 80px;
+            text-align: center;
+        }
+
+        .sidebar .support-button {
+            margin-bottom: 40px;
+            width: 200px;
+        }
+
+        .support-button button {
+            font-weight: 600;
+            background-color: #71bca3;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            /*鼠標移入時變化*/
+            height: 100px;
+            width: 200px;
+            box-shadow: 0px 2px 2px #444
+        }
+
+
+        .support-button button:hover {
+            background-color: #68a66b;
+        }
+
+        .advertisement {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .advertisement img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+
+        .edit-button {
+            width: 100%;
+            text-align: center;
+            margin: 30px auto;
+        }
+
+        .edit-button button {
+            background-color: #edeeef;
+            color: rgb(63, 63, 63);
+            width: 90%;
+            height: 70px;
+            font-size: 20px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0px 2px 2px #bbb7b7
+        }
+
+        .edit-button button:hover {
+            background-color: #cecccc;
+        }
+
+        .rescue-details {
+            margin-top: 70px;
+            border: 5px solid transparent;
+            /* 透明的邊框 */
+            border-image: repeating-linear-gradient(50deg, rgb(194, 188, 161) 0, rgb(224, 218, 191) 20px, transparent 10px, transparent 30px) 80;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .rescue-reason {
+            border-bottom: 1px solid #ddd;
+        }
+
+        .rescue-reason-p {
+            margin: 30px;
+        }
+
+        .rescue-reason h3 {
+            font-weight: 500
+        }
+
+        .rescue-progress {
+            margin: 30px 0;
+        }
+
+        .rescue-progress h3 {
+            font-weight: 500
+        }
+
+        .comments-section {
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .comments-section h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .comments-section textarea {
+            width: 100%;
+            height: 80px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: none;
+        }
+
+        .comments-section button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .comments-section button:hover {
+            background-color: #0056b3;
+        }
+
+        .share-buttons {
+            width: 100%;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .share-buttons a {
+            display: inline-block;
+            margin: 0 10px;
+            text-decoration: none;
+            font-size: 16px;
+            color: #007bff;
+        }
+
+        .share-buttons a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <img src="images/logo.png" alt="浪途 Logo">
+                <h1>浪途</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#">首頁</a></li>
+                <li><a href="#">關於我們</a></li>
+                <li><a href="#">通報案件</a></li>
+                <li><a href="#">救援活動</a></li>
+                <li><a href="#">購物商城</a></li>
+                <li><a href="#">會員登入</a></li>
+            </ul>
+        </div>
+    </header>
+    <div class="container">
+        <div class="post-header">
+            <h2>[台南市東區] 幫忙抓流浪貓結紮</h2>
+        </div>
+        <div class="second-container">
+            <div>
+                <div class="post">
+                    <div class="post-image">
+                        <img src="/images/meow1.jpg" alt="流浪貓照片">
+                    </div>
+                    <div class="post-details">
+                        <div class="info">
+                            <div class="post-id">
+                                案件編號: R173506041235
+                            </div>
+                            <div class="views">
+                                瀏覽數: 36
+                            </div>
+                        </div>
+                        <div class="info-3">
+                            <p>發佈日期: 2024-11-24</p>
+                            <p>結案日期: 2024-12-24</p>
+                        </div>
+                        <div class="tag">
+                            等待救援
+                        </div>
+                        <h3>[台南市東區] 幫忙抓流浪貓結紮</h3>
+                        <div class="post-details-p">
+                            <p>動物類別：貓</p>
+                            <p>動物數量：1</p>
+                            <p>地點：台南市東區</p>
+                            <p>救援需求：尋求誘捕協助 尋求抓紮協助 </p>
+                            <p>通報人可負擔事項：醫療費用</p>
+                        </div>
+                        <div class="info-4">
+                            <p>發文者: 陳小美</p>
+                            <p>觀看:54</p>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="edit-button">
+                    <button>要求共同編輯權限</button>
+                </div>
+                <div class="share-buttons">
+                    <a href="#">分享至 Facebook</a>
+                    <a href="#">分享至 Line</a>
+                    <a href="#">分享至 Twitter</a>
+                </div>
+                <div class="rescue-details">
+                    <div class="rescue-reason">
+                        <h3>救援原因</h3>
+                        <div class="rescue-reason-p">
+                            <p>母貓12/7出現無食慾現象，8日再出現已經掛著黏稠口水，胸前毛都濕了，嘗試濕食但咬了一口就掉出來且會用前腳撥嘴巴，9日嘴上依然掛著濃稠口水。
+                                以前用誘捕籠抓過她去絕育，嘗試再用似乎效益不彰，希望能夠幫忙</p>
+                        </div>
+
+                    </div>
+                    <div class="rescue-progress">
+                        <h3>救援進度</h3>
+
+                    </div>
+
+                </div>
+                <div class="comments-section">
+                    <h3>留言區</h3>
+                    <textarea placeholder="新增留言..."></textarea>
+                    <button>提交留言</button>
+                </div>
+            </div>
+            <div class="sidebar">
+                <div class="support-button">
+                    <button>新增救援資訊</button>
+                </div>
+                <div class="advertisement">
+                    <p>工商</p>
+                    <img src="ad.jpg" alt="廣告圖片">
+                </div>
+            </div>
+        </div>
+</body>
+
+</html>
