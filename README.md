@@ -13,3 +13,6 @@ SSMS
 
 
 Azure
+
+網站主色
+https://coolors.co/palette/d0ccd0-c6bc77-fffd77-feba07
