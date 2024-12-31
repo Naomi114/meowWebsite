@@ -26,8 +26,20 @@
 
 - Azure 雲端資料庫
 
+# 安裝插件 plugin
+## Chrome
+- Wappalyzer: 查看網頁使用的前後端技術
+![image](https://www.notion.so/Vue-JS-1602af478a2d80ee8feffb5a4d6c251b?pvs=4#1652af478a2d80278fe7c8de73f5bdaf)
+
+## VS code
+- Vue official
+- Vue 3 support - All in One：提示函式庫
+- Path autocomplete
+- Auto rename tag
+- indent rainbow: 顏色標記階層 (白色視窗會比較明顯)
+
 # 專案初始設定
-## Spring Boot 建立 Maven 專案
+## 建立 Spring Boot Maven 專案
 1. 編碼規則 encoding= UTF-8
 2. 使用 application.yml
 3. 加入相關儲存庫依賴 pom.xml
@@ -40,4 +52,10 @@
 
    ### 範例: ![image](https://github.com/user-attachments/assets/99c698ff-2f17-467f-a6d1-8dd25f1812c9)
 
-## 建立 Vue-project 專案
+## 建立 Vue 專案相關語法
+1. 產生專案: `npm create vue@latest`
+2. 初始專案: `npm install`
+3. 安裝前端路由套件: `npm install vue-router@4`
+4. 測試專案: `npm run dev`
+5. 安裝bootstrap網站到覽列: `npm install bootstrap@5`
+
