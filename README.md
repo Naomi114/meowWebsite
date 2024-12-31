@@ -1,7 +1,12 @@
+<p align="center">
+    <img src="[https://raw.githubusercontent.com/badges/shields/master/readme-logo.svg?sanitize=true](https://coolors.co/palette/d0ccd0-c6bc77-fffd77-feba07)"
+        height="100">
+</p>
+
 # 待辦事項
 - 網站名稱未決定
 - 網站主色
-[網站主色]: https://coolors.co/palette/d0ccd0-c6bc77-fffd77-feba07
+
 - SQL 資料庫初始化資料連結
 - 假資料製作
 
@@ -27,16 +32,15 @@
 - Azure 雲端資料庫
 
 # 安裝插件 plugin
-## Chrome
-- Wappalyzer: 查看網頁使用的前後端技術
-![image](https://www.notion.so/Vue-JS-1602af478a2d80ee8feffb5a4d6c251b?pvs=4#1652af478a2d80278fe7c8de73f5bdaf)
+- Chrome
+  - Wappalyzer: 查看網頁使用的前後端技術
 
-## VS code
-- Vue official
-- Vue 3 support - All in One：提示函式庫
-- Path autocomplete
-- Auto rename tag
-- indent rainbow: 顏色標記階層 (白色視窗會比較明顯)
+- VS code
+  - Vue official
+  - Vue 3 support - All in One：提示函式庫
+  - Path autocomplete
+  - Auto rename tag
+  - indent rainbow: 顏色標記階層 (白色視窗會比較明顯)
 
 # 專案初始設定
 ## 建立 Spring Boot Maven 專案
@@ -58,3 +62,8 @@
 3. 安裝前端路由套件: `npm install vue-router@4`
 4. 安裝bootstrap網站到覽列: `npm install bootstrap@5`
 5. 測試專案: `npm run dev`
+
+
+## 建立連線
+- 不能設定localhost 8080, 如何連線到專題報告的教室電腦?? (restful 會教 by 馬老師 20241231)
+- 使用https開頭，建立安全連線: 申請 SSL 憑證 (ref. Azure 課程) 
