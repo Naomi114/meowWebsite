@@ -53,6 +53,13 @@
    -  spring-boot-starter-web
    -  spring-boot-tomcat
    -  mssql-jdbc
+4. 和 Vue 有關的儲存庫依賴
+   - nimbus-jose-jwt
+   <dependency>
+	    <groupId>com.nimbusds</groupId>
+	    <artifactId>nimbus-jose-jwt</artifactId>
+	    <version>9.48</version>
+    </dependency>
 
    ### 範例: ![image](https://github.com/user-attachments/assets/99c698ff-2f17-467f-a6d1-8dd25f1812c9)
 
