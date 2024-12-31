@@ -56,6 +56,5 @@
 1. 產生專案: `npm create vue@latest`
 2. 初始專案: `npm install`
 3. 安裝前端路由套件: `npm install vue-router@4`
-4. 測試專案: `npm run dev`
-5. 安裝bootstrap網站到覽列: `npm install bootstrap@5`
-
+4. 安裝bootstrap網站到覽列: `npm install bootstrap@5`
+5. 測試專案: `npm run dev`
