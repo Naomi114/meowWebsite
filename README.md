@@ -1,9 +1,15 @@
-# 待辦事項
-- 網站名稱未決定
-- 網站主色
+# UI 美編風格
+- 網站名稱(未決定)
+- 字型統一????
+- 網站主色 
+<img width="800" alt="100" src="https://github.com/user-attachments/assets/4511bc74-5cb9-4810-8ac6-31eb200037fb" />
 
-- SQL 資料庫初始化資料連結
-- 假資料製作
+| 分類         | 範例參考                          |
+| ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| 主視覺       | <img width="800" alt="image" src="https://github.com/user-attachments/assets/f400c4d8-f286-4b15-b60e-d6907786a385" /> |
+| 圖表設計     | <img width="800" alt="image" src="https://github.com/user-attachments/assets/8fe0876e-5610-42e2-8688-91282e1003d7" />     |
+| icon 符號    | <img width="869" alt="image" src="https://github.com/user-attachments/assets/77ea0699-19dc-4cc9-ad15-1915a10e1fb2" />   |
+|
 
 # 開發工具及版本設定
 
@@ -24,6 +30,9 @@
 - SSMS 資料庫管理工具
   - 版本: 20.2.30.0
   - 編碼規則 encoding= UTF-8
+  - database 名稱: meow(??)
+  - 登入: ?????
+  - 密碼: ?????
 
 - Azure 雲端資料庫
 
