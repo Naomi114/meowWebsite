@@ -1,8 +1,3 @@
-<p align="center">
-    <img src="[https://raw.githubusercontent.com/badges/shields/master/readme-logo.svg?sanitize=true](https://coolors.co/palette/d0ccd0-c6bc77-fffd77-feba07)"
-        height="100">
-</p>
-
 # 待辦事項
 - 網站名稱未決定
 - 網站主色
@@ -19,14 +14,15 @@
 - VS code
   - 版本: 1.93.1 (system setup)
   - 認可: 38c31bc77e0dd6ae88a4e9cc93428cc27a56ba40
-  -日期: 2024-09-11T17:20:05.685Z
+  - 日期: 2024-09-11T17:20:05.685Z
   - Electron: 30.4.0
   - ElectronBuildId: 10073054
   - Chromium: 124.0.6367.243
-  - Node.js: 20.15.1
+  - Node.js: 18.20.5
   - OS: Windows_NT x64 10.0.19045
 
 - SSMS 資料庫管理工具
+  - 版本: 20.2.30.0
   - 編碼規則 encoding= UTF-8
 
 - Azure 雲端資料庫
@@ -46,20 +42,14 @@
 ## 建立 Spring Boot Maven 專案
 1. 編碼規則 encoding= UTF-8
 2. 使用 application.yml
-3. 加入相關儲存庫依賴 pom.xml
+3. 加入相關儲存庫依賴 pom.xml (將範例檔丟上來!
    -  spring-boot-starter
    -  spring-boot-devtools
    -  spring-boot-starter-data-jpa
    -  spring-boot-starter-web
    -  spring-boot-tomcat
    -  mssql-jdbc
-4. 和 Vue 有關的儲存庫依賴
-   - nimbus-jose-jwt
-   <dependency>
-	    <groupId>com.nimbusds</groupId>
-	    <artifactId>nimbus-jose-jwt</artifactId>
-	    <version>9.48</version>
-    </dependency>
+   -  nimbus-jose-jwt (V 9.48)
 
    ### 範例: ![image](https://github.com/user-attachments/assets/99c698ff-2f17-467f-a6d1-8dd25f1812c9)
 
