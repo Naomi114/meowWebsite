@@ -70,6 +70,13 @@
 5. 測試專案: `npm run dev`
 
 
-## 建立連線
+## 正式上線部署
 - 不能設定localhost 8080, 如何連線到專題報告的教室電腦?? (restful 會教 by 馬老師 20241231)
 - 使用https開頭，建立安全連線: 申請 SSL 憑證 (ref. Azure 課程) 
+
+-後端部署：Vscode SpringBoot專案
+ - 打包war檔步驟（ref. 影片202501031400-）
+
+- 前端部署：Vscode Vue專案
+ - 使用 Nginx Server（ref.2025010311420）
+
