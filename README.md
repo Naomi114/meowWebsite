@@ -30,9 +30,9 @@
 - SSMS 資料庫管理工具
   - 版本: 20.2.30.0
   - 編碼規則 encoding= UTF-8
-  - database 名稱: meow(??)
-  - 登入: ?????
-  - 密碼: ?????
+  - database 名稱: meowdb
+  - 登入: admin
+  - 密碼: a123
 
 - Azure 雲端資料庫
 
@@ -52,15 +52,16 @@
 1. 編碼規則 encoding= UTF-8
 2. 使用 application.yml
 3. 加入相關儲存庫依賴 pom.xml (將範例檔丟上來!
+   -  json (v20240303)
    -  spring-boot-starter
    -  spring-boot-devtools
    -  spring-boot-starter-data-jpa
    -  spring-boot-starter-web
    -  spring-boot-tomcat
    -  mssql-jdbc
-   -  nimbus-jose-jwt (V 9.48)
+   -  nimbus-jose-jwt (v9.48)
 
-   ### 範例: ![image](https://github.com/user-attachments/assets/99c698ff-2f17-467f-a6d1-8dd25f1812c9)
+   ### 建立 Maven 專案畫面 ![image](https://github.com/user-attachments/assets/ab4a50bc-318f-4308-ad64-a7701e04b2ff)
 
 ## 建立 Vue 專案相關語法
 1. 產生專案: `npm create vue@latest`
@@ -74,9 +75,9 @@
 - 不能設定localhost 8080, 如何連線到專題報告的教室電腦?? (restful 會教 by 馬老師 20241231)
 - 使用https開頭，建立安全連線: 申請 SSL 憑證 (ref. Azure 課程) 
 
--後端部署：Vscode SpringBoot專案
- - 打包war檔步驟（ref. 影片202501031400-）
+- 後端部署：Vscode SpringBoot專案
+  - 打包war檔步驟（ref. 影片 202501031400）
 
 - 前端部署：Vscode Vue專案
- - 使用 Nginx Server（ref.2025010311420）
+  - 使用 Nginx Server（ref.影片 2025010311420）
 
