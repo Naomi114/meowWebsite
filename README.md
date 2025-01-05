@@ -70,6 +70,8 @@
 4. 安裝bootstrap網站到覽列: `npm install bootstrap@5`
 5. 測試專案: `npm run dev`
 
+### ![projfinal-front 建立設定](image.png)
+
 
 ## 正式上線部署
 - 不能設定localhost 8080, 如何連線到專題報告的教室電腦?? (restful 會教 by 馬老師 20241231)

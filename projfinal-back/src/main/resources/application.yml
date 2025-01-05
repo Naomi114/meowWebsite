@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: projfinal-meow
+
+  profiles:
+    active: "@xxxx@"
+
+  #資料庫連線設定
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://localhost:1433;database=moewdb;trustServerCertificate=true
+    username: admin
+    password: a123
+
+  #Hibernate/JPA的相關設定
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.SQLServerDialect
+    hibernate:
+      ddl-auto: validate
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+  #conosle顏色
+  output:
+    ansi:
+      enabled: always
+
+  jackson:
+    date-format: "yyyy-MM-dd"
+    time-zone: Asia/Taipei
+
+jwt:
+  token:
+    expire: 10
