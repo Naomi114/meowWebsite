@@ -8,7 +8,7 @@ spring:
   #資料庫連線設定
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://localhost:1433;database=moewdb;trustServerCertificate=true
+    url: jdbc:sqlserver://localhost:1433;database=meowdb;trustServerCertificate=true
     username: admin
     password: a123
 
