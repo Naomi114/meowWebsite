@@ -1,4 +1,4 @@
-package profinalMeow.domain;
+package tw.com.ispan.projfinal_back.domain.pet;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
