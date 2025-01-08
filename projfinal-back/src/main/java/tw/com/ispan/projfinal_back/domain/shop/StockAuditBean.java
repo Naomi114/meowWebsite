@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "stockAudit")
-public class StockAudit {
+public class StockAuditBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer auditId;
@@ -35,10 +35,10 @@ public class StockAudit {
     @JoinColumn(name = "inventoryId", nullable = false)
     private InventoryBean inventory;
 
-    public StockAudit() {
+    public StockAuditBean() {
     }
 
-    public StockAudit(Integer auditId, Date auditDate, Integer quantityBefore, Integer quantityAfter,
+    public StockAuditBean(Integer auditId, Date auditDate, Integer quantityBefore, Integer quantityAfter,
             ProductBean product, InventoryBean inventory) {
         this.auditId = auditId;
         this.auditDate = auditDate;

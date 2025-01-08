@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.domain;
+package tw.com.ispan.projfinal_back.domain.shop;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.domain;
+package tw.com.ispan.projfinal_back.domain.admin;
 
 import java.util.List;
 
@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import tw.com.ispan.projfinal_back.domain.shop.Order;
 
 @Entity
 @Table(name = "Member")
