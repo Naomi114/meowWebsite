@@ -17,32 +17,37 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "inventory")
-public class InventoryBean {
+@Table(name = "Discount")
+public class Discount {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer inventoryId;
-
-    @Column(nullable = false)
-    private Integer quantity;
-
-    private String diffReason;
-
-    @Column(nullable = false)
-    private String inventoryStatus;
-
-    @Column(nullable = false)
-    private LocalDateTime checkAt;
-
-    @Column(nullable = false)
-    private LocalDateTime endAt;
+    private Integer discountId;
 
     @ManyToOne
     @JoinColumn(name = "adminId", nullable = false)
     private Admin admin;
 
-    @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StockAudit> stockAudits;
+    @Column(nullable = false)
+    private LocalDateTime discountStartTime;
 
-    // Getters and Setters
+    @Column(nullable = false)
+    private LocalDateTime discountEndTime;
+
+    private Double minAmount;
+
+    private Integer minQuantity;
+
+    private Integer priority;
+
+    private String discountStatus;
+
+    private String discountType;
+
+    private Double discountValue;
+
+    @OneToMany(mappedBy = "discount", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DiscountScope> discountScopes;
+
+    // Constructors, getters, setters, toString()
 }

@@ -1,20 +1,22 @@
 package tw.com.ispan.projfinal_back.domain;
 
-import jakarta.persistence.Entity;
+import java.io.Serializable;
 
 import javax.swing.text.html.HTML.Tag;
 
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "productTag")
-public class ProductTagBean {
+public class ProductTag {
 
     @EmbeddedId
-    private ProductTagId id;  // Use the embeddable class for the composite key
+    private ProductTagId id; // Change from ProductTagBean to ProductTagId
 
     @ManyToOne
     @MapsId("productId")
@@ -26,3 +28,4 @@ public class ProductTagBean {
 
     // Getters and Setters
 }
+
