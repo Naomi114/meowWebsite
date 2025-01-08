@@ -14,15 +14,13 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "banner")
-public class BannerBean {
+public class ProductBannerBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer bannerId;
 
     @Column(nullable = false)
     private String bannerTitle;
-
-    private String bannerDescription;
 
     @Column(nullable = false)
     private String bannerImageUrl;

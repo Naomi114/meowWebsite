@@ -1,93 +1,66 @@
 package tw.com.ispan.projfinal_back.domain.pet;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-@Table(name="distint")
-@Entity(name="Distint")
+@Entity
+@Table(name = "Distint")
 public class Distint {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int casePictureId ;
-	
-	private int rescueCaseId;
-	
-	private int lostCaseId;
-	
-	private int adoptionCaseId;
-	
-	private String pictureUrl;
 
-	
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer distintId;
+
+    @Column(columnDefinition = "NVARCHAR(5)", name = "distintName", nullable = false)
+    private String distintName;
+
+    
+    //和RescueCase表雙向一對多
+    @OneToMany(mappedBy = "distintId", cascade = CascadeType.PERSIST)
+    private List<RescueCase> rescueCases;
+    
 	public Distint() {
 		super();
 	}
 
-
-	public Distint(int casePictureId, int rescueCaseId, int lostCaseId, int adoptionCaseId, String pictureUrl) {
+	public Distint(Integer distintId, String distintName) {
 		super();
-		this.casePictureId = casePictureId;
-		this.rescueCaseId = rescueCaseId;
-		this.lostCaseId = lostCaseId;
-		this.adoptionCaseId = adoptionCaseId;
-		this.pictureUrl = pictureUrl;
+		this.distintId = distintId;
+		this.distintName = distintName;
 	}
 
-
-	public int getCasePictureId() {
-		return casePictureId;
+	public Integer getDistintId() {
+		return distintId;
 	}
 
-
-	public void setCasePictureId(int casePictureId) {
-		this.casePictureId = casePictureId;
+	public void setDistintId(int distintId) {
+		this.distintId = distintId;
 	}
 
-
-	public int getRescueCaseId() {
-		return rescueCaseId;
+	public String getDistintName() {
+		return distintName;
 	}
 
-
-	public void setRescueCaseId(int rescueCaseId) {
-		this.rescueCaseId = rescueCaseId;
+	public void setDistintName(String distintName) {
+		this.distintName = distintName;
 	}
 
-
-	public int getLostCaseId() {
-		return lostCaseId;
+	public List<RescueCase> getRescueCases() {
+		return rescueCases;
 	}
 
-
-	public void setLostCaseId(int lostCaseId) {
-		this.lostCaseId = lostCaseId;
+	public void setRescueCases(List<RescueCase> rescueCases) {
+		this.rescueCases = rescueCases;
 	}
-
-
-	public int getAdoptionCaseId() {
-		return adoptionCaseId;
-	}
-
-
-	public void setAdoptionCaseId(int adoptionCaseId) {
-		this.adoptionCaseId = adoptionCaseId;
-	}
-
-
-	public String getPictureUrl() {
-		return pictureUrl;
-	}
-
-
-	public void setPictureUrl(String pictureUrl) {
-		this.pictureUrl = pictureUrl;
-	}
+    
 	
-	
-	
-	
+
 }

@@ -8,7 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -23,23 +23,23 @@ public class TagBean {
 
     private String tagDescription;
 
-    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductTagBean> productTags;
+    @ManyToMany(mappedBy = "tags", cascade = CascadeType.ALL)
+    private List<ProductBean> products;
 
     public TagBean() {
     }
 
-    public TagBean(Integer tagId, String tagName, String tagDescription, List<ProductTagBean> productTags) {
+    public TagBean(Integer tagId, String tagName, String tagDescription, List<ProductBean> products) {
         this.tagId = tagId;
         this.tagName = tagName;
         this.tagDescription = tagDescription;
-        this.productTags = productTags;
+        this.products = products;
     }
 
     @Override
     public String toString() {
-        return "TagBean [tagId=" + tagId + ", tagName=" + tagName + ", tagDescription=" + tagDescription
-                + ", productTags=" + productTags + "]";
+        return "TagBean [tagId=" + tagId + ", tagName=" + tagName + ", tagDescription=" + tagDescription + ", products="
+                + products + "]";
     }
 
     public Integer getTagId() {
@@ -66,12 +66,13 @@ public class TagBean {
         this.tagDescription = tagDescription;
     }
 
-    public List<ProductTagBean> getProductTags() {
-        return productTags;
+    public List<ProductBean> getProducts() {
+        return products;
     }
 
-    public void setProductTags(List<ProductTagBean> productTags) {
-        this.productTags = productTags;
+    public void setProducts(List<ProductBean> products) {
+        this.products = products;
     }
+   
 }
 
