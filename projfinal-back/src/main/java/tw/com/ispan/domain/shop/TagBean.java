@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.domain.shop;
+package tw.com.ispan.domain.shop;
 
 import java.util.List;
 
@@ -73,6 +73,5 @@ public class TagBean {
     public void setProducts(List<ProductBean> products) {
         this.products = products;
     }
-   
-}
 
+}

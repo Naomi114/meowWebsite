@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.domain.admin;
+package tw.com.ispan.domain.admin;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import tw.com.ispan.projfinal_back.domain.shop.Order;
+import tw.com.ispan.domain.shop.Order;
 
 @Entity
 @Table(name = "Member")
@@ -24,7 +24,7 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders;
 
-    @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     private List<RescueCase> rescueCases;
 
     // Constructors, getters, setters, toString()

@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.domain.shop;
+package tw.com.ispan.domain.shop;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class ProductCategoryBean {
 
     @OneToMany(mappedBy = "productCategory", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<ProductBean> products;
-  
+
     public ProductCategoryBean() {
     }
 
@@ -89,5 +89,4 @@ public class ProductCategoryBean {
         this.products = products;
     }
 
-    
 }

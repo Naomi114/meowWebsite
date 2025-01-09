@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.service;
+package tw.com.ispan.service;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import tw.com.ispan.projfinal_back.domain.admin.Member;
-import tw.com.ispan.projfinal_back.repository.admin.MemberRepository;
+import tw.com.ispan.domain.admin.Member;
+import tw.com.ispan.repository.admin.MemberRepository;
 
 @Service
 @Transactional

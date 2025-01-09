@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.domain.pet;
+package tw.com.ispan.domain.pet;
 
 import jakarta.persistence.*;
 
@@ -13,8 +13,7 @@ public class CasePicture {
 	@Column(name = "pictureUrl", length = 255, nullable = false)
 	private String pictureUrl;
 
-	
-	//Constructor
+	// Constructor
 	public CasePicture() {
 		super();
 	}
@@ -41,6 +40,5 @@ public class CasePicture {
 	public void setPictureUrl(String pictureUrl) {
 		this.pictureUrl = pictureUrl;
 	}
-	
-	
+
 }

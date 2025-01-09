@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.domain.pet;
+package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
@@ -15,18 +15,17 @@ import jakarta.persistence.Table;
 @Table(name = "Distint")
 public class Distint {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer distintId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer distintId;
 
-    @Column(columnDefinition = "NVARCHAR(5)", name = "distintName", nullable = false)
-    private String distintName;
+	@Column(columnDefinition = "NVARCHAR(5)", name = "distintName", nullable = false)
+	private String distintName;
 
-    
-    //和RescueCase表雙向一對多
-    @OneToMany(mappedBy = "distintId", cascade = CascadeType.PERSIST)
-    private List<RescueCase> rescueCases;
-    
+	// 和RescueCase表雙向一對多
+	@OneToMany(mappedBy = "distintId", cascade = CascadeType.PERSIST)
+	private List<RescueCase> rescueCases;
+
 	public Distint() {
 		super();
 	}
@@ -60,7 +59,5 @@ public class Distint {
 	public void setRescueCases(List<RescueCase> rescueCases) {
 		this.rescueCases = rescueCases;
 	}
-    
-	
 
 }
