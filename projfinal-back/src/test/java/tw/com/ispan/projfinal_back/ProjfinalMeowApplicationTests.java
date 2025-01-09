@@ -1,10 +1,10 @@
-package tw.com.ispan.projfinal_meow;
+package tw.com.ispan.projfinal_back;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ProjfinalMeowApplicationTests {
+class ProjfinalBackApplicationTests {
 
 	@Test
 	void contextLoads() {

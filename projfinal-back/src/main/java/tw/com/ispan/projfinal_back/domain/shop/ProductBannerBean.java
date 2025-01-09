@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.domain;
+package tw.com.ispan.projfinal_back.domain.shop;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -14,15 +14,13 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "banner")
-public class BannerBean {
+public class ProductBannerBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer bannerId;
 
     @Column(nullable = false)
     private String bannerTitle;
-
-    private String bannerDescription;
 
     @Column(nullable = false)
     private String bannerImageUrl;
