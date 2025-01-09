@@ -10,13 +10,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import w.com.ispan.domain.shop.Order;
+import tw.com.ispan.domain.pet.Activity;
+import tw.com.ispan.domain.pet.ActivityParticipantList;
+import tw.com.ispan.domain.pet.Follow;
+import tw.com.ispan.domain.pet.RescueCase;
 
 @Entity
 @Table(name = "Member")
 public class Member {
     @Id
-    @GeeratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer memberId;
     // Othe ields rel
 

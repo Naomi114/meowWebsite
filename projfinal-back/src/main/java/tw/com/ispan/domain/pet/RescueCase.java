@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.domain.pet;
+package tw.com.ispan.domain.pet;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,7 +19,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import tw.com.ispan.projfinal_back.domain.admin.Member;
+import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.projfinal_back.domain.pet.forRescue.CanAfford;
 import tw.com.ispan.projfinal_back.domain.pet.forRescue.RescueDemand;
 import tw.com.ispan.projfinal_back.domain.pet.forRescue.RescueProgress;

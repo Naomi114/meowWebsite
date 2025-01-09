@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.domain.pet;
+package tw.com.ispan.domain.pet;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -14,7 +14,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import tw.com.ispan.projfinal_back.domain.admin.Member;
+import tw.com.ispan.domain.admin.Member;
 
 @Entity
 @Table(name = "Activity")
