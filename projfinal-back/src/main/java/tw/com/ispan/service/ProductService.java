@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.service;
+package tw.com.ispan.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import tw.com.ispan.domain.ProductBean;
-import tw.com.ispan.repository.ProductRepository;
+import tw.com.ispan.domain.shop.ProductBean;
+import tw.com.ispan.repository.shop.ProductRepository;
 import tw.com.ispan.util.DatetimeConverter;
 
 @Service

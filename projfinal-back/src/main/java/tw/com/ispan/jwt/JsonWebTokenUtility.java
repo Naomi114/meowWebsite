@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.jwt;
+package tw.com.ispan.jwt;
 
 import java.security.SecureRandom;
 import java.time.Instant;

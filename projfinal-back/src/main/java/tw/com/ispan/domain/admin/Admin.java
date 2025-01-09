@@ -1,5 +1,5 @@
-package tw.com.ispan.projfinal_back.domain.admin;
+package tw.com.ispan.domain.admin;
 
 public class Admin {
-    
+
 }

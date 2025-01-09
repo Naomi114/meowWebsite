@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.jwt;
+package tw.com.ispan.jwt;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.domain.shop;
+package tw.com.ispan.domain.shop;
 
 import java.time.LocalDateTime;
 import java.util.List;

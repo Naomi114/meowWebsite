@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back.domain.shop;
+package tw.com.ispan.domain.shop;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,7 +19,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import tw.com.ispan.projfinal_back.domain.admin.Admin;
+import tw.com.ispan.domain.admin.Admin;
 
 @Entity
 @Table(name = "product")
