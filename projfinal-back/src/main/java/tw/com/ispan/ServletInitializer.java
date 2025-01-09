@@ -1,4 +1,4 @@
-package tw.com.ispan.projfinal_back;
+package tw.com.ispan;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
