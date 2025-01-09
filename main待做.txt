@@ -1,0 +1,8 @@
+[冠儒]
+1. 在 LostCase 類別中新增與 Follow 的關聯：
+ @OneToMany(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Follow> follows;
+
+2. 在 AdoptionCase 類別中新增與 Follow 的關聯：
+ @OneToMany(mappedBy = "adoptionCase", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Follow> follows;
