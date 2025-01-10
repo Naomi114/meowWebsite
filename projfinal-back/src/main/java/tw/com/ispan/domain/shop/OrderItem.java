@@ -1,6 +1,4 @@
-package tw.com.ispan.projfinal_back.domain.shop;
-
-import java.time.LocalDateTime;
+package tw.com.ispan.domain.shop;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,26 +8,28 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import tw.com.ispan.projfinal_back.domain.admin.Member;
 
 @Entity
-@Table(name = "wishlist")
-public class WishListBean {
+@Table(name = "OrderItem")
+public class OrderItem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer wishlistId;
+    private Integer orderItemId;
 
     @ManyToOne
-    @JoinColumn(name = "memberId", nullable = false)
-    private Member member;
+    @JoinColumn(name = "orderId", nullable = false)
+    private Order order;
 
     @ManyToOne
     @JoinColumn(name = "productId", nullable = false)
     private ProductBean product;
 
     @Column(nullable = false)
-    private LocalDateTime addedAt;
+    private Integer orderQuantity;
 
-    // Getters and Setters
+    @Column(nullable = false)
+    private Double purchasedPrice;
+
+    // Constructors, getters, setters, toString()
 }
-
