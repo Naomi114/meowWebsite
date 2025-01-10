@@ -29,8 +29,8 @@ public class ProductDAOImpl implements ProductDAO {
 	public Long count(JSONObject param) {
 		Integer productId = param.isNull("productId") ? null : param.getInt("productId");
 		String productName = param.isNull("productName") ? null : param.getString("productName");
-		Double priceMin = param.isNull("priceMin") ? null : param.getDouble("priceMin");
-		Double priceMax = param.isNull("priceMax") ? null : param.getDouble("priceMax");
+		BigDecimal priceMin = param.isNull("priceMin") ? null : param.getBigDecimal("priceMin");
+		BigDecimal priceMax = param.isNull("priceMax") ? null : param.getBigDecimal("priceMax");
 		String createdMin = param.isNull("createdMin") ? null : param.getString("createdMin");
 		String createdMax = param.isNull("createdMax") ? null : param.getString("createdMax");
 

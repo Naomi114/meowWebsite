@@ -21,8 +21,8 @@ public class ProductService {
 
 	public List<ProductBean> select(ProductBean bean) {
 		List<ProductBean> result = null;
-		if (bean != null && bean.getId() != null && !bean.getId().equals(0)) {
-			Optional<ProductBean> optional = productRepository.findById(bean.getId());
+		if (bean != null && bean.getProductId() != null && !bean.getProductId().equals(0)) {
+			Optional<ProductBean> optional = productRepository.findById(bean.getProductId());
 			if (optional.isPresent()) {
 				result = new ArrayList<ProductBean>();
 				result.add(optional.get());
@@ -34,8 +34,8 @@ public class ProductService {
 	}
 
 	public ProductBean insert(ProductBean bean) {
-		if (bean != null && bean.getId() != null) {
-			if (!productRepository.existsById(bean.getId())) {
+		if (bean != null && bean.getProductId() != null) {
+			if (!productRepository.existsById(bean.getProductId())) {
 				return productRepository.save(bean);
 			}
 		}
@@ -43,8 +43,8 @@ public class ProductService {
 	}
 
 	public ProductBean update(ProductBean bean) {
-		if (bean != null && bean.getId() != null) {
-			if (productRepository.existsById(bean.getId())) {
+		if (bean != null && bean.getProductId() != null) {
+			if (productRepository.existsById(bean.getProductId())) {
 				return productRepository.save(bean);
 			}
 		}
@@ -52,9 +52,9 @@ public class ProductService {
 	}
 
 	public boolean delete(ProductBean bean) {
-		if (bean != null && bean.getId() != null) {
-			if (productRepository.existsById(bean.getId())) {
-				productRepository.deleteById(bean.getId());
+		if (bean != null && bean.getProductId() != null) {
+			if (productRepository.existsById(bean.getProductId())) {
+				productRepository.deleteById(bean.getProductId());
 				return true;
 			}
 		}
@@ -158,4 +158,13 @@ public class ProductService {
 		}
 		return null;
 	}
+
+	public List<ProductBean> searchByNameOrDescription(String keyword) {
+		return productRepository.findByProductNameContainingOrDescriptionContaining(keyword, keyword);
+	}
+
+	public List<ProductBean> findByCategory(Integer categoryId) {
+		return productRepository.findByProductCategory_CategoryId(categoryId);
+	}
+
 }
