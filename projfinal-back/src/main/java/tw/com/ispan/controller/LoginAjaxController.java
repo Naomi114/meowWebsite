@@ -6,14 +6,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import tw.com.ispan.domain.CustomerBean;
+import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.jwt.JsonWebTokenUtility;
-import tw.com.ispan.service.CustomerService;
+import tw.com.ispan.service.MemberService;
 
 @RestController
-public class LoginAjacController {
+public class LoginAjaxController {
     @Autowired
-    private CustomerService customerService;
+    private MemberService MemberService;
 
     @Autowired
     private JsonWebTokenUtility jsonWebTokenUtility;
@@ -35,7 +35,7 @@ public class LoginAjacController {
         }
 
         // 呼叫Model
-        CustomerBean bean = customerService.login(username, password);
+        Member bean = MemberService.login(username, password);
 
         // 根據Model執行結果決定要呼叫的View
         if (bean == null) {
