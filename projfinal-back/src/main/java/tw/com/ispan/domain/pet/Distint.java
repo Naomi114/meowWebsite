@@ -26,6 +26,9 @@ public class Distint {
 	@OneToMany(mappedBy = "distintId", cascade = CascadeType.PERSIST)
 	private List<RescueCase> rescueCases;
 
+	@OneToMany(mappedBy = "distintId", cascade = CascadeType.ALL)
+	private List<LostCase> lostCases;
+
 	public Distint() {
 		super();
 	}
@@ -58,6 +61,14 @@ public class Distint {
 
 	public void setRescueCases(List<RescueCase> rescueCases) {
 		this.rescueCases = rescueCases;
+	}
+
+	public List<LostCase> getLostCases() {
+		return lostCases;
+	}
+
+	public void setLostCases(List<LostCase> lostCases) {
+		this.lostCases = lostCases;
 	}
 
 }

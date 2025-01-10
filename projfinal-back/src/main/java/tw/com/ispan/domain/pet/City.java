@@ -18,6 +18,9 @@ public class City {
 	@OneToMany(mappedBy = "cityId", cascade = CascadeType.PERSIST)
 	private List<RescueCase> rescueCases;
 
+	@OneToMany(mappedBy = "cityId", cascade = CascadeType.ALL)
+	private List<LostCase> lostCases;
+
 	public City() {
 		super();
 	}
@@ -50,6 +53,14 @@ public class City {
 
 	public void setRescueCases(List<RescueCase> rescueCases) {
 		this.rescueCases = rescueCases;
+	}
+
+	public List<LostCase> getLostCases() {
+		return lostCases;
+	}
+
+	public void setLostCases(List<LostCase> lostCases) {
+		this.lostCases = lostCases;
 	}
 
 }

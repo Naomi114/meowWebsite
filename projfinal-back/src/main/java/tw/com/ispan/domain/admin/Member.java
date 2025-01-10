@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import tw.com.ispan.domain.pet.Activity;
 import tw.com.ispan.domain.pet.ActivityParticipantList;
 import tw.com.ispan.domain.pet.Follow;
+import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.domain.shop.Order;
 
@@ -29,6 +30,9 @@ public class Member {
 
     @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     private List<RescueCase> rescueCases;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<LostCase> lostCases;
 
     @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     private Set<Activity> activity;
