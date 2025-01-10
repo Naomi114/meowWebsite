@@ -98,8 +98,8 @@ public class RescueCase {
 	private Integer donationAmount;
 
 	@Column(name = "viewCount")
-
 	private Integer viewCount;
+
 	@Column(name = "follow")
 	private Integer follow;
 

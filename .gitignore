@@ -1,10 +1,6 @@
 /sts-4.27.0.RELEASE/**
-<<<<<<< HEAD
-
-=======
 .codegpt
 .metadata
->>>>>>> 68657025b987f64d5b1bc2c639d87126f8cac4b3
 /projfinal-frontend/images/*
 
 # Compiled class file

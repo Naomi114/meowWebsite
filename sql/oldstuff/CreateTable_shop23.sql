@@ -1,5 +1,5 @@
 /*建立資料表*/
-USE moewdb
+USE meowdb
 
 -- 建立 productCategory 表
 CREATE TABLE productCategory (
@@ -120,6 +120,20 @@ CREATE TABLE wishlist (
     FOREIGN KEY (memberId) REFERENCES member(memberId),
     FOREIGN KEY (productId) REFERENCES product(productId)
 );
+
+CREATE TABLE Discount (
+        discountId INT PRIMARY KEY,
+        adminId INT NOT NULL,
+        discountStartTime DATETIME2 NOT NULL,  -- Changed to DATETIME2
+        discountEndTime DATETIME2 NOT NULL,    -- Changed to DATETIME2
+        minAmount FLOAT,
+        minQuantity INT,
+        priority INT,
+        discountStatus NVARCHAR(20),
+        discountType NVARCHAR(20),
+        discountValue FLOAT,
+        FOREIGN KEY (adminId) REFERENCES Admin(adminId)
+    );
 
 
 
