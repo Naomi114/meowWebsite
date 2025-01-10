@@ -40,6 +40,7 @@ public class RescueCase {
 	@JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_Member"))
 	private Member member;
 
+	<<<<<<<HEAD
 	// // 關聯到species表，單向多對一
 	// @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	// @JoinColumn(name = "specieId", nullable = false, foreignKey =
@@ -57,8 +58,27 @@ public class RescueCase {
 	// @JoinColumn(name = "furColorId", nullable = false, foreignKey =
 	// @ForeignKey(name = "FK_RescueCase_FurColor"))
 	// private Integer furColorId;
+	=======
+	// // 關聯到species表，單向多對一
+	// @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	// @JoinColumn(name = "specieId", nullable = false, foreignKey =
+	// @ForeignKey(name = "FK_RescueCase_Specie"))
+	// private Integer specieId;
+	//
+	// // 關聯到breed表，單向多對一
+	// @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	// @JoinColumn(name = "breedId", nullable = false, foreignKey = @ForeignKey(name
+	// = "FK_RescueCase_Breed"))
+	// private Integer breedId;
+	//
+	// // 關聯到furColor表，單向多對一
+	// @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	// @JoinColumn(name = "furColorId", nullable = false, foreignKey =
+	// @ForeignKey(name = "FK_RescueCase_FurColor"))
+	// private Integer furColorId;
+	>>>>>>>2898 ae4dfbd868b7702ba1e58e22ad612d9b161a
 
-	@Column(columnDefinition = "NVARCHAR(5)", name = "gender")
+	@Column(columnDefinition="NVARCHAR(5)",name="gender")
 	private String gender;
 
 	@Column(columnDefinition = "NVARCHAR(5)", name = "sterilization", nullable = false)
@@ -98,9 +118,11 @@ public class RescueCase {
 	private Integer donationAmount;
 
 	@Column(name = "viewCount")
-	private Integer viewCount;
+<<<<<<< HEAD
+	private Integer viewCount;=======
+	private Integer viewCount;>>>>>>>2898 ae4dfbd868b7702ba1e58e22ad612d9b161a
 
-	@Column(name = "follow")
+	@Column(name="follow")
 	private Integer follow;
 
 	@Column(name = "publicationTime", nullable = false)
@@ -118,7 +140,32 @@ public class RescueCase {
 	private String rescueReason;
 
 	@Column(name = "caseUrl", length = 255)
-	private String caseUrl;
+	private String caseUrl;<<<<<<<HEAD
+
+	// 關聯到CasePicture表，單向一對多，rescueCaseId外鍵會在CasePicture表中
+	@OneToMany @JoinColumn(name="rescueCaseId",foreignKey=
+	@ForeignKey(name = "FK_CasePicture_RescueCase")
+	)private List<CasePicture> casePictures;
+
+	// 和rescueDemand單向多對多
+	@ManyToMany
+	@JoinTable(name = "RescueCase_RescueDemand", joinColumns = @JoinColumn(name = "rescueCaseId"), inverseJoinColumns = @JoinColumn(name = "rescueDemandId"))
+	private Set<RescueDemand> rescueDemands = new HashSet<>();
+
+	// 和canAfford表為單向多對多(case找去afford)
+	@ManyToMany
+	@JoinTable(name = "CanAfford_RescueCase", joinColumns = @JoinColumn(name = "rescueCaseId"), inverseJoinColumns = @JoinColumn(name = "canAffordId"))
+	private Set<CanAfford> canAffords;
+
+	// 和RescueProgress表單向一對多(case找去RescueProgress)
+	@OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
+	@JoinColumn(name = "rescueCaseId")
+	private Set<RescueProgress> rescueProgresses;
+
+	@OneToMany(mappedBy = "rescueCase", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<Follow> follows;
+
+	=======
 
 	// 關聯到CasePicture表，單向一對多，rescueCaseId外鍵會在CasePicture表中
 	@OneToMany
@@ -143,10 +190,16 @@ public class RescueCase {
 	@OneToMany(mappedBy = "rescueCase", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Follow> follows;
 
+	>>>>>>>2898 ae4dfbd868b7702ba1e58e22ad612d9b161a
+
 	// Hibernate 進行實體的初始化需要用到空參建構子
 	public RescueCase() {
 		super();
 	}
+
+	<<<<<<<HEAD=======
+
+	>>>>>>>2898 ae4dfbd868b7702ba1e58e22ad612d9b161a
 
 	public RescueCase(Integer rescueCaseId, String caseTitle, String gender, String sterilization, Integer age,
 			Integer microChipNumber, boolean suspLost, City cityId, Distint distintId, String street,
@@ -178,6 +231,10 @@ public class RescueCase {
 		this.rescueDemands = rescueDemands;
 	}
 
+	<<<<<<<HEAD=======
+
+	>>>>>>>2898 ae4dfbd868b7702ba1e58e22ad612d9b161a
+
 	public Integer getRescueCaseId() {
 		return rescueCaseId;
 	}
@@ -185,6 +242,10 @@ public class RescueCase {
 	public void setRescueCaseId(Integer rescueCaseId) {
 		this.rescueCaseId = rescueCaseId;
 	}
+
+	<<<<<<<HEAD=======
+
+	>>>>>>>2898 ae4dfbd868b7702ba1e58e22ad612d9b161a
 
 	public String getCaseTitle() {
 		return caseTitle;
@@ -194,6 +255,7 @@ public class RescueCase {
 		this.caseTitle = caseTitle;
 	}
 
+	<<<<<<<HEAD
 	// public Integer getMemberId() {
 	// return memberId;
 	// }
@@ -225,6 +287,39 @@ public class RescueCase {
 	// public void setFurColorId(Integer furColorId) {
 	// this.furColorId = furColorId;
 	// }
+	=======
+	// public Integer getMemberId() {
+	// return memberId;
+	// }
+	//
+	// public void setMemberId(Integer memberId) {
+	// this.memberId = memberId;
+	// }
+
+	// public Integer getSpecieId() {
+	// return specieId;
+	// }
+	//
+	// public void setSpecieId(Integer specieId) {
+	// this.specieId = specieId;
+	// }
+	//
+	// public Integer getBreedId() {
+	// return breedId;
+	// }
+	//
+	// public void setBreedId(Integer breedId) {
+	// this.breedId = breedId;
+	// }
+	//
+	// public Integer getFurColorId() {
+	// return furColorId;
+	// }
+	//
+	// public void setFurColorId(Integer furColorId) {
+	// this.furColorId = furColorId;
+	// }
+	>>>>>>>2898 ae4dfbd868b7702ba1e58e22ad612d9b161a
 
 	public String getGender() {
 		return gender;
@@ -312,7 +407,9 @@ public class RescueCase {
 
 	public void setDonationAmount(Integer donationAmount) {
 		this.donationAmount = donationAmount;
-	}
+	}<<<<<<<HEAD=======
+
+	>>>>>>>2898 ae4dfbd868b7702ba1e58e22ad612d9b161a
 
 	public Integer getViewCount() {
 		return viewCount;
@@ -321,6 +418,10 @@ public class RescueCase {
 	public void setViewCount(Integer viewCount) {
 		this.viewCount = viewCount;
 	}
+
+	<<<<<<<HEAD=======
+
+	>>>>>>>2898 ae4dfbd868b7702ba1e58e22ad612d9b161a
 
 	public Integer getFollow() {
 		return follow;

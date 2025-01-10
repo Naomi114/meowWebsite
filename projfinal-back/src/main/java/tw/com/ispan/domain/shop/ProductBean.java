@@ -28,23 +28,26 @@ public class ProductBean {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer productId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String productName;
 
-    private String productDescription;
+    @Column(nullable = true)
+    private String description;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal productOriginalPrice;
+    private BigDecimal originalPrice;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal productSalePrice;
+    private BigDecimal salePrice;
 
     @Column(nullable = false)
-    private Integer productStock;
+    private Integer stockQuantity;
 
-    private String productUnit;
+    @Column(nullable = true)
+    private String unit;
 
-    private String productStatus;
+    @Column(nullable = true)
+    private String status;
 
     @Column(nullable = false)
     private Date expire;
@@ -79,19 +82,19 @@ public class ProductBean {
     public ProductBean() {
     }
 
-    public ProductBean(Integer productId, String productName, String productDescription,
-            BigDecimal productOriginalPrice, BigDecimal productSalePrice, Integer productStock, String productUnit,
-            String productStatus, Date expire, LocalDateTime createdAt, LocalDateTime updatedAt,
-            ProductCategoryBean productCategory, Admin admin, List<ProductImageBean> productImages, Set<TagBean> tags,
-            List<StockAuditBean> stockAudits, List<WishListBean> wishlists) {
+    public ProductBean(Integer productId, String productName, String description, BigDecimal originalPrice,
+            BigDecimal salePrice, Integer stockQuantity, String unit, String status, Date expire,
+            LocalDateTime createdAt, LocalDateTime updatedAt, ProductCategoryBean productCategory, Admin admin,
+            List<ProductImageBean> productImages, Set<TagBean> tags, List<StockAuditBean> stockAudits,
+            List<WishListBean> wishlists) {
         this.productId = productId;
         this.productName = productName;
-        this.productDescription = productDescription;
-        this.productOriginalPrice = productOriginalPrice;
-        this.productSalePrice = productSalePrice;
-        this.productStock = productStock;
-        this.productUnit = productUnit;
-        this.productStatus = productStatus;
+        this.description = description;
+        this.originalPrice = originalPrice;
+        this.salePrice = salePrice;
+        this.stockQuantity = stockQuantity;
+        this.unit = unit;
+        this.status = status;
         this.expire = expire;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -105,10 +108,9 @@ public class ProductBean {
 
     @Override
     public String toString() {
-        return "ProductBean [productId=" + productId + ", productName=" + productName + ", productDescription="
-                + productDescription + ", productOriginalPrice=" + productOriginalPrice + ", productSalePrice="
-                + productSalePrice + ", productStock=" + productStock + ", productUnit=" + productUnit
-                + ", productStatus=" + productStatus + ", expire=" + expire + ", createdAt=" + createdAt
+        return "ProductBean [productId=" + productId + ", productName=" + productName + ", description=" + description
+                + ", originalPrice=" + originalPrice + ", salePrice=" + salePrice + ", stockQuantity=" + stockQuantity
+                + ", unit=" + unit + ", status=" + status + ", expire=" + expire + ", createdAt=" + createdAt
                 + ", updatedAt=" + updatedAt + ", productCategory=" + productCategory + ", admin=" + admin
                 + ", productImages=" + productImages + ", tags=" + tags + ", stockAudits=" + stockAudits
                 + ", wishlists=" + wishlists + "]";
@@ -130,52 +132,52 @@ public class ProductBean {
         this.productName = productName;
     }
 
-    public String getProductDescription() {
-        return productDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setProductDescription(String productDescription) {
-        this.productDescription = productDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public BigDecimal getProductOriginalPrice() {
-        return productOriginalPrice;
+    public BigDecimal getOriginalPrice() {
+        return originalPrice;
     }
 
-    public void setProductOriginalPrice(BigDecimal productOriginalPrice) {
-        this.productOriginalPrice = productOriginalPrice;
+    public void setOriginalPrice(BigDecimal originalPrice) {
+        this.originalPrice = originalPrice;
     }
 
-    public BigDecimal getProductSalePrice() {
-        return productSalePrice;
+    public BigDecimal getSalePrice() {
+        return salePrice;
     }
 
-    public void setProductSalePrice(BigDecimal productSalePrice) {
-        this.productSalePrice = productSalePrice;
+    public void setSalePrice(BigDecimal salePrice) {
+        this.salePrice = salePrice;
     }
 
-    public Integer getProductStock() {
-        return productStock;
+    public Integer getStockQuantity() {
+        return stockQuantity;
     }
 
-    public void setProductStock(Integer productStock) {
-        this.productStock = productStock;
+    public void setStockQuantity(Integer stockQuantity) {
+        this.stockQuantity = stockQuantity;
     }
 
-    public String getProductUnit() {
-        return productUnit;
+    public String getUnit() {
+        return unit;
     }
 
-    public void setProductUnit(String productUnit) {
-        this.productUnit = productUnit;
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
-    public String getProductStatus() {
-        return productStatus;
+    public String getStatus() {
+        return status;
     }
 
-    public void setProductStatus(String productStatus) {
-        this.productStatus = productStatus;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Date getExpire() {
