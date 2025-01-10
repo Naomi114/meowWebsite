@@ -20,9 +20,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
-import tw.com.ispan.projfinal_back.domain.pet.forRescue.CanAfford;
-import tw.com.ispan.projfinal_back.domain.pet.forRescue.RescueDemand;
-import tw.com.ispan.projfinal_back.domain.pet.forRescue.RescueProgress;
+import tw.com.ispan.domain.pet.forRescue.CanAfford;
+import tw.com.ispan.domain.pet.forRescue.RescueDemand;
+import tw.com.ispan.domain.pet.forRescue.RescueProgress;
 
 @Entity
 @Table(name = "RescueCase")
