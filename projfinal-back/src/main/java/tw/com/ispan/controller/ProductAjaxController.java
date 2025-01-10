@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import tw.com.ispan.domain.ProductBean;
-import tw.com.ispan.dto.ProductResponse;
+import tw.com.ispan.domain.shop.ProductBean;
+// import tw.com.ispan.dto.ProductResponse;
 import tw.com.ispan.service.ProductService;
 import tw.com.ispan.util.DatetimeConverter;
 
