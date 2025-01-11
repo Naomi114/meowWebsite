@@ -2,7 +2,7 @@ package tw.com.ispan.domain.pet.banner;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import tw.com.ispan.domain.RescueCase;
+import tw.com.ispan.domain.pet.RescueCase;
 
 @Entity
 @Table(name = "RescueBanner")
@@ -56,4 +56,3 @@ public class RescueBanner {
         this.rescueCase = rescueCase;
     }
 }
-
