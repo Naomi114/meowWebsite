@@ -60,7 +60,7 @@ public class ProductBean {
 
     @ManyToOne
     @JoinColumn(name = "categoryId", nullable = false)
-    private CategoryBean productCategory;
+    private CategoryBean category;
 
     @ManyToOne
     @JoinColumn(name = "adminId", nullable = false)
@@ -84,7 +84,7 @@ public class ProductBean {
 
     public ProductBean(Integer productId, String productName, String description, BigDecimal originalPrice,
             BigDecimal salePrice, Integer stockQuantity, String unit, String status, Date expire,
-            LocalDateTime createdAt, LocalDateTime updatedAt, CategoryBean productCategory, Admin admin,
+            LocalDateTime createdAt, LocalDateTime updatedAt, CategoryBean category, Admin admin,
             List<ProductImageBean> productImages, Set<TagBean> tags, List<StockAuditBean> stockAudits,
             List<WishListBean> wishlists) {
         this.productId = productId;
@@ -98,7 +98,7 @@ public class ProductBean {
         this.expire = expire;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.productCategory = productCategory;
+        this.category = category;
         this.admin = admin;
         this.productImages = productImages;
         this.tags = tags;
@@ -111,7 +111,7 @@ public class ProductBean {
         return "ProductBean [productId=" + productId + ", productName=" + productName + ", description=" + description
                 + ", originalPrice=" + originalPrice + ", salePrice=" + salePrice + ", stockQuantity=" + stockQuantity
                 + ", unit=" + unit + ", status=" + status + ", expire=" + expire + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt + ", productCategory=" + productCategory + ", admin=" + admin
+                + ", updatedAt=" + updatedAt + ", category=" + category + ", admin=" + admin
                 + ", productImages=" + productImages + ", tags=" + tags + ", stockAudits=" + stockAudits
                 + ", wishlists=" + wishlists + "]";
     }
@@ -160,8 +160,8 @@ public class ProductBean {
         return updatedAt;
     }
 
-    public CategoryBean getProductCategory() {
-        return productCategory;
+    public CategoryBean getCategory() {
+        return category;
     }
 
     public Admin getAdmin() {
@@ -182,6 +182,74 @@ public class ProductBean {
 
     public List<WishListBean> getWishlists() {
         return wishlists;
+    }
+
+    public void setProductId(Integer productId) {
+        this.productId = productId;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setOriginalPrice(BigDecimal originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+
+    public void setSalePrice(BigDecimal salePrice) {
+        this.salePrice = salePrice;
+    }
+
+    public void setStockQuantity(Integer stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setExpire(Date expire) {
+        this.expire = expire;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setCategory(CategoryBean category) {
+        this.category = category;
+    }
+
+    public void setAdmin(Admin admin) {
+        this.admin = admin;
+    }
+
+    public void setProductImages(List<ProductImageBean> productImages) {
+        this.productImages = productImages;
+    }
+
+    public void setTags(Set<TagBean> tags) {
+        this.tags = tags;
+    }
+
+    public void setStockAudits(List<StockAuditBean> stockAudits) {
+        this.stockAudits = stockAudits;
+    }
+
+    public void setWishlists(List<WishListBean> wishlists) {
+        this.wishlists = wishlists;
     }
 
 }

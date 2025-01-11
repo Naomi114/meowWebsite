@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tw.com.ispan.domain.shop.ProductBean;
@@ -121,6 +122,7 @@ public class ProductAjaxController {
 
     @PostMapping("/find")
     public ProductResponse find(@RequestBody String json) {
+
         ProductResponse responseBean = new ProductResponse();
 
         long count = productService.count(json);
@@ -135,4 +137,104 @@ public class ProductAjaxController {
 
         return responseBean;
     }
+
+    @RestController
+    @RequestMapping("/ajax/pages/products")
+    public class ProductAjaxController {
+        @Autowired
+        private ProductService productService;
+
+        // 新增商品
+        @PostMapping
+        public String create(@RequestBody String json) {
+            JSONObject responseJson = new JSONObject();
+            try {
+                ProductBean product = productService.create(json);
+                if (product == null) {
+                    responseJson.put("success", false);
+                    responseJson.put("message", "新增失敗");
+                } else {
+                    responseJson.put("success", true);
+                    responseJson.put("message", "新增成功");
+                    responseJson.put("data", new JSONObject(product));
+                }
+            } catch (Exception e) {
+                responseJson.put("success", false);
+                responseJson.put("message", "資料處理錯誤: " + e.getMessage());
+            }
+            return responseJson.toString();
+        }
+
+        // 修改商品
+        @PutMapping("/{id}")
+        public String modify(@PathVariable Integer id, @RequestBody String json) {
+            JSONObject responseJson = new JSONObject();
+            try {
+                ProductBean product = productService.modify(json);
+                if (product == null) {
+                    responseJson.put("success", false);
+                    responseJson.put("message", "修改失敗");
+                } else {
+                    responseJson.put("success", true);
+                    responseJson.put("message", "修改成功");
+                    responseJson.put("data", new JSONObject(product));
+                }
+            } catch (Exception e) {
+                responseJson.put("success", false);
+                responseJson.put("message", "資料處理錯誤: " + e.getMessage());
+            }
+            return responseJson.toString();
+        }
+
+        // 刪除商品
+        @DeleteMapping("/{id}")
+        public String remove(@PathVariable Integer id) {
+            JSONObject responseJson = new JSONObject();
+            boolean success = productService.remove(id);
+            responseJson.put("success", success);
+            responseJson.put("message", success ? "刪除成功" : "刪除失敗");
+            return responseJson.toString();
+        }
+
+        // 根據 ID 查詢商品
+        @GetMapping("/{id}")
+        public String findById(@PathVariable Integer id) {
+            JSONObject responseJson = new JSONObject();
+            ProductBean product = productService.findById(id);
+            if (product != null) {
+                responseJson.put("success", true);
+                responseJson.put("data", new JSONObject(product));
+            } else {
+                responseJson.put("success", false);
+                responseJson.put("message", "找不到指定商品");
+            }
+            return responseJson.toString();
+        }
+
+        // 查詢所有商品或根據條件查詢
+        @PostMapping("/search")
+        public String search(@RequestBody String json) {
+            JSONObject responseJson = new JSONObject();
+            try {
+                List<ProductBean> products = productService.find(json);
+                responseJson.put("success", true);
+                responseJson.put("data", products);
+            } catch (Exception e) {
+                responseJson.put("success", false);
+                responseJson.put("message", "搜尋失敗: " + e.getMessage());
+            }
+            return responseJson.toString();
+        }
+
+        // 根據關鍵字搜尋
+        @GetMapping("/search/keyword")
+        public String searchByKeyword(@RequestParam("keyword") String keyword) {
+            JSONObject responseJson = new JSONObject();
+            List<ProductBean> products = productService.searchByNameOrDescription(keyword);
+            responseJson.put("success", true);
+            responseJson.put("data", products);
+            return responseJson.toString();
+        }
+    }
+
 }

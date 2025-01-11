@@ -1,6 +1,9 @@
 package tw.com.ispan.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import tw.com.ispan.domain.admin.Admin;
+import tw.com.ispan.domain.shop.CategoryBean;
 import tw.com.ispan.domain.shop.ProductBean;
 import tw.com.ispan.repository.shop.ProductRepository;
 import tw.com.ispan.util.DatetimeConverter;
@@ -19,18 +24,47 @@ public class ProductService {
 	@Autowired
 	private ProductRepository productRepository;
 
-	public List<ProductBean> select(ProductBean bean) {
-		List<ProductBean> result = null;
-		if (bean != null && bean.getProductId() != null && !bean.getProductId().equals(0)) {
-			Optional<ProductBean> optional = productRepository.findById(bean.getProductId());
-			if (optional.isPresent()) {
-				result = new ArrayList<ProductBean>();
-				result.add(optional.get());
-			}
-		} else {
-			result = productRepository.findAll();
+	public ProductBean create(String json) {
+		try {
+			JSONObject obj = new JSONObject(json);
+			String productName = obj.isNull("productName") ? null : obj.getString("productName");
+			String description = obj.isNull("description") ? null : obj.getString("description");
+			BigDecimal originalPrice = obj.isNull("originalPrice") ? null : obj.getBigDecimal("originalPrice");
+			BigDecimal salePrice = obj.isNull("salePrice") ? null : obj.getBigDecimal("salePrice");
+			Integer stockQuantity = obj.isNull("stockQuantity") ? null : obj.getInt("stockQuantity");
+			String unit = obj.isNull("unit") ? null : obj.getString("unit");
+			String status = obj.isNull("status") ? null : obj.getString("status");
+			Date expire = obj.isNull("expire") ? null : new Date(obj.getLong("expire"));
+			LocalDateTime createdAt = LocalDateTime.now();
+			LocalDateTime updatedAt = LocalDateTime.now();
+			Integer categoryId = obj.isNull("categoryId") ? null : obj.getInt("categoryId");
+			Integer adminId = obj.isNull("adminId") ? null : obj.getInt("adminId");
+
+			CategoryBean category = new CategoryBean();
+			category.setCategoryId(categoryId);
+
+			Admin admin = new Admin();
+			admin.setAdminId(adminId);
+
+			ProductBean product = new ProductBean();
+			product.setProductName(productName);
+			product.setDescription(description);
+			product.setOriginalPrice(originalPrice);
+			product.setSalePrice(salePrice);
+			product.setStockQuantity(stockQuantity);
+			product.setUnit(unit);
+			product.setStatus(status);
+			product.setExpire(expire);
+			product.setCreatedAt(createdAt);
+			product.setUpdatedAt(updatedAt);
+			product.setCategory(category);
+			product.setAdmin(admin);
+
+			return productRepository.save(product);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		return result;
+		return null;
 	}
 
 	public ProductBean insert(ProductBean bean) {
@@ -78,67 +112,6 @@ public class ProductService {
 		return false;
 	}
 
-	public ProductBean create(String json) {
-		try {
-			JSONObject obj = new JSONObject(json);
-			Integer id = obj.isNull("id") ? null : obj.getInt("id");
-			String name = obj.isNull("name") ? null : obj.getString("name");
-			Double price = obj.isNull("price") ? null : obj.getDouble("price");
-			String make = obj.isNull("make") ? null : obj.getString("make");
-			Integer expire = obj.isNull("expire") ? null : obj.getInt("expire");
-
-			if (id != null && !productRepository.existsById(id)) {
-				ProductBean insert = new ProductBean();
-				insert.setId(id);
-				insert.setName(name);
-				insert.setPrice(price);
-				insert.setMake(null);
-				insert.setMake(DatetimeConverter.parse(make, "yyyy-MM-dd"));
-				insert.setExpire(expire);
-
-				return productRepository.save(insert);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public ProductBean modify(String json) {
-		try {
-			JSONObject obj = new JSONObject(json);
-			Integer id = obj.isNull("id") ? null : obj.getInt("id");
-			String name = obj.isNull("name") ? null : obj.getString("name");
-			Double price = obj.isNull("price") ? null : obj.getDouble("price");
-			String make = obj.isNull("make") ? null : obj.getString("make");
-			Integer expire = obj.isNull("expire") ? null : obj.getInt("expire");
-
-			if (id != null) {
-				Optional<ProductBean> optional = productRepository.findById(id);
-				if (optional.isPresent()) {
-					ProductBean update = optional.get();
-					update.setName(name);
-					update.setPrice(price);
-					update.setMake(null);
-					update.setMake(DatetimeConverter.parse(make, "yyyy-MM-dd"));
-					update.setExpire(expire);
-					return productRepository.save(update);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public boolean remove(Integer id) {
-		if (id != null && productRepository.existsById(id)) {
-			productRepository.deleteById(id);
-			return true;
-		}
-		return false;
-	}
-
 	public long count(String json) {
 		try {
 			JSONObject obj = new JSONObject(json);
@@ -159,12 +132,38 @@ public class ProductService {
 		return null;
 	}
 
+	public List<ProductBean> select(ProductBean bean) {
+		List<ProductBean> result = null;
+		if (bean != null && bean.getProductId() != null && !bean.getProductId().equals(0)) {
+			Optional<ProductBean> optional = productRepository.findById(bean.getProductId());
+			if (optional.isPresent()) {
+				result = new ArrayList<ProductBean>();
+				result.add(optional.get());
+			}
+		} else {
+			result = productRepository.findAll();
+		}
+		return result;
+	}
+
 	public List<ProductBean> searchByNameOrDescription(String keyword) {
-		return productRepository.findByProductNameContainingOrDescriptionContaining(keyword, keyword);
+		if (keyword != null && !keyword.trim().isEmpty()) {
+			return productRepository.findByProductNameContainingOrDescriptionContaining(keyword, keyword);
+		}
+		return new ArrayList<>();
 	}
 
-	public List<ProductBean> findByCategory(Integer categoryId) {
-		return productRepository.findByProductCategory_CategoryId(categoryId);
+	public List<ProductBean> findByCategory(String categoryId) {
+		// 沒有收到資料，回傳空List
+		if (categoryId == null || categoryId.trim().isEmpty()) {
+			return new ArrayList<>();
+		}
+		// 有收到資料，前端收到String、轉型別為Integer給後端接收
+		try {
+			return productRepository.findByProductCategory_CategoryId(Integer.parseInt(categoryId));
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
 	}
-
 }
