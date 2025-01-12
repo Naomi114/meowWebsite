@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ProjfinalMeowApplication<projfinal-back>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "tw.com.ispan.projfinal_back.ProjfinalMeowApplication",
+            "projectName": "projfinal-back",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

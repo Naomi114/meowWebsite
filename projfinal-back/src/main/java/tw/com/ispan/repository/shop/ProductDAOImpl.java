@@ -29,8 +29,10 @@ public class ProductDAOImpl implements ProductDAO {
 	public Long count(JSONObject param) {
 		Integer productId = param.isNull("productId") ? null : param.getInt("productId");
 		String productName = param.isNull("productName") ? null : param.getString("productName");
-		BigDecimal priceMin = param.isNull("priceMin") ? null : param.getBigDecimal("priceMin");
-		BigDecimal priceMax = param.isNull("priceMax") ? null : param.getBigDecimal("priceMax");
+		Double priceMin = param.isNull("priceMin") ? null : param.getDouble("priceMin");
+		Double priceMax = param.isNull("priceMax") ? null : param.getDouble("priceMax");
+		String description = param.isNull("description") ? null : param.getString("description");
+		Integer categoryId = param.isNull("categoryId") ? null : param.getInt("categoryId");
 		String createdMin = param.isNull("createdMin") ? null : param.getString("createdMin");
 		String createdMax = param.isNull("createdMax") ? null : param.getString("createdMax");
 
@@ -141,4 +143,24 @@ public class ProductDAOImpl implements ProductDAO {
 
 		return query.getResultList();
 	}
+	
+	// 模糊搜尋: 商品名稱或描述 (JPQL)
+	@Override
+	public List<ProductBean> findByProductNameContainingOrDescriptionContaining(String keyword1, String keyword2) {
+		String jpql = "SELECT p FROM ProductBean p WHERE p.productName LIKE :keyword OR p.description LIKE :keyword";
+		return entityManager.createQuery(jpql, ProductBean.class)
+				.setParameter("keyword", "%" + keyword1 + "%")
+				.getResultList();
+	}
+	
+	// 依商品類別搜尋 (Criteria API)
+	@Override
+	public List<ProductBean> findByProductCategory_CategoryId(Integer categoryId) {
+    	CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    	CriteriaQuery<ProductBean> cq = cb.createQuery(ProductBean.class);
+    	Root<ProductBean> root = cq.from(ProductBean.class);
+    	cq.where(cb.equal(root.get("category").get("categoryId"), categoryId));
+    	return entityManager.createQuery(cq).getResultList();
+	}
+
 }
