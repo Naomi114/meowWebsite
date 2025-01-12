@@ -1,5 +1,6 @@
 /sts-4.27.0.RELEASE/**
 .codegpt
+.metadata
 /projfinal-frontend/images/*
 
 # Compiled class file
