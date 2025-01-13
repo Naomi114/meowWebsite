@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +17,6 @@ import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.domain.shop.CategoryBean;
 import tw.com.ispan.domain.shop.ProductBean;
 import tw.com.ispan.repository.shop.ProductRepository;
-import tw.com.ispan.util.DatetimeConverter;
 
 @Service
 @Transactional
@@ -28,13 +28,13 @@ public class ProductService {
 	public ProductBean create(String json) {
 		try {
 			JSONObject obj = new JSONObject(json);
+
 			String productName = obj.isNull("productName") ? null : obj.getString("productName");
 			String description = obj.isNull("description") ? null : obj.getString("description");
 			BigDecimal originalPrice = obj.isNull("originalPrice") ? null : obj.getBigDecimal("originalPrice");
 			BigDecimal salePrice = obj.isNull("salePrice") ? null : obj.getBigDecimal("salePrice");
 			Integer stockQuantity = obj.isNull("stockQuantity") ? null : obj.getInt("stockQuantity");
 			String unit = obj.isNull("unit") ? null : obj.getString("unit");
-			String status = obj.isNull("status") ? null : obj.getString("status");
 			Date expire = obj.isNull("expire") ? null : new Date(obj.getLong("expire"));
 			LocalDateTime createdAt = LocalDateTime.now();
 			LocalDateTime updatedAt = LocalDateTime.now();
@@ -46,15 +46,21 @@ public class ProductService {
 
 			Admin admin = new Admin();
 			admin.setAdminId(adminId);
-
+			
 			ProductBean product = new ProductBean();
+
+			if (product.getStockQuantity() <= 0) {
+				product.setStatus("已售完");
+			}else{
+				product.setStatus("上架中");
+			}
+
 			product.setProductName(productName);
 			product.setDescription(description);
 			product.setOriginalPrice(originalPrice);
 			product.setSalePrice(salePrice);
 			product.setStockQuantity(stockQuantity);
 			product.setUnit(unit);
-			product.setStatus(status);
 			product.setExpire(expire);
 			product.setCreatedAt(createdAt);
 			product.setUpdatedAt(updatedAt);
@@ -71,15 +77,25 @@ public class ProductService {
 	public ProductBean insert(ProductBean bean) {
 		if (bean != null && bean.getProductId() != null) {
 			if (!productRepository.existsById(bean.getProductId())) {
+				if (bean.getStockQuantity() <= 0) {
+					bean.setStatus("已售完");
+				}else{
+					bean.setStatus("上架中");
+				}
 				return productRepository.save(bean);
 			}
 		}
 		return null;
 	}
 
-	public ProductBean update(ProductBean bean) {
+	public ProductBean modify(ProductBean bean) {
 		if (bean != null && bean.getProductId() != null) {
 			if (productRepository.existsById(bean.getProductId())) {
+				if (bean.getStockQuantity() <= 0) {
+					bean.setStatus("已售完");
+				}else{
+					bean.setStatus("上架中");
+				}
 				return productRepository.save(bean);
 			}
 		}
@@ -128,6 +144,7 @@ public class ProductService {
 		return result;
 	}
 
+	// 統計商品數量
 	public long count(String json) {
 		try {
 			JSONObject obj = new JSONObject(json);
@@ -146,13 +163,6 @@ public class ProductService {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	public List<ProductBean> searchByNameOrDescription(String keyword) {
-		if (keyword != null && !keyword.trim().isEmpty()) {
-			return productRepository.findByProductNameContainingOrDescriptionContaining(keyword, keyword);
-		}
-		return new ArrayList<>();
 	}
 
 }

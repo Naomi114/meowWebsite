@@ -25,6 +25,7 @@ public class ProductDAOImpl implements ProductDAO {
 		return entityManager;
 	}
 
+    // 商品搜尋頁>>
 	@Override
 	public Long count(JSONObject param) {
 		Integer productId = param.isNull("productId") ? null : param.getInt("productId");
@@ -78,6 +79,7 @@ public class ProductDAOImpl implements ProductDAO {
 		return query.getSingleResult();
 	}
 
+	// 商品搜尋頁>>多條件（如價格範圍或類別）模糊查詢
 	@Override
 	public List<ProductBean> find(JSONObject param) {
 		Integer productId = param.isNull("productId") ? null : param.getInt("productId");
@@ -123,6 +125,7 @@ public class ProductDAOImpl implements ProductDAO {
 					DatetimeConverter.parse(createdMax, "yyyy-MM-dd HH:mm:ss")));
 		}
 
+        // 商品搜尋頁>>分頁和排序
 		if (!predicates.isEmpty()) {
 			criteriaQuery.where(predicates.toArray(new Predicate[0]));
 		}
@@ -144,23 +147,4 @@ public class ProductDAOImpl implements ProductDAO {
 		return query.getResultList();
 	}
 	
-	// 模糊搜尋: 商品名稱或描述 (JPQL)
-	@Override
-	public List<ProductBean> findByProductNameContainingOrDescriptionContaining(String keyword1, String keyword2) {
-		String jpql = "SELECT p FROM ProductBean p WHERE p.productName LIKE :keyword OR p.description LIKE :keyword";
-		return entityManager.createQuery(jpql, ProductBean.class)
-				.setParameter("keyword", "%" + keyword1 + "%")
-				.getResultList();
-	}
-	
-	// 依商品類別搜尋 (Criteria API)
-	@Override
-	public List<ProductBean> findByProductCategory_CategoryId(Integer categoryId) {
-    	CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-    	CriteriaQuery<ProductBean> cq = cb.createQuery(ProductBean.class);
-    	Root<ProductBean> root = cq.from(ProductBean.class);
-    	cq.where(cb.equal(root.get("category").get("categoryId"), categoryId));
-    	return entityManager.createQuery(cq).getResultList();
-	}
-
 }

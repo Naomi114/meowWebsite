@@ -62,7 +62,7 @@ public class ProductAjaxController {
             responseJson.put("success", false);
             responseJson.put("message", "Id不存在");
         } else {
-            ProductBean product = productService.modify(entity);
+            ProductBean product = productService.update(entity);
             if (product == null) {
                 responseJson.put("success", false);
                 responseJson.put("message", "修改失敗");
