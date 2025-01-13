@@ -96,6 +96,7 @@ public class ProductService {
 		return false;
 	}
 
+	// 商品搜尋頁>>商品查詢: 品名或是描述模糊查詢
 	public ProductBean findById(Integer id) {
 		if (id != null) {
 			Optional<ProductBean> optional = productRepository.findById(id);
@@ -127,7 +128,6 @@ public class ProductService {
 		return result;
 	}
 
-	// 商品查詢
 	public long count(String json) {
 		try {
 			JSONObject obj = new JSONObject(json);
@@ -155,17 +155,4 @@ public class ProductService {
 		return new ArrayList<>();
 	}
 
-	public List<ProductBean> findByCategory(String categoryId) {
-		// 沒有收到資料，回傳空List
-		if (categoryId == null || categoryId.trim().isEmpty()) {
-			return new ArrayList<>();
-		}
-		// 有收到資料，前端收到String、轉型別為Integer給後端接收
-		try {
-			return productRepository.findByProductCategory_CategoryId(Integer.parseInt(categoryId));
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-			return new ArrayList<>();
-		}
-	}
 }
