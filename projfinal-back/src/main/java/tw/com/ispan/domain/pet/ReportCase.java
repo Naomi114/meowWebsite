@@ -18,17 +18,19 @@ public class ReportCase {
     private Integer reportId;
 
     @ManyToOne
-    @JoinColumn(name = "rescueCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_RescueCase"))
+    @JoinColumn(name = "rescueCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_RescueCase"), nullable = true)
     private RescueCase rescueCase;
 
+    // 關聯到 LostCase 表，單向多對一
     @ManyToOne
-    @JoinColumn(name = "lostCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_LostCase"))
+    @JoinColumn(name = "lostCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_LostCase"), nullable = true)
     private LostCase lostCase;
 
     @ManyToOne
-    @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_AdoptionCase"))
+    @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_AdoptionCase"), nullable = true)
     private AdoptionCase adoptionCase;
 
+    // 關聯到 Member 表，單向多對一
     @ManyToOne(optional = false)
     @JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(name = "FK_ReportCase_Member"))
     private Member member;

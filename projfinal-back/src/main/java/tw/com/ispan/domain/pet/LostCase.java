@@ -38,17 +38,17 @@ public class LostCase {
     // 關聯到species表，單向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     @JoinColumn(name = "specieId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Specie"))
-    private Integer specieId;
+    private Species species;
 
     // 關聯到breed表，單向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     @JoinColumn(name = "breedId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Breed"))
-    private Integer breedId;
+    private Breed breed;
 
     // 關聯到furColor表，單向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     @JoinColumn(name = "furColorId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_FurColor"))
-    private Integer furColorId;
+    private FurColor furColor;
 
     @Column(columnDefinition = "NVARCHAR(5)", name = "gender")
     private String gender;
@@ -113,10 +113,28 @@ public class LostCase {
     @Column(name = "featureDescription")
     private String featureDescription;
 
-    // 關聯到CasePicture表，單向一對多，rescueCaseId外鍵會在CasePicture表中
+    // 關聯到CasePicture表，單向一對多，lostCaseId外鍵會在CasePicture表中
     @OneToMany
-    @JoinColumn(name = "rescueCaseId", foreignKey = @ForeignKey(name = "FK_CasePicture_LostCase"))
+    @JoinColumn(name = "lostCaseId", foreignKey = @ForeignKey(name = "FK_CasePicture_LostCase"))
     private List<CasePicture> casePictures;
+
+    // 關聯到ReportCase表，單向一對多，lostCaseId外鍵會在ReportCase表中
+    @OneToMany(mappedBy = "lostCaseId", cascade = CascadeType.ALL)
+    private List<ReportCase> reportCases; // 一對多關聯
+
+    @Override
+    public String toString() {
+        return "LostCase [lostCaseId=" + lostCaseId + ", caseTitle=" + caseTitle + ", member=" + member
+                + ", species=" + species + ", breed=" + breed + ", furColor=" + furColor + ", gender=" + gender
+                + ", sterilization=" + sterilization + ", age=" + age + ", microChipNumber=" + microChipNumber
+                + ", suspLost=" + suspLost + ", cityId=" + cityId + ", distinctId=" + distinctId + ", street=" + street
+                + ", latitude=" + latitude + ", longitude=" + longitude + ", donationAmount=" + donationAmount
+                + ", viewCount=" + viewCount + ", follow=" + follow + ", publicationTime=" + publicationTime
+                + ", lastUpdateTime=" + lastUpdateTime + ", caseStateId=" + caseStateId + ", rescueReason="
+                + rescueReason + ", caseUrl=" + caseUrl + ", casePictures=" + casePictures + ", rescueDemands="
+                + rescueDemands + ", canAffords=" + canAffords + ", rescueProgresses=" + rescueProgresses + ", follows="
+                + follows + "]";
+    }
 
     // Getters and Setters
     public Integer getLostCaseId() {
@@ -135,36 +153,36 @@ public class LostCase {
         this.caseTitle = caseTitle;
     }
 
-    // public Integer getMemberId() {
-    // return memberId;
-    // }
-
-    // public void setMemberId(Integer memberId) {
-    // this.memberId = memberId;
-    // }
-
-    public Integer getSpecieId() {
-        return specieId;
+    public Member getMember() {
+        return member;
     }
 
-    public void setSpecieId(Integer specieId) {
-        this.specieId = specieId;
+    public void setMember(Member member) {
+        this.member = member;
     }
 
-    public Integer getBreedId() {
-        return breedId;
+    public Species getSpecies() {
+        return species;
     }
 
-    public void setBreedId(Integer breedId) {
-        this.breedId = breedId;
+    public void setSpecies(Species species) {
+        this.species = species;
     }
 
-    public Integer getFurColorId() {
-        return furColorId;
+    public Breed getBreed() {
+        return breed;
     }
 
-    public void setFurColorId(Integer furColorId) {
-        this.furColorId = furColorId;
+    public void setBreed(Breed breed) {
+        this.breed = breed;
+    }
+
+    public FurColor getFurColor() {
+        return furColor;
+    }
+
+    public void setFurColor(FurColor furColor) {
+        this.furColor = furColor;
     }
 
     public String getGender() {
@@ -317,5 +335,13 @@ public class LostCase {
 
     public void setFeatureDescription(String featureDescription) {
         this.featureDescription = featureDescription;
+    }
+
+    public List<ReportCase> getReportCases() {
+        return reportCases;
+    }
+
+    public void setReportCases(List<ReportCase> reportCases) {
+        this.reportCases = reportCases;
     }
 }
