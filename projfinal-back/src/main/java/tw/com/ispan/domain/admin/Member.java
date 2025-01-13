@@ -13,11 +13,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.pet.Activity;
 import tw.com.ispan.domain.pet.ActivityParticipantList;
+import tw.com.ispan.domain.pet.AdoptionCase;
 import tw.com.ispan.domain.pet.Follow;
 import tw.com.ispan.domain.pet.LostCase;
+import tw.com.ispan.domain.pet.ReportCase;
 import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.domain.shop.Order;
 
@@ -55,28 +58,35 @@ public class Member {
 	@Column(nullable = false)
 	private LocalDateTime updateDate;
 
-	// Status是對應到Iventory的Status?
-	// @Column(columnDefinition = "NVARCHAR(20)", nullable = false)
-	// @ForeignKey(name = "FK_Member_Inventory")
-	// private Inventory status;
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	private Set<Activity> activity;
+
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	private Set<ActivityParticipantList> acitvityParticipantList;
+
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	private List<WishList> wishList;
+
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	private Set<Cart> cart;
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Order> orders;
+	private List<Order> order;
 
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	private List<RescueCase> rescueCases;
 
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
+	private Set<Follow> follow;
+
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	private List<LostCase> lostCases;
+	private List<LostCase> lostCase;
 
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-	private Set<Activity> activity;
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private List<AdoptionCase> adoptionCase;
 
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
-	private Set<ActivityParticipantList> acitvityParticipantLists;
-
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
-	private Follow follows;
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private List<ReportCase> reportCase;
 
 	public Integer getMemberId() {
 		return memberId;
