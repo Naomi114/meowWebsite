@@ -12,8 +12,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "productCategory")
-public class ProductCategoryBean {
+@Table(name = "category")
+public class CategoryBean {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,10 +30,10 @@ public class ProductCategoryBean {
     @OneToMany(mappedBy = "productCategory", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<ProductBean> products;
 
-    public ProductCategoryBean() {
+    public CategoryBean() {
     }
 
-    public ProductCategoryBean(Integer categoryId, String categoryName, String categoryDescription, String defaultUnit,
+    public CategoryBean(Integer categoryId, String categoryName, String categoryDescription, String defaultUnit,
             List<ProductBean> products) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;

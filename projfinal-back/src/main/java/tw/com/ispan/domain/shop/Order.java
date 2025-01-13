@@ -16,7 +16,7 @@ import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
-@Table(name = "Order")
+@Table(name = "order")
 public class Order {
 
     @Id
