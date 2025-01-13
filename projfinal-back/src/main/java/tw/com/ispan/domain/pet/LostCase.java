@@ -75,7 +75,7 @@ public class LostCase {
 
     // 關聯到distint表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    @JoinColumn(name = "distinctId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Distint"))
+    @JoinColumn(name = "distinctId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Distinct"))
     private Distinct distinctId;
 
     @Column(columnDefinition = "NVARCHAR(10)", name = "street", nullable = false)
@@ -104,6 +104,12 @@ public class LostCase {
     @Column(name = "lastUpdateTime", nullable = false)
     private LocalDateTime lastUpdateTime;
 
+    // 必填
+    // 關聯到CaseState表，單向多對一
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @JoinColumn(name = "CaseStateId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_CaseState"))
+    private CaseState caseStateId;
+
     @Lob
     @Column(name = "lostExperience")
     private String lostExperience;
@@ -115,6 +121,9 @@ public class LostCase {
     @Lob
     @Column(name = "featureDescription")
     private String featureDescription;
+
+    @Column(name = "caseUrl", length = 255)
+    private String caseUrl;
 
     // 關聯到CasePicture表，單向一對多，lostCaseId外鍵會在CasePicture表中
     @OneToMany
@@ -133,9 +142,10 @@ public class LostCase {
                 + ", microChipNumber=" + microChipNumber + ", suspLost=" + suspLost + ", cityId=" + cityId
                 + ", distinctId=" + distinctId + ", street=" + street + ", latitude=" + latitude + ", longitude="
                 + longitude + ", donationAmount=" + donationAmount + ", viewCount=" + viewCount + ", follow=" + follow
-                + ", publicationTime=" + publicationTime + ", lastUpdateTime=" + lastUpdateTime + ", lostExperience="
-                + lostExperience + ", contactInformation=" + contactInformation + ", featureDescription="
-                + featureDescription + ", casePictures=" + casePictures + "]";
+                + ", publicationTime=" + publicationTime + ", lastUpdateTime=" + lastUpdateTime + ", caseStateId="
+                + caseStateId + ", lostExperience=" + lostExperience + ", contactInformation=" + contactInformation
+                + ", featureDescription=" + featureDescription + ", caseUrl=" + caseUrl + ", casePictures="
+                + casePictures + ", reportCases=" + reportCases + "]";
     }
 
     // Getters and Setters
@@ -191,7 +201,7 @@ public class LostCase {
         return name;
     }
 
-    public void getName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -247,7 +257,7 @@ public class LostCase {
         return distinctId;
     }
 
-    public void setDistintcId(Distinct distinctId) {
+    public void setDistinctId(Distinct distinctId) {
         this.distinctId = distinctId;
     }
 
@@ -315,6 +325,14 @@ public class LostCase {
         this.lastUpdateTime = lastUpdateTime;
     }
 
+    public CaseState getCaseStateId() {
+        return caseStateId;
+    }
+
+    public void setCaseStateId(CaseState caseStateId) {
+        this.caseStateId = caseStateId;
+    }
+
     public List<CasePicture> getCasePictures() {
         return casePictures;
     }
@@ -345,6 +363,14 @@ public class LostCase {
 
     public void setFeatureDescription(String featureDescription) {
         this.featureDescription = featureDescription;
+    }
+
+    public String getCaseUrl() {
+        return caseUrl;
+    }
+
+    public void setCaseUrl(String caseUrl) {
+        this.caseUrl = caseUrl;
     }
 
     public List<ReportCase> getReportCases() {
