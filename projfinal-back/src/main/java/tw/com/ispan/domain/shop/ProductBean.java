@@ -10,6 +10,8 @@ import java.util.Set;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,6 +36,7 @@ public class ProductBean {
     @Column(nullable = true)
     private String description;
 
+    // 總共 10 位數，整數 8 位，小數 2 位
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal originalPrice;
 
@@ -58,15 +61,18 @@ public class ProductBean {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    // 雙向關係的多對一端，藉由DTO/ProductRequest 解決雙向序列化問題
     @ManyToOne
-    @JoinColumn(name = "categoryId", nullable = false)
+    @JoinColumn(name = "FK_categoryId", foreignKey = @ForeignKey(name = "fkc_category_id"))
     private CategoryBean category;
 
+    // 雙向關係的多對一端；尚未檢查 Admin 實體的關聯????
     @ManyToOne
-    @JoinColumn(name = "adminId", nullable = false)
+    @JoinColumn(name = "FK_adminId", foreignKey = @ForeignKey(name = "fkc_admin_id"))
     private Admin admin;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "fk_imageId", foreignKey = @ForeignKey(name = "fkc_image_id"))
     private List<ProductImageBean> productImages;
 
     @ManyToMany
@@ -230,6 +236,10 @@ public class ProductBean {
 
     public void setCategory(CategoryBean category) {
         this.category = category;
+        // 確保雙向關係一致: 若目前商品類別不包含此商品，則將此商品加入商品類別
+        if (!category.getProducts().contains(this)) {
+            category.getProducts().add(this);
+        }
     }
 
     public void setAdmin(Admin admin) {

@@ -15,38 +15,39 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.shop.ProductBean;
-import tw.com.ispan.dto.ProductResponse;
-import tw.com.ispan.service.shop.ProductService;
+import tw.com.ispan.dto.LostCaseResponse;
+import tw.com.ispan.service.pet.LostCaseService;
 import tw.com.ispan.util.DatetimeConverter;
 
 @RestController
-@RequestMapping("/ajax/pages/products")
-public class ProductAjaxController {
+@RequestMapping("/ajax/pages/lostcase")
+public class LostCaseAjaxController {
     @Autowired
-    private ProductService productService;
+    private LostCaseService lostCaseService;
 
     @PostMapping
-    public ProductResponse create(@RequestBody String json) {
-        ProductResponse responseBean = new ProductResponse();
+    public LostCase create(@RequestBody String json) {
+        LostCaseResponse responseBean = new LostCaseResponse();
 
         JSONObject obj = new JSONObject(json);
         Integer id = obj.isNull("id") ? null : obj.getInt("id");
 
         if (id == null) {
             responseBean.setSuccess(false);
-            responseBean.setMessage("id是必要欄位(bean)");
-        } else if (productService.exists(id)) {
+            responseBean.setMessage("id是必要欄位");
+        } else if (lostCaseService.exists(id)) {
             responseBean.setSuccess(false);
-            responseBean.setMessage("id已存在(bean)");
+            responseBean.setMessage("id已存在");
         } else {
-            ProductBean insert = productService.create(json);
+            LostCase insert = lostCaseService.create(json);
             if (insert == null) {
                 responseBean.setSuccess(false);
-                responseBean.setMessage("新增失敗(bean)");
+                responseBean.setMessage("新增失敗");
             } else {
                 responseBean.setSuccess(true);
-                responseBean.setMessage("新增成功(bean)");
+                responseBean.setMessage("新增成功");
             }
         }
         return responseBean;
@@ -58,12 +59,12 @@ public class ProductAjaxController {
         if (id == null) {
             responseJson.put("success", false);
             responseJson.put("message", "Id是必要欄位");
-        } else if (!productService.exists(id)) {
+        } else if (!lostCaseService.exists(id)) {
             responseJson.put("success", false);
             responseJson.put("message", "Id不存在");
         } else {
-            ProductBean product = productService.modify(entity);
-            if (product == null) {
+            LostCase update = lostCaseService.modify(entity);
+            if (update == null) {
                 responseJson.put("success", false);
                 responseJson.put("message", "修改失敗");
             } else {
@@ -81,11 +82,11 @@ public class ProductAjaxController {
         if (id == null) {
             responseJson.put("success", false);
             responseJson.put("message", "id是必要欄位");
-        } else if (!productService.exists(id)) {
+        } else if (!lostCaseService.exists(id)) {
             responseJson.put("success", false);
             responseJson.put("message", "id不存在");
         } else {
-            boolean delete = productService.remove(id);
+            boolean delete = lostCaseService.remove(id);
             if (!delete) {
                 responseJson.put("success", false);
                 responseJson.put("message", "刪除失敗");
@@ -94,7 +95,6 @@ public class ProductAjaxController {
                 responseJson.put("message", "刪除成功");
             }
         }
-
         return responseJson.toString();
     }
 
@@ -103,15 +103,18 @@ public class ProductAjaxController {
         JSONObject responseJson = new JSONObject();
         JSONArray array = new JSONArray();
         if (id != null) {
-            ProductBean product = productService.findById(id);
-            if (product != null) {
-                String make = DatetimeConverter.toString(product.getMake(), "yyyy-MM-dd");
+            LostCase findCase = lostCaseService.findById(id);
+            if (findCase != null) {
+                String make = DatetimeConverter.toString(findCase.getPublicationTime(), "yyyy-MM-dd");
                 JSONObject item = new JSONObject()
-                        .put("id", product.getId())
-                        .put("name", product.getName())
-                        .put("price", product.getPrice())
-                        .put("make", make)
-                        .put("expire", product.getExpire());
+                        .put("lostCaseId", findCase.getLostCaseId())
+                        .put("caseTitle", findCase.getCaseTitle())
+                        .put("species", findCase.getSpecies())
+                        .put("name", findCase.getName())
+                        .put("gender", findCase.getGender())
+                        .put("breed", findCase.getBreed())
+                        .put("sterilization", findCase.getSterilization())
+                        .put("publicationTime", findCase.getPublicationTime());
                 array = array.put(item);
             }
         }
@@ -120,21 +123,18 @@ public class ProductAjaxController {
     }
 
     @PostMapping("/find")
-    public ProductResponse find(@RequestBody String json) {
+    public LostCase find(@RequestBody String json) {
+        LostCaseResponse responseBean = new LostCaseResponse();
 
-        ProductResponse responseBean = new ProductResponse();
-
-        long count = productService.count(json);
+        long count = lostCaseService.count(json);
         responseBean.setCount(count);
 
-        List<ProductBean> products = productService.find(json);
-        if (products != null && !products.isEmpty()) {
-            responseBean.setList(products);
+        List<LostCase> LostCase = lostCaseService.find(json);
+        if (LostCase != null && !LostCase.isEmpty()) {
+            responseBean.setList(LostCase);
         } else {
             responseBean.setList(new ArrayList<>());
         }
-
         return responseBean;
     }
-
 }

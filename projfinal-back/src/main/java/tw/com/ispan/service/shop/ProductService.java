@@ -1,4 +1,4 @@
-package tw.com.ispan.service;
+package tw.com.ispan.service.shop;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,6 +24,7 @@ public class ProductService {
 	@Autowired
 	private ProductRepository productRepository;
 
+	// 商品增刪修
 	public ProductBean create(String json) {
 		try {
 			JSONObject obj = new JSONObject(json);
@@ -95,6 +96,7 @@ public class ProductService {
 		return false;
 	}
 
+	// 商品搜尋頁>>商品查詢: 品名或是描述模糊查詢
 	public ProductBean findById(Integer id) {
 		if (id != null) {
 			Optional<ProductBean> optional = productRepository.findById(id);
@@ -110,6 +112,20 @@ public class ProductService {
 			return productRepository.existsById(id);
 		}
 		return false;
+	}
+
+	public List<ProductBean> select(ProductBean bean) {
+		List<ProductBean> result = null;
+		if (bean != null && bean.getProductId() != null && !bean.getProductId().equals(0)) {
+			Optional<ProductBean> optional = productRepository.findById(bean.getProductId());
+			if (optional.isPresent()) {
+				result = new ArrayList<ProductBean>();
+				result.add(optional.get());
+			}
+		} else {
+			result = productRepository.findAll();
+		}
+		return result;
 	}
 
 	public long count(String json) {
@@ -132,20 +148,6 @@ public class ProductService {
 		return null;
 	}
 
-	public List<ProductBean> select(ProductBean bean) {
-		List<ProductBean> result = null;
-		if (bean != null && bean.getProductId() != null && !bean.getProductId().equals(0)) {
-			Optional<ProductBean> optional = productRepository.findById(bean.getProductId());
-			if (optional.isPresent()) {
-				result = new ArrayList<ProductBean>();
-				result.add(optional.get());
-			}
-		} else {
-			result = productRepository.findAll();
-		}
-		return result;
-	}
-
 	public List<ProductBean> searchByNameOrDescription(String keyword) {
 		if (keyword != null && !keyword.trim().isEmpty()) {
 			return productRepository.findByProductNameContainingOrDescriptionContaining(keyword, keyword);
@@ -153,17 +155,4 @@ public class ProductService {
 		return new ArrayList<>();
 	}
 
-	public List<ProductBean> findByCategory(String categoryId) {
-		// 沒有收到資料，回傳空List
-		if (categoryId == null || categoryId.trim().isEmpty()) {
-			return new ArrayList<>();
-		}
-		// 有收到資料，前端收到String、轉型別為Integer給後端接收
-		try {
-			return productRepository.findByProductCategory_CategoryId(Integer.parseInt(categoryId));
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-			return new ArrayList<>();
-		}
-	}
 }

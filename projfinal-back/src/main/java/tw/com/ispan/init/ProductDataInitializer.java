@@ -14,7 +14,6 @@ import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.domain.shop.CategoryBean;
 import tw.com.ispan.domain.shop.ProductBean;
 import tw.com.ispan.repository.shop.ProductRepository;
-import tw.com.ispan.repository.shop.CategoryRepository;
 
 @Component
 public class ProductDataInitializer {
@@ -23,8 +22,6 @@ public class ProductDataInitializer {
     private SessionFactory sessionFactory;
     @Autowired
     private ProductRepository productRepository;
-    @Autowired
-    private CategoryRepository categoryRepository;
 
     @Transactional
     public void initializeData() {
@@ -43,7 +40,8 @@ public class ProductDataInitializer {
             product1.setExpire(new Date());
             product1.setCreatedAt(LocalDateTime.now());
             product1.setUpdatedAt(LocalDateTime.now());
-            CategoryBean category1 = categoryRepository.findById(1).orElseThrow(() -> new RuntimeException("Category not found"));
+            CategoryBean category1 = categoryRepository.findById(1)
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
             product1.setCategory(category1); // 假設 categoryId 1 是 "寵物用品"
             product1.setAdmin(new Admin(1, "管理員1")); // 假設 adminId 1 是 "管理員1"
 

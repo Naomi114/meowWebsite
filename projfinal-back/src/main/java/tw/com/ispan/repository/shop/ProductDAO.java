@@ -20,7 +20,4 @@ public interface ProductDAO {
 			@Param("keyword") String keyword1,
 			@Param("keyword") String keyword2);
 
-	// 依商品類別搜尋
-	public abstract List<ProductBean> findByProductCategory_CategoryId(Integer categoryId);
-
 }
