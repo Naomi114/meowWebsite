@@ -1,17 +1,17 @@
 /*建立DB及交易紀錄檔*/
-CREATE DATABASE moewdb
--- DROP DATABASE moewdb
+CREATE DATABASE meowdb
+-- DROP DATABASE meowdb
 
 ON PRIMARY(
-NAME = Moewdb,  --資料庫邏輯名稱
-FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\Moewdb.mdf', 
+NAME = Meowdb_Data,  --資料庫邏輯名稱
+FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\Meowdb.mdf', 
 SIZE = 100MB,
 MAXSIZE = 500MB,
 FILEGROWTH = 10MB )
 
 LOG ON(
-NAME = Moewdb,  --交易紀錄檔邏輯名稱
-FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\Moewdb.ldf', 
+NAME = Meowdb_Log,  --交易紀錄檔邏輯名稱
+FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\Meowdb.ldf', 
 SIZE = 50MB,
 MAXSIZE = 500MB,
 FILEGROWTH = 10MB )
