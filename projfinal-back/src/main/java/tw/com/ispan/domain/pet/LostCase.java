@@ -72,8 +72,8 @@ public class LostCase {
 
     // 關聯到distint表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    @JoinColumn(name = "distintId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Distint"))
-    private Distint distintId;
+    @JoinColumn(name = "distinctId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Distint"))
+    private Distinct distinctId;
 
     @Column(columnDefinition = "NVARCHAR(10)", name = "street", nullable = false)
     private String street;
@@ -130,10 +130,9 @@ public class LostCase {
                 + ", suspLost=" + suspLost + ", cityId=" + cityId + ", distinctId=" + distinctId + ", street=" + street
                 + ", latitude=" + latitude + ", longitude=" + longitude + ", donationAmount=" + donationAmount
                 + ", viewCount=" + viewCount + ", follow=" + follow + ", publicationTime=" + publicationTime
-                + ", lastUpdateTime=" + lastUpdateTime + ", caseStateId=" + caseStateId + ", rescueReason="
-                + rescueReason + ", caseUrl=" + caseUrl + ", casePictures=" + casePictures + ", rescueDemands="
-                + rescueDemands + ", canAffords=" + canAffords + ", rescueProgresses=" + rescueProgresses + ", follows="
-                + follows + "]";
+                + ", lastUpdateTime=" + lastUpdateTime + ", lostExperience=" + lostExperience + ", contactInformation="
+                + contactInformation + ", featureDescription=" + featureDescription + ", casePictures=" + casePictures
+                + "]";
     }
 
     // Getters and Setters
@@ -233,12 +232,12 @@ public class LostCase {
         this.cityId = cityId;
     }
 
-    public Distint getDistintId() {
-        return distintId;
+    public Distinct getDistinctId() {
+        return distinctId;
     }
 
-    public void setDistintId(Distint distintId) {
-        this.distintId = distintId;
+    public void setDistintcId(Distinct distinctId) {
+        this.distinctId = distinctId;
     }
 
     public String getStreet() {
