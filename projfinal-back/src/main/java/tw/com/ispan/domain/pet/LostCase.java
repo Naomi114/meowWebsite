@@ -50,6 +50,9 @@ public class LostCase {
     @JoinColumn(name = "furColorId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_FurColor"))
     private FurColor furColor;
 
+    @Column(columnDefinition = "NVARCHAR(5)", name = "name", nullable = false)
+    private String name;
+
     @Column(columnDefinition = "NVARCHAR(5)", name = "gender")
     private String gender;
 
@@ -125,14 +128,14 @@ public class LostCase {
     @Override
     public String toString() {
         return "LostCase [lostCaseId=" + lostCaseId + ", caseTitle=" + caseTitle + ", member=" + member
-                + ", species=" + species + ", breed=" + breed + ", furColor=" + furColor + ", gender=" + gender
-                + ", sterilization=" + sterilization + ", age=" + age + ", microChipNumber=" + microChipNumber
-                + ", suspLost=" + suspLost + ", cityId=" + cityId + ", distinctId=" + distinctId + ", street=" + street
-                + ", latitude=" + latitude + ", longitude=" + longitude + ", donationAmount=" + donationAmount
-                + ", viewCount=" + viewCount + ", follow=" + follow + ", publicationTime=" + publicationTime
-                + ", lastUpdateTime=" + lastUpdateTime + ", lostExperience=" + lostExperience + ", contactInformation="
-                + contactInformation + ", featureDescription=" + featureDescription + ", casePictures=" + casePictures
-                + "]";
+                + ", species=" + species + ", breed=" + breed + ", furColor=" + furColor + ", name=" + name
+                + ", gender=" + gender + ", sterilization=" + sterilization + ", age=" + age
+                + ", microChipNumber=" + microChipNumber + ", suspLost=" + suspLost + ", cityId=" + cityId
+                + ", distinctId=" + distinctId + ", street=" + street + ", latitude=" + latitude + ", longitude="
+                + longitude + ", donationAmount=" + donationAmount + ", viewCount=" + viewCount + ", follow=" + follow
+                + ", publicationTime=" + publicationTime + ", lastUpdateTime=" + lastUpdateTime + ", lostExperience="
+                + lostExperience + ", contactInformation=" + contactInformation + ", featureDescription="
+                + featureDescription + ", casePictures=" + casePictures + "]";
     }
 
     // Getters and Setters
@@ -182,6 +185,14 @@ public class LostCase {
 
     public void setFurColor(FurColor furColor) {
         this.furColor = furColor;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void getName(String name) {
+        this.name = name;
     }
 
     public String getGender() {

@@ -1,5 +1,8 @@
 package tw.com.ispan.dto;
 
+import java.util.List;
+import tw.com.ispan.domain.pet.LostCase;
+
 public class LostCaseResponse {
     private Boolean success;
     private String message;
