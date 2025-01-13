@@ -1,4 +1,4 @@
-package tw.com.ispan.service;
+package tw.com.ispan.service.shop;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,6 +24,7 @@ public class ProductService {
 	@Autowired
 	private ProductRepository productRepository;
 
+	// 商品增刪修
 	public ProductBean create(String json) {
 		try {
 			JSONObject obj = new JSONObject(json);
@@ -112,6 +113,21 @@ public class ProductService {
 		return false;
 	}
 
+	public List<ProductBean> select(ProductBean bean) {
+		List<ProductBean> result = null;
+		if (bean != null && bean.getProductId() != null && !bean.getProductId().equals(0)) {
+			Optional<ProductBean> optional = productRepository.findById(bean.getProductId());
+			if (optional.isPresent()) {
+				result = new ArrayList<ProductBean>();
+				result.add(optional.get());
+			}
+		} else {
+			result = productRepository.findAll();
+		}
+		return result;
+	}
+
+	// 商品查詢
 	public long count(String json) {
 		try {
 			JSONObject obj = new JSONObject(json);
@@ -130,20 +146,6 @@ public class ProductService {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	public List<ProductBean> select(ProductBean bean) {
-		List<ProductBean> result = null;
-		if (bean != null && bean.getProductId() != null && !bean.getProductId().equals(0)) {
-			Optional<ProductBean> optional = productRepository.findById(bean.getProductId());
-			if (optional.isPresent()) {
-				result = new ArrayList<ProductBean>();
-				result.add(optional.get());
-			}
-		} else {
-			result = productRepository.findAll();
-		}
-		return result;
 	}
 
 	public List<ProductBean> searchByNameOrDescription(String keyword) {

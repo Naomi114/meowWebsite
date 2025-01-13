@@ -1,6 +1,5 @@
 package tw.com.ispan.domain.admin;
 
-
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -12,7 +11,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "admin")
-public class Admin{
+public class Admin {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer adminId;
