@@ -166,7 +166,14 @@ public class RescueCase {
     private Set<Follow> follows;
     
     
-	// Hibernate 進行實體的初始化需要用到空參建構子
+    // 關聯到ReportCase表，單向一對多
+    @OneToMany(mappedBy = "lostCaseId", cascade = CascadeType.ALL)
+    private List<ReportCase> reportCases; 
+    
+	
+    
+    
+    // Hibernate 進行實體的初始化需要用到空參建構子
 	public RescueCase() {
 		super();
 	}
@@ -504,6 +511,18 @@ public class RescueCase {
 	public void setFollows(Set<Follow> follows) {
 		this.follows = follows;
 	}
+
+	
+	
+	public List<ReportCase> getReportCases() {
+		return reportCases;
+	}
+
+
+	public void setReportCases(List<ReportCase> reportCases) {
+		this.reportCases = reportCases;
+	}
+
 
 
 	@Override
