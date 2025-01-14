@@ -1,12 +1,13 @@
 package tw.com.ispan.dto;
 
 import java.util.List;
-import tw.com.ispan.domain.pet.LostCase;
 
-public class LostCaseResponse {
+import tw.com.ispan.domain.pet.ReportCase;
+
+public class ReportCaseResponse {
     private Boolean success;
     private String message;
-    private List<LostCase> list;
+    private List<ReportCase> list;
     private Long count;
 
     @Override
@@ -31,11 +32,11 @@ public class LostCaseResponse {
         this.message = message;
     }
 
-    public List<LostCase> getList() {
+    public List<ReportCase> getList() {
         return list;
     }
 
-    public void setList(List<LostCase> list) {
+    public void setList(List<ReportCase> list) {
         this.list = list;
     }
 

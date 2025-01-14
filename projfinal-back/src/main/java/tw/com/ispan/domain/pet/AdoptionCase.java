@@ -119,6 +119,21 @@ public class AdoptionCase {
     @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_CasePicture_AdoptionCase"), nullable = false)
     private List<CasePicture> casePictures;
 
+    // 單向一對多，對應follow表
+    @OneToMany(mappedBy = "adoptionCaseId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Follow> follows;
+
+    // 關聯到ReportCase表，單向一對多
+    @OneToMany(mappedBy = "adoptionCaseId", cascade = CascadeType.ALL)
+    private List<ReportCase> reportCases;
+
+    // 與AdoptionCaseApply 多對多
+    @ManyToMany
+    @JoinTable(name = "Case_CaseApply", joinColumns = {
+            @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_Case")) }, inverseJoinColumns = {
+                    @JoinColumn(name = "adoptionCaseApplyId", foreignKey = @ForeignKey(name = "FK_CaseApply")) })
+    private Set<AdoptionCaseApply> adoptionCaseApplys = new HashSet<AdoptionCaseApply>();
+
     public Integer getAdoptionCaseId() {
         return adoptionCaseId;
     }
@@ -358,20 +373,5 @@ public class AdoptionCase {
     public void setNote(Integer note) {
         this.note = note;
     }
-
-    // 單向一對多，對應follow表
-    @OneToMany(mappedBy = "adoptionCaseId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Follow> follows;
-
-    // 關聯到ReportCase表，單向一對多
-    @OneToMany(mappedBy = "adoptionCaseId", cascade = CascadeType.ALL)
-    private List<ReportCase> reportCases;
-
-    // 與AdoptionCaseApply 多對多
-    @ManyToMany
-    @JoinTable(name = "Case_CaseApply", joinColumns = {
-            @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_Case")) }, inverseJoinColumns = {
-                    @JoinColumn(name = "adoptionCaseApplyId", foreignKey = @ForeignKey(name = "FK_CaseApply")) })
-    private Set<AdoptionCaseApply> adoptionCaseApplys = new HashSet<AdoptionCaseApply>();
 
 }
