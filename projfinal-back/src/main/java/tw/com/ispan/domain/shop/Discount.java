@@ -52,7 +52,7 @@ public class Discount {
     private Double discountValue; // Nullable by default
 
     @OneToMany(mappedBy = "discount", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Discount> discountScopes;
+    private List<DiscountScope> discountScopes;
 
     // Constructors, getters, setters, toString()
 }

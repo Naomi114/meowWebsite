@@ -46,7 +46,7 @@ public class LoginAjaxController {
             responseJson.put("message", "登入成功");
 
             JSONObject user = new JSONObject()
-                    .put("custid", bean.getCustid())
+                    .put("custid", bean.getMemberId())
                     .put("email", bean.getEmail());
             String token = jsonWebTokenUtility.createToken(user.toString());
             responseJson.put("token", token);

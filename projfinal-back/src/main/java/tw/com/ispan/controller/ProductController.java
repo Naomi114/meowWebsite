@@ -1,11 +1,17 @@
 package tw.com.ispan.controller;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,8 +19,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.annotation.PostConstruct;
 import tw.com.ispan.domain.shop.ProductBean;
 import tw.com.ispan.dto.ProductResponse;
 import tw.com.ispan.service.shop.ProductService;
@@ -26,6 +36,33 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    @PostMapping("/{productId}/upload-image")
+    public ResponseEntity<?> uploadImage(
+            @PathVariable Integer productId,
+            @RequestParam("image") MultipartFile image) {
+
+        // 驗證圖片是否有效
+        if (image.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("圖片文件不能為空");
+        }
+
+        try {
+            // 呼叫 Service 層處理圖片上傳
+            productService.uploadProductImage(productId, image);
+            return ResponseEntity.ok("圖片上傳成功");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("商品不存在: " + e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("圖片上傳失敗: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("未知錯誤: " + e.getMessage());
+        }
+    }
+    
     @PostMapping
     public ProductResponse create(@RequestBody String json) {
         ProductResponse responseBean = new ProductResponse();
