@@ -1,20 +1,22 @@
 package tw.com.ispan.service.shop;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.domain.shop.CategoryBean;
+import tw.com.ispan.domain.shop.InventoryItem;
 import tw.com.ispan.domain.shop.ProductBean;
 import tw.com.ispan.repository.shop.ProductRepository;
 
@@ -35,7 +37,8 @@ public class ProductService {
 			BigDecimal salePrice = obj.isNull("salePrice") ? null : obj.getBigDecimal("salePrice");
 			Integer stockQuantity = obj.isNull("stockQuantity") ? null : obj.getInt("stockQuantity");
 			String unit = obj.isNull("unit") ? null : obj.getString("unit");
-			Date expire = obj.isNull("expire") ? null : new Date(obj.getLong("expire"));
+			LocalDate expire = obj.isNull("expire") ? null
+					: LocalDate.parse(obj.getString("expire")); // 將字串解析為 LocalDate
 			LocalDateTime createdAt = LocalDateTime.now();
 			LocalDateTime updatedAt = LocalDateTime.now();
 			Integer categoryId = obj.isNull("categoryId") ? null : obj.getInt("categoryId");
@@ -46,12 +49,12 @@ public class ProductService {
 
 			Admin admin = new Admin();
 			admin.setAdminId(adminId);
-			
+
 			ProductBean product = new ProductBean();
 
 			if (product.getStockQuantity() <= 0) {
 				product.setStatus("已售完");
-			}else{
+			} else {
 				product.setStatus("上架中");
 			}
 
@@ -79,7 +82,7 @@ public class ProductService {
 			if (!productRepository.existsById(bean.getProductId())) {
 				if (bean.getStockQuantity() <= 0) {
 					bean.setStatus("已售完");
-				}else{
+				} else {
 					bean.setStatus("上架中");
 				}
 				return productRepository.save(bean);
@@ -93,7 +96,7 @@ public class ProductService {
 			if (productRepository.existsById(bean.getProductId())) {
 				if (bean.getStockQuantity() <= 0) {
 					bean.setStatus("已售完");
-				}else{
+				} else {
 					bean.setStatus("上架中");
 				}
 				return productRepository.save(bean);
@@ -104,8 +107,17 @@ public class ProductService {
 
 	public boolean delete(ProductBean bean) {
 		if (bean != null && bean.getProductId() != null) {
+			// 確認商品是否存在
 			if (productRepository.existsById(bean.getProductId())) {
-				productRepository.deleteById(bean.getProductId());
+				// 獲取商品實體，若不存在則拋出 NoSuchElementException
+				ProductBean product = productRepository.findById(bean.getProductId()).orElseThrow();
+
+				// 解除與盤點紀錄的關聯
+				Set<InventoryItem> inventoryItems = product.getInventoryItems();
+				inventoryItems.forEach(item -> item.setProduct(null)); // 將外鍵設為 NULL
+
+				// 刪除商品
+				productRepository.delete(product);
 				return true;
 			}
 		}

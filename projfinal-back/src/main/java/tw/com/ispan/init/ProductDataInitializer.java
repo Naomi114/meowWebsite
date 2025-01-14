@@ -1,6 +1,7 @@
 package tw.com.ispan.init;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.domain.shop.CategoryBean;
 import tw.com.ispan.domain.shop.ProductBean;
+import tw.com.ispan.repository.shop.CategoryRepository;
 import tw.com.ispan.repository.shop.ProductRepository;
 
 @Component
@@ -20,8 +22,12 @@ public class ProductDataInitializer {
 
     @Autowired
     private SessionFactory sessionFactory;
+
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Transactional
     public void initializeData() {
@@ -37,7 +43,7 @@ public class ProductDataInitializer {
             product1.setStockQuantity(100);
             product1.setUnit("公斤");
             product1.setStatus("可用");
-            product1.setExpire(new Date());
+            product1.setExpire(LocalDate.parse("2025-12-31"));
             product1.setCreatedAt(LocalDateTime.now());
             product1.setUpdatedAt(LocalDateTime.now());
             CategoryBean category1 = categoryRepository.findById(1)
@@ -53,7 +59,7 @@ public class ProductDataInitializer {
             product2.setStockQuantity(200);
             product2.setUnit("個");
             product2.setStatus("可用");
-            product2.setExpire(new Date());
+            product2.setExpire(LocalDate.parse("2030-12-31"));
             product2.setCreatedAt(LocalDateTime.now());
             product2.setUpdatedAt(LocalDateTime.now());
             product2.setCategory(category1);
@@ -67,7 +73,7 @@ public class ProductDataInitializer {
             product3.setStockQuantity(150);
             product3.setUnit("個");
             product3.setStatus("可用");
-            product3.setExpire(new Date());
+            product3.setExpire(LocalDate.parse("2025-12-31"));
             product3.setCreatedAt(LocalDateTime.now());
             product3.setUpdatedAt(LocalDateTime.now());
             product3.setCategory(category1);
@@ -81,7 +87,7 @@ public class ProductDataInitializer {
             product4.setStockQuantity(300);
             product4.setUnit("個");
             product4.setStatus("可用");
-            product4.setExpire(new Date());
+            product4.setExpire(LocalDate.now());
             product4.setCreatedAt(LocalDateTime.now());
             product4.setUpdatedAt(LocalDateTime.now());
             product4.setCategory(category1);
@@ -95,7 +101,7 @@ public class ProductDataInitializer {
             product5.setStockQuantity(80);
             product5.setUnit("公斤");
             product5.setStatus("可用");
-            product5.setExpire(new Date());
+            product5.setExpire(LocalDate.parse("2025-06-31"));
             product5.setCreatedAt(LocalDateTime.now());
             product5.setUpdatedAt(LocalDateTime.now());
             product5.setCategory(category1);

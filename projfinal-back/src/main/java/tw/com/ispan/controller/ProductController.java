@@ -21,8 +21,8 @@ import tw.com.ispan.service.shop.ProductService;
 import tw.com.ispan.util.DatetimeConverter;
 
 @RestController
-@RequestMapping("/ajax/pages/products")
-public class ProductAjaxController {
+@RequestMapping("/products")
+public class ProductController {
     @Autowired
     private ProductService productService;
 

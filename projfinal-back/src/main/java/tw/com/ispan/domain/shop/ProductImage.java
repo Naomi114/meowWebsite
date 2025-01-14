@@ -2,8 +2,10 @@ package tw.com.ispan.domain.shop;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,7 +15,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "productImage")
-public class ProductImageBean {
+public class ProductImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer imageId;
@@ -28,13 +30,13 @@ public class ProductImageBean {
     private LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "productId", nullable = false)
+    @JoinColumn(name = "FK_imageId", foreignKey = @ForeignKey(name = "fkc_image_id"))
     private ProductBean product;
 
-    public ProductImageBean() {
+    public ProductImage() {
     }
 
-    public ProductImageBean(Integer imageId, String imageUrl, Boolean isPrimary, LocalDateTime createdAt,
+    public ProductImage(Integer imageId, String imageUrl, Boolean isPrimary, LocalDateTime createdAt,
             ProductBean product) {
         this.imageId = imageId;
         this.imageUrl = imageUrl;
