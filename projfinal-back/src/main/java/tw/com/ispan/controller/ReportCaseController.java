@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,6 +46,22 @@ public class ReportCaseController {
             return reportCase.get();
         } else {
             throw new IllegalArgumentException("找不到指定的 ReportCase，ID: " + id);
+        }
+    }
+
+    /**
+     * 根據 memberId 查詢 ReportCase
+     *
+     * @param memberId 會員的 ID
+     * @return 與該會員相關的 ReportCase 列表
+     */
+    @GetMapping("/{memberId}")
+    public ResponseEntity<?> getReportCasesByMemberId(@PathVariable Integer memberId) {
+        List<ReportCase> reportCases = reportCaseService.findByMemberId(memberId);
+        if (!reportCases.isEmpty()) {
+            return ResponseEntity.ok(reportCases);
+        } else {
+            return ResponseEntity.status(404).body("No ReportCases found for memberId: " + memberId);
         }
     }
 
