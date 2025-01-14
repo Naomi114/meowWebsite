@@ -1,7 +1,9 @@
 package tw.com.ispan.domain.shop;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties.Admin;
 
@@ -18,7 +20,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "inventory")
-public class InventoryBean {
+public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer inventoryId;
@@ -26,6 +28,7 @@ public class InventoryBean {
     @Column(nullable = false)
     private Integer quantity;
 
+    @Column(nullable = true)
     private String diffReason;
 
     @Column(nullable = false)
@@ -41,14 +44,17 @@ public class InventoryBean {
     @JoinColumn(name = "adminId", nullable = false)
     private Admin admin;
 
-    @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StockAuditBean> stockAudits;
+    // 單向一對多關聯
+    // cascade = CascadeType.remove 因為庫存紀錄對商品數量有影響，所以不允許連動刪除庫存異動記錄，只能手動刪除
+    @OneToMany(mappedBy = "inventory", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
+            CascadeType.REFRESH }, orphanRemoval = true)
+    private Set<InventoryItem> inventoryItems = new LinkedHashSet<>();
 
-    public InventoryBean() {
+    public Inventory() {
     }
 
-    public InventoryBean(Integer inventoryId, Integer quantity, String diffReason, String inventoryStatus,
-            LocalDateTime checkAt, LocalDateTime endAt, Admin admin, List<StockAuditBean> stockAudits) {
+    public Inventory(Integer inventoryId, Integer quantity, String diffReason, String inventoryStatus,
+            LocalDateTime checkAt, LocalDateTime endAt, Admin admin, Set<InventoryItem> inventoryItems) {
         this.inventoryId = inventoryId;
         this.quantity = quantity;
         this.diffReason = diffReason;
@@ -56,14 +62,14 @@ public class InventoryBean {
         this.checkAt = checkAt;
         this.endAt = endAt;
         this.admin = admin;
-        this.stockAudits = stockAudits;
+        this.inventoryItems = inventoryItems;
     }
 
     @Override
     public String toString() {
         return "InventoryBean [inventoryId=" + inventoryId + ", quantity=" + quantity + ", diffReason=" + diffReason
                 + ", inventoryStatus=" + inventoryStatus + ", checkAt=" + checkAt + ", endAt=" + endAt + ", admin="
-                + admin + ", stockAudits=" + stockAudits + "]";
+                + admin + ", inventoryItems=" + inventoryItems + "]";
     }
 
     public Integer getInventoryId() {
@@ -122,12 +128,12 @@ public class InventoryBean {
         this.admin = admin;
     }
 
-    public List<StockAuditBean> getStockAudits() {
-        return stockAudits;
+    public Set<InventoryItem> getInventoryItems() {
+        return inventoryItems;
     }
 
-    public void setStockAudits(List<StockAuditBean> stockAudits) {
-        this.stockAudits = stockAudits;
+    public void setInventoryItems(Set<InventoryItem> inventoryItems) {
+        this.inventoryItems = inventoryItems;
     }
 
 }

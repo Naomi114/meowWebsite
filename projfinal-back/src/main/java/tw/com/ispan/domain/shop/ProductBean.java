@@ -1,10 +1,10 @@
 package tw.com.ispan.domain.shop;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -52,47 +52,61 @@ public class ProductBean {
     @Column(nullable = true)
     private String status;
 
+    // LocalDate 存年月日
     @Column(nullable = false)
-    private Date expire;
+    private LocalDate expire;
 
+    // LocalDateTime 存年月日時分秒
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    // 雙向關係的多對一端，藉由DTO/ProductRequest 解決雙向序列化問題
-    @ManyToOne
+    // 雙向關係的多對一端，可反向查找
+    // cascade = CascadeType.remove 會導致刪除商品時刪除商品類別；只有新增、修改、更新同步
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "FK_categoryId", foreignKey = @ForeignKey(name = "fkc_category_id"))
     private CategoryBean category;
 
-    // 雙向關係的多對一端；尚未檢查 Admin 實體的關聯????
-    @ManyToOne
+    // 雙向關係的多對一端，可反向查找
+    // 尚待確認 Admin 表格有fetch = FetchType.EAGER (預設為 LAZY)
+    // cascade = CascadeType.remove 會導致刪除商品時刪除管理員；須排除在外
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "FK_adminId", foreignKey = @ForeignKey(name = "fkc_admin_id"))
     private Admin admin;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "fk_imageId", foreignKey = @ForeignKey(name = "fkc_image_id"))
-    private List<ProductImageBean> productImages;
+    // 單向關係的一對多端，可由商品查找商品圖片
+    // cascade = CascadeType.remove 當刪除商品時，會刪除商品圖片；已包含在 ALL 內
+    // orphanRemoval = true，確保當某圖片從商品圖片集合中移除時，該圖片會從資料庫中刪除。
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private Set<ProductImage> productImages = new LinkedHashSet<>(); // 按插入順序存取的唯一集合，首圖放第一張
 
-    @ManyToMany
+    // 雙向關係的多對多端，可反向查找
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
+            CascadeType.REFRESH }, fetch = FetchType.LAZY)
     @JoinTable(name = "product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private Set<TagBean> tags = new HashSet<>();
+    private Set<ProductTag> tags = new HashSet<>(); // 無序不重複、高效查找
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StockAuditBean> stockAudits;
+    // 單向關係的一對多端，可由商品查找庫存異動
+    // 商品刪除時，保留相關的庫存異動記錄
+    // cascade = CascadeType.remove 當刪除商品時，會刪除庫存異動；須排除在外
+    @OneToMany(mappedBy = "product", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
+            CascadeType.REFRESH }, fetch = FetchType.EAGER)
+    private Set<InventoryItem> inventoryItems = new HashSet<>(); // 適合高效查找
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WishListBean> wishlists;
+    // 雙向關係的一對多端，可反向查找
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private Set<WishListBean> wishlists;
 
     public ProductBean() {
     }
 
     public ProductBean(Integer productId, String productName, String description, BigDecimal originalPrice,
-            BigDecimal salePrice, Integer stockQuantity, String unit, String status, Date expire,
+            BigDecimal salePrice, Integer stockQuantity, String unit, String status, LocalDate expire,
             LocalDateTime createdAt, LocalDateTime updatedAt, CategoryBean category, Admin admin,
-            List<ProductImageBean> productImages, Set<TagBean> tags, List<StockAuditBean> stockAudits,
-            List<WishListBean> wishlists) {
+            Set<ProductImage> productImages, Set<ProductTag> tags, Set<InventoryItem> inventoryItems,
+            Set<WishListBean> wishlists) {
         this.productId = productId;
         this.productName = productName;
         this.description = description;
@@ -108,7 +122,7 @@ public class ProductBean {
         this.admin = admin;
         this.productImages = productImages;
         this.tags = tags;
-        this.stockAudits = stockAudits;
+        this.inventoryItems = inventoryItems;
         this.wishlists = wishlists;
     }
 
@@ -117,9 +131,9 @@ public class ProductBean {
         return "ProductBean [productId=" + productId + ", productName=" + productName + ", description=" + description
                 + ", originalPrice=" + originalPrice + ", salePrice=" + salePrice + ", stockQuantity=" + stockQuantity
                 + ", unit=" + unit + ", status=" + status + ", expire=" + expire + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt + ", category=" + category + ", admin=" + admin
-                + ", productImages=" + productImages + ", tags=" + tags + ", stockAudits=" + stockAudits
-                + ", wishlists=" + wishlists + "]";
+                + ", updatedAt=" + updatedAt + ", category=" + category + ", admin=" + admin + ", productImages="
+                + productImages + ", tags=" + tags + ", inventoryItems=" + inventoryItems + ", wishlists=" + wishlists
+                + "]";
     }
 
     public Integer getProductId() {
@@ -154,7 +168,7 @@ public class ProductBean {
         return status;
     }
 
-    public Date getExpire() {
+    public LocalDate getExpire() {
         return expire;
     }
 
@@ -174,19 +188,15 @@ public class ProductBean {
         return admin;
     }
 
-    public List<ProductImageBean> getProductImages() {
+    public Set<ProductImage> getProductImages() {
         return productImages;
     }
 
-    public Set<TagBean> getTags() {
+    public Set<ProductTag> getTags() {
         return tags;
     }
 
-    public List<StockAuditBean> getStockAudits() {
-        return stockAudits;
-    }
-
-    public List<WishListBean> getWishlists() {
+    public Set<WishListBean> getWishlists() {
         return wishlists;
     }
 
@@ -222,7 +232,7 @@ public class ProductBean {
         this.status = status;
     }
 
-    public void setExpire(Date expire) {
+    public void setExpire(LocalDate expire) {
         this.expire = expire;
     }
 
@@ -246,20 +256,23 @@ public class ProductBean {
         this.admin = admin;
     }
 
-    public void setProductImages(List<ProductImageBean> productImages) {
+    public void setProductImages(Set<ProductImage> productImages) {
         this.productImages = productImages;
     }
 
-    public void setTags(Set<TagBean> tags) {
+    public void setTags(Set<ProductTag> tags) {
         this.tags = tags;
     }
 
-    public void setStockAudits(List<StockAuditBean> stockAudits) {
-        this.stockAudits = stockAudits;
-    }
-
-    public void setWishlists(List<WishListBean> wishlists) {
+    public void setWishlists(Set<WishListBean> wishlists) {
         this.wishlists = wishlists;
     }
 
+    public Set<InventoryItem> getInventoryItems() {
+        return inventoryItems;
+    }
+
+    public void setInventoryItems(Set<InventoryItem> inventoryItems) {
+        this.inventoryItems = inventoryItems;
+    }
 }

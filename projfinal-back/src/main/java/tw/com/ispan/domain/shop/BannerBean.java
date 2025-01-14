@@ -38,5 +38,81 @@ public class BannerBean {
     @JoinColumn(name = "discountId", nullable = false)
     private Discount discount;
 
-    // Getters and Setters
+    public BannerBean() {
+    }
+
+    public BannerBean(Integer bannerId, String bannerTitle, String bannerImageUrl, Date startDate, Date endDate,
+            LocalDateTime createdAt, Discount discount) {
+        this.bannerId = bannerId;
+        this.bannerTitle = bannerTitle;
+        this.bannerImageUrl = bannerImageUrl;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.createdAt = createdAt;
+        this.discount = discount;
+    }
+
+    @Override
+    public String toString() {
+        return "BannerBean [bannerId=" + bannerId + ", bannerTitle=" + bannerTitle + ", bannerImageUrl="
+                + bannerImageUrl + ", startDate=" + startDate + ", endDate=" + endDate + ", createdAt=" + createdAt
+                + ", discount=" + discount + "]";
+    }
+
+    public Integer getBannerId() {
+        return bannerId;
+    }
+
+    public void setBannerId(Integer bannerId) {
+        this.bannerId = bannerId;
+    }
+
+    public String getBannerTitle() {
+        return bannerTitle;
+    }
+
+    public void setBannerTitle(String bannerTitle) {
+        this.bannerTitle = bannerTitle;
+    }
+
+    public String getBannerImageUrl() {
+        return bannerImageUrl;
+    }
+
+    public void setBannerImageUrl(String bannerImageUrl) {
+        this.bannerImageUrl = bannerImageUrl;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Discount getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Discount discount) {
+        this.discount = discount;
+    }
+
 }
