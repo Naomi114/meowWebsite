@@ -1,12 +1,21 @@
 package tw.com.ispan.domain.pet.banner;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import tw.com.ispan.domain.pet.AdoptCase;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import tw.com.ispan.domain.pet.AdoptionCase;
 
 @Entity
 @Table(name = "AdoptBanner")
-public class AdoptBanner {
+public class AdoptionBanner {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 自增流水號
@@ -20,8 +29,8 @@ public class AdoptBanner {
     private LocalDateTime dueDate;
 
     @OneToOne
-    @JoinColumn(name = "adoptCaseId", nullable = false, unique = true, foreignKey = @ForeignKey(name = "FK_AdoptBanner_AdoptCase"))
-    private AdoptCase adoptCase;
+    @JoinColumn(name = "adoptionCaseId", nullable = false, unique = true, foreignKey = @ForeignKey(name = "FK_AdoptionBanner_AdoptCase"))
+    private AdoptionCase adoptionCase;
 
     // Getters and Setters
     public Integer getBannerId() {
@@ -48,11 +57,11 @@ public class AdoptBanner {
         this.dueDate = dueDate;
     }
 
-    public AdoptCase getAdoptCase() {
-        return adoptCase;
+    public AdoptionCase getAdoptionCase() {
+        return adoptionCase;
     }
 
-    public void setAdoptCase(AdoptCase adoptCase) {
-        this.adoptCase = adoptCase;
+    public void setAdoptionCase(AdoptionCase adoptionCase) {
+        this.adoptionCase = adoptionCase;
     }
 }
