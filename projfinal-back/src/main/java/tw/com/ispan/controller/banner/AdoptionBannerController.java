@@ -29,7 +29,10 @@ public class AdoptionBannerController {
      * @return 新增結果
      */
     @PostMapping
-    public ResponseEntity<?> createBanner(@RequestBody AdoptionBanner adoptionBanner) {
+    public ResponseEntity<?> createAdoptionBanner(@RequestBody AdoptionBanner adoptionBanner) {
+        if (adoptionBanner.getAdoptionCase() == null || adoptionBanner.getAdoptionCase().getAdoptionCaseId() == null) {
+            return ResponseEntity.badRequest().body("AdoptionCase ID is required.");
+        }
         AdoptionBanner createdBanner = adoptionBannerService.create(adoptionBanner);
         return ResponseEntity.ok(createdBanner);
     }
@@ -42,8 +45,11 @@ public class AdoptionBannerController {
      * @return 更新結果
      */
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBanner(@PathVariable Integer id,
+    public ResponseEntity<?> updateAdoptionBanner(@PathVariable Integer id,
             @RequestBody AdoptionBanner adoptionBanner) {
+        if (adoptionBanner.getAdoptionCase() == null || adoptionBanner.getAdoptionCase().getAdoptionCaseId() == null) {
+            return ResponseEntity.badRequest().body("AdoptionCase ID is required.");
+        }
         Optional<AdoptionBanner> updatedBanner = adoptionBannerService.update(id, adoptionBanner);
         if (updatedBanner.isPresent()) {
             return ResponseEntity.ok(updatedBanner.get());
@@ -59,7 +65,7 @@ public class AdoptionBannerController {
      * @return 刪除結果
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBanner(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteAdoptionBanner(@PathVariable Integer id) {
         boolean deleted = adoptionBannerService.deleteById(id);
         if (deleted) {
             return ResponseEntity.ok("AdoptionBanner deleted successfully.");

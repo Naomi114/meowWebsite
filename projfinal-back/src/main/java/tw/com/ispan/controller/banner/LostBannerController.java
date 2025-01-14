@@ -25,11 +25,15 @@ public class LostBannerController {
     /**
      * 新增 LostBanner
      *
-     * @param lostBanner 要新增的 LostBanner 物件
+     * @param lostBanner LostBanner 資料
      * @return 新增結果
      */
     @PostMapping
-    public ResponseEntity<?> createBanner(@RequestBody LostBanner lostBanner) {
+    public ResponseEntity<?> createLostBanner(@RequestBody LostBanner lostBanner) {
+        if (lostBanner.getLostCase() == null || lostBanner.getLostCase().getLostCaseId() == null) {
+            return ResponseEntity.badRequest().body("LostCase ID is required.");
+        }
+
         LostBanner createdBanner = lostBannerService.create(lostBanner);
         return ResponseEntity.ok(createdBanner);
     }
@@ -37,12 +41,16 @@ public class LostBannerController {
     /**
      * 更新 LostBanner
      *
-     * @param id         Banner 的 ID
+     * @param id         Banner ID
      * @param lostBanner 更新內容
      * @return 更新結果
      */
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBanner(@PathVariable Integer id, @RequestBody LostBanner lostBanner) {
+    public ResponseEntity<?> updateLostBanner(@PathVariable Integer id, @RequestBody LostBanner lostBanner) {
+        if (lostBanner.getLostCase() == null || lostBanner.getLostCase().getLostCaseId() == null) {
+            return ResponseEntity.badRequest().body("LostCase ID is required.");
+        }
+
         Optional<LostBanner> updatedBanner = lostBannerService.update(id, lostBanner);
         if (updatedBanner.isPresent()) {
             return ResponseEntity.ok(updatedBanner.get());
@@ -54,11 +62,11 @@ public class LostBannerController {
     /**
      * 根據 ID 刪除 LostBanner
      *
-     * @param id Banner 的 ID
+     * @param id Banner ID
      * @return 刪除結果
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBanner(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteLostBanner(@PathVariable Integer id) {
         boolean deleted = lostBannerService.deleteById(id);
         if (deleted) {
             return ResponseEntity.ok("LostBanner deleted successfully.");
