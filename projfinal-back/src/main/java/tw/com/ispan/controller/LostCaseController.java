@@ -16,19 +16,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import tw.com.ispan.domain.pet.LostCase;
-import tw.com.ispan.domain.shop.ProductBean;
 import tw.com.ispan.dto.LostCaseResponse;
 import tw.com.ispan.service.pet.LostCaseService;
 import tw.com.ispan.util.DatetimeConverter;
 
 @RestController
-@RequestMapping("/ajax/pages/lostcase")
-public class LostCaseAjaxController {
+@RequestMapping("/lostcase")
+public class LostCaseController {
     @Autowired
     private LostCaseService lostCaseService;
 
     @PostMapping
-    public LostCase create(@RequestBody String json) {
+    public LostCaseResponse create(@RequestBody String json) {
         LostCaseResponse responseBean = new LostCaseResponse();
 
         JSONObject obj = new JSONObject(json);
@@ -105,7 +104,7 @@ public class LostCaseAjaxController {
         if (id != null) {
             LostCase findCase = lostCaseService.findById(id);
             if (findCase != null) {
-                String make = DatetimeConverter.toString(findCase.getPublicationTime(), "yyyy-MM-dd");
+                String date = DatetimeConverter.toString(findCase.getPublicationTime(), "yyyy-MM-dd");
                 JSONObject item = new JSONObject()
                         .put("lostCaseId", findCase.getLostCaseId())
                         .put("caseTitle", findCase.getCaseTitle())
@@ -114,7 +113,7 @@ public class LostCaseAjaxController {
                         .put("gender", findCase.getGender())
                         .put("breed", findCase.getBreed())
                         .put("sterilization", findCase.getSterilization())
-                        .put("publicationTime", findCase.getPublicationTime());
+                        .put("publicationTime", date);
                 array = array.put(item);
             }
         }
@@ -123,7 +122,7 @@ public class LostCaseAjaxController {
     }
 
     @PostMapping("/find")
-    public LostCase find(@RequestBody String json) {
+    public LostCaseResponse find(@RequestBody String json) {
         LostCaseResponse responseBean = new LostCaseResponse();
 
         long count = lostCaseService.count(json);
@@ -135,6 +134,7 @@ public class LostCaseAjaxController {
         } else {
             responseBean.setList(new ArrayList<>());
         }
+
         return responseBean;
     }
 }
