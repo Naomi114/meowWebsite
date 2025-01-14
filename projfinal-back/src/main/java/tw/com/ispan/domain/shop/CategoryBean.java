@@ -1,5 +1,6 @@
 package tw.com.ispan.domain.shop;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -27,8 +28,9 @@ public class CategoryBean {
     @Column(nullable = false, length = 10)
     private String defaultUnit;
 
-    @OneToMany(mappedBy = "productCategory", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<ProductBean> products;
+    // 雙向關係的一對多端
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductBean> products = new ArrayList<>();
 
     public CategoryBean() {
     }
