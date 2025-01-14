@@ -20,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
+import tw.com.ispan.domain.pet.forAdopt.AdoptionCaseApply;
 
 @Entity
 @Table(name = "AdoptionCase")
@@ -119,20 +120,19 @@ public class AdoptionCase {
     @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_CasePicture_AdoptionCase"), nullable = false)
     private List<CasePicture> casePictures;
 
-    // 單向一對多，對應follow表
+    // 雙向一對多，對應follow表
     @OneToMany(mappedBy = "adoptionCaseId", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Follow> follows;
 
     // 關聯到ReportCase表，單向一對多
+    // 無外鍵，怕爛掉，測試版
     @OneToMany(mappedBy = "adoptionCaseId", cascade = CascadeType.ALL)
-    private List<ReportCase> reportCases;
+    private List<ReportCase> reportCase;
 
     // 與AdoptionCaseApply 多對多
     @ManyToMany
-    @JoinTable(name = "Case_CaseApply", joinColumns = {
-            @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_Case")) }, inverseJoinColumns = {
-                    @JoinColumn(name = "adoptionCaseApplyId", foreignKey = @ForeignKey(name = "FK_CaseApply")) })
-    private Set<AdoptionCaseApply> adoptionCaseApplys = new HashSet<AdoptionCaseApply>();
+    @JoinTable(name = "Case_CaseApply", joinColumns = @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_Case")), inverseJoinColumns = @JoinColumn(name = "adoptionCaseApplyId", foreignKey = @ForeignKey(name = "FK_CaseApply")))
+    private Set<AdoptionCaseApply> adoptionCaseApplys = new HashSet<>();
 
     public Integer getAdoptionCaseId() {
         return adoptionCaseId;
@@ -154,12 +154,12 @@ public class AdoptionCase {
         this.follows = follows;
     }
 
-    public List<ReportCase> getReportCases() {
-        return reportCases;
+    public List<ReportCase> getReportCase() {
+        return reportCase;
     }
 
-    public void setReportCases(List<ReportCase> reportCases) {
-        this.reportCases = reportCases;
+    public void setReportCases(List<ReportCase> reportCase) {
+        this.reportCase = reportCase;
     }
 
     public Set<AdoptionCaseApply> getAdoptionCaseApplys() {

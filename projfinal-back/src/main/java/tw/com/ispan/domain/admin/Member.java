@@ -22,7 +22,10 @@ import tw.com.ispan.domain.pet.Follow;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.ReportCase;
 import tw.com.ispan.domain.pet.RescueCase;
+import tw.com.ispan.domain.pet.forAdopt.AdoptionCaseApply;
+import tw.com.ispan.domain.shop.Cart;
 import tw.com.ispan.domain.shop.Order;
+import tw.com.ispan.domain.shop.WishListBean;
 
 @Entity
 @Table(name = "Member")
@@ -65,7 +68,7 @@ public class Member {
 	private Set<ActivityParticipantList> acitvityParticipantList;
 
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-	private List<WishList> wishList;
+	private List<WishListBean> wishList;
 
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	private Set<Cart> cart;
@@ -87,6 +90,10 @@ public class Member {
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private List<ReportCase> reportCase;
+
+	// 關聯圖沒有，最後meeting加的
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private Set<AdoptionCaseApply> adoptionCaseApply;
 
 	public Integer getMemberId() {
 		return memberId;
@@ -167,13 +174,5 @@ public class Member {
 	public void setUpdateDate(LocalDateTime updateDate) {
 		this.updateDate = updateDate;
 	}
-
-	// public String getStatus() {
-	// return status;
-	// }
-
-	// public void setStatus(String status) {
-	// this.status = status;
-	// }
 
 }
