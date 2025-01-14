@@ -3,8 +3,6 @@ package tw.com.ispan.domain.shop;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties.Admin;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import tw.com.ispan.domain.admin.Admin;
 
 @Entity
 @Table(name = "Discount")
@@ -34,20 +33,26 @@ public class Discount {
     @Column(nullable = false)
     private LocalDateTime discountEndTime;
 
-    private Double minAmount;
+    @Column
+    private Double minAmount; // Nullable by default
 
-    private Integer minQuantity;
+    @Column
+    private Integer minQuantity; // Nullable by default
 
-    private Integer priority;
+    @Column
+    private Integer priority; // Nullable by default
 
-    private String discountStatus;
+    @Column(length = 20)
+    private String discountStatus; // Nullable by default, can add length constraint
 
-    private String discountType;
+    @Column(length = 20)
+    private String discountType; // Nullable by default, can add length constraint
 
-    private Double discountValue;
+    @Column
+    private Double discountValue; // Nullable by default
 
     @OneToMany(mappedBy = "discount", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DiscountScope> discountScopes;
+    private List<Discount> discountScopes;
 
     // Constructors, getters, setters, toString()
 }

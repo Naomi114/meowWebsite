@@ -10,6 +10,8 @@ import java.util.Set;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,6 +36,7 @@ public class ProductBean {
     @Column(nullable = true)
     private String description;
 
+    // 總共 10 位數，整數 8 位，小數 2 位
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal originalPrice;
 
@@ -58,15 +61,18 @@ public class ProductBean {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    // 雙向關係的多對一端，藉由DTO/ProductRequest 解決雙向序列化問題
     @ManyToOne
-    @JoinColumn(name = "categoryId", nullable = false)
-    private ProductCategoryBean productCategory;
+    @JoinColumn(name = "FK_categoryId", foreignKey = @ForeignKey(name = "fkc_category_id"))
+    private CategoryBean category;
 
+    // 雙向關係的多對一端；尚未檢查 Admin 實體的關聯????
     @ManyToOne
-    @JoinColumn(name = "adminId", nullable = false)
+    @JoinColumn(name = "FK_adminId", foreignKey = @ForeignKey(name = "fkc_admin_id"))
     private Admin admin;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "fk_imageId", foreignKey = @ForeignKey(name = "fkc_image_id"))
     private List<ProductImageBean> productImages;
 
     @ManyToMany
@@ -84,7 +90,7 @@ public class ProductBean {
 
     public ProductBean(Integer productId, String productName, String description, BigDecimal originalPrice,
             BigDecimal salePrice, Integer stockQuantity, String unit, String status, Date expire,
-            LocalDateTime createdAt, LocalDateTime updatedAt, ProductCategoryBean productCategory, Admin admin,
+            LocalDateTime createdAt, LocalDateTime updatedAt, CategoryBean category, Admin admin,
             List<ProductImageBean> productImages, Set<TagBean> tags, List<StockAuditBean> stockAudits,
             List<WishListBean> wishlists) {
         this.productId = productId;
@@ -98,7 +104,7 @@ public class ProductBean {
         this.expire = expire;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.productCategory = productCategory;
+        this.category = category;
         this.admin = admin;
         this.productImages = productImages;
         this.tags = tags;
@@ -111,7 +117,7 @@ public class ProductBean {
         return "ProductBean [productId=" + productId + ", productName=" + productName + ", description=" + description
                 + ", originalPrice=" + originalPrice + ", salePrice=" + salePrice + ", stockQuantity=" + stockQuantity
                 + ", unit=" + unit + ", status=" + status + ", expire=" + expire + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt + ", productCategory=" + productCategory + ", admin=" + admin
+                + ", updatedAt=" + updatedAt + ", category=" + category + ", admin=" + admin
                 + ", productImages=" + productImages + ", tags=" + tags + ", stockAudits=" + stockAudits
                 + ", wishlists=" + wishlists + "]";
     }
@@ -120,132 +126,136 @@ public class ProductBean {
         return productId;
     }
 
-    public void setProductId(Integer productId) {
-        this.productId = productId;
-    }
-
     public String getProductName() {
         return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public BigDecimal getOriginalPrice() {
         return originalPrice;
-    }
-
-    public void setOriginalPrice(BigDecimal originalPrice) {
-        this.originalPrice = originalPrice;
     }
 
     public BigDecimal getSalePrice() {
         return salePrice;
     }
 
-    public void setSalePrice(BigDecimal salePrice) {
-        this.salePrice = salePrice;
-    }
-
     public Integer getStockQuantity() {
         return stockQuantity;
-    }
-
-    public void setStockQuantity(Integer stockQuantity) {
-        this.stockQuantity = stockQuantity;
     }
 
     public String getUnit() {
         return unit;
     }
 
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
     public String getStatus() {
         return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public Date getExpire() {
         return expire;
     }
 
-    public void setExpire(Date expire) {
-        this.expire = expire;
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public ProductCategoryBean getProductCategory() {
-        return productCategory;
-    }
-
-    public void setProductCategory(ProductCategoryBean productCategory) {
-        this.productCategory = productCategory;
+    public CategoryBean getCategory() {
+        return category;
     }
 
     public Admin getAdmin() {
         return admin;
     }
 
-    public void setAdmin(Admin admin) {
-        this.admin = admin;
-    }
-
     public List<ProductImageBean> getProductImages() {
         return productImages;
-    }
-
-    public void setProductImages(List<ProductImageBean> productImages) {
-        this.productImages = productImages;
     }
 
     public Set<TagBean> getTags() {
         return tags;
     }
 
-    public void setTags(Set<TagBean> tags) {
-        this.tags = tags;
-    }
-
     public List<StockAuditBean> getStockAudits() {
         return stockAudits;
     }
 
-    public void setStockAudits(List<StockAuditBean> stockAudits) {
-        this.stockAudits = stockAudits;
-    }
-
     public List<WishListBean> getWishlists() {
         return wishlists;
+    }
+
+    public void setProductId(Integer productId) {
+        this.productId = productId;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setOriginalPrice(BigDecimal originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+
+    public void setSalePrice(BigDecimal salePrice) {
+        this.salePrice = salePrice;
+    }
+
+    public void setStockQuantity(Integer stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setExpire(Date expire) {
+        this.expire = expire;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setCategory(CategoryBean category) {
+        this.category = category;
+        // 確保雙向關係一致: 若目前商品類別不包含此商品，則將此商品加入商品類別
+        if (!category.getProducts().contains(this)) {
+            category.getProducts().add(this);
+        }
+    }
+
+    public void setAdmin(Admin admin) {
+        this.admin = admin;
+    }
+
+    public void setProductImages(List<ProductImageBean> productImages) {
+        this.productImages = productImages;
+    }
+
+    public void setTags(Set<TagBean> tags) {
+        this.tags = tags;
+    }
+
+    public void setStockAudits(List<StockAuditBean> stockAudits) {
+        this.stockAudits = stockAudits;
     }
 
     public void setWishlists(List<WishListBean> wishlists) {

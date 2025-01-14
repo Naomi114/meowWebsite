@@ -1,10 +1,17 @@
 package tw.com.ispan.domain.pet;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import tw.com.ispan.domain.pet.RescueCase;
-import tw.com.ispan.domain.pet.LostCase;
-import tw.com.ispan.domain.pet.AdoptionCase;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
@@ -18,17 +25,19 @@ public class ReportCase {
     private Integer reportId;
 
     @ManyToOne
-    @JoinColumn(name = "rescueCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_RescueCase"))
+    @JoinColumn(name = "rescueCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_RescueCase"), nullable = true)
     private RescueCase rescueCase;
 
+    // 關聯到 LostCase 表，單向多對一
     @ManyToOne
-    @JoinColumn(name = "lostCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_LostCase"))
+    @JoinColumn(name = "lostCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_LostCase"), nullable = true)
     private LostCase lostCase;
 
     @ManyToOne
-    @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_AdoptionCase"))
+    @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_AdoptionCase"), nullable = true)
     private AdoptionCase adoptionCase;
 
+    // 關聯到 Member 表，單向多對一
     @ManyToOne(optional = false)
     @JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(name = "FK_ReportCase_Member"))
     private Member member;
@@ -41,6 +50,13 @@ public class ReportCase {
 
     @Column(name = "reportNotes", columnDefinition = "TEXT")
     private String reportNotes;
+
+    @Override
+    public String toString() {
+        return "ReportCase [reportId=" + reportId + ", rescueCaseId=" + rescueCase + ", lostCaseId=" + lostCase
+                + ", adoptionCaseId=" + adoptionCase + ", memberId=" + member + ", reportDate=" + reportDate
+                + ", reportType=" + reportType + ", reportNotes=" + reportNotes + "]";
+    }
 
     // Getters and Setters
     public Integer getReportId() {

@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import tw.com.ispan.domain.shop.ProductBean;
-// import tw.com.ispan.dto.ProductResponse;
-import tw.com.ispan.service.ProductService;
+import tw.com.ispan.dto.ProductResponse;
+import tw.com.ispan.service.shop.ProductService;
 import tw.com.ispan.util.DatetimeConverter;
 
 @RestController
@@ -62,7 +62,7 @@ public class ProductAjaxController {
             responseJson.put("success", false);
             responseJson.put("message", "Id不存在");
         } else {
-            ProductBean product = productService.modify(entity);
+            ProductBean product = productService.update(entity);
             if (product == null) {
                 responseJson.put("success", false);
                 responseJson.put("message", "修改失敗");
@@ -121,6 +121,7 @@ public class ProductAjaxController {
 
     @PostMapping("/find")
     public ProductResponse find(@RequestBody String json) {
+
         ProductResponse responseBean = new ProductResponse();
 
         long count = productService.count(json);
@@ -135,4 +136,5 @@ public class ProductAjaxController {
 
         return responseBean;
     }
+
 }

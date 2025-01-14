@@ -1,14 +1,17 @@
 package tw.com.ispan.util;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class DatetimeConverter {
-	public static String toString(Date datetime, String format) {
+
+	// 將 LocalDateTime 格式化為字串
+	public static String toString(LocalDateTime datetime, String format) {
 		String result = "";
 		try {
 			if (datetime != null) {
-				result = new SimpleDateFormat(format).format(datetime);
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+				result = datetime.format(formatter);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -16,12 +19,15 @@ public class DatetimeConverter {
 		return result;
 	}
 
-	public static Date parse(String datetime, String format) {
-		Date result = new Date();
+	// 將字串解析為 LocalDateTime
+	public static LocalDateTime parse(String datetime, String format) {
+		LocalDateTime result = null;
 		try {
-			result = new SimpleDateFormat(format).parse(datetime);
+			if (datetime != null && !datetime.isEmpty()) {
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+				result = LocalDateTime.parse(datetime, formatter);
+			}
 		} catch (Exception e) {
-			result = new Date();
 			e.printStackTrace();
 		}
 		return result;

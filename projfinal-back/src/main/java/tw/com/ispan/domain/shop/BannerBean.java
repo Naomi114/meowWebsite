@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "banner")
-public class ProductBannerBean {
+public class BannerBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer bannerId;
