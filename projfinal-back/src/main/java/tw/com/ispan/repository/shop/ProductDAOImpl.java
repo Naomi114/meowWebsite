@@ -25,12 +25,15 @@ public class ProductDAOImpl implements ProductDAO {
 		return entityManager;
 	}
 
+    // 商品搜尋頁>>
 	@Override
 	public Long count(JSONObject param) {
 		Integer productId = param.isNull("productId") ? null : param.getInt("productId");
 		String productName = param.isNull("productName") ? null : param.getString("productName");
 		Double priceMin = param.isNull("priceMin") ? null : param.getDouble("priceMin");
 		Double priceMax = param.isNull("priceMax") ? null : param.getDouble("priceMax");
+		String description = param.isNull("description") ? null : param.getString("description");
+		Integer categoryId = param.isNull("categoryId") ? null : param.getInt("categoryId");
 		String createdMin = param.isNull("createdMin") ? null : param.getString("createdMin");
 		String createdMax = param.isNull("createdMax") ? null : param.getString("createdMax");
 
@@ -76,6 +79,7 @@ public class ProductDAOImpl implements ProductDAO {
 		return query.getSingleResult();
 	}
 
+	// 商品搜尋頁>>多條件（如價格範圍或類別）模糊查詢
 	@Override
 	public List<ProductBean> find(JSONObject param) {
 		Integer productId = param.isNull("productId") ? null : param.getInt("productId");
@@ -121,6 +125,7 @@ public class ProductDAOImpl implements ProductDAO {
 					DatetimeConverter.parse(createdMax, "yyyy-MM-dd HH:mm:ss")));
 		}
 
+        // 商品搜尋頁>>分頁和排序
 		if (!predicates.isEmpty()) {
 			criteriaQuery.where(predicates.toArray(new Predicate[0]));
 		}
@@ -141,4 +146,5 @@ public class ProductDAOImpl implements ProductDAO {
 
 		return query.getResultList();
 	}
+	
 }
