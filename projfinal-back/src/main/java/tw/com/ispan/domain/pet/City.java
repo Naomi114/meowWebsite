@@ -15,18 +15,27 @@ public class City {
 	private String city;
 
 	// 和RescueCase表雙向一對多
-	@OneToMany(mappedBy = "cityId", cascade = CascadeType.PERSIST)
+	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
 	private List<RescueCase> rescueCases;
+	
+	// 和LostCase表雙向一對多
+	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
+	private List<LostCase> lostCases;
+	
+	// 和adoptionCase表雙向一對多
+	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
+	private List<AdoptionCase> adoptionCase;
 
 	public City() {
 		super();
 	}
 
-	public City(Integer cityId, String city) {
+
+	public City(String city) {
 		super();
-		this.cityId = cityId;
 		this.city = city;
 	}
+
 
 	public Integer getCityId() {
 		return cityId;

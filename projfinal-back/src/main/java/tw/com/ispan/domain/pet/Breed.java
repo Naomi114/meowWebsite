@@ -12,7 +12,7 @@ public class Breed {
     @Column(name = "breedId")
     private Integer breedId;
 
-    @Column(name = "breed", nullable = false, length = 50)
+    @Column(name = "breed", nullable = false, columnDefinition = "NVARCHAR(50)")
     private String breed;
 
     @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
@@ -20,9 +20,10 @@ public class Breed {
 
     @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
     private List<RescueCase> rescueCases;
-
+    
     @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
     private List<AdoptionCase> adoptionCases;
+
 
     // Getters and Setters
     public Integer getBreedId() {
@@ -56,4 +57,14 @@ public class Breed {
     public void setLostCases(List<LostCase> lostCases) {
         this.lostCases = lostCases;
     }
+
+	@Override
+	public String toString() {
+		return "Breed [breedId=" + breedId + ", breed=" + breed + ", lostCases=" + lostCases + ", rescueCases="
+				+ rescueCases + ", adoptionCases=" + adoptionCases + "]";
+	}
+    
+    
+    
 }
+

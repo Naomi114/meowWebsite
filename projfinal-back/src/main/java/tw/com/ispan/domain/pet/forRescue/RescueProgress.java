@@ -31,15 +31,6 @@ public class RescueProgress {
 	}
 
 
-	public RescueProgress(Integer rescueProgressId, String progressDetail, LocalDateTime createTime, String imageUrl) {
-		super();
-		this.rescueProgressId = rescueProgressId;
-		this.progressDetail = progressDetail;
-		this.createTime = createTime;
-		this.imageUrl = imageUrl;
-	}
-
-
 	public Integer getRescueProgressId() {
 		return rescueProgressId;
 	}

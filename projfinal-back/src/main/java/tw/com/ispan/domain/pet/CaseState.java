@@ -1,13 +1,18 @@
 package tw.com.ispan.domain.pet;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "CaseState")
 public class CaseState {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CaseStateId")
     private Integer CaseStateId;
 
@@ -21,13 +26,10 @@ public class CaseState {
 	}
 
 
-
-	public CaseState(Integer caseStateId, String caseStatement) {
+	public CaseState(String caseStatement) {
 		super();
-		CaseStateId = caseStateId;
 		this.caseStatement = caseStatement;
 	}
-
 
 
 	public Integer getCaseStateId() {

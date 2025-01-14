@@ -2,6 +2,8 @@ package tw.com.ispan.repository.pet;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ActivityRepository extends JpaRepository<ActivityRepository, Integer>{
+import tw.com.ispan.domain.pet.Activity;
+
+public interface ActivityRepository extends JpaRepository<Activity, Integer>{
 
 }
