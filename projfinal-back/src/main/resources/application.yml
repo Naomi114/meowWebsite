@@ -35,6 +35,6 @@ spring:
     date-format: "yyyy-MM-dd"
     time-zone: Asia/Taipei
 
-#jwt:
-  #token:
-    #expire: 10
+jwt:
+  token:
+    expire: 10
