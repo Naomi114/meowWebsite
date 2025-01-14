@@ -2,7 +2,7 @@ package tw.com.ispan.domain.pet.banner;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import tw.com.ispan.domain.pet.AdoptCase;
+import tw.com.ispan.domain.pet.AdoptionCase;
 
 @Entity
 @Table(name = "AdoptBanner")
@@ -21,7 +21,7 @@ public class AdoptBanner {
 
     @OneToOne
     @JoinColumn(name = "adoptCaseId", nullable = false, unique = true, foreignKey = @ForeignKey(name = "FK_AdoptBanner_AdoptCase"))
-    private AdoptCase adoptCase;
+    private AdoptionCase adoptionCase;
 
     // Getters and Setters
     public Integer getBannerId() {
@@ -48,11 +48,4 @@ public class AdoptBanner {
         this.dueDate = dueDate;
     }
 
-    public AdoptCase getAdoptCase() {
-        return adoptCase;
-    }
-
-    public void setAdoptCase(AdoptCase adoptCase) {
-        this.adoptCase = adoptCase;
-    }
 }

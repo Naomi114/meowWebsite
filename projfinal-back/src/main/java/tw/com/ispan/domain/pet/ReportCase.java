@@ -26,6 +26,7 @@ public class ReportCase {
     @JoinColumn(name = "lostCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_LostCase"), nullable = true)
     private LostCase lostCase;
 
+    // 單向?
     @ManyToOne
     @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_AdoptionCase"), nullable = true)
     private AdoptionCase adoptionCase;
