@@ -28,14 +28,14 @@ public class Follow {
 	@ManyToOne
 	@JoinColumn(name = "rescueCaseId", nullable = true)
 	private RescueCase rescueCase;
-//
-//	@ManyToOne
-//	@JoinColumn(name = "lostCaseId", nullable = true)
-//	private LostCase lostCase;
-//
-//	@ManyToOne
-//	@JoinColumn(name = "adoptionCaseId", nullable = true)
-//	private AdoptionCase adoptionCase;
+
+	@ManyToOne
+	@JoinColumn(name = "lostCaseId", nullable = true)
+	private LostCase lostCase;
+
+	@ManyToOne
+	@JoinColumn(name = "adoptionCaseId", nullable = true)
+	private AdoptionCase adoptionCase;
 
 	@Column(name = "followDate")
 	private LocalDateTime followDate;
