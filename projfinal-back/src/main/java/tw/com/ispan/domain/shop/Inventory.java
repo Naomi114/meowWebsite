@@ -2,7 +2,6 @@ package tw.com.ispan.domain.shop;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties.Admin;

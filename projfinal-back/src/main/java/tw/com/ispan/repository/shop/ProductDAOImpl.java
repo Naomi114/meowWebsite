@@ -25,7 +25,7 @@ public class ProductDAOImpl implements ProductDAO {
 		return entityManager;
 	}
 
-    // 商品搜尋頁>>
+	// 商品搜尋頁
 	@Override
 	public Long count(JSONObject param) {
 		Integer productId = param.isNull("productId") ? null : param.getInt("productId");
@@ -125,7 +125,7 @@ public class ProductDAOImpl implements ProductDAO {
 					DatetimeConverter.parse(createdMax, "yyyy-MM-dd HH:mm:ss")));
 		}
 
-        // 商品搜尋頁>>分頁和排序
+		// 商品搜尋頁>>分頁和排序
 		if (!predicates.isEmpty()) {
 			criteriaQuery.where(predicates.toArray(new Predicate[0]));
 		}
@@ -146,5 +146,5 @@ public class ProductDAOImpl implements ProductDAO {
 
 		return query.getResultList();
 	}
-	
+
 }
