@@ -16,8 +16,8 @@ import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
-@Table(name = "order")
-public class Order {
+@Table(name = "orders") // order 為Hibernate保留字，所以改為orders (by Naomi 20250115)
+public class Orders {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,10 +55,10 @@ public class Order {
     @Column(nullable = false)
     private Double finalPrice;
 
-    public Order() {
+    public Orders() {
     }
 
-    public Order(Integer orderId, Member member, List<OrderItem> orderItems, Discount discount, String shippingAddress,
+    public Orders(Integer orderId, Member member, List<OrderItem> orderItems, Discount discount, String shippingAddress,
             LocalDateTime orderDate, String creditCard, String orderStatus, String feedback, Double subtotalPrice,
             Double finalPrice) {
         this.orderId = orderId;

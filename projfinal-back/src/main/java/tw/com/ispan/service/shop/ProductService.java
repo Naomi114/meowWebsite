@@ -24,6 +24,8 @@ import tw.com.ispan.domain.shop.CategoryBean;
 import tw.com.ispan.domain.shop.InventoryItem;
 import tw.com.ispan.domain.shop.ProductBean;
 import tw.com.ispan.domain.shop.ProductImage;
+import tw.com.ispan.dto.ProductRequest;
+import tw.com.ispan.dto.ProductResponse;
 import tw.com.ispan.repository.shop.ProductImageRepository;
 import tw.com.ispan.repository.shop.ProductRepository;
 
@@ -37,6 +39,38 @@ public class ProductService {
 	private ProductImageRepository productImageRepository;
 
 	// 商品增刪修
+	// 新增商品: 使用 DTO 來接收前端傳來的數據 (測試中)
+	public ProductResponse create(ProductRequest request) {
+		ProductResponse response = new ProductResponse();
+
+		try {
+			ProductBean product = new ProductBean();
+			product.setProductName(request.getProductName());
+			product.setDescription(request.getDescription());
+			product.setOriginalPrice(request.getPrice());
+			product.setStockQuantity(request.getStockQuantity());
+			product.setExpire(request.getExpire());
+			product.setUnit(request.getUnit());
+
+			CategoryBean category = new CategoryBean();
+			category.setCategoryId(request.getCategoryId());
+			product.setCategory(category);
+
+			ProductBean savedProduct = productRepository.save(product);
+
+			response.setSuccess(true);
+			response.setMessage("商品新增成功");
+			response.setProduct(savedProduct);
+
+		} catch (Exception e) {
+			response.setSuccess(false);
+			response.setMessage("商品新增失敗: " + e.getMessage());
+		}
+
+		return response;
+	}
+
+	// 新增商品: 讀取json格式的字串
 	public ProductBean create(String json) {
 		try {
 			JSONObject obj = new JSONObject(json);
@@ -57,7 +91,7 @@ public class ProductService {
 			CategoryBean category = new CategoryBean();
 			category.setCategoryId(categoryId);
 
-			Admin admin = new Admin();
+			Admin admin = new Admin(adminId, unit);
 			admin.setAdminId(adminId);
 
 			ProductBean product = new ProductBean();
@@ -189,53 +223,53 @@ public class ProductService {
 
 	// 上傳商品圖片
 	public void uploadProductImage(Integer productId, MultipartFile image) throws IOException {
-        // 確保商品存在
-        ProductBean product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("商品不存在"));
+		// 確保商品存在
+		ProductBean product = productRepository.findById(productId)
+				.orElseThrow(() -> new RuntimeException("商品不存在"));
 
-        // 驗證圖片格式和大小
-        validateImage(image);
+		// 驗證圖片格式和大小
+		validateImage(image);
 
-        // 存儲圖片並獲取路徑
-        String imageUrl = saveImageToStorage(image);
+		// 存儲圖片並獲取路徑
+		String imageUrl = saveImageToStorage(image);
 
-        // 保存圖片數據到資料庫
-        ProductImage productImage = new ProductImage();
-        productImage.setProduct(product);
-        productImage.setImageUrl(imageUrl);
-        productImage.setIsPrimary(false); // 默認為非主圖片
-        productImage.setCreatedAt(LocalDateTime.now());
+		// 保存圖片數據到資料庫
+		ProductImage productImage = new ProductImage();
+		productImage.setProduct(product);
+		productImage.setImageUrl(imageUrl);
+		productImage.setIsPrimary(false); // 默認為非主圖片
+		productImage.setCreatedAt(LocalDateTime.now());
 
-        productImageRepository.save(productImage);
-    }
+		productImageRepository.save(productImage);
+	}
 
-    private void validateImage(MultipartFile image) throws IOException {
-        // 檢查圖片大小（限制為 5MB）
-        long maxSize = 5 * 1024 * 1024;
-        if (image.getSize() > maxSize) {
-            throw new IOException("圖片大小超過限制（5MB）");
-        }
+	private void validateImage(MultipartFile image) throws IOException {
+		// 檢查圖片大小（限制為 5MB）
+		long maxSize = 5 * 1024 * 1024;
+		if (image.getSize() > maxSize) {
+			throw new IOException("圖片大小超過限制（5MB）");
+		}
 
-        // 檢查圖片格式
-        String contentType = image.getContentType();
-        if (!"image/jpeg".equals(contentType) && !"image/png".equals(contentType)) {
-            throw new IOException("僅支持 JPEG 或 PNG 格式的圖片");
-        }
-    }
+		// 檢查圖片格式
+		String contentType = image.getContentType();
+		if (!"image/jpeg".equals(contentType) && !"image/png".equals(contentType)) {
+			throw new IOException("僅支持 JPEG 或 PNG 格式的圖片");
+		}
+	}
 
-    private String saveImageToStorage(MultipartFile image) throws IOException {
-        // 圖片存儲路徑
-        String uploadDir = "uploads/images/";
-        String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
-        Path filePath = Paths.get(uploadDir, filename);
+	private String saveImageToStorage(MultipartFile image) throws IOException {
+		// 圖片存儲路徑
+		String uploadDir = "uploads/images/";
+		String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
+		Path filePath = Paths.get(uploadDir, filename);
 
-        // 確保目錄存在
-        Files.createDirectories(filePath.getParent());
+		// 確保目錄存在
+		Files.createDirectories(filePath.getParent());
 
-        // 存儲圖片
-        Files.write(filePath, image.getBytes());
+		// 存儲圖片
+		Files.write(filePath, image.getBytes());
 
-        return filePath.toString();
-    }
+		return filePath.toString();
+	}
 
 }

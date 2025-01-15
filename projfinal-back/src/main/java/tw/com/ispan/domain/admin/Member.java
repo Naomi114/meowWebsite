@@ -23,7 +23,7 @@ import jakarta.persistence.Table;
 // import tw.com.ispan.domain.pet.ReportCase;
 // import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.domain.shop.Cart;
-import tw.com.ispan.domain.shop.Order;
+import tw.com.ispan.domain.shop.Orders;
 import tw.com.ispan.domain.shop.WishListBean;
 
 @Entity
@@ -75,7 +75,7 @@ public class Member {
 	private Set<Cart> cart;
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Order> order;
+	private List<Orders> order;
 
 	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
 	// CascadeType.REMOVE })

@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "banner")
-public class BannerBean {
+public class Banner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer bannerId;
@@ -38,10 +38,10 @@ public class BannerBean {
     @JoinColumn(name = "discountId", nullable = false)
     private Discount discount;
 
-    public BannerBean() {
+    public Banner() {
     }
 
-    public BannerBean(Integer bannerId, String bannerTitle, String bannerImageUrl, Date startDate, Date endDate,
+    public Banner(Integer bannerId, String bannerTitle, String bannerImageUrl, Date startDate, Date endDate,
             LocalDateTime createdAt, Discount discount) {
         this.bannerId = bannerId;
         this.bannerTitle = bannerTitle;

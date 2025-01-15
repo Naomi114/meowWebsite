@@ -9,6 +9,6 @@ import tw.com.ispan.domain.shop.CartItem;
 public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
 
     // 查詢所有未下單且包含指定商品的購物車項目；調整盤點數量時在CartService中使用 (by Naomi)
-    List<CartItem> findByProductIdAndOrderIsNull(Integer productId);
+    List<CartItem> findByProduct_ProductIdAndOrderIsNull(Integer productId);
 
 }

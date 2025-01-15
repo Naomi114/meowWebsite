@@ -9,6 +9,6 @@ import tw.com.ispan.domain.shop.OrderItem;
 public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
 
     // 查詢已下單但未出貨的商品條目 (20250114 by Naomi)
-    List<OrderItem> findByProductIdAndOrderStatus(Integer productId, String orderStatus);
+    List<OrderItem> findByProduct_ProductIdAndOrder_OrderStatus(Integer productId, String orderStatus);
 
 }

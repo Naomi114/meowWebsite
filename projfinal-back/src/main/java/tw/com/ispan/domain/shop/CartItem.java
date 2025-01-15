@@ -22,7 +22,7 @@ public class CartItem implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "orderId")
-    private Order order;
+    private Orders order;
 
     @Column(name = "cartItemStatus")
     private String cartItemStatus;
@@ -61,11 +61,11 @@ public class CartItem implements Serializable {
         this.product = product;
     }
 
-    public Order getOrder() {
+    public Orders getOrder() {
         return order;
     }
 
-    public void setOrder(Order order) {
+    public void setOrder(Orders order) {
         this.order = order;
     }
 

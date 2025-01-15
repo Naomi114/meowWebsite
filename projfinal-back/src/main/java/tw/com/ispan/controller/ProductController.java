@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.annotation.PostConstruct;
 import tw.com.ispan.domain.shop.ProductBean;
+import tw.com.ispan.dto.ProductRequest;
 import tw.com.ispan.dto.ProductResponse;
 import tw.com.ispan.service.shop.ProductService;
 import tw.com.ispan.util.DatetimeConverter;
@@ -62,32 +63,40 @@ public class ProductController {
                     .body("未知錯誤: " + e.getMessage());
         }
     }
-    
+
     @PostMapping
-    public ProductResponse create(@RequestBody String json) {
-        ProductResponse responseBean = new ProductResponse();
-
-        JSONObject obj = new JSONObject(json);
-        Integer id = obj.isNull("id") ? null : obj.getInt("id");
-
-        if (id == null) {
-            responseBean.setSuccess(false);
-            responseBean.setMessage("id是必要欄位(bean)");
-        } else if (productService.exists(id)) {
-            responseBean.setSuccess(false);
-            responseBean.setMessage("id已存在(bean)");
-        } else {
-            ProductBean insert = productService.create(json);
-            if (insert == null) {
-                responseBean.setSuccess(false);
-                responseBean.setMessage("新增失敗(bean)");
-            } else {
-                responseBean.setSuccess(true);
-                responseBean.setMessage("新增成功(bean)");
-            }
-        }
-        return responseBean;
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
+        ProductResponse response = productService.create(request);
+        return response.isSuccess()
+                ? ResponseEntity.status(HttpStatus.CREATED).body(response)
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
+    // @PostMapping
+    // public ProductResponse create(@RequestBody String json) {
+    // ProductResponse responseBean = new ProductResponse();
+
+    // JSONObject obj = new JSONObject(json);
+    // Integer id = obj.isNull("id") ? null : obj.getInt("id");
+
+    // if (id == null) {
+    // responseBean.setSuccess(false);
+    // responseBean.setMessage("id是必要欄位(bean)");
+    // } else if (productService.exists(id)) {
+    // responseBean.setSuccess(false);
+    // responseBean.setMessage("id已存在(bean)");
+    // } else {
+    // ProductBean insert = productService.create(json);
+    // if (insert == null) {
+    // responseBean.setSuccess(false);
+    // responseBean.setMessage("新增失敗(bean)");
+    // } else {
+    // responseBean.setSuccess(true);
+    // responseBean.setMessage("新增成功(bean)");
+    // }
+    // }
+    // return responseBean;
+    // }
 
     @PutMapping("/{id}")
     public String modify(@PathVariable Integer id, @RequestBody String entity) {
@@ -99,16 +108,37 @@ public class ProductController {
             responseJson.put("success", false);
             responseJson.put("message", "Id不存在");
         } else {
-            ProductBean product = productService.update(entity);
-            if (product == null) {
+            ProductBean productBean = parseProductBean(entity);
+            if (productBean == null) {
                 responseJson.put("success", false);
-                responseJson.put("message", "修改失敗");
+                responseJson.put("message", "無效的產品數據");
             } else {
-                responseJson.put("success", true);
-                responseJson.put("message", "修改成功");
+                ProductBean product = productService.update(productBean);
+                if (product == null) {
+                    responseJson.put("success", false);
+                    responseJson.put("message", "修改失敗");
+                } else {
+                    responseJson.put("success", true);
+                    responseJson.put("message", "修改成功");
+                }
             }
         }
         return responseJson.toString();
+    }
+
+    private ProductBean parseProductBean(String entity) {
+        try {
+            JSONObject obj = new JSONObject(entity);
+            ProductBean productBean = new ProductBean();
+            productBean.setId(obj.getInt("id"));
+            productBean.setName(obj.getString("name"));
+            productBean.setPrice(obj.getDouble("price"));
+            productBean.setMake(DatetimeConverter.toDate(obj.getString("make"), "yyyy-MM-dd"));
+            productBean.setExpire(obj.getInt("expire"));
+            return productBean;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @DeleteMapping("/{pk}")

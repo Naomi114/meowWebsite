@@ -42,7 +42,7 @@ public class ProductDataInitializer {
             CategoryBean category1 = categoryRepository.findById(1)
                     .orElseThrow(() -> new RuntimeException("Category not found"));
             product1.setCategory(category1); // 假設 categoryId 1 是 "寵物用品"
-            product1.setAdmin(new Admin(1,"管理員1")); // 假設 adminId 1 是 "管理員1"
+            product1.setAdmin(new Admin(1, "管理員1")); // 假設 adminId 1 是 "管理員1"
 
             ProductBean product2 = new ProductBean();
             product2.setProductName("狗項圈");

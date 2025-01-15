@@ -55,6 +55,11 @@ public class Admin {
 	@JsonManagedReference("admin")
 	private Set<ProductBean> products = new HashSet<>();
 
+	public Admin(Integer adminId, String adminName) {
+		this.adminId = adminId;
+		this.adminName = adminName;
+	}
+
 	public Integer getAdminId() {
 		return adminId;
 	}

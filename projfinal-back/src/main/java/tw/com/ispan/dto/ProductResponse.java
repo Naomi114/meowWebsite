@@ -8,13 +8,14 @@ import tw.com.ispan.domain.shop.ProductBean;
 public class ProductResponse {
     private Boolean success;
     private String message;
-    private List<ProductBean> list;
+    private ProductBean product; // 單商品數據
+    private List<ProductBean> products; // 多商品列表
     private Long count;
 
     @Override
     public String toString() {
-        return "ProductResponse [success=" + success + ", message=" + message + ", list=" + list + ", count=" + count
-                + "]";
+        return "ProductResponse [success=" + success + ", message=" + message + ", product=" + product + ", products="
+                + products + ", count=" + count + "]";
     }
 
     public Boolean getSuccess() {
@@ -33,12 +34,20 @@ public class ProductResponse {
         this.message = message;
     }
 
-    public List<ProductBean> getList() {
-        return list;
+    public ProductBean getProduct() {
+        return product;
     }
 
-    public void setList(List<ProductBean> list) {
-        this.list = list;
+    public void setProduct(ProductBean product) {
+        this.product = product;
+    }
+
+    public List<ProductBean> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<ProductBean> products) {
+        this.products = products;
     }
 
     public Long getCount() {
@@ -48,4 +57,5 @@ public class ProductResponse {
     public void setCount(Long count) {
         this.count = count;
     }
+
 }

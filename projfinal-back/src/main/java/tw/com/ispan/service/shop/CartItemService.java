@@ -19,7 +19,7 @@ public class CartItemService {
     public void syncCartQuantities(Integer productId, Integer newStockQuantity) {
 
         // 查找所有未下單的購物車項目
-        List<CartItem> cartItems = cartItemRepository.findByProductIdAndOrderIsNull(productId);
+        List<CartItem> cartItems = cartItemRepository.findByProduct_ProductIdAndOrderIsNull(productId);
 
         // 更新購物車數量
         for (CartItem item : cartItems) {
