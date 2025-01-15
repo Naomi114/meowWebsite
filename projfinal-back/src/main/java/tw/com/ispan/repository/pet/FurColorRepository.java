@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import tw.com.ispan.domain.pet.FurColor;
 
-public interface FurColorRepository extends JpaRepository<FurColor, Integer> {
+public interface FurColorRepository extends JpaRepository<FurColor, Integer>{
 
 }

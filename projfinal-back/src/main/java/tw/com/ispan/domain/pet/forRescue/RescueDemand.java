@@ -25,11 +25,12 @@ public class RescueDemand {
 	}
 
 
-	public RescueDemand(Integer rescueDemandId, String rescueDemand) {
+
+	public RescueDemand(String rescueDemand) {
 		super();
-		this.rescueDemandId = rescueDemandId;
 		this.rescueDemand = rescueDemand;
 	}
+
 
 
 	public Integer getRescueDemandId() {
