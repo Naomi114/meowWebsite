@@ -2,6 +2,7 @@ package tw.com.ispan.domain.pet;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -131,8 +132,7 @@ public class AdoptionCase {
     @JoinTable(name = "Case_CaseApply", joinColumns = {
             @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_Case")) }, inverseJoinColumns = {
                     @JoinColumn(name = "adoptionCaseApplyId", foreignKey = @ForeignKey(name = "FK_CaseApply")) })
-    // private Set<AdoptionCaseApply> adoptionCaseApplys = new
-    // HashSet<AdoptionCaseApply>();
+    private Set<AdoptionCaseApply> adoptionCaseApplys = new HashSet<AdoptionCaseApply>();
 
     public Integer getAdoptionCaseId() {
         return adoptionCaseId;

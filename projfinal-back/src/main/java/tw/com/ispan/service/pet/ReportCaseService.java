@@ -94,15 +94,15 @@ public class ReportCaseService {
         return reportCaseRepository.existsById(id);
     }
 
-    /**
-     * 根據 ReportType 查詢 ReportCase
-     *
-     * @param reportType 報告類型
-     * @return 符合條件的 ReportCase 列表
-     */
-    public List<ReportCase> findByReportType(String reportType) {
-        return reportCaseRepository.findByReportType(reportType);
-    }
+    // /**
+    // * 根據 ReportType 查詢 ReportCase
+    // *
+    // * @param reportType 報告類型
+    // * @return 符合條件的 ReportCase 列表
+    // */
+    // public List<ReportCase> findByReportType(String reportType) {
+    // return reportCaseRepository.findByReportType(reportType);
+    // }
 
     /**
      * 根據 Member ID 查詢相關的 ReportCase
