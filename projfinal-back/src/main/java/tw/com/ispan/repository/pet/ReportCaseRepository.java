@@ -10,8 +10,8 @@ import tw.com.ispan.domain.pet.ReportCase;
 @Repository
 public interface ReportCaseRepository extends JpaRepository<ReportCase, Integer> {
 
-    // 根據 ReportType 查詢
-    List<ReportCase> findByReportType(String reportType);
+    // // 根據 ReportType 查詢
+    // List<ReportCase> findByReportType(String reportType);
 
     // 根據 Member ID 查詢
     List<ReportCase> findByMemberId(Integer memberId);
