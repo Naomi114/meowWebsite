@@ -1,10 +1,7 @@
 package tw.com.ispan.domain.pet;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -156,7 +153,7 @@ public class RescueCase {
     private Set<Follow> follows;
 
     // 關聯到ReportCase表，單向一對多
-    @OneToMany(mappedBy = "rescueCase", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "lostCaseId", cascade = CascadeType.ALL)
     private List<ReportCase> reportCases;
 
     // Hibernate 進行實體的初始化需要用到空參建構子
@@ -434,14 +431,6 @@ public class RescueCase {
 
     public void setFollows(Set<Follow> follows) {
         this.follows = follows;
-    }
-
-    public List<ReportCase> getReportCases() {
-        return reportCases;
-    }
-
-    public void setReportCases(List<ReportCase> reportCases) {
-        this.reportCases = reportCases;
     }
 
     @Override
