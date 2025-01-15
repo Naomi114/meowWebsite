@@ -71,10 +71,10 @@ public class ReportCaseController {
         Optional<ReportCase> existingReportCase = reportCaseService.findById(id);
         if (existingReportCase.isPresent()) {
             ReportCase update = existingReportCase.get();
-            // update.setRescueCase(reportCase.getRescueCase());
+            update.setRescueCase(reportCase.getRescueCase());
             update.setLostCase(reportCase.getLostCase());
-            // update.setAdoptionCase(reportCase.getAdoptionCase());
-            // update.setMember(reportCase.getMember());
+            update.setAdoptionCase(reportCase.getAdoptionCase());
+            update.setMember(reportCase.getMember());
             update.setReportType(reportCase.getReportType());
             update.setReportNotes(reportCase.getReportNotes());
             return reportCaseService.save(update);

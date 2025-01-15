@@ -20,53 +20,53 @@ import tw.com.ispan.domain.admin.Member;
 @Table(name = "Activity")
 public class Activity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "activityId")
-    private Integer activityId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "activityId")
+	private Integer activityId;
 
-    // 和member表為雙向多對一
-    @ManyToOne
-    @JoinColumn(name = "memberId", nullable = false)
-    private Member member;
+	// 和member表為雙向多對一
+	@ManyToOne
+	@JoinColumn(name = "memberId", nullable = false)
+	private Member member;
 
-    @Column(name = "title", columnDefinition = "nvarchar(30)", nullable = false)
-    private String title;
+	@Column(name = "title", columnDefinition = "nvarchar(30)", nullable = false)
+	private String title;
 
-    @Column(name = "purpose", columnDefinition = "nvarchar(30)")
-    private String purpose;
+	@Column(name = "purpose", columnDefinition = "nvarchar(30)")
+	private String purpose;
 
-    @Lob
-    @Column(name = "description", columnDefinition = "nvarchar(max)")
-    private String description;
+	@Lob
+	@Column(name = "description", columnDefinition = "nvarchar(max)")
+	private String description;
 
-    @Column(name = "location", columnDefinition = "nvarchar(max)")
-    private String location;
+	@Column(name = "location", columnDefinition = "nvarchar(max)")
+	private String location;
 
-    @Column(name = "startTime")
-    private LocalDateTime startTime;
+	@Column(name = "startTime")
+	private LocalDateTime startTime;
 
-    @Column(name = "endTime")
-    private LocalDateTime endTime;
+	@Column(name = "endTime")
+	private LocalDateTime endTime;
 
-    @Column(name = "maxParticipants")
-    private Integer maxParticipants;
+	@Column(name = "maxParticipants")
+	private Integer maxParticipants;
 
-    @Column(name = "createdAt")
-    private LocalDateTime createdAt;
+	@Column(name = "createdAt")
+	private LocalDateTime createdAt;
 
-    @Column(name = "updatedAt")
-    private LocalDateTime updatedAt;
+	@Column(name = "updatedAt")
+	private LocalDateTime updatedAt;
 
-    @Column(name = "activityStatus", columnDefinition = "varchar(5)")
-    private String activityStatus;
+	@Column(name = "activityStatus", columnDefinition = "varchar(5)")
+	private String activityStatus;
 
-    @Column(name = "adminPermission")
-    private Boolean adminPermission;
+	@Column(name = "adminPermission")
+	private Boolean adminPermission;
 
-    @Column(name = "reward")
-    private Integer reward;
+	@Column(name = "reward")
+	private Integer reward;
 
-    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ActivityParticipantList> participantLists;
+	@OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<ActivityParticipantList> participantLists;
 }

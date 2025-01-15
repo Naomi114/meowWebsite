@@ -98,7 +98,7 @@ public class LostCaseController {
     }
 
     @GetMapping("/{id}")
-    public String findByPrimaryKey(@PathVariable(name = "id") Integer id) {
+    public String findByPrimaryKey(@PathVariable Integer id) {
         JSONObject responseJson = new JSONObject();
         JSONArray array = new JSONArray();
         if (id != null) {

@@ -15,12 +15,12 @@ import jakarta.persistence.UniqueConstraint;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
-@Table(name = "ReportCase", uniqueConstraints = @UniqueConstraint(name = "UK_Member_Report", columnNames = {
-        "memberId", "rescueCaseId", "lostCaseId", "adoptionCaseId", "reportType" }))
+@Table(name = "ReportCase", uniqueConstraints = @UniqueConstraint(name = "UK_Member_Report", columnNames = { "memberId",
+        "rescueCaseId", "lostCaseId", "adoptionCaseId", "reportType" }))
 public class ReportCase {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 自增流水號
     @Column(name = "reportId")
     private Integer reportId;
 
@@ -29,15 +29,13 @@ public class ReportCase {
     private RescueCase rescueCase;
 
     // 關聯到 LostCase 表，單向多對一
-
     @ManyToOne
     @JoinColumn(name = "lostCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_LostCase"), nullable = true)
     private LostCase lostCase;
 
-    // @ManyToOne
-    // @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name =
-    // "FK_ReportCase_AdoptionCase"), nullable = true)
-    // private AdoptionCase adoptionCase;
+    @ManyToOne
+    @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_AdoptionCase"), nullable = true)
+    private AdoptionCase adoptionCase;
 
     // 關聯到 Member 表，單向多對一
     @ManyToOne(optional = false)
@@ -56,7 +54,7 @@ public class ReportCase {
     @Override
     public String toString() {
         return "ReportCase [reportId=" + reportId + ", rescueCaseId=" + rescueCase + ", lostCaseId=" + lostCase
-                + ", memberId=" + member + ", reportDate=" + reportDate
+                + ", adoptionCaseId=" + adoptionCase + ", memberId=" + member + ", reportDate=" + reportDate
                 + ", reportType=" + reportType + ", reportNotes=" + reportNotes + "]";
     }
 
@@ -85,13 +83,13 @@ public class ReportCase {
         this.lostCase = lostCase;
     }
 
-    // public AdoptionCase getAdoptionCase() {
-    // return adoptionCase;
-    // }
+    public AdoptionCase getAdoptionCase() {
+        return adoptionCase;
+    }
 
-    // public void setAdoptionCase(AdoptionCase adoptionCase) {
-    // this.adoptionCase = adoptionCase;
-    // }
+    public void setAdoptionCase(AdoptionCase adoptionCase) {
+        this.adoptionCase = adoptionCase;
+    }
 
     public Member getMember() {
         return member;
