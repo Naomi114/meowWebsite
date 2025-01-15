@@ -22,7 +22,9 @@ import tw.com.ispan.domain.pet.Follow;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.ReportCase;
 import tw.com.ispan.domain.pet.RescueCase;
+import tw.com.ispan.domain.shop.Cart;
 import tw.com.ispan.domain.shop.Order;
+import tw.com.ispan.domain.shop.WishListBean;
 
 @Entity
 @Table(name = "Member")
@@ -65,7 +67,7 @@ public class Member {
 	private Set<ActivityParticipantList> acitvityParticipantList;
 
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-	private List<WishList> wishList;
+	private List<WishListBean> wishList;
 
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	private Set<Cart> cart;
