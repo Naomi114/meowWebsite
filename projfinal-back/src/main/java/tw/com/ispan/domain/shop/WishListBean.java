@@ -30,5 +30,52 @@ public class WishListBean {
     @Column(nullable = false)
     private LocalDateTime addedAt;
 
-    // Getters and Setters
+    public WishListBean() {
+    }
+
+    public WishListBean(Integer wishlistId, Member member, ProductBean product, LocalDateTime addedAt) {
+        this.wishlistId = wishlistId;
+        this.member = member;
+        this.product = product;
+        this.addedAt = addedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "WishListBean [wishlistId=" + wishlistId + ", member=" + member + ", product=" + product + ", addedAt="
+                + addedAt + "]";
+    }
+
+    public Integer getWishlistId() {
+        return wishlistId;
+    }
+
+    public void setWishlistId(Integer wishlistId) {
+        this.wishlistId = wishlistId;
+    }
+
+    public Member getMember() {
+        return member;
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
+    }
+
+    public ProductBean getProduct() {
+        return product;
+    }
+
+    public void setProduct(ProductBean product) {
+        this.product = product;
+    }
+
+    public LocalDateTime getAddedAt() {
+        return addedAt;
+    }
+
+    public void setAddedAt(LocalDateTime addedAt) {
+        this.addedAt = addedAt;
+    }
+
 }

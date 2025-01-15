@@ -1,6 +1,8 @@
 package tw.com.ispan.domain.shop;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -14,7 +16,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tag")
-public class TagBean {
+public class ProductTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer tagId;
@@ -24,13 +26,14 @@ public class TagBean {
 
     private String tagDescription;
 
-    @ManyToMany(mappedBy = "tags", cascade = CascadeType.ALL)
-    private List<ProductBean> products;
+    // 雙向關係的多對多端，可反向查找商品
+    @ManyToMany(mappedBy = "tags", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<ProductBean> products = new HashSet<>(); // 無序唯一高效查找
 
-    public TagBean() {
+    public ProductTag() {
     }
 
-    public TagBean(Integer tagId, String tagName, String tagDescription, List<ProductBean> products) {
+    public ProductTag(Integer tagId, String tagName, String tagDescription, Set<ProductBean> products) {
         this.tagId = tagId;
         this.tagName = tagName;
         this.tagDescription = tagDescription;
@@ -67,11 +70,11 @@ public class TagBean {
         this.tagDescription = tagDescription;
     }
 
-    public List<ProductBean> getProducts() {
+    public Set<ProductBean> getProducts() {
         return products;
     }
 
-    public void setProducts(List<ProductBean> products) {
+    public void setProducts(Set<ProductBean> products) {
         this.products = products;
     }
 

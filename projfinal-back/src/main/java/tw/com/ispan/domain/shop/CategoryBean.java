@@ -1,18 +1,19 @@
 package tw.com.ispan.domain.shop;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-@Entity
+@Entity(name = "CategoryBean")
 @Table(name = "category")
 public class CategoryBean {
 
@@ -28,15 +29,17 @@ public class CategoryBean {
     @Column(nullable = false, length = 10)
     private String defaultUnit;
 
-    // 雙向關係的一對多端
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductBean> products = new ArrayList<>();
+    // 雙向關係的一對多端，可反向查找
+    // cascade = CascadeType.remove 刪除類別時，會刪除該類別的所有商品；只有新增、修改、更新同步
+    @OneToMany(mappedBy = "categoryBean", cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH }, fetch = FetchType.EAGER, orphanRemoval = true)
+    private Set<ProductBean> products = new HashSet<>(); // 無序不重複、高效查找
 
     public CategoryBean() {
     }
 
     public CategoryBean(Integer categoryId, String categoryName, String categoryDescription, String defaultUnit,
-            List<ProductBean> products) {
+            Set<ProductBean> products) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.categoryDescription = categoryDescription;
@@ -83,11 +86,11 @@ public class CategoryBean {
         this.defaultUnit = defaultUnit;
     }
 
-    public List<ProductBean> getProducts() {
+    public Set<ProductBean> getProducts() {
         return products;
     }
 
-    public void setProducts(List<ProductBean> products) {
+    public void setProducts(Set<ProductBean> products) {
         this.products = products;
     }
 

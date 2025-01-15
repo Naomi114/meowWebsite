@@ -132,6 +132,10 @@ public class LostCase {
         inverseJoinColumns = @JoinColumn(name = "rescueDemandId")
     )
     private List<RescueDemand> rescueDemands;
+
+     // 關聯到ReportCase表，單向一對多，lostCaseId外鍵會在ReportCase表中
+     @OneToMany(mappedBy = "lostCaseId", cascade = CascadeType.ALL, orphanRemoval = true)
+     private List<ReportCase> reportCases; //
     
     //必填
     //和canAfford表為單向多對多(case找去afford)
