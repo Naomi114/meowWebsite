@@ -21,7 +21,7 @@ import tw.com.ispan.service.pet.LostCaseService;
 import tw.com.ispan.util.DatetimeConverter;
 
 @RestController
-@RequestMapping("/lostcase")
+@RequestMapping("/lostcases")
 public class LostCaseController {
     @Autowired
     private LostCaseService lostCaseService;
