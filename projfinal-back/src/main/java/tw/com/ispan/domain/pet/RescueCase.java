@@ -15,6 +15,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.forRescue.CanAfford;
@@ -25,28 +27,24 @@ import tw.com.ispan.domain.pet.forRescue.RescueProgress;
 @Table(name = "RescueCase")
 public class RescueCase {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer rescueCaseId;
-
-    // 必填
-    @Column(columnDefinition = "NVARCHAR(30)", name = "caseTitle", nullable = false)
+    	@Id ner vate Integer rescueCaseI;
+		//必填
+    @Co
     private String caseTitle;
+    
 
-    // 必填
-    // 關聯到member表，雙向多對一
+    //  關
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    @JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_Member"))
-    private Member member;
+    @JoinColumn(name = "membe
 
-    // 必填
-    // 關聯到species表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    @JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_Species"))
-    private Species species;
+     
+       // 必填
+       // 關聯到species表，雙向多對一
+       @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+       @JoinColumn(name =     priate Species species;
 
     // 關聯到breed表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CsadeType.PERSIST CasaeType.REMOVE})
     @JoinColumn(name = "breedId", foreignKey = @ForeignKey(name = "FK_RescueCase_Breed"))
     private Breed breed;
 
@@ -66,44 +64,74 @@ public class RescueCase {
 
     @Column(name = "microChipNumber")
     private Integer microChipNumber;
+	@Column(columnDefinition = "NVARCHAR(10)", name = "street")
+	private String street;
+	
+	//必填(請求成功後記得改回來)
+	// 10位數，8位小數
+	@Column(name = "latitude", precision = 10, nullable = true)
+	private Double latitude;
+	
+	//必填
+	// 11位數，8位小數
+	@Column(name = "longitude", precision = 11,  nullable = true)
+	private Double longitude;
 
-    // 必填
-    @Column(name = "suspLost", nullable = false)
-    private Boolean suspLost;
 
-    // 必填
-    // 關聯到city表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    @JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_City"))
-    private City city;
+        @Coumn( private Boola suspLost;
+    // 
+       // 關聯到city表，雙向多對一
+       @ManyToOne(cascade 
 
-    // 必填
-    // 關聯到distinctArea表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    @JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_DistinctArea"))
-    private DistinctArea distinctArea;
+        private City 
+    
+       // 必填
+       // 關聯到distinctArea表，雙
 
-    @Column(columnDefinition = "NVARCHAR(10)", name = "street")
-    private String street;
+        @
+       private D
+    @Column(name = "follow") 
+    private Integer follow;	
+	//必填
+	@Column(name = "publicationTime", nullable = false)
+	private LocalDaeime publicaionTime;
+	
+	//必填
+	@Column(name = "lastUpdateTime", nullable = false)
+	private LocalDateTime lastUpdateTime;
+	
+	@Column(name = "tag", nullable = true, columnDefinition = "nvarchar(100)")
+	private String tag;
 
-    // 必填
-    // 10位數，8位小數
-    @Column(name = "latitude", precision = 10, nullable = false)
-    private Double latitude;
+    	//必填
+	// 關聯到CaseState表，單向多對一
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@JoinColumn(name = "CsSateId", nullable = flse, foreignKey = Fovate CaseState csState;
+    
+    	//必填
+    @Column(name = "rescueRe
+    private String rescueRe
 
-    // 必填
-    // 11位數，8位小數
-    @Column(name = "longitude", precision = 11, nullable = false)
-    private Double longitude;
+        @
+       private String street;
+    
 
-    @Column(name = "donationAmount")
-    private Integer donationAmount;
+        /
+       @Column(name = "latitude", precision = 10, null
+       private Double latitude;
 
-    @Column(name = "viewCount")
-    private Integer viewCount;
+       // 必填
+       // 11位數，8位小數
 
-    @Column(name = "follow")
-    private Integer follow;
+        p
+    
+       @Column(name = "donationAmount")
+       private Integer donationAmount;
+    
+
+        p
+    
+       @Column(name = "follow")    priate Integer follow;
 
     // 必填
     @Column(name = "publicationTime", nullable = false)
@@ -324,34 +352,55 @@ public class RescueCase {
         return longitude;
     }
 
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
+    p
 
-    public Integer getDonationAmount() {
-        return donationAmount;
-    }
+        }
 
-    public void setDonationAmount(Integer donationAmount) {
-        this.donationAmount = donationAmount;
-    }
+    定初始值(publicationTime、lastUpdateTime、caseState為待救援id=3)，在物件永續化存入之前會觸發
+	@PrePersist
+	public void prePersist() {
+	    this.publicationTime = LocalDateTime.now();
+	    this.lastUpdateTime = LocalDateTime.now();
+//	    		Optional<CaseState> result = caseStateRepository.findById(3);
+//	    		if (result != null && result.isPresent()) {
+//	    			rescueCase.setCaseState(result.get());
+//	    		}
+	}
+	
+	//實體更新操作(save,merge)前會觸發，更改更新時間
+	@PreUpdate
+	public void preUpdate() {
+	    this.lastUpdateTime = LocalDateTime.now();
+	}
 
-    public Integer getViewCount() {
-        return viewCount;
-    }
+	
+	
+	//getter setter
+	public Integer getRescueCaseId() {
+		return rescueCaseId;
+	}
 
-    public void setViewCount(Integer viewCount) {
-        this.viewCount = viewCount;
-    }
+        public Integer getDonationAmount() {
+           retu
+       }
+        
+        ublic void setDonationAmount(Integer donat
+           his.donationAmount = donationAmount;
+           
+         
+           c
+     
 
-    public Integer getFollow() {
-        return follow;
-    }
+     
+       public 
+           this.viewCount = v
+        
+    
 
-    public void setFollow(Integer follow) {
+     
+       public void setFollow(Integer follow) {
         this.follow = follow;
-    }
-
+  
     public LocalDateTime getPublicationTime() {
         return publicationTime;
     }
