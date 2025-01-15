@@ -2,6 +2,8 @@ package tw.com.ispan.domain.shop;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,6 +27,7 @@ public class WishListBean {
 
     @ManyToOne
     @JoinColumn(name = "productId", nullable = false)
+    @JsonManagedReference("wishlists")
     private ProductBean product;
 
     @Column(nullable = false)

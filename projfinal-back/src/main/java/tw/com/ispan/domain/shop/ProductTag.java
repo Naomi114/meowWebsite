@@ -3,6 +3,8 @@ package tw.com.ispan.domain.shop;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,6 +29,7 @@ public class ProductTag {
 
     // 雙向關係的多對多端，可反向查找商品
     @ManyToMany(mappedBy = "tags", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("tags")
     private Set<ProductBean> products = new HashSet<>(); // 無序唯一高效查找
 
     public ProductTag() {

@@ -3,6 +3,8 @@ package tw.com.ispan.domain.shop;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,6 +35,7 @@ public class CategoryBean {
     // cascade = CascadeType.remove 刪除類別時，會刪除該類別的所有商品；只有新增、修改、更新同步
     @OneToMany(mappedBy = "category", cascade = { CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH }, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JsonManagedReference("category")
     private Set<ProductBean> products = new HashSet<>(); // 無序不重複、高效查找
 
     public CategoryBean() {

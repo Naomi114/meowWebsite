@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -63,40 +65,44 @@ public class ProductBean {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    // 雙向關係的多對一端，可反向查找
+    // 雙向多對一，可反向查找
     // cascade = CascadeType.remove 會導致刪除商品時刪除商品類別；只有新增、修改、更新同步
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "FK_categoryId", foreignKey = @ForeignKey(name = "fkc_category_id"))
+    @JsonBackReference("products")
     private CategoryBean category;
 
-    // 雙向關係的多對一端，可反向查找
+    // 雙向多對一，可反向查找
     // 尚待確認 Admin 表格有fetch = FetchType.EAGER (預設為 LAZY)
     // cascade = CascadeType.remove 會導致刪除商品時刪除管理員；須排除在外
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "FK_adminId", foreignKey = @ForeignKey(name = "fkc_admin_id"))
+    @JsonBackReference("products")
     private Admin admin;
 
-    // 單向關係的一對多端，可由商品查找商品圖片
+    // 單向一對多，可由商品查找商品圖片
     // cascade = CascadeType.remove 當刪除商品時，會刪除商品圖片；已包含在 ALL 內
     // orphanRemoval = true，確保當某圖片從商品圖片集合中移除時，該圖片會從資料庫中刪除。
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<ProductImage> productImages = new LinkedHashSet<>(); // 按插入順序存取的唯一集合，首圖放第一張
 
-    // 雙向關係的多對多端，可反向查找
+    // 雙向多對多，可反向查找
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
             CascadeType.REFRESH }, fetch = FetchType.LAZY)
     @JoinTable(name = "product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @JsonBackReference("products")
     private Set<ProductTag> tags = new HashSet<>(); // 無序不重複、高效查找
 
-    // 單向關係的一對多端，可由商品查找庫存異動
+    // 單向一對多，可由商品查找庫存異動
     // 商品刪除時，保留相關的庫存異動記錄
     // cascade = CascadeType.remove 當刪除商品時，會刪除庫存異動；須排除在外
     @OneToMany(mappedBy = "product", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
             CascadeType.REFRESH }, fetch = FetchType.EAGER)
     private Set<InventoryItem> inventoryItems = new HashSet<>(); // 適合高效查找
 
-    // 雙向關係的一對多端，可反向查找
+    // 雙向一對多，可反向查找
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JsonBackReference("products")
     private Set<WishListBean> wishlists;
 
     public ProductBean() {
