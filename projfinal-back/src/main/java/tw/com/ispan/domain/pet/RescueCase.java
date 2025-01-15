@@ -3,8 +3,6 @@ package tw.com.ispan.domain.pet;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.hibernate.sql.ast.tree.expression.Distinct;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,6 +15,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.forRescue.CanAfford;
@@ -35,10 +35,10 @@ public class RescueCase {
 	@Column(columnDefinition = "NVARCHAR(30)", name = "caseTitle", nullable = false)
 	private String caseTitle;
 	
-	//必填
+	//必填(但為了測試先改成非必填)
 	// 關聯到member表，雙向多對一
 	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-	@JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_Member"))
+	@JoinColumn(name = "memberId", nullable = true, foreignKey = @ForeignKey(name = "FK_RescueCase_Member"))
 	private Member member;
 
 	//必填
@@ -88,14 +88,14 @@ public class RescueCase {
 	@Column(columnDefinition = "NVARCHAR(10)", name = "street")
 	private String street;
 	
-	//必填
+	//必填(請求成功後記得改回來)
 	// 10位數，8位小數
-	@Column(name = "latitude", precision = 10, nullable = false)
+	@Column(name = "latitude", precision = 10, nullable = true)
 	private Double latitude;
 	
 	//必填
 	// 11位數，8位小數
-	@Column(name = "longitude", precision = 11,  nullable = false)
+	@Column(name = "longitude", precision = 11,  nullable = true)
 	private Double longitude;
 
 	@Column(name = "donationAmount")
@@ -114,6 +114,9 @@ public class RescueCase {
 	//必填
 	@Column(name = "lastUpdateTime", nullable = false)
 	private LocalDateTime lastUpdateTime;
+	
+	@Column(name = "tag", nullable = true, columnDefinition = "nvarchar(100)")
+	private String tag;
 	
 	//必填
 	// 關聯到CaseState表，單向多對一
@@ -179,49 +182,26 @@ public class RescueCase {
 
 
 
-	public RescueCase(Integer rescueCaseId, String caseTitle, Member member, Species species, Breed breed,
-			FurColor furColor, String gender, String sterilization, Integer age, Integer microChipNumber,
-			Boolean suspLost, City city, DistinctArea distinctArea, String street, Double latitude, Double longitude,
-			Integer donationAmount, Integer viewCount, Integer follow, LocalDateTime publicationTime,
-			LocalDateTime lastUpdateTime, CaseState caseState, String rescueReason, String caseUrl,
-			List<CasePicture> casePictures, List<RescueDemand> rescueDemands, List<CanAfford> canAffords,
-			List<RescueProgress> rescueProgresses, List<Follow> follows) {
-		super();
-		this.rescueCaseId = rescueCaseId;
-		this.caseTitle = caseTitle;
-		this.member = member;
-		this.species = species;
-		this.breed = breed;
-		this.furColor = furColor;
-		this.gender = gender;
-		this.sterilization = sterilization;
-		this.age = age;
-		this.microChipNumber = microChipNumber;
-		this.suspLost = suspLost;
-		this.city = city;
-		this.distinctArea = distinctArea;
-		this.street = street;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.donationAmount = donationAmount;
-		this.viewCount = viewCount;
-		this.follow = follow;
-		this.publicationTime = publicationTime;
-		this.lastUpdateTime = lastUpdateTime;
-		this.caseState = caseState;
-		this.rescueReason = rescueReason;
-		this.caseUrl = caseUrl;
-		this.casePictures = casePictures;
-		this.rescueDemands = rescueDemands;
-		this.canAffords = canAffords;
-		this.rescueProgresses = rescueProgresses;
-		this.follows = follows;
+	//設定初始值(publicationTime、lastUpdateTime、caseState為待救援id=3)，在物件永續化存入之前會觸發
+	@PrePersist
+	public void prePersist() {
+	    this.publicationTime = LocalDateTime.now();
+	    this.lastUpdateTime = LocalDateTime.now();
+//	    		Optional<CaseState> result = caseStateRepository.findById(3);
+//	    		if (result != null && result.isPresent()) {
+//	    			rescueCase.setCaseState(result.get());
+//	    		}
+	}
+	
+	//實體更新操作(save,merge)前會觸發，更改更新時間
+	@PreUpdate
+	public void preUpdate() {
+	    this.lastUpdateTime = LocalDateTime.now();
 	}
 
-
-
-
-
+	
+	
+	//getter setter
 	public Integer getRescueCaseId() {
 		return rescueCaseId;
 	}

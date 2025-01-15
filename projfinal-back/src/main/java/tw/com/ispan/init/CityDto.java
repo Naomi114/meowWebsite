@@ -1,4 +1,4 @@
-package tw.com.ispan.util;
+package tw.com.ispan.init;
 
 import java.util.List;
 
