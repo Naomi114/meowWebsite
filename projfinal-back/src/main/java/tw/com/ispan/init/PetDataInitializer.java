@@ -1,5 +1,6 @@
 package tw.com.ispan.init;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import tw.com.ispan.domain.pet.Breed;
 import tw.com.ispan.domain.pet.CaseState;
 import tw.com.ispan.domain.pet.City;
+import tw.com.ispan.domain.pet.DistinctArea;
 import tw.com.ispan.domain.pet.FurColor;
 import tw.com.ispan.domain.pet.Species;
 import tw.com.ispan.domain.pet.forRescue.CanAfford;
