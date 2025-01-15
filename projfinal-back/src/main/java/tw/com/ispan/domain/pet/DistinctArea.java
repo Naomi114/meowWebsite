@@ -8,7 +8,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -26,16 +25,14 @@ public class DistinctArea {
 	// 和RescueCase表雙向一對多
 	@OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
 	private List<RescueCase> rescueCases;
-	
+
 	// 和LostCase表雙向一對多
 	@OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
 	private List<LostCase> lostCases;
-	
+
 	// 和adoptionCase表雙向一對多
 	@OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
 	private List<AdoptionCase> adoptionCase;
-	
-	
 
 	public DistinctArea() {
 		super();

@@ -2,7 +2,6 @@ package tw.com.ispan.domain.pet;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -71,8 +70,8 @@ public class AdoptionCase {
 
     // 雙向多對一,外鍵,對應city表
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    @JoinColumn(name = "distintId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_Distinct"))
-    private Distinct distintId;
+    @JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_DistinctArea"))
+    private DistinctArea distinctAreaId;
 
     @Column(name = "street", columnDefinition = "NVARCHAR(10)")
     private String street;
@@ -132,7 +131,8 @@ public class AdoptionCase {
     @JoinTable(name = "Case_CaseApply", joinColumns = {
             @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_Case")) }, inverseJoinColumns = {
                     @JoinColumn(name = "adoptionCaseApplyId", foreignKey = @ForeignKey(name = "FK_CaseApply")) })
-    private Set<AdoptionCaseApply> adoptionCaseApplys = new HashSet<AdoptionCaseApply>();
+    // private Set<AdoptionCaseApply> adoptionCaseApplys = new
+    // HashSet<AdoptionCaseApply>();
 
     public Integer getAdoptionCaseId() {
         return adoptionCaseId;
@@ -162,13 +162,14 @@ public class AdoptionCase {
         this.reportCases = reportCases;
     }
 
-    public Set<AdoptionCaseApply> getAdoptionCaseApplys() {
-        return adoptionCaseApplys;
-    }
+    // public Set<AdoptionCaseApply> getAdoptionCaseApplys() {
+    // return adoptionCaseApplys;
+    // }
 
-    public void setAdoptionCaseApplys(Set<AdoptionCaseApply> adoptionCaseApplys) {
-        this.adoptionCaseApplys = adoptionCaseApplys;
-    }
+    // public void setAdoptionCaseApplys(Set<AdoptionCaseApply> adoptionCaseApplys)
+    // {
+    // this.adoptionCaseApplys = adoptionCaseApplys;
+    // }
 
     public void setAdoptionCaseId(Integer adoptionCaseId) {
         this.adoptionCaseId = adoptionCaseId;
@@ -262,12 +263,12 @@ public class AdoptionCase {
         this.cityId = cityId;
     }
 
-    public Distinct getDistintId() {
-        return distintId;
+    public DistinctArea getDistintAreaId() {
+        return distinctAreaId;
     }
 
-    public void setDistintId(Distinct distintId) {
-        this.distintId = distintId;
+    public void setDistintAreaId(DistinctArea distinctAreaId) {
+        this.distinctAreaId = distinctAreaId;
     }
 
     public String getStreet() {

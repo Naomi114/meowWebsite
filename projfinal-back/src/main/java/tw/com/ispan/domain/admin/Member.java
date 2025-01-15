@@ -8,12 +8,12 @@ import java.util.Set;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
+// import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+// import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.pet.Activity;
 import tw.com.ispan.domain.pet.ActivityParticipantList;
@@ -22,7 +22,7 @@ import tw.com.ispan.domain.pet.Follow;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.ReportCase;
 import tw.com.ispan.domain.pet.RescueCase;
-import tw.com.ispan.domain.shop.Order;
+// import tw.com.ispan.domain.shop.Order;
 
 @Entity
 @Table(name = "Member")
@@ -64,14 +64,17 @@ public class Member {
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	private Set<ActivityParticipantList> acitvityParticipantList;
 
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-	private List<WishList> wishList;
+	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
+	// CascadeType.REMOVE })
+	// private List<WishList> wishList;
 
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-	private Set<Cart> cart;
+	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
+	// CascadeType.REMOVE })
+	// private Set<Cart> cart;
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Order> order;
+	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval =
+	// true)
+	// private List<Order> order;
 
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	private List<RescueCase> rescueCases;

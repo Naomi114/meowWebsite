@@ -15,7 +15,7 @@ import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.Breed;
 import tw.com.ispan.domain.pet.CaseState;
 import tw.com.ispan.domain.pet.City;
-import tw.com.ispan.domain.pet.Distinct;
+import tw.com.ispan.domain.pet.DistinctArea;
 import tw.com.ispan.domain.pet.FurColor;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.Species;
@@ -23,7 +23,7 @@ import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.pet.BreedRepository;
 import tw.com.ispan.repository.pet.CaseStateRepository;
 import tw.com.ispan.repository.pet.CityRepository;
-import tw.com.ispan.repository.pet.DistinctRepository;
+import tw.com.ispan.repository.pet.DistinctAreaRepository;
 import tw.com.ispan.repository.pet.FurColorRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.SpeciesRepository;
@@ -50,7 +50,7 @@ public class LostCaseService {
     private CityRepository cityRepository;
 
     @Autowired
-    private DistinctRepository distinctRepository;
+    private DistinctAreaRepository distinctAreaRepository;
 
     @Autowired
     private CaseStateRepository caseStateRepository;
@@ -151,7 +151,7 @@ public class LostCaseService {
             Integer microChipNumber = obj.optInt("microChipNumber", -1);
             boolean suspLost = obj.optBoolean("suspLost", false);
             Integer cityId = obj.optInt("cityId");
-            Integer distinctId = obj.optInt("distinctId");
+            Integer distinctAreaId = obj.optInt("distinctAreaId");
             String street = obj.optString("street");
             BigDecimal latitude = obj.optBigDecimal("latitude", null);
             BigDecimal longitude = obj.optBigDecimal("longitude", null);
@@ -166,9 +166,8 @@ public class LostCaseService {
 
             // 驗證必填欄位
             if (caseTitle == null || memberId == null || speciesId == null || breedId == null || furColorId == null ||
-                    sterilization == null || cityId == null || distinctId == null || street == null || latitude == null
-                    ||
-                    longitude == null || caseStateId == null) {
+                    sterilization == null || cityId == null || distinctAreaId == null || street == null
+                    || latitude == null || longitude == null || caseStateId == null) {
                 throw new IllegalArgumentException("必填欄位不可為空");
             }
 
@@ -183,8 +182,8 @@ public class LostCaseService {
                     .orElseThrow(() -> new IllegalArgumentException("無效的 furColorId"));
             City city = cityRepository.findById(cityId)
                     .orElseThrow(() -> new IllegalArgumentException("無效的 cityId"));
-            Distinct distinct = distinctRepository.findById(distinctId)
-                    .orElseThrow(() -> new IllegalArgumentException("無效的 distinctId"));
+            DistinctArea distinctArea = distinctAreaRepository.findById(distinctAreaId)
+                    .orElseThrow(() -> new IllegalArgumentException("無效的 distinctAreaId"));
             CaseState caseState = caseStateRepository.findById(caseStateId)
                     .orElseThrow(() -> new IllegalArgumentException("無效的 caseStateId"));
 
@@ -201,8 +200,8 @@ public class LostCaseService {
             lostCase.setAge(age == -1 ? null : age); // 設定空值
             lostCase.setMicroChipNumber(microChipNumber == -1 ? null : microChipNumber);
             lostCase.setSuspLost(suspLost);
-            lostCase.setCityId(city);
-            lostCase.setDistinctId(distinct);
+            lostCase.setCity(city);
+            lostCase.setDistinctArea(distinctArea);
             lostCase.setStreet(street);
             lostCase.setLatitude(latitude);
             lostCase.setLongitude(longitude);
@@ -211,7 +210,7 @@ public class LostCaseService {
             lostCase.setFollow(follow);
             lostCase.setPublicationTime(LocalDateTime.now());
             lostCase.setLastUpdateTime(LocalDateTime.now());
-            lostCase.setCaseStateId(caseState);
+            lostCase.setCaseState(caseState);
             lostCase.setLostExperience(lostExperience);
             lostCase.setContactInformation(contactInformation);
             lostCase.setFeatureDescription(featureDescription);
@@ -243,7 +242,7 @@ public class LostCaseService {
             Integer microChipNumber = obj.isNull("microChipNumber") ? null : obj.getInt("microChipNumber");
             Boolean suspLost = obj.isNull("suspLost") ? null : obj.getBoolean("suspLost");
             Integer cityId = obj.isNull("cityId") ? null : obj.getInt("cityId");
-            Integer distinctId = obj.isNull("distinctId") ? null : obj.getInt("distinctId");
+            Integer distinctAreaId = obj.isNull("distinctAreaId") ? null : obj.getInt("distinctAreaId");
             String street = obj.optString("street", null);
             BigDecimal latitude = obj.isNull("latitude") ? null : obj.getBigDecimal("latitude");
             BigDecimal longitude = obj.isNull("longitude") ? null : obj.getBigDecimal("longitude");
@@ -291,12 +290,12 @@ public class LostCaseService {
                     if (cityId != null) {
                         City city = cityRepository.findById(cityId)
                                 .orElseThrow(() -> new IllegalArgumentException("無效的 cityId"));
-                        update.setCityId(city);
+                        update.setCity(city);
                     }
-                    if (distinctId != null) {
-                        Distinct distinct = distinctRepository.findById(distinctId)
-                                .orElseThrow(() -> new IllegalArgumentException("無效的 distinctId"));
-                        update.setDistinctId(distinct);
+                    if (distinctAreaId != null) {
+                        DistinctArea distinctArea = distinctAreaRepository.findById(distinctAreaId)
+                                .orElseThrow(() -> new IllegalArgumentException("無效的 distinctAreaId"));
+                        update.setDistinctArea(distinctArea);
                     }
                     if (street != null)
                         update.setStreet(street);
@@ -307,7 +306,7 @@ public class LostCaseService {
                     if (caseStateId != null) {
                         CaseState caseState = caseStateRepository.findById(caseStateId)
                                 .orElseThrow(() -> new IllegalArgumentException("無效的 caseStateId"));
-                        update.setCaseStateId(caseState);
+                        update.setCaseState(caseState);
                     }
                     if (lostExperience != null)
                         update.setLostExperience(lostExperience);
