@@ -1,18 +1,19 @@
 package tw.com.ispan.service.shop;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import tw.com.ispan.dto.ProductRequest;
-import tw.com.ispan.dto.ProductResponse;
-import tw.com.ispan.domain.shop.ProductBean;
-import tw.com.ispan.repository.shop.ProductRepository;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import tw.com.ispan.domain.shop.ProductBean;
+import tw.com.ispan.dto.ProductRequest;
+import tw.com.ispan.dto.ProductResponse;
+import tw.com.ispan.repository.shop.ProductRepository;
+import tw.com.ispan.specification.ProductSpecifications;
 
 @Service
 @Transactional
@@ -21,9 +22,7 @@ public class ProductService {
 	@Autowired
 	private ProductRepository productRepository;
 
-	/**
-	 * 單筆刪除商品
-	 */
+	// 單筆刪除商品
 	public ProductResponse deleteSingle(Integer productId) {
 		ProductResponse response = new ProductResponse();
 
@@ -40,9 +39,7 @@ public class ProductService {
 		return response;
 	}
 
-	/**
-	 * 批量刪除商品
-	 */
+	// 批量刪除商品
 	public ProductResponse deleteBatch(List<Integer> productIds) {
 		ProductResponse response = new ProductResponse();
 
@@ -59,9 +56,7 @@ public class ProductService {
 		return response;
 	}
 
-	/**
-	 * 單筆修改商品
-	 */
+	// 單筆修改商品
 	public ProductResponse updateSingle(Integer productId, ProductRequest request) {
 		ProductResponse response = new ProductResponse();
 
@@ -87,16 +82,19 @@ public class ProductService {
 		return response;
 	}
 
-	/**
-	 * 批量修改商品
-	 */
+	// 批量修改商品
 	public ProductResponse updateBatch(List<ProductRequest> requests) {
 		ProductResponse response = new ProductResponse();
 
+		// 遍歷請求列表並動態更新
 		List<ProductBean> updatedProducts = requests.stream().map(request -> {
-			Optional<ProductBean> productOpt = productRepository.findAll(request.getProductName());
-			if (productOpt.isPresent()) {
-				ProductBean product = productOpt.get();
+			// 動態查詢條件
+			Specification<ProductBean> spec = Specification
+					.where(ProductSpecifications.hasProductName(request.getProductName()));
+			List<ProductBean> products = productRepository.findAll(spec);
+
+			if (!products.isEmpty()) {
+				ProductBean product = products.get(0); // 更新第一個匹配的商品
 				product.setProductName(request.getProductName());
 				product.setDescription(request.getDescription());
 				product.setOriginalPrice(request.getOriginalPrice());
@@ -109,6 +107,7 @@ public class ProductService {
 			return null;
 		}).filter(product -> product != null).collect(Collectors.toList());
 
+		// 設定返回結果
 		response.setSuccess(!updatedProducts.isEmpty());
 		response.setProducts(updatedProducts);
 		response.setMessage(updatedProducts.isEmpty() ? "未找到任何匹配的商品進行更新" : "批量更新成功");
@@ -116,9 +115,7 @@ public class ProductService {
 		return response;
 	}
 
-	/**
-	 * 單筆查詢商品
-	 */
+	// 單筆查詢商品
 	public ProductResponse findSingle(Integer productId) {
 		ProductResponse response = new ProductResponse();
 
@@ -135,9 +132,7 @@ public class ProductService {
 		return response;
 	}
 
-	/**
-	 * 批量查詢商品
-	 */
+	// 批量查詢商品
 	public ProductResponse findBatch(List<Integer> productIds) {
 		ProductResponse response = new ProductResponse();
 
