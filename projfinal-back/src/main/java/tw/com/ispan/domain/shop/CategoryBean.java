@@ -31,7 +31,7 @@ public class CategoryBean {
 
     // 雙向關係的一對多端，可反向查找
     // cascade = CascadeType.remove 刪除類別時，會刪除該類別的所有商品；只有新增、修改、更新同步
-    @OneToMany(mappedBy = "categoryBean", cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+    @OneToMany(mappedBy = "category", cascade = { CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH }, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<ProductBean> products = new HashSet<>(); // 無序不重複、高效查找
 

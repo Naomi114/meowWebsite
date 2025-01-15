@@ -3,10 +3,7 @@ package tw.com.ispan.init;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +18,6 @@ import tw.com.ispan.repository.shop.ProductRepository;
 public class ProductDataInitializer {
 
     @Autowired
-    private SessionFactory sessionFactory;
-
-    @Autowired
     private ProductRepository productRepository;
 
     @Autowired
@@ -31,7 +25,6 @@ public class ProductDataInitializer {
 
     @Transactional
     public void initializeData() {
-        Session session = sessionFactory.getCurrentSession();
 
         try {
             // 初始化五組假資料
@@ -49,7 +42,7 @@ public class ProductDataInitializer {
             CategoryBean category1 = categoryRepository.findById(1)
                     .orElseThrow(() -> new RuntimeException("Category not found"));
             product1.setCategory(category1); // 假設 categoryId 1 是 "寵物用品"
-            product1.setAdmin(new Admin(1, "管理員1")); // 假設 adminId 1 是 "管理員1"
+            product1.setAdmin(new Admin(1,"管理員1")); // 假設 adminId 1 是 "管理員1"
 
             ProductBean product2 = new ProductBean();
             product2.setProductName("狗項圈");

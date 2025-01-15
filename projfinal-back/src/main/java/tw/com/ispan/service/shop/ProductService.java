@@ -1,22 +1,30 @@
 package tw.com.ispan.service.shop;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.domain.shop.CategoryBean;
 import tw.com.ispan.domain.shop.InventoryItem;
 import tw.com.ispan.domain.shop.ProductBean;
+import tw.com.ispan.domain.shop.ProductImage;
+import tw.com.ispan.repository.shop.ProductImageRepository;
 import tw.com.ispan.repository.shop.ProductRepository;
 
 @Service
@@ -24,6 +32,9 @@ import tw.com.ispan.repository.shop.ProductRepository;
 public class ProductService {
 	@Autowired
 	private ProductRepository productRepository;
+
+	@Autowired
+	private ProductImageRepository productImageRepository;
 
 	// 商品增刪修
 	public ProductBean create(String json) {
@@ -90,7 +101,7 @@ public class ProductService {
 		return null;
 	}
 
-	public ProductBean modify(ProductBean bean) {
+	public ProductBean update(ProductBean bean) {
 		if (bean != null && bean.getProductId() != null) {
 			if (productRepository.existsById(bean.getProductId())) {
 				if (bean.getStockQuantity() <= 0) {
@@ -175,5 +186,56 @@ public class ProductService {
 		}
 		return null;
 	}
+
+	// 上傳商品圖片
+	public void uploadProductImage(Integer productId, MultipartFile image) throws IOException {
+        // 確保商品存在
+        ProductBean product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("商品不存在"));
+
+        // 驗證圖片格式和大小
+        validateImage(image);
+
+        // 存儲圖片並獲取路徑
+        String imageUrl = saveImageToStorage(image);
+
+        // 保存圖片數據到資料庫
+        ProductImage productImage = new ProductImage();
+        productImage.setProduct(product);
+        productImage.setImageUrl(imageUrl);
+        productImage.setIsPrimary(false); // 默認為非主圖片
+        productImage.setCreatedAt(LocalDateTime.now());
+
+        productImageRepository.save(productImage);
+    }
+
+    private void validateImage(MultipartFile image) throws IOException {
+        // 檢查圖片大小（限制為 5MB）
+        long maxSize = 5 * 1024 * 1024;
+        if (image.getSize() > maxSize) {
+            throw new IOException("圖片大小超過限制（5MB）");
+        }
+
+        // 檢查圖片格式
+        String contentType = image.getContentType();
+        if (!"image/jpeg".equals(contentType) && !"image/png".equals(contentType)) {
+            throw new IOException("僅支持 JPEG 或 PNG 格式的圖片");
+        }
+    }
+
+    private String saveImageToStorage(MultipartFile image) throws IOException {
+        // 圖片存儲路徑
+        String uploadDir = "uploads/images/";
+        String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
+        Path filePath = Paths.get(uploadDir, filename);
+
+        // 確保目錄存在
+        Files.createDirectories(filePath.getParent());
+
+        // 存儲圖片
+        Files.write(filePath, image.getBytes());
+
+        return filePath.toString();
+    }
 
 }

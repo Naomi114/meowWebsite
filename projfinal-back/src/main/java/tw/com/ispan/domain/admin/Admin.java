@@ -28,6 +28,30 @@ public class Admin {
 	@Column(nullable = false)
 	private LocalDateTime updateDate;
 
+	public Admin() {
+	}
+
+	public Admin(Integer adminId, String adminName, String password, LocalDateTime createDate,
+			LocalDateTime updateDate) {
+		this.adminId = adminId;
+		this.adminName = adminName;
+		this.password = password;
+		this.createDate = createDate;
+		this.updateDate = updateDate;
+	}
+
+	// 初始化原始資料用 (by Naomi)
+	public Admin(Integer adminId, String adminName) {
+		this.adminId = adminId;
+		this.adminName = adminName;
+	}	
+
+	@Override
+	public String toString() {
+		return "Admin [adminId=" + adminId + ", adminName=" + adminName + ", password=" + password + ", createDate="
+				+ createDate + ", updateDate=" + updateDate + "]";
+	}
+
 	public Integer getAdminId() {
 		return adminId;
 	}
