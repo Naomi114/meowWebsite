@@ -21,8 +21,8 @@ public class Breed {
     @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
     private List<RescueCase> rescueCases;
 
-    @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
-    private List<AdoptionCase> adoptionCases;
+    // @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
+    // private List<AdoptionCase> adoptionCases;
 
     // Getters and Setters
     public Integer getBreedId() {

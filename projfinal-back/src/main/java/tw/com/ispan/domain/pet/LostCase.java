@@ -125,20 +125,23 @@ public class LostCase {
     @Column(name = "caseUrl", length = 255)
     private String caseUrl;
 
+    @Column(name = "tag", nullable = true, columnDefinition = "nvarchar(100)")
+    private String tag;
+
     // 關聯到CasePicture表，單向一對多，lostCaseId外鍵會在CasePicture表中
     @OneToMany
     @JoinColumn(name = "lostCaseId", foreignKey = @ForeignKey(name = "FK_CasePicture_LostCase"))
     private List<CasePicture> casePictures;
 
     // 關聯到ReportCase表，單向一對多，lostCaseId外鍵會在ReportCase表中
-    @OneToMany(mappedBy = "lostCaseId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReportCase> reportCases; // 一對多關聯
 
     @Override
     public String toString() {
         return "LostCase [lostCaseId=" + lostCaseId + ", caseTitle=" + caseTitle + ", member=" + member
-                + ", species=" + species + ", breed=" + breed + ", furColor=" + furColor + ", name=" + name
-                + ", gender=" + gender + ", sterilization=" + sterilization + ", age=" + age
+                + ", species=" + species + ", name=" + name + ", breed=" + breed + ", furColor=" + furColor + ", tag="
+                + tag + ", gender=" + gender + ", sterilization=" + sterilization + ", age=" + age
                 + ", microChipNumber=" + microChipNumber + ", suspLost=" + suspLost + ", cityId=" + cityId
                 + ", distinctId=" + distinctId + ", street=" + street + ", latitude=" + latitude + ", longitude="
                 + longitude + ", donationAmount=" + donationAmount + ", viewCount=" + viewCount + ", follow=" + follow

@@ -191,7 +191,7 @@ public class LostCaseService {
             // 建立 LostCase 實體
             LostCase lostCase = new LostCase();
             lostCase.setCaseTitle(caseTitle);
-            lostCase.setMember(member);
+            // lostCase.setMember(member);
             lostCase.setSpecies(species);
             lostCase.setBreed(breed);
             lostCase.setFurColor(furColor);

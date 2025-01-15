@@ -39,7 +39,7 @@ public class ReportCaseService {
                 // 更新非空欄位值
                 existingReportCase.setRescueCase(reportCase.getRescueCase());
                 existingReportCase.setLostCase(reportCase.getLostCase());
-                existingReportCase.setAdoptionCase(reportCase.getAdoptionCase());
+                // existingReportCase.setAdoptionCase(reportCase.getAdoptionCase());
                 existingReportCase.setMember(reportCase.getMember());
                 existingReportCase.setReportDate(reportCase.getReportDate());
                 existingReportCase.setReportType(reportCase.getReportType());
