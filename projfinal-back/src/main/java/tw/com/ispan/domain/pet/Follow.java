@@ -33,9 +33,9 @@ public class Follow {
 	// @JoinColumn(name = "lostCaseId", nullable = true)
 	// private LostCase lostCase;
 	//
-	@ManyToOne
-	@JoinColumn(name = "adoptionCaseId", nullable = true)
-	private AdoptionCase adoptionCase;
+	// @ManyToOne
+	// @JoinColumn(name = "adoptionCaseId", nullable = true)
+	// private AdoptionCase adoptionCase;
 
 	@Column(name = "followDate")
 	private LocalDateTime followDate;

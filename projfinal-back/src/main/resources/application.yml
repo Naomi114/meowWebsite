@@ -25,6 +25,22 @@ spring:
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  #圖片大小限制
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+    #spring手動設定 HTTP 請求和回應的字符編碼
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+  #圖片下載路徑
+file:
+  upload-dir: /images
+
 
   #conosle顏色
   output:
@@ -38,3 +54,8 @@ spring:
 jwt:
   token:
     expire: 10
+
+#google座標api
+google:
+  api:
+    key: AIzaSyATLMpyW2m1qnNAAQf0rZSpcl6TadBobBg

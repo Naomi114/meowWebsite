@@ -1,7 +1,6 @@
 package tw.com.ispan.domain.pet;
 
 import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,8 +27,27 @@ public class Species {
 
     @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
     private List<RescueCase> rescueCases;
+    
 
-    // Getters and Setters
+    @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
+    private List<AdoptionCase> adoptionCase;	
+
+    
+    
+    public Species() {
+		super();
+	}
+
+	
+
+	public Species(String species) {
+		super();
+		this.species = species;
+	}
+
+
+
+	// Getters and Setters
     public Integer getSpeciesId() {
         return speciesId;
     }
