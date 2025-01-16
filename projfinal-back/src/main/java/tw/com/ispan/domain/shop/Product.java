@@ -28,8 +28,8 @@ import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Admin;
 
 @Entity
-@Table(name = "product")
-public class ProductBean {
+@Table(name = "Product")
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer productId;
@@ -72,7 +72,7 @@ public class ProductBean {
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "FK_categoryId", foreignKey = @ForeignKey(name = "fkc_category_id"))
     @JsonBackReference("products")
-    private CategoryBean category;
+    private Category category;
 
     // 雙向多對一，可反向查找
     // 尚待確認 Admin 表格有fetch = FetchType.EAGER (預設為 LAZY)
@@ -92,7 +92,7 @@ public class ProductBean {
     // 雙向多對多，可反向查找
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
             CascadeType.REFRESH }, fetch = FetchType.LAZY)
-    @JoinTable(name = "product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @JoinTable(name = "Product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @JsonBackReference("products")
     private HashSet<ProductTag> tags; // 無序不重複
 
@@ -106,16 +106,16 @@ public class ProductBean {
     // 雙向一對多，可反向查找
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonBackReference("products")
-    private LinkedList<WishListBean> wishlists; // 可重複，適合頻繁插入和刪除
+    private LinkedList<WishList> wishlists; // 可重複，適合頻繁插入和刪除
 
-    public ProductBean() {
+    public Product() {
     }
 
-    public ProductBean(Integer productId, String productName, String description, BigDecimal originalPrice,
+    public Product(Integer productId, String productName, String description, BigDecimal originalPrice,
             BigDecimal salePrice, Integer stockQuantity, String unit, String status, LocalDate expire,
-            LocalDateTime createdAt, LocalDateTime updatedAt, CategoryBean category, Admin admin,
+            LocalDateTime createdAt, LocalDateTime updatedAt, Category category, Admin admin,
             LinkedHashSet<ProductImage> productImages, HashSet<ProductTag> tags,
-            ArrayList<InventoryItem> inventoryItems, LinkedList<WishListBean> wishlists) {
+            ArrayList<InventoryItem> inventoryItems, LinkedList<WishList> wishlists) {
         this.productId = productId;
         this.productName = productName;
         this.description = description;
@@ -189,7 +189,7 @@ public class ProductBean {
         return updatedAt;
     }
 
-    public CategoryBean getCategory() {
+    public Category getCategory() {
         return category;
     }
 
@@ -205,7 +205,7 @@ public class ProductBean {
         return tags;
     }
 
-    public LinkedList<WishListBean> getWishlists() {
+    public LinkedList<WishList> getWishlists() {
         return wishlists;
     }
 
@@ -253,12 +253,8 @@ public class ProductBean {
         this.updatedAt = updatedAt;
     }
 
-    public void setCategory(CategoryBean category) {
+    public void setCategory(Category category) {
         this.category = category;
-        // 確保雙向關係一致: 若目前商品類別不包含此商品，則將此商品加入商品類別
-        if (!category.getProducts().contains(this)) {
-            category.getProducts().add(this);
-        }
     }
 
     public void setAdmin(Admin admin) {
@@ -281,7 +277,7 @@ public class ProductBean {
         this.inventoryItems = inventoryItems;
     }
 
-    public void setWishlists(LinkedList<WishListBean> wishlists) {
+    public void setWishlists(LinkedList<WishList> wishlists) {
         this.wishlists = wishlists;
     }
 

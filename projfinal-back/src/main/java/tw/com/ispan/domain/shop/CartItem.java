@@ -18,7 +18,7 @@ public class CartItem implements Serializable {
 
     @OneToOne
     @JoinColumn(name = "productId", nullable = false)
-    private ProductBean product;
+    private Product product;
 
     @ManyToOne
     @JoinColumn(name = "orderId")
@@ -53,11 +53,11 @@ public class CartItem implements Serializable {
         this.cart = cart;
     }
 
-    public ProductBean getProduct() {
+    public Product getProduct() {
         return product;
     }
 
-    public void setProduct(ProductBean product) {
+    public void setProduct(Product product) {
         this.product = product;
     }
 

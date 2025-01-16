@@ -2,21 +2,21 @@ package tw.com.ispan.dto;
 
 import java.util.List;
 
-import tw.com.ispan.domain.shop.ProductBean;
+import tw.com.ispan.domain.shop.Product;
 
 // 輸出DTO: 返回給前端的數據，經過計算或格式化
 public class ProductResponse {
     private Boolean success;
     private String message;
-    private ProductBean product; // 單商品數據
-    private List<ProductBean> products; // 多商品列表
+    private Product product; // 單商品數據
+    private List<Product> products; // 多商品列表
     private Long count;
 
     // 無參建構子: 默認初始化可以留空
     public ProductResponse() {
     }
 
-    public ProductResponse(ProductBean productBean) {
+    public ProductResponse(Product productBean) {
 
     }
 
@@ -42,19 +42,19 @@ public class ProductResponse {
         this.message = message;
     }
 
-    public ProductBean getProduct() {
+    public Product getProduct() {
         return product;
     }
 
-    public void setProduct(ProductBean product) {
+    public void setProduct(Product product) {
         this.product = product;
     }
 
-    public List<ProductBean> getProducts() {
+    public List<Product> getProducts() {
         return products;
     }
 
-    public void setProducts(List<ProductBean> products) {
+    public void setProducts(List<Product> products) {
         this.products = products;
     }
 

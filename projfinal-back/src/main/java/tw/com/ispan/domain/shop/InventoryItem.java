@@ -11,7 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "inventoryItem")
+@Table(name = "InventoryItem")
 public class InventoryItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class InventoryItem {
     // 將多對一關係設置為可選（optional = true），允許商品刪除後，該關聯字段為 null
     @ManyToOne(optional = true)
     @JoinColumn(name = "FK_productId", foreignKey = @ForeignKey(name = "fkc_product_id"), nullable = true)
-    private ProductBean product;
+    private Product product;
 
     // 盤點任務刪除時，保留相關的庫存異動記錄
     // 將多對一關係設置為可選（optional = true），允許盤點任務刪除後，該關聯字段為 null
@@ -38,7 +38,7 @@ public class InventoryItem {
     public InventoryItem() {
     }
 
-    public InventoryItem(Integer inventoryItemId, Integer stockQuantity, Integer actualStock, ProductBean product,
+    public InventoryItem(Integer inventoryItemId, Integer stockQuantity, Integer actualStock, Product product,
             Inventory inventory) {
         this.inventoryItemId = inventoryItemId;
         this.stockQuantity = stockQuantity;
@@ -78,11 +78,11 @@ public class InventoryItem {
         this.actualStock = actualStock;
     }
 
-    public ProductBean getProduct() {
+    public Product getProduct() {
         return product;
     }
 
-    public void setProduct(ProductBean product) {
+    public void setProduct(Product product) {
         this.product = product;
     }
 

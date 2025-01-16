@@ -15,7 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "productImage")
+@Table(name = "ProductImage")
 public class ProductImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,13 +33,13 @@ public class ProductImage {
     @ManyToOne
     @JoinColumn(name = "FK_imageId", foreignKey = @ForeignKey(name = "fkc_image_id"))
     @JsonManagedReference("productImages")
-    private ProductBean product;
+    private Product product;
 
     public ProductImage() {
     }
 
     public ProductImage(Integer imageId, String imageUrl, Boolean isPrimary, LocalDateTime createdAt,
-            ProductBean product) {
+            Product product) {
         this.imageId = imageId;
         this.imageUrl = imageUrl;
         this.isPrimary = isPrimary;
@@ -85,11 +85,11 @@ public class ProductImage {
         this.createdAt = createdAt;
     }
 
-    public ProductBean getProduct() {
+    public Product getProduct() {
         return product;
     }
 
-    public void setProduct(ProductBean product) {
+    public void setProduct(Product product) {
         this.product = product;
     }
 

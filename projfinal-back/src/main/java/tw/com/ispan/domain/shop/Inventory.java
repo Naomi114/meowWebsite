@@ -17,7 +17,7 @@ import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Admin;
 
 @Entity
-@Table(name = "inventory")
+@Table(name = "Inventory")
 public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

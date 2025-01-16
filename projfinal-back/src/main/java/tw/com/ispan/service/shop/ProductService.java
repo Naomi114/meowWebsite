@@ -1,5 +1,6 @@
 package tw.com.ispan.service.shop;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -11,8 +12,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import tw.com.ispan.domain.shop.CategoryBean;
-import tw.com.ispan.domain.shop.ProductBean;
+import tw.com.ispan.domain.shop.Category;
+import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.domain.shop.ProductImage;
 import tw.com.ispan.domain.shop.ProductTag;
 import tw.com.ispan.dto.ProductRequest;
@@ -31,8 +32,8 @@ public class ProductService {
 	public ProductResponse createSingle(ProductRequest request) {
 		ProductResponse response = new ProductResponse();
 		try {
-			ProductBean product = new ProductBean();
-			CategoryBean category = new CategoryBean();
+			Product product = new Product();
+			Category category = new Category();
 
 			product.setProductName(request.getProductName());
 			product.setDescription(request.getDescription());
@@ -82,6 +83,10 @@ public class ProductService {
 			}
 			product.setExpire(request.getExpire());
 
+			// 創建時間和更新時間自動生成
+			product.setCreatedAt(LocalDateTime.now());
+			product.setUpdatedAt(LocalDateTime.now());
+
 			// 前端傳入多張圖片url，轉換成商品圖片實體
 			if (request.getProductImages() == null || request.getProductImages().isEmpty()) {
 				throw new IllegalArgumentException("商品圖片不能為空");
@@ -97,7 +102,7 @@ public class ProductService {
 					}).collect(Collectors.toList());
 			product.setProductImages(new LinkedHashSet<>(images));
 
-			ProductBean savedProduct = productRepository.save(product);
+			Product savedProduct = productRepository.save(product);
 			response.setSuccess(true);
 			response.setProduct(savedProduct);
 			response.setMessage("商品新增成功");
@@ -112,8 +117,8 @@ public class ProductService {
 	// public ProductResponse createBatch(List<ProductRequest> requests) {
 	// ProductResponse response = new ProductResponse();
 	// try {
-	// ProductBean product = new ProductBean();
-	// CategoryBean category = new CategoryBean();
+	// Product product = new Product();
+	// Category category = new Category();
 	// product.setProductName(requests.getProductName());
 	// product.setDescription(requests.getDescription());
 	// category.setCategoryName(request.getCategoryName());
@@ -171,7 +176,7 @@ public class ProductService {
 	// return productImage;
 	// }).collect(Collectors.toList());
 	// product.setProductImages(new LinkedHashSet<>(images));
-	// List<ProductBean> savedProducts = productRepository.saveAll(products);
+	// List<Product> savedProducts = productRepository.saveAll(products);
 	// response.setSuccess(true);
 	// response.setProducts(savedProducts);
 	// response.setMessage("批量新增成功");
@@ -186,7 +191,7 @@ public class ProductService {
 	public ProductResponse deleteSingle(Integer productId) {
 		ProductResponse response = new ProductResponse();
 
-		Optional<ProductBean> productOpt = productRepository.findById(productId);
+		Optional<Product> productOpt = productRepository.findById(productId);
 		if (productOpt.isPresent()) {
 			productRepository.delete(productOpt.get());
 			response.setSuccess(true);
@@ -203,7 +208,7 @@ public class ProductService {
 	public ProductResponse deleteBatch(List<Integer> productIds) {
 		ProductResponse response = new ProductResponse();
 
-		List<ProductBean> products = productRepository.findAllById(productIds);
+		List<Product> products = productRepository.findAllById(productIds);
 		if (!products.isEmpty()) {
 			productRepository.deleteAll(products);
 			response.setSuccess(true);
@@ -220,9 +225,9 @@ public class ProductService {
 	public ProductResponse updateSingle(Integer productId, ProductRequest request) {
 		ProductResponse response = new ProductResponse();
 
-		Optional<ProductBean> productOpt = productRepository.findById(productId);
+		Optional<Product> productOpt = productRepository.findById(productId);
 		if (productOpt.isPresent()) {
-			ProductBean product = productOpt.get();
+			Product product = productOpt.get();
 			product.setProductName(request.getProductName());
 			product.setDescription(request.getDescription());
 			product.setOriginalPrice(request.getOriginalPrice());
@@ -230,7 +235,7 @@ public class ProductService {
 			product.setStockQuantity(request.getStockQuantity());
 			product.setUnit(request.getUnit());
 			product.setExpire(request.getExpire());
-			ProductBean updatedProduct = productRepository.save(product);
+			Product updatedProduct = productRepository.save(product);
 			response.setSuccess(true);
 			response.setProduct(updatedProduct);
 			response.setMessage("商品更新成功");
@@ -247,14 +252,14 @@ public class ProductService {
 		ProductResponse response = new ProductResponse();
 
 		// 遍歷請求列表並動態更新
-		List<ProductBean> updatedProducts = requests.stream().map(request -> {
+		List<Product> updatedProducts = requests.stream().map(request -> {
 			// 動態查詢條件
-			Specification<ProductBean> spec = Specification
+			Specification<Product> spec = Specification
 					.where(ProductSpecifications.hasProductName(request.getProductName()));
-			List<ProductBean> products = productRepository.findAll(spec);
+			List<Product> products = productRepository.findAll(spec);
 
 			if (!products.isEmpty()) {
-				ProductBean product = products.get(0); // 更新第一個匹配的商品
+				Product product = products.get(0); // 更新第一個匹配的商品
 				product.setProductName(request.getProductName());
 				product.setDescription(request.getDescription());
 				product.setOriginalPrice(request.getOriginalPrice());
@@ -279,7 +284,7 @@ public class ProductService {
 	public ProductResponse findSingle(Integer productId) {
 		ProductResponse response = new ProductResponse();
 
-		Optional<ProductBean> productOpt = productRepository.findById(productId);
+		Optional<Product> productOpt = productRepository.findById(productId);
 		if (productOpt.isPresent()) {
 			response.setSuccess(true);
 			response.setProduct(productOpt.get());
@@ -293,11 +298,11 @@ public class ProductService {
 	}
 
 	// 動態查詢: Specification類的應用
-	public ProductResponse findBatch(Specification<ProductBean> spec) {
+	public ProductResponse findBatch(Specification<Product> spec) {
 		ProductResponse response = new ProductResponse();
 
 		// 使用 Specification 執行查詢
-		List<ProductBean> products = productRepository.findAll(spec);
+		List<Product> products = productRepository.findAll(spec);
 
 		// 設定返回結果
 		response.setSuccess(!products.isEmpty());

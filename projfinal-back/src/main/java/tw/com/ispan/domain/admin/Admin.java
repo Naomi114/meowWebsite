@@ -19,7 +19,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.shop.Discount;
 import tw.com.ispan.domain.shop.Inventory;
-import tw.com.ispan.domain.shop.ProductBean;
+import tw.com.ispan.domain.shop.Product;
 
 @Entity
 @Table(name = "admin")
@@ -28,7 +28,7 @@ public class Admin {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer adminId;
 
-	@Column(unique = true, length = 20, nullable = false)
+	@Column(unique = true, length = 20, nullable = true)
 	private String adminName;
 
 	@Column(length = 20, nullable = false)
@@ -43,7 +43,7 @@ public class Admin {
 	// 雙向一對多，對應Discount
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval = true)
 	@JsonManagedReference("admin") // by Naomi
-	private List<Discount> discounts = new ArrayList<>();
+	private List<Discount> discounts;
 
 	// 雙向一對多，對應Inventory
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval = true)
@@ -51,13 +51,17 @@ public class Admin {
 	private Set<Inventory> inventory;
 
 	// 雙向一對多，對應ProductBean (by Naomi)
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval = true)
+	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
+			CascadeType.REFRESH }, mappedBy = "admin", orphanRemoval = true)
 	@JsonManagedReference("admin")
-	private Set<ProductBean> products = new HashSet<>();
+	private Set<Product> products = new HashSet<>();
 
 	public Admin(Integer adminId, String adminName) {
 		this.adminId = adminId;
 		this.adminName = adminName;
+	}
+
+	public Admin() {
 	}
 
 	public Integer getAdminId() {

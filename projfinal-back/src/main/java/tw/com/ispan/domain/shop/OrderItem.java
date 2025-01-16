@@ -10,7 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "orderItem")
+@Table(name = "OrderItem")
 public class OrderItem {
 
     @Id
@@ -23,7 +23,7 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "productId", nullable = false)
-    private ProductBean product;
+    private Product product;
 
     @Column(nullable = false)
     private Integer orderQuantity;
@@ -37,7 +37,7 @@ public class OrderItem {
     public OrderItem() {
     }
 
-    public OrderItem(Integer orderItemId, Orders order, ProductBean product, Integer orderQuantity,
+    public OrderItem(Integer orderItemId, Orders order, Product product, Integer orderQuantity,
             Double purchasedPrice) {
         this.orderItemId = orderItemId;
         this.order = order;
@@ -68,11 +68,11 @@ public class OrderItem {
         this.order = order;
     }
 
-    public ProductBean getProduct() {
+    public Product getProduct() {
         return product;
     }
 
-    public void setProduct(ProductBean product) {
+    public void setProduct(Product product) {
         this.product = product;
     }
 

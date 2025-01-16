@@ -15,8 +15,8 @@ import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
-@Table(name = "wishlist")
-public class WishListBean {
+@Table(name = "Wishlist")
+public class WishList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer wishlistId;
@@ -28,15 +28,15 @@ public class WishListBean {
     @ManyToOne
     @JoinColumn(name = "productId", nullable = false)
     @JsonManagedReference("wishlists")
-    private ProductBean product;
+    private Product product;
 
     @Column(nullable = false)
     private LocalDateTime addedAt;
 
-    public WishListBean() {
+    public WishList() {
     }
 
-    public WishListBean(Integer wishlistId, Member member, ProductBean product, LocalDateTime addedAt) {
+    public WishList(Integer wishlistId, Member member, Product product, LocalDateTime addedAt) {
         this.wishlistId = wishlistId;
         this.member = member;
         this.product = product;
@@ -65,11 +65,11 @@ public class WishListBean {
         this.member = member;
     }
 
-    public ProductBean getProduct() {
+    public Product getProduct() {
         return product;
     }
 
-    public void setProduct(ProductBean product) {
+    public void setProduct(Product product) {
         this.product = product;
     }
 

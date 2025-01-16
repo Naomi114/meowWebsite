@@ -16,7 +16,7 @@ import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
-@Table(name = "orders") // order 為Hibernate保留字，所以改為orders (by Naomi 20250115)
+@Table(name = "Orders") // order 為Hibernate保留字，所以改為orders (by Naomi 20250115)
 public class Orders {
 
     @Id

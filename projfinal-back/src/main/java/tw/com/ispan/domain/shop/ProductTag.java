@@ -16,7 +16,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tag")
+@Table(name = "ProductTag")
 public class ProductTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,12 +30,12 @@ public class ProductTag {
     // 雙向關係的多對多端，可反向查找商品
     @ManyToMany(mappedBy = "tags", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference("tags")
-    private HashSet<ProductBean> products; // 無序不重複
+    private HashSet<Product> products; // 無序不重複
 
     public ProductTag() {
     }
 
-    public ProductTag(Integer tagId, String tagName, String tagDescription, HashSet<ProductBean> products) {
+    public ProductTag(Integer tagId, String tagName, String tagDescription, HashSet<Product> products) {
         this.tagId = tagId;
         this.tagName = tagName;
         this.tagDescription = tagDescription;
@@ -72,11 +72,11 @@ public class ProductTag {
         this.tagDescription = tagDescription;
     }
 
-    public Set<ProductBean> getProducts() {
+    public Set<Product> getProducts() {
         return products;
     }
 
-    public void setProducts(HashSet<ProductBean> products) {
+    public void setProducts(HashSet<Product> products) {
         this.products = products;
     }
 

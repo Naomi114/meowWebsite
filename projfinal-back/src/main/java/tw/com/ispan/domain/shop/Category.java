@@ -15,9 +15,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-@Entity(name = "CategoryBean")
-@Table(name = "category")
-public class CategoryBean {
+@Entity
+@Table(name = "Category")
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,13 +36,13 @@ public class CategoryBean {
     @OneToMany(mappedBy = "category", cascade = { CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH }, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonManagedReference("category")
-    private Set<ProductBean> products = new HashSet<>(); // 無序不重複、高效查找
+    private Set<Product> products = new HashSet<>(); // 無序不重複、高效查找
 
-    public CategoryBean() {
+    public Category() {
     }
 
-    public CategoryBean(Integer categoryId, String categoryName, String categoryDescription, String defaultUnit,
-            Set<ProductBean> products) {
+    public Category(Integer categoryId, String categoryName, String categoryDescription, String defaultUnit,
+            Set<Product> products) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.categoryDescription = categoryDescription;
@@ -89,11 +89,11 @@ public class CategoryBean {
         this.defaultUnit = defaultUnit;
     }
 
-    public Set<ProductBean> getProducts() {
+    public Set<Product> getProducts() {
         return products;
     }
 
-    public void setProducts(Set<ProductBean> products) {
+    public void setProducts(Set<Product> products) {
         this.products = products;
     }
 
