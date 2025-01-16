@@ -7,4 +7,4 @@
  @OneToMany(mappedBy = "adoptionCase", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Follow> follows;
 
-3.在member中的List<rescueCase>加上@JsonManagedReference註釋
+3.在member中的List<rescueCase>加上@@JsonBackReference
