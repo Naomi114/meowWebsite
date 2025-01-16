@@ -7,12 +7,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.AdoptionCase;
 
 @Entity
-@Table(name = "adoptioncaseapply")
+@Table(name = "adoptionCaseApply")
 public class AdoptionCaseApply {
 
     @Id
@@ -25,8 +28,17 @@ public class AdoptionCaseApply {
     @Column(nullable = false)
     private boolean applicationStatus;
 
-    // 雙向多對多,外鍵在多方
-    @ManyToMany(mappedBy = "adoptioncaseapply")
+    public AdoptionCaseApply() {
+        // 无参构造函数
+    }
+
+    // 雙向多對一,對應member表
+    @ManyToOne
+    @JoinColumn(name = "memberId")
+    private Member member;
+
+    // 雙向多對多,外鍵在多方，對應adoptioncase表
+    @ManyToMany(mappedBy = "adoptionCaseApply")
     private Set<AdoptionCase> adoptionCase;
 
     public AdoptionCaseApply(Integer adoptionCaseApplyId, String introduction, boolean applicationStatus,

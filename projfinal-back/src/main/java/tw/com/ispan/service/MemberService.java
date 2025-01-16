@@ -1,6 +1,5 @@
 package tw.com.ispan.service;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +21,16 @@ public class MemberService {
             Optional<Member> optional = memberRepository.findByNickName(username);
             if (optional.isPresent()) {
                 Member bean = optional.get();
-                String storedPassword = bean.getPassword(); // 或許儲存密碼 (假设是字符串)
-                byte[] pass = storedPassword.getBytes(); // 型別轉換
-                byte[] temp = password.getBytes(); // 使用者輸入
-                if (Arrays.equals(pass, temp)) {
-                    return bean;
+                System.out.println("找到的用戶：" + bean.getNickName()); // 檢查查詢結果
+                String storedPassword = bean.getPassword(); // 儲存的密碼 (假設是字符串)
+                if (storedPassword.equals(password)) { // 直接比對字串
+                    return bean; // 密碼正確，返回用戶資料
                 }
+            } else {
+                System.out.println("未找到該用戶");
             }
         }
-        return null;
+        return null; // 若無效的用戶或密碼錯誤，返回 null
     }
 
     public boolean changePassword(String username, String oldPassword, String newPassword) {

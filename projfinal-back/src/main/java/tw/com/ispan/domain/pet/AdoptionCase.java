@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.sql.ast.tree.expression.Distinct;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -68,12 +70,12 @@ public class AdoptionCase {
     // 雙向多對一,外鍵,對應city表
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     @JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_City"))
-    private City cityId;
+    private City city;
 
     // 雙向多對一,外鍵,對應city表
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     @JoinColumn(name = "distintId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_Distinct"))
-    private Distinct distintId;
+    private DistinctArea distinctArea;
 
     @Column(name = "street", columnDefinition = "NVARCHAR(10)")
     private String street;
@@ -109,10 +111,10 @@ public class AdoptionCase {
     @Column(name = "adoptedCondition", columnDefinition = "NVARCHAR(max)", nullable = false)
     private String adoptedCondition;
 
-    @Column(name = "contactPerson", columnDefinition = "NVARCHAR(20)", nullable = false)
+    @Column(name = "status", columnDefinition = "NVARCHAR(20)", nullable = false)
     private Integer status;
 
-    @Column(name = "contactPerson", columnDefinition = "NVARCHAR(max)", nullable = false)
+    @Column(name = "note", columnDefinition = "NVARCHAR(max)", nullable = false)
     private Integer note;
 
     // 關聯到CasePicture表，單向一對多，外鍵在一方
@@ -121,26 +123,31 @@ public class AdoptionCase {
     private List<CasePicture> casePictures;
 
     // 雙向一對多，對應follow表
-    @OneToMany(mappedBy = "adoptionCaseId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "adoptionCase", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Follow> follows;
 
     // 關聯到ReportCase表，單向一對多
     // 無外鍵，怕爛掉，測試版
-    @OneToMany(mappedBy = "adoptionCaseId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "adoptionCase", cascade = CascadeType.ALL)
     private List<ReportCase> reportCase;
 
     // 與AdoptionCaseApply 多對多
     @ManyToMany
     @JoinTable(name = "Case_CaseApply", joinColumns = @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_Case")), inverseJoinColumns = @JoinColumn(name = "adoptionCaseApplyId", foreignKey = @ForeignKey(name = "FK_CaseApply")))
-    private Set<AdoptionCaseApply> adoptionCaseApplys = new HashSet<>();
+    private Set<AdoptionCaseApply> adoptionCaseApply = new HashSet<>();
+
+    public AdoptionCase() {
+
+    }
 
     public AdoptionCase(Integer adoptionCaseId, String caseTitle, Member member, Species species, Breed breed,
             FurColor furColor, String gender, String sterilization, Integer age, Integer microChipNumber,
-            Boolean susLost, City cityId, Distinct distintId, String street, BigDecimal latitude, BigDecimal longitude,
+            Boolean susLost, City city, DistinctArea distinctArea, String street, BigDecimal latitude,
+            BigDecimal longitude,
             Integer viewCount, Integer follow, LocalDateTime publicationTime, LocalDateTime lastUpdateTime,
             String title, String story, String healthCondition, String adoptedCondition, Integer status, Integer note,
             List<CasePicture> casePictures, Set<Follow> follows, List<ReportCase> reportCase,
-            Set<AdoptionCaseApply> adoptionCaseApplys) {
+            Set<AdoptionCaseApply> adoptionCaseApply) {
         this.adoptionCaseId = adoptionCaseId;
         this.caseTitle = caseTitle;
         this.member = member;
@@ -152,8 +159,8 @@ public class AdoptionCase {
         this.age = age;
         this.microChipNumber = microChipNumber;
         this.susLost = susLost;
-        this.cityId = cityId;
-        this.distintId = distintId;
+        this.city = city;
+        this.distinctArea = distinctArea;
         this.street = street;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -170,7 +177,7 @@ public class AdoptionCase {
         this.casePictures = casePictures;
         this.follows = follows;
         this.reportCase = reportCase;
-        this.adoptionCaseApplys = adoptionCaseApplys;
+        this.adoptionCaseApply = adoptionCaseApply;
     }
 
     public Integer getAdoptionCaseId() {
@@ -202,11 +209,11 @@ public class AdoptionCase {
     }
 
     public Set<AdoptionCaseApply> getAdoptionCaseApplys() {
-        return adoptionCaseApplys;
+        return adoptionCaseApply;
     }
 
-    public void setAdoptionCaseApplys(Set<AdoptionCaseApply> adoptionCaseApplys) {
-        this.adoptionCaseApplys = adoptionCaseApplys;
+    public void setAdoptionCaseApplys(Set<AdoptionCaseApply> adoptionCaseApply) {
+        this.adoptionCaseApply = adoptionCaseApply;
     }
 
     public void setAdoptionCaseId(Integer adoptionCaseId) {
@@ -294,19 +301,19 @@ public class AdoptionCase {
     }
 
     public City getCityId() {
-        return cityId;
+        return city;
     }
 
-    public void setCityId(City cityId) {
-        this.cityId = cityId;
+    public void setCityId(City city) {
+        this.city = city;
     }
 
-    public Distinct getDistintId() {
-        return distintId;
+    public DistinctArea getDistintId() {
+        return distinctArea;
     }
 
-    public void setDistintId(Distinct distintId) {
-        this.distintId = distintId;
+    public void setDistintId(DistinctArea distinctArea) {
+        this.distinctArea = distinctArea;
     }
 
     public String getStreet() {
@@ -418,12 +425,12 @@ public class AdoptionCase {
         return "AdoptionCase [adoptionCaseId=" + adoptionCaseId + ", caseTitle=" + caseTitle + ", member=" + member
                 + ", species=" + species + ", breed=" + breed + ", furColor=" + furColor + ", gender=" + gender
                 + ", sterilization=" + sterilization + ", age=" + age + ", microChipNumber=" + microChipNumber
-                + ", susLost=" + susLost + ", cityId=" + cityId + ", distintId=" + distintId + ", street=" + street
+                + ", susLost=" + susLost + ", cityId=" + city + ", distintId=" + distinctArea + ", street=" + street
                 + ", latitude=" + latitude + ", longitude=" + longitude + ", viewCount=" + viewCount + ", follow="
                 + follow + ", publicationTime=" + publicationTime + ", lastUpdateTime=" + lastUpdateTime + ", title="
                 + title + ", story=" + story + ", healthCondition=" + healthCondition + ", adoptedCondition="
                 + adoptedCondition + ", status=" + status + ", note=" + note + ", casePictures=" + casePictures
-                + ", follows=" + follows + ", reportCase=" + reportCase + ", adoptionCaseApplys=" + adoptionCaseApplys
+                + ", follows=" + follows + ", reportCase=" + reportCase + ", adoptionCaseApplys=" + adoptionCaseApply
                 + "]";
     }
 
