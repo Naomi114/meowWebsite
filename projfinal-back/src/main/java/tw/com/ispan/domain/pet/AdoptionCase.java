@@ -134,6 +134,45 @@ public class AdoptionCase {
     @JoinTable(name = "Case_CaseApply", joinColumns = @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_Case")), inverseJoinColumns = @JoinColumn(name = "adoptionCaseApplyId", foreignKey = @ForeignKey(name = "FK_CaseApply")))
     private Set<AdoptionCaseApply> adoptionCaseApplys = new HashSet<>();
 
+    public AdoptionCase(Integer adoptionCaseId, String caseTitle, Member member, Species species, Breed breed,
+            FurColor furColor, String gender, String sterilization, Integer age, Integer microChipNumber,
+            Boolean susLost, City cityId, Distinct distintId, String street, BigDecimal latitude, BigDecimal longitude,
+            Integer viewCount, Integer follow, LocalDateTime publicationTime, LocalDateTime lastUpdateTime,
+            String title, String story, String healthCondition, String adoptedCondition, Integer status, Integer note,
+            List<CasePicture> casePictures, Set<Follow> follows, List<ReportCase> reportCase,
+            Set<AdoptionCaseApply> adoptionCaseApplys) {
+        this.adoptionCaseId = adoptionCaseId;
+        this.caseTitle = caseTitle;
+        this.member = member;
+        this.species = species;
+        this.breed = breed;
+        this.furColor = furColor;
+        this.gender = gender;
+        this.sterilization = sterilization;
+        this.age = age;
+        this.microChipNumber = microChipNumber;
+        this.susLost = susLost;
+        this.cityId = cityId;
+        this.distintId = distintId;
+        this.street = street;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.viewCount = viewCount;
+        this.follow = follow;
+        this.publicationTime = publicationTime;
+        this.lastUpdateTime = lastUpdateTime;
+        this.title = title;
+        this.story = story;
+        this.healthCondition = healthCondition;
+        this.adoptedCondition = adoptedCondition;
+        this.status = status;
+        this.note = note;
+        this.casePictures = casePictures;
+        this.follows = follows;
+        this.reportCase = reportCase;
+        this.adoptionCaseApplys = adoptionCaseApplys;
+    }
+
     public Integer getAdoptionCaseId() {
         return adoptionCaseId;
     }
@@ -372,6 +411,20 @@ public class AdoptionCase {
 
     public void setNote(Integer note) {
         this.note = note;
+    }
+
+    @Override
+    public String toString() {
+        return "AdoptionCase [adoptionCaseId=" + adoptionCaseId + ", caseTitle=" + caseTitle + ", member=" + member
+                + ", species=" + species + ", breed=" + breed + ", furColor=" + furColor + ", gender=" + gender
+                + ", sterilization=" + sterilization + ", age=" + age + ", microChipNumber=" + microChipNumber
+                + ", susLost=" + susLost + ", cityId=" + cityId + ", distintId=" + distintId + ", street=" + street
+                + ", latitude=" + latitude + ", longitude=" + longitude + ", viewCount=" + viewCount + ", follow="
+                + follow + ", publicationTime=" + publicationTime + ", lastUpdateTime=" + lastUpdateTime + ", title="
+                + title + ", story=" + story + ", healthCondition=" + healthCondition + ", adoptedCondition="
+                + adoptedCondition + ", status=" + status + ", note=" + note + ", casePictures=" + casePictures
+                + ", follows=" + follows + ", reportCase=" + reportCase + ", adoptionCaseApplys=" + adoptionCaseApplys
+                + "]";
     }
 
 }

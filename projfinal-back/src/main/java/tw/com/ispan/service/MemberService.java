@@ -13,33 +13,35 @@ import tw.com.ispan.repository.admin.MemberRepository;
 @Service
 @Transactional
 public class MemberService {
-	@Autowired
-	private MemberRepository MemberRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
-	public Member login(String username, String password) {
-		if (username != null && username.length() != 0 &&
-				password != null && password.length() != 0) {
-			Optional<Member> optional = MemberRepository.findById(username);
-			if (optional.isPresent()) {
-				Member bean = optional.get();
-				byte[] pass = bean.getPassword(); // 資料庫抓出
-				byte[] temp = password.getBytes(); // 使用者輸入
-				if (Arrays.equals(pass, temp)) {
-					return bean;
-				}
-			}
-		}
-		return null;
-	}
+    public Member login(String username, String password) {
+        if (username != null && username.length() != 0 &&
+                password != null && password.length() != 0) {
+            Optional<Member> optional = memberRepository.findByNickName(username);
+            if (optional.isPresent()) {
+                Member bean = optional.get();
+                String storedPassword = bean.getPassword(); // 或許儲存密碼 (假设是字符串)
+                byte[] pass = storedPassword.getBytes(); // 型別轉換
+                byte[] temp = password.getBytes(); // 使用者輸入
+                if (Arrays.equals(pass, temp)) {
+                    return bean;
+                }
+            }
+        }
+        return null;
+    }
 
-	public boolean changePassword(String username, String oldPassword, String newPassword) {
-		Member bean = this.login(username, oldPassword);
-		if (bean != null) {
-			byte[] temp = newPassword.getBytes();
-			bean.setPassword(temp);
-			MemberRepository.save(bean);
-			return true;
-		}
-		return false;
-	}
+    public boolean changePassword(String username, String oldPassword, String newPassword) {
+        Member bean = this.login(username, oldPassword);
+        if (bean != null) {
+            bean.setPassword(newPassword);
+            memberRepository.save(bean);
+            return true;
+        }
+
+        return false;
+    }
+
 }
