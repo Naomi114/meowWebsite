@@ -33,6 +33,10 @@ public class Admin {
 	@Column(length = 20, nullable = false)
 	private String password;
 
+	public Admin() {
+		// 這是默認構造函數，Hibernate 需要
+	}
+
 	@Column(nullable = false)
 	private LocalDateTime createDate;
 
