@@ -30,12 +30,12 @@ public class ProductTag {
     // 雙向關係的多對多端，可反向查找商品
     @ManyToMany(mappedBy = "tags", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference("tags")
-    private Set<ProductBean> products = new HashSet<>(); // 無序唯一高效查找
+    private HashSet<ProductBean> products; // 無序不重複
 
     public ProductTag() {
     }
 
-    public ProductTag(Integer tagId, String tagName, String tagDescription, Set<ProductBean> products) {
+    public ProductTag(Integer tagId, String tagName, String tagDescription, HashSet<ProductBean> products) {
         this.tagId = tagId;
         this.tagName = tagName;
         this.tagDescription = tagDescription;
@@ -76,7 +76,7 @@ public class ProductTag {
         return products;
     }
 
-    public void setProducts(Set<ProductBean> products) {
+    public void setProducts(HashSet<ProductBean> products) {
         this.products = products;
     }
 

@@ -5,9 +5,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.annotation.PostConstruct;
 import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.domain.shop.CategoryBean;
 import tw.com.ispan.domain.shop.ProductBean;
@@ -15,6 +17,7 @@ import tw.com.ispan.repository.shop.CategoryRepository;
 import tw.com.ispan.repository.shop.ProductRepository;
 
 @Component
+@Profile("dev")
 public class ProductDataInitializer {
 
     @Autowired
@@ -23,6 +26,7 @@ public class ProductDataInitializer {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @PostConstruct
     @Transactional
     public void initializeData() {
 

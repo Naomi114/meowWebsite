@@ -2,6 +2,8 @@ package tw.com.ispan.domain.shop;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
@@ -30,6 +32,7 @@ public class ProductImage {
 
     @ManyToOne
     @JoinColumn(name = "FK_imageId", foreignKey = @ForeignKey(name = "fkc_image_id"))
+    @JsonManagedReference("productImages")
     private ProductBean product;
 
     public ProductImage() {

@@ -3,8 +3,10 @@ package tw.com.ispan.domain.shop;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -80,30 +82,31 @@ public class ProductBean {
     @JsonBackReference("products")
     private Admin admin;
 
-    // 單向一對多，可由商品查找商品圖片
+    // 雙向一對多，可反向查找
     // cascade = CascadeType.remove 當刪除商品時，會刪除商品圖片；已包含在 ALL 內
     // orphanRemoval = true，確保當某圖片從商品圖片集合中移除時，該圖片會從資料庫中刪除。
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    private Set<ProductImage> productImages = new LinkedHashSet<>(); // 按插入順序存取的唯一集合，首圖放第一張
+    @JsonBackReference("product")
+    private Set<ProductImage> productImages = new LinkedHashSet<>(); // 有序不重複 (首圖為選取的第一張)
 
     // 雙向多對多，可反向查找
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
             CascadeType.REFRESH }, fetch = FetchType.LAZY)
     @JoinTable(name = "product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @JsonBackReference("products")
-    private Set<ProductTag> tags = new HashSet<>(); // 無序不重複、高效查找
+    private HashSet<ProductTag> tags; // 無序不重複
 
     // 單向一對多，可由商品查找庫存異動
     // 商品刪除時，保留相關的庫存異動記錄
     // cascade = CascadeType.remove 當刪除商品時，會刪除庫存異動；須排除在外
     @OneToMany(mappedBy = "product", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
             CascadeType.REFRESH }, fetch = FetchType.EAGER)
-    private Set<InventoryItem> inventoryItems = new HashSet<>(); // 適合高效查找
+    private ArrayList<InventoryItem> inventoryItems; // 無序可重複，隨機存取性能好
 
     // 雙向一對多，可反向查找
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonBackReference("products")
-    private Set<WishListBean> wishlists;
+    private LinkedList<WishListBean> wishlists; // 可重複，適合頻繁插入和刪除
 
     public ProductBean() {
     }
@@ -111,8 +114,8 @@ public class ProductBean {
     public ProductBean(Integer productId, String productName, String description, BigDecimal originalPrice,
             BigDecimal salePrice, Integer stockQuantity, String unit, String status, LocalDate expire,
             LocalDateTime createdAt, LocalDateTime updatedAt, CategoryBean category, Admin admin,
-            Set<ProductImage> productImages, Set<ProductTag> tags, Set<InventoryItem> inventoryItems,
-            Set<WishListBean> wishlists) {
+            LinkedHashSet<ProductImage> productImages, HashSet<ProductTag> tags,
+            ArrayList<InventoryItem> inventoryItems, LinkedList<WishListBean> wishlists) {
         this.productId = productId;
         this.productName = productName;
         this.description = description;
@@ -202,7 +205,7 @@ public class ProductBean {
         return tags;
     }
 
-    public Set<WishListBean> getWishlists() {
+    public LinkedList<WishListBean> getWishlists() {
         return wishlists;
     }
 
@@ -262,23 +265,24 @@ public class ProductBean {
         this.admin = admin;
     }
 
-    public void setProductImages(Set<ProductImage> productImages) {
+    public void setProductImages(LinkedHashSet<ProductImage> productImages) {
         this.productImages = productImages;
     }
 
-    public void setTags(Set<ProductTag> tags) {
+    public void setTags(HashSet<ProductTag> tags) {
         this.tags = tags;
     }
 
-    public void setWishlists(Set<WishListBean> wishlists) {
-        this.wishlists = wishlists;
-    }
-
-    public Set<InventoryItem> getInventoryItems() {
+    public ArrayList<InventoryItem> getInventoryItems() {
         return inventoryItems;
     }
 
-    public void setInventoryItems(Set<InventoryItem> inventoryItems) {
+    public void setInventoryItems(ArrayList<InventoryItem> inventoryItems) {
         this.inventoryItems = inventoryItems;
     }
+
+    public void setWishlists(LinkedList<WishListBean> wishlists) {
+        this.wishlists = wishlists;
+    }
+
 }

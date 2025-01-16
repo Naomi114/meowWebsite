@@ -2,6 +2,8 @@ package tw.com.ispan.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.validation.constraints.DecimalMax;
@@ -15,57 +17,72 @@ import tw.com.ispan.domain.shop.ProductTag;
 
 // 輸入DTO: 接收前端傳來的數據
 public class ProductRequest {
+    // @NotBlank 只能限制String類型，其他類不為null需要在service層判斷
     @NotBlank
-    private String productName;
+    String productName;
 
     String description;
 
+    // 前端為單選；不能為空值
+    @NotBlank
+    String categoryName;
+
+    // 前端為多選；不能為空值
+    /*
+     * Q. 如果前端做成選單，還需要判斷空值嗎?
+     * A. 前端做成選單，可以設定必填，但是後端也要做判斷，因為前端可以被繞過判斷(ex. Chrome devtool, postman,
+     * curl)，同時為了避免惡意腳本攻擊，所以後端也要做判斷。
+     */
+    HashSet<ProductTag> tags;
+
+    // 前端為填入框；不能為空值
     @Positive
     @DecimalMax(value = "99999999.99")
     BigDecimal originalPrice;
 
+    // 前端為填入框；不能為空值
     @Positive
     @DecimalMax(value = "99999999.99")
     BigDecimal salePrice;
 
+    // 前端為填入框；不能為空值
     @PositiveOrZero
     Integer stockQuantity;
 
+    @NotBlank
     String unit;
+
+    // 自動生成：上架中、已售完 (20250116 寫入ProductService)
+    // 手動調整：隱藏 (未完成)--應該寫入 adminService
+    @NotBlank
     String status;
 
     @Future
     LocalDate expire;
 
-    // 前端為單選
-    String categoryName;
-
-    // 前端為多選
-    Set<ProductTag> tags;
-
-    @NotBlank
-    Set<ProductImage> productImages;
+    // 前端為多選: 1~5張圖片；不能為空值
+    LinkedHashSet<ProductImage> productImages;
 
     // 無參建構子: 默認初始化可以留空
     public ProductRequest() {
 
     }
 
-    public ProductRequest(@NotBlank String productName, String description,
-            @Positive @DecimalMax("99999999.99") BigDecimal originalPrice,
-            @Positive @DecimalMax("99999999.99") BigDecimal salePrice, @PositiveOrZero Integer stockQuantity,
-            String unit, String status, @Future LocalDate expire, String categoryName, Set<ProductTag> tags,
-            @NotBlank Set<ProductImage> productImages) {
+    public ProductRequest(@NotBlank String productName, String description, @NotBlank String categoryName,
+            HashSet<ProductTag> tags, @NotBlank @Positive @DecimalMax("99999999.99") BigDecimal originalPrice,
+            @NotBlank @Positive @DecimalMax("99999999.99") BigDecimal salePrice,
+            @NotBlank @PositiveOrZero Integer stockQuantity, @NotBlank String unit, String status,
+            @NotBlank @Future LocalDate expire, @NotBlank LinkedHashSet<ProductImage> productImages) {
         this.productName = productName;
         this.description = description;
+        this.categoryName = categoryName;
+        this.tags = tags;
         this.originalPrice = originalPrice;
         this.salePrice = salePrice;
         this.stockQuantity = stockQuantity;
         this.unit = unit;
         this.status = status;
         this.expire = expire;
-        this.categoryName = categoryName;
-        this.tags = tags;
         this.productImages = productImages;
     }
 
@@ -145,15 +162,15 @@ public class ProductRequest {
         return tags;
     }
 
-    public void setTags(Set<ProductTag> tags) {
+    public void setTags(HashSet<ProductTag> tags) {
         this.tags = tags;
     }
 
-    public Set<ProductImage> getProductImages() {
+    public LinkedHashSet<ProductImage> getProductImages() {
         return productImages;
     }
 
-    public void setProductImages(Set<ProductImage> productImages) {
+    public void setProductImages(LinkedHashSet<ProductImage> productImages) {
         this.productImages = productImages;
     }
 
