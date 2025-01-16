@@ -2,6 +2,8 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,16 +25,17 @@ public class DistinctArea {
 	private String distinctAreaName;
 
 	// 和RescueCase表雙向一對多
-	@OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
-	private List<RescueCase> rescueCases;
+	// @OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
+	// private List<RescueCase> rescueCases;
 
 	// 和LostCase表雙向一對多
 	@OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
+	@JsonManagedReference
 	private List<LostCase> lostCases;
 
 	// 和adoptionCase表雙向一對多
-	@OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
-	private List<AdoptionCase> adoptionCase;
+	// @OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
+	// private List<AdoptionCase> adoptionCase;
 
 	public DistinctArea() {
 		super();
@@ -60,12 +63,20 @@ public class DistinctArea {
 		this.distinctAreaName = distinctAreaName;
 	}
 
-	public List<RescueCase> getRescueCases() {
-		return rescueCases;
-	}
+	// public List<RescueCase> getRescueCases() {
+	// return rescueCases;
+	// }
 
-	public void setRescueCases(List<RescueCase> rescueCases) {
-		this.rescueCases = rescueCases;
+	// public void setRescueCases(List<RescueCase> rescueCases) {
+	// this.rescueCases = rescueCases;
+	// }
+
+	@Override
+	public String toString() {
+		return "DistinctArea [distinctAreaId=" + distinctAreaId +
+				", distinctAreaName=" + distinctAreaName +
+				// ", rescueCases=" + rescueCases +
+				", lostCases=" + lostCases + "]";
 	}
 
 }

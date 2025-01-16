@@ -8,10 +8,11 @@ import java.util.Optional;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import tw.com.ispan.domain.admin.Member;
+// import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.Breed;
 import tw.com.ispan.domain.pet.CaseState;
 import tw.com.ispan.domain.pet.City;
@@ -19,7 +20,7 @@ import tw.com.ispan.domain.pet.DistinctArea;
 import tw.com.ispan.domain.pet.FurColor;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.Species;
-import tw.com.ispan.repository.admin.MemberRepository;
+// import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.pet.BreedRepository;
 import tw.com.ispan.repository.pet.CaseStateRepository;
 import tw.com.ispan.repository.pet.CityRepository;
@@ -27,6 +28,7 @@ import tw.com.ispan.repository.pet.DistinctAreaRepository;
 import tw.com.ispan.repository.pet.FurColorRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.SpeciesRepository;
+import tw.com.ispan.specification.LostcaseSpecifications;
 
 @Service
 @Transactional
@@ -34,8 +36,8 @@ public class LostCaseService {
     @Autowired
     private LostCaseRepository lostCaseRepository; // 假設有 JPA Repository
 
-    @Autowired
-    private MemberRepository memberRepository;
+    // @Autowired
+    // private MemberRepository memberRepository;
 
     @Autowired
     private SpeciesRepository speciesRepository;
@@ -98,6 +100,34 @@ public class LostCaseService {
         return null;
     }
 
+    /**
+     * 動態條件查詢 LostCase
+     *
+     * @param caseTitle        案件標題模糊查詢條件
+     * @param memberIdPattern  memberId 模糊查詢條件
+     * @param caseIdPattern    caseId 模糊查詢條件
+     * @param cityName         城市名稱模糊查詢條件
+     * @param distinctAreaName 鄉鎮區名稱模糊查詢條件
+     * @return 符合條件的 LostCase 列表
+     */
+    public List<LostCase> findCases(
+            String caseTitle,
+            String memberIdPattern,
+            String caseIdPattern,
+            String cityName,
+            String distinctAreaName) {
+
+        // 動態構建查詢條件
+        Specification<LostCase> spec = Specification.where(LostcaseSpecifications.caseTitleLike(caseTitle))
+                .and(LostcaseSpecifications.hasMemberIdLike(memberIdPattern))
+                .and(LostcaseSpecifications.hasCaseIdLike(caseIdPattern))
+                .and(LostcaseSpecifications.hasCityNameLike(cityName))
+                .and(LostcaseSpecifications.hasDistinctAreaNameLike(distinctAreaName));
+
+        // 查詢並返回結果
+        return lostCaseRepository.findAll(spec);
+    }
+
     public boolean exists(Integer id) {
         if (id != null) {
             return lostCaseRepository.existsById(id);
@@ -111,26 +141,6 @@ public class LostCaseService {
             return true; // 成功刪除，回傳 true
         }
         return false; // 若 ID 為空或資料不存在，回傳 false
-    }
-
-    public long count(String json) {
-        try {
-            JSONObject obj = new JSONObject(json); // 將 JSON 字串轉換為 JSONObject
-            return lostCaseRepository.count(obj); // 調用 Repository 的 count 方法進行統計
-        } catch (Exception e) {
-            e.printStackTrace(); // 捕捉並記錄例外情況
-        }
-        return 0; // 若發生例外，返回 0
-    }
-
-    public List<LostCase> find(String json) {
-        try {
-            JSONObject obj = new JSONObject(json); // 將 JSON 字串轉換為 JSONObject
-            return lostCaseRepository.find(obj); // 調用 Repository 的 find 方法進行查詢
-        } catch (Exception e) {
-            e.printStackTrace(); // 捕捉並記錄例外情況
-        }
-        return null; // 若發生例外，返回 null
     }
 
     public LostCase create(String json) {
@@ -157,7 +167,6 @@ public class LostCaseService {
             BigDecimal longitude = obj.optBigDecimal("longitude", null);
             Integer donationAmount = obj.optInt("donationAmount", 0);
             Integer viewCount = obj.optInt("viewCount", 0);
-            Integer follow = obj.optInt("follow", 0);
             Integer caseStateId = obj.optInt("caseStateId");
             String lostExperience = obj.optString("lostExperience", null);
             String contactInformation = obj.optString("contactInformation", null);
@@ -172,8 +181,8 @@ public class LostCaseService {
             }
 
             // 查詢關聯物件
-            Member member = memberRepository.findById(memberId)
-                    .orElseThrow(() -> new IllegalArgumentException("無效的 memberId"));
+            // Member member = memberRepository.findById(memberId)
+            // .orElseThrow(() -> new IllegalArgumentException("無效的 memberId"));
             Species species = speciesRepository.findById(speciesId)
                     .orElseThrow(() -> new IllegalArgumentException("無效的 speciesId"));
             Breed breed = breedRepository.findById(breedId)
@@ -190,7 +199,7 @@ public class LostCaseService {
             // 建立 LostCase 實體
             LostCase lostCase = new LostCase();
             lostCase.setCaseTitle(caseTitle);
-            lostCase.setMember(member);
+            // lostCase.setMember(member);
             lostCase.setSpecies(species);
             lostCase.setBreed(breed);
             lostCase.setFurColor(furColor);
@@ -207,7 +216,6 @@ public class LostCaseService {
             lostCase.setLongitude(longitude);
             lostCase.setDonationAmount(donationAmount);
             lostCase.setViewCount(viewCount);
-            lostCase.setFollow(follow);
             lostCase.setPublicationTime(LocalDateTime.now());
             lostCase.setLastUpdateTime(LocalDateTime.now());
             lostCase.setCaseState(caseState);
