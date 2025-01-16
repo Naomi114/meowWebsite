@@ -11,7 +11,7 @@ import tw.com.ispan.jwt.JsonWebTokenUtility;
 import tw.com.ispan.service.MemberService;
 
 @RestController
-public class LoginAjaxController {
+public class LoginController {
     @Autowired
     private MemberService MemberService;
 
@@ -28,7 +28,8 @@ public class LoginAjaxController {
         String password = obj.isNull("password") ? null : obj.getString("password");
 
         // 驗證資料
-        if (username == null || username.length() == 0 || password == null || password.length() == 0) {
+        if (username == null || username.length() == 0 || password == null ||
+                password.length() == 0) {
             responseJson.put("success", false);
             responseJson.put("message", "請輸入帳號/密碼");
             return responseJson.toString();
@@ -46,11 +47,12 @@ public class LoginAjaxController {
             responseJson.put("message", "登入成功");
 
             JSONObject user = new JSONObject()
-                    .put("custid", bean.getCustid())
+                    .put("custid", bean.getMemberId())
                     .put("email", bean.getEmail());
             String token = jsonWebTokenUtility.createToken(user.toString());
             responseJson.put("token", token);
             responseJson.put("user", bean.getEmail());
+
         }
         return responseJson.toString();
     }
