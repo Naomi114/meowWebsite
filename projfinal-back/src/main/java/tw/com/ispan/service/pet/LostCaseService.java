@@ -28,13 +28,12 @@ import tw.com.ispan.repository.pet.DistinctAreaRepository;
 import tw.com.ispan.repository.pet.FurColorRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.SpeciesRepository;
-import tw.com.ispan.specification.LostcaseSpecifications;
 
 @Service
 @Transactional
 public class LostCaseService {
     @Autowired
-    private LostCaseRepository lostCaseRepository; // 假設有 JPA Repository
+    private LostCaseRepository lostCaseRepository;
 
     // @Autowired
     // private MemberRepository memberRepository;
@@ -57,18 +56,28 @@ public class LostCaseService {
     @Autowired
     private CaseStateRepository caseStateRepository;
 
-    public List<LostCase> select(LostCase bean) {
-        List<LostCase> result = null;
-        if (bean != null && bean.getLostCaseId() != null && !bean.getLostCaseId().equals(0)) {
-            Optional<LostCase> optional = lostCaseRepository.findById(bean.getLostCaseId());
-            if (optional.isPresent()) {
-                result = new ArrayList<LostCase>();
-                result.add(optional.get());
-            }
-        } else {
-            result = lostCaseRepository.findAll();
+    public List<LostCase> select(LostCase condition) {
+        if (condition == null) {
+            return lostCaseRepository.findAll(); // 无条件查询
         }
-        return result;
+
+        // 动态构建查询条件
+        Specification<LostCase> spec = Specification.where(null);
+
+        if (condition.getLostCaseId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("lostCaseId"), condition.getLostCaseId()));
+        }
+
+        if (condition.getCaseTitle() != null && !condition.getCaseTitle().trim().isEmpty()) {
+            spec = spec.and((root, query, cb) -> cb.like(root.get("caseTitle"), "%" + condition.getCaseTitle() + "%"));
+        }
+
+        if (condition.getCity() != null && condition.getCity().getCityId() != null) {
+            spec = spec.and(
+                    (root, query, cb) -> cb.equal(root.get("city").get("cityId"), condition.getCity().getCityId()));
+        }
+
+        return lostCaseRepository.findAll(spec);
     }
 
     public LostCase insert(LostCase bean) {
@@ -84,60 +93,57 @@ public class LostCaseService {
         if (bean != null && bean.getLostCaseId() != null) {
             if (lostCaseRepository.existsById(bean.getLostCaseId())) {
                 lostCaseRepository.deleteById(bean.getLostCaseId());
+                System.out.println(123);
                 return true;
             }
         }
         return false;
     }
 
-    public LostCase findById(Integer id) {
-        if (id != null) {
-            Optional<LostCase> optional = lostCaseRepository.findById(id);
-            if (optional.isPresent()) {
-                return optional.get();
-            }
+    public LostCase findById(Integer lostCaseId) {
+        if (lostCaseId == null) {
+            System.out.println("LostCase ID is null, returning null.");
+            return null;
+        }
+        Optional<LostCase> result = lostCaseRepository.findById(lostCaseId);
+        System.out.println("Checking LostCase ID " + lostCaseId + ": " + (result.isPresent() ? "Found" : "Not Found"));
+        return result.orElse(null);
+    }
+
+    public long count(String json) {
+        try {
+            JSONObject obj = new JSONObject(json);
+            return lostCaseRepository.count(obj);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<LostCase> find(String json) {
+        try {
+            JSONObject obj = new JSONObject(json);
+            return lostCaseRepository.find(obj);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
 
-    /**
-     * 動態條件查詢 LostCase
-     *
-     * @param caseTitle        案件標題模糊查詢條件
-     * @param memberIdPattern  memberId 模糊查詢條件
-     * @param caseIdPattern    caseId 模糊查詢條件
-     * @param cityName         城市名稱模糊查詢條件
-     * @param distinctAreaName 鄉鎮區名稱模糊查詢條件
-     * @return 符合條件的 LostCase 列表
-     */
-    public List<LostCase> findCases(
-            String caseTitle,
-            String memberIdPattern,
-            String caseIdPattern,
-            String cityName,
-            String distinctAreaName) {
-
-        // 動態構建查詢條件
-        Specification<LostCase> spec = Specification.where(LostcaseSpecifications.caseTitleLike(caseTitle))
-                .and(LostcaseSpecifications.hasMemberIdLike(memberIdPattern))
-                .and(LostcaseSpecifications.hasCaseIdLike(caseIdPattern))
-                .and(LostcaseSpecifications.hasCityNameLike(cityName))
-                .and(LostcaseSpecifications.hasDistinctAreaNameLike(distinctAreaName));
-
-        // 查詢並返回結果
-        return lostCaseRepository.findAll(spec);
-    }
-
-    public boolean exists(Integer id) {
-        if (id != null) {
-            return lostCaseRepository.existsById(id);
+    public boolean exists(Integer lostCaseId) {
+        if (lostCaseId == null) {
+            System.out.println("LostCase ID is null, returning false.");
+            return false;
         }
-        return false;
+        boolean exists = lostCaseRepository.existsById(lostCaseId);
+        System.out.println("Checking existence for LostCase ID " + lostCaseId + ": " + exists);
+        return exists;
     }
 
     public boolean remove(Integer id) {
         if (id != null && lostCaseRepository.existsById(id)) { // 驗證 ID 是否存在
             lostCaseRepository.deleteById(id); // 使用 Repository 刪除對應的資料
+            System.out.println(789);
             return true; // 成功刪除，回傳 true
         }
         return false; // 若 ID 為空或資料不存在，回傳 false
@@ -145,86 +151,77 @@ public class LostCaseService {
 
     public LostCase create(String json) {
         try {
-            // 解析 JSON 字串
             JSONObject obj = new JSONObject(json);
 
-            // 基本欄位解析
+            // 解析 JSON 参数
             String caseTitle = obj.optString("caseTitle");
-            Integer memberId = obj.optInt("memberId");
             Integer speciesId = obj.optInt("speciesId");
             Integer breedId = obj.optInt("breedId");
             Integer furColorId = obj.optInt("furColorId");
-            String name = obj.optString("name");
-            String gender = obj.optString("gender", null); // 可選欄位
-            String sterilization = obj.optString("sterilization");
-            Integer age = obj.optInt("age", -1); // -1 表示空值
-            Integer microChipNumber = obj.optInt("microChipNumber", -1);
-            boolean suspLost = obj.optBoolean("suspLost", false);
             Integer cityId = obj.optInt("cityId");
             Integer distinctAreaId = obj.optInt("distinctAreaId");
             String street = obj.optString("street");
+            String gender = obj.optString("gender", null); // 可选字段
+            String sterilization = obj.optString("sterilization");
+            Integer age = obj.optInt("age", -1);
+            Integer microChipNumber = obj.optInt("microChipNumber", -1);
+            boolean suspLost = obj.optBoolean("suspLost", false);
             BigDecimal latitude = obj.optBigDecimal("latitude", null);
             BigDecimal longitude = obj.optBigDecimal("longitude", null);
             Integer donationAmount = obj.optInt("donationAmount", 0);
-            Integer viewCount = obj.optInt("viewCount", 0);
             Integer caseStateId = obj.optInt("caseStateId");
             String lostExperience = obj.optString("lostExperience", null);
             String contactInformation = obj.optString("contactInformation", null);
             String featureDescription = obj.optString("featureDescription", null);
             String caseUrl = obj.optString("caseUrl", null);
 
-            // 驗證必填欄位
-            if (caseTitle == null || memberId == null || speciesId == null || breedId == null || furColorId == null ||
-                    sterilization == null || cityId == null || distinctAreaId == null || street == null
-                    || latitude == null || longitude == null || caseStateId == null) {
-                throw new IllegalArgumentException("必填欄位不可為空");
+            // 验证必填字段
+            if (caseTitle == null || speciesId == null || breedId == null || furColorId == null || cityId == null
+                    || distinctAreaId == null || street == null || sterilization == null || latitude == null
+                    || longitude == null || caseStateId == null) {
+                throw new IllegalArgumentException("必填字段不能为空！");
             }
 
-            // 查詢關聯物件
-            // Member member = memberRepository.findById(memberId)
-            // .orElseThrow(() -> new IllegalArgumentException("無效的 memberId"));
+            // 查询关联对象
             Species species = speciesRepository.findById(speciesId)
-                    .orElseThrow(() -> new IllegalArgumentException("無效的 speciesId"));
+                    .orElseThrow(() -> new IllegalArgumentException("无效的 speciesId"));
             Breed breed = breedRepository.findById(breedId)
-                    .orElseThrow(() -> new IllegalArgumentException("無效的 breedId"));
+                    .orElseThrow(() -> new IllegalArgumentException("无效的 breedId"));
             FurColor furColor = furColorRepository.findById(furColorId)
-                    .orElseThrow(() -> new IllegalArgumentException("無效的 furColorId"));
+                    .orElseThrow(() -> new IllegalArgumentException("无效的 furColorId"));
             City city = cityRepository.findById(cityId)
-                    .orElseThrow(() -> new IllegalArgumentException("無效的 cityId"));
+                    .orElseThrow(() -> new IllegalArgumentException("无效的 cityId"));
             DistinctArea distinctArea = distinctAreaRepository.findById(distinctAreaId)
-                    .orElseThrow(() -> new IllegalArgumentException("無效的 distinctAreaId"));
+                    .orElseThrow(() -> new IllegalArgumentException("无效的 distinctAreaId"));
             CaseState caseState = caseStateRepository.findById(caseStateId)
-                    .orElseThrow(() -> new IllegalArgumentException("無效的 caseStateId"));
+                    .orElseThrow(() -> new IllegalArgumentException("无效的 caseStateId"));
 
-            // 建立 LostCase 實體
+            // 构建实体
             LostCase lostCase = new LostCase();
             lostCase.setCaseTitle(caseTitle);
-            // lostCase.setMember(member);
             lostCase.setSpecies(species);
             lostCase.setBreed(breed);
             lostCase.setFurColor(furColor);
-            lostCase.setName(name);
-            lostCase.setGender(gender);
-            lostCase.setSterilization(sterilization);
-            lostCase.setAge(age == -1 ? null : age); // 設定空值
-            lostCase.setMicroChipNumber(microChipNumber == -1 ? null : microChipNumber);
-            lostCase.setSuspLost(suspLost);
             lostCase.setCity(city);
             lostCase.setDistinctArea(distinctArea);
             lostCase.setStreet(street);
+            lostCase.setGender(gender);
+            lostCase.setSterilization(sterilization);
+            lostCase.setAge(age == -1 ? null : age);
+            lostCase.setMicroChipNumber(microChipNumber == -1 ? null : microChipNumber);
+            lostCase.setSuspLost(suspLost);
             lostCase.setLatitude(latitude);
             lostCase.setLongitude(longitude);
             lostCase.setDonationAmount(donationAmount);
-            lostCase.setViewCount(viewCount);
-            lostCase.setPublicationTime(LocalDateTime.now());
-            lostCase.setLastUpdateTime(LocalDateTime.now());
             lostCase.setCaseState(caseState);
             lostCase.setLostExperience(lostExperience);
             lostCase.setContactInformation(contactInformation);
             lostCase.setFeatureDescription(featureDescription);
             lostCase.setCaseUrl(caseUrl);
+            lostCase.setPublicationTime(LocalDateTime.now());
+            lostCase.setLastUpdateTime(LocalDateTime.now());
 
-            // 儲存到資料庫
+            // 保存并返回
             return lostCaseRepository.save(lostCase);
         } catch (Exception e) {
             e.printStackTrace();
@@ -234,99 +231,40 @@ public class LostCaseService {
 
     public LostCase modify(String json) {
         try {
-            // 解析 JSON 字串
             JSONObject obj = new JSONObject(json);
-
-            // 提取欄位資料
             Integer lostCaseId = obj.isNull("lostCaseId") ? null : obj.getInt("lostCaseId");
-            String caseTitle = obj.optString("caseTitle", null);
-            Integer speciesId = obj.isNull("speciesId") ? null : obj.getInt("speciesId");
-            Integer breedId = obj.isNull("breedId") ? null : obj.getInt("breedId");
-            Integer furColorId = obj.isNull("furColorId") ? null : obj.getInt("furColorId");
-            String name = obj.optString("name", null);
-            String gender = obj.optString("gender", null);
-            String sterilization = obj.optString("sterilization", null);
-            Integer age = obj.isNull("age") ? null : obj.getInt("age");
-            Integer microChipNumber = obj.isNull("microChipNumber") ? null : obj.getInt("microChipNumber");
-            Boolean suspLost = obj.isNull("suspLost") ? null : obj.getBoolean("suspLost");
-            Integer cityId = obj.isNull("cityId") ? null : obj.getInt("cityId");
-            Integer distinctAreaId = obj.isNull("distinctAreaId") ? null : obj.getInt("distinctAreaId");
-            String street = obj.optString("street", null);
-            BigDecimal latitude = obj.isNull("latitude") ? null : obj.getBigDecimal("latitude");
-            BigDecimal longitude = obj.isNull("longitude") ? null : obj.getBigDecimal("longitude");
-            Integer caseStateId = obj.isNull("caseStateId") ? null : obj.getInt("caseStateId");
-            String lostExperience = obj.optString("lostExperience", null);
-            String contactInformation = obj.optString("contactInformation", null);
-            String featureDescription = obj.optString("featureDescription", null);
 
-            // 驗證是否提供了 LostCase ID
             if (lostCaseId != null) {
                 Optional<LostCase> optional = lostCaseRepository.findById(lostCaseId);
                 if (optional.isPresent()) {
                     LostCase update = optional.get();
 
-                    // 更新欄位資料
-                    if (caseTitle != null)
-                        update.setCaseTitle(caseTitle);
-                    if (speciesId != null) {
-                        Species species = speciesRepository.findById(speciesId)
-                                .orElseThrow(() -> new IllegalArgumentException("無效的 speciesId"));
-                        update.setSpecies(species);
-                    }
-                    if (breedId != null) {
-                        Breed breed = breedRepository.findById(breedId)
-                                .orElseThrow(() -> new IllegalArgumentException("無效的 breedId"));
-                        update.setBreed(breed);
-                    }
-                    if (furColorId != null) {
-                        FurColor furColor = furColorRepository.findById(furColorId)
-                                .orElseThrow(() -> new IllegalArgumentException("無效的 furColorId"));
-                        update.setFurColor(furColor);
-                    }
-                    if (name != null)
-                        update.setName(name);
-                    if (gender != null)
-                        update.setGender(gender);
-                    if (sterilization != null)
-                        update.setSterilization(sterilization);
-                    if (age != null)
-                        update.setAge(age);
-                    if (microChipNumber != null)
-                        update.setMicroChipNumber(microChipNumber);
-                    if (suspLost != null)
-                        update.setSuspLost(suspLost);
-                    if (cityId != null) {
-                        City city = cityRepository.findById(cityId)
-                                .orElseThrow(() -> new IllegalArgumentException("無效的 cityId"));
-                        update.setCity(city);
-                    }
-                    if (distinctAreaId != null) {
-                        DistinctArea distinctArea = distinctAreaRepository.findById(distinctAreaId)
-                                .orElseThrow(() -> new IllegalArgumentException("無效的 distinctAreaId"));
-                        update.setDistinctArea(distinctArea);
-                    }
-                    if (street != null)
-                        update.setStreet(street);
-                    if (latitude != null)
-                        update.setLatitude(latitude);
-                    if (longitude != null)
-                        update.setLongitude(longitude);
-                    if (caseStateId != null) {
-                        CaseState caseState = caseStateRepository.findById(caseStateId)
-                                .orElseThrow(() -> new IllegalArgumentException("無效的 caseStateId"));
-                        update.setCaseState(caseState);
-                    }
-                    if (lostExperience != null)
-                        update.setLostExperience(lostExperience);
-                    if (contactInformation != null)
-                        update.setContactInformation(contactInformation);
-                    if (featureDescription != null)
-                        update.setFeatureDescription(featureDescription);
-
-                    // 更新最後修改時間
+                    // 更新字段
+                    update.setCaseTitle(obj.optString("caseTitle", update.getCaseTitle()));
+                    update.setSpecies(speciesRepository.findById(obj.optInt("speciesId")).orElse(update.getSpecies()));
+                    update.setBreed(breedRepository.findById(obj.optInt("breedId")).orElse(update.getBreed()));
+                    update.setFurColor(
+                            furColorRepository.findById(obj.optInt("furColorId")).orElse(update.getFurColor()));
+                    update.setCity(cityRepository.findById(obj.optInt("cityId")).orElse(update.getCity()));
+                    update.setDistinctArea(distinctAreaRepository.findById(obj.optInt("distinctAreaId"))
+                            .orElse(update.getDistinctArea()));
+                    update.setStreet(obj.optString("street", update.getStreet()));
+                    update.setGender(obj.optString("gender", update.getGender()));
+                    update.setSterilization(obj.optString("sterilization", update.getSterilization()));
+                    update.setAge(obj.optInt("age", update.getAge()));
+                    update.setMicroChipNumber(obj.optInt("microChipNumber", update.getMicroChipNumber()));
+                    update.setSuspLost(obj.optBoolean("suspLost", update.isSuspLost()));
+                    update.setLatitude(obj.optBigDecimal("latitude", update.getLatitude()));
+                    update.setLongitude(obj.optBigDecimal("longitude", update.getLongitude()));
+                    update.setDonationAmount(obj.optInt("donationAmount", update.getDonationAmount()));
+                    update.setCaseState(
+                            caseStateRepository.findById(obj.optInt("caseStateId")).orElse(update.getCaseState()));
+                    update.setLostExperience(obj.optString("lostExperience", update.getLostExperience()));
+                    update.setContactInformation(obj.optString("contactInformation", update.getContactInformation()));
+                    update.setFeatureDescription(obj.optString("featureDescription", update.getFeatureDescription()));
+                    update.setCaseUrl(obj.optString("caseUrl", update.getCaseUrl()));
                     update.setLastUpdateTime(LocalDateTime.now());
 
-                    // 儲存更新後的資料
                     return lostCaseRepository.save(update);
                 }
             }
@@ -335,4 +273,5 @@ public class LostCaseService {
         }
         return null;
     }
+
 }

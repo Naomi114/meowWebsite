@@ -20,8 +20,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-// import tw.com.ispan.domain.admin.Member;
-import tw.com.ispan.domain.pet.forRescue.CanAfford;
 import tw.com.ispan.domain.pet.forRescue.RescueDemand;
 
 @Entity
@@ -143,11 +141,6 @@ public class LostCase {
     // @JsonManagedReference
     // private List<ReportCase> reportCases;
 
-    // 必填，與 CanAfford 單向多對多
-    @ManyToMany
-    @JoinTable(name = "CanAfford_LostCase", joinColumns = @JoinColumn(name = "lostCaseId"), inverseJoinColumns = @JoinColumn(name = "canAffordId"))
-    private List<CanAfford> canAffords;
-
     // 必填，與 CaseState 單向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     @JoinColumn(name = "CaseStateId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_CaseState"))
@@ -171,7 +164,7 @@ public class LostCase {
             Integer donationAmount, Integer viewCount, List<Follow> follows, LocalDateTime publicationTime,
             LocalDateTime lastUpdateTime, String lostExperience, String contactInformation, String featureDescription,
             List<CasePicture> casePictures, List<RescueDemand> rescueDemands,
-            List<CanAfford> canAffords, CaseState caseState, String caseUrl) {
+            CaseState caseState, String caseUrl) {
         this.lostCaseId = lostCaseId;
         this.caseTitle = caseTitle;
         // this.member = member;
@@ -200,7 +193,6 @@ public class LostCase {
         this.casePictures = casePictures;
         this.rescueDemands = rescueDemands;
         // this.reportCases = reportCases;
-        this.canAffords = canAffords;
         this.caseState = caseState;
         this.caseUrl = caseUrl;
     }
@@ -430,14 +422,6 @@ public class LostCase {
     // this.reportCases = reportCases;
     // }
 
-    public List<CanAfford> getCanAffords() {
-        return canAffords;
-    }
-
-    public void setCanAffords(List<CanAfford> canAffords) {
-        this.canAffords = canAffords;
-    }
-
     public CaseState getCaseState() {
         return caseState;
     }
@@ -484,7 +468,6 @@ public class LostCase {
                 ", casePictures=" + casePictures +
                 ", rescueDemands=" + rescueDemands +
                 // ", reportCases=" + reportCases +
-                ", canAffords=" + canAffords +
                 ", caseState=" + caseState +
                 ", caseUrl=" + caseUrl + "]";
     }

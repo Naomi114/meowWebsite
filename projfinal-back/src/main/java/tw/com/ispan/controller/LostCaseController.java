@@ -1,5 +1,6 @@
 package tw.com.ispan.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tw.com.ispan.domain.pet.LostCase;
@@ -111,9 +111,10 @@ public class LostCaseController {
                         .put("name", findCase.getName())
                         .put("gender", findCase.getGender())
                         .put("breed", findCase.getBreed())
-                        .put("sterilization", findCase.getSterilization())
+                        .put("sterilization", findCase.getSterilization())// 絕育
                         // .put("memberId", findCase.getMemberId())
-                        .put("lastUpdateTime", date);
+                        .put("caseState", findCase.getCaseState())
+                        .put("publicationTime", date);
                 array = array.put(item);
             }
         }
@@ -121,26 +122,20 @@ public class LostCaseController {
         return responseJson.toString();
     }
 
-    // @PostMapping("/find")
+    @PostMapping("/find")
+    public LostCaseResponse find(@RequestBody String json) {
+        LostCaseResponse responseBean = new LostCaseResponse();
 
-    /**
-     * 動態條件查詢 LostCase
-     *
-     * @param caseTitle        案件標題模糊查詢條件
-     * @param memberIdPattern  memberId 模糊查詢條件
-     * @param caseIdPattern    caseId 模糊查詢條件
-     * @param cityName         城市名稱模糊查詢條件
-     * @param distinctAreaName 鄉鎮區名稱模糊查詢條件
-     * @return 符合條件的 LostCase 列表
-     */
-    @GetMapping("/search")
-    public List<LostCase> searchCases(
-            @RequestParam(required = false) String caseTitle,
-            @RequestParam(required = false) String memberIdPattern,
-            @RequestParam(required = false) String caseIdPattern,
-            @RequestParam(required = false) String cityName,
-            @RequestParam(required = false) String distinctAreaName) {
+        long count = lostCaseService.count(json);
+        responseBean.setCount(count);
 
-        return lostCaseService.findCases(caseTitle, memberIdPattern, caseIdPattern, cityName, distinctAreaName);
+        List<LostCase> products = lostCaseService.find(json);
+        if (products != null && !products.isEmpty()) {
+            responseBean.setList(products);
+        } else {
+            responseBean.setList(new ArrayList<>());
+        }
+
+        return responseBean;
     }
 }
