@@ -14,7 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 // import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;<<<<<<<HEAD
+import jakarta.persistence.Table;
 // import tw.com.ispan.domain.pet.Activity;
 // import tw.com.ispan.domain.pet.ActivityParticipantList;
 // import tw.com.ispan.domain.pet.AdoptionCase;
@@ -24,15 +24,7 @@ import jakarta.persistence.Table;<<<<<<<HEAD
 // import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.domain.shop.Cart;
 import tw.com.ispan.domain.shop.Orders;
-import tw.com.ispan.domain.shop.WishList;=======
-import tw.com.ispan.domain.pet.Activity;
-import tw.com.ispan.domain.pet.ActivityParticipantList;
-import tw.com.ispan.domain.pet.AdoptionCase;
-import tw.com.ispan.domain.pet.Follow;
-import tw.com.ispan.domain.pet.LostCase;
-import tw.com.ispan.domain.pet.ReportCase;
-import tw.com.ispan.domain.pet.RescueCase;
-import tw.com.ispan.domain.shop.Order;
+import tw.com.ispan.domain.shop.WishList;
 
 @Entity
 @Table(name = "Member")
@@ -68,7 +60,6 @@ public class Member {
 	@Column(nullable = false)
 	private LocalDateTime updateDate;
 
-	<<<<<<<HEAD
 	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
 	// CascadeType.REMOVE })
 	// private Set<Activity> activity;
@@ -77,27 +68,13 @@ public class Member {
 	// CascadeType.REMOVE })
 	// private Set<ActivityParticipantList> acitvityParticipantList;
 
-	@OneToMany(mappedBy="member",cascade={CascadeType.PERSIST,CascadeType.REMOVE})
-	private List<WishList> wishLists;=======
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-	private Set<Activity> activity;
+	private List<WishList> wishList;
 
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-	private Set<ActivityParticipantList> acitvityParticipantList;
+	private Set<Cart> cart;
 
-	// // @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
-	//
-	// CascadeType.REMOVE })
-	// // private List<WishList> wishList;
-	>>>>>>>255185a (修改資料庫程式碼-1)
-
-	// // @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
-	//
-	// CascadeType.REMOVE })
-	// // private Set<Cart> cart;
-
-<<<<<<< HEAD
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 
 	private List<Orders> order;
 
@@ -111,29 +88,13 @@ public class Member {
 
 	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	// private List<LostCase> lostCase;
-	=======
+
 	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval =
 	// true)
 	// private List<Order> order;
 
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-	private List<RescueCase> rescueCases;
-
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
-	private Set<Follow> follow;
-
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	private List<LostCase> lostCase;>>>>>>>255185a (修改資料庫程式碼-1)
-
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	private List<AdoptionCase> adoptionCase;
-
-	<<<<<<<HEAD
 	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	// private List<ReportCase> reportCase;
-	=======
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	private List<ReportCase> reportCase;>>>>>>>255185a (修改資料庫程式碼-1)
 
 	public Integer getMemberId() {
 		return memberId;
