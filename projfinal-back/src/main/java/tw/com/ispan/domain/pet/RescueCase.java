@@ -28,10 +28,13 @@ import tw.com.ispan.domain.pet.forRescue.RescueProgress;
 public class RescueCase {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer rescueCaseId;
 =======
+=======
+>>>>>>> 39771d9 (解決rescuecase檔格式化問題)
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer rescueCaseId;
@@ -45,6 +48,7 @@ public class RescueCase {
 	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	@JoinColumn(name = "memberId", nullable = true, foreignKey = @ForeignKey(name = "FK_RescueCase_Member"))
 	private Member member;
+<<<<<<< HEAD
 >>>>>>> b34f32d (更新資料初始化程式(增加breed,city先驗證存在)、更新repository、domain)
 
     // 必填
@@ -67,25 +71,60 @@ public class RescueCase {
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     @JoinColumn(name = "breedId", foreignKey = @ForeignKey(name = "FK_RescueCase_Breed"))
     private Breed breed;
+=======
 
-    // 關聯到furColor表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    @JoinColumn(name = "furColorId", foreignKey = @ForeignKey(name = "FK_RescueCase_FurColor"))
-    private FurColor furColor;
+	//必填
+	// 關聯到species表，雙向多對一
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_Species"))
+	private Species species;
 
-    @Column(columnDefinition = "NVARCHAR(5)", name = "gender")
-    private String gender;
+	// 關聯到breed表，雙向多對一
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@JoinColumn(name = "breedId", foreignKey = @ForeignKey(name = "FK_RescueCase_Breed"))
+	private Breed breed;
 
-    @Column(columnDefinition = "NVARCHAR(5)", name = "sterilization")
-    private String sterilization;
+	// 關聯到furColor表，雙向多對一
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@JoinColumn(name = "furColorId", foreignKey = @ForeignKey(name = "FK_RescueCase_FurColor"))
+	private FurColor furColor;
+>>>>>>> 39771d9 (解決rescuecase檔格式化問題)
 
-    @Column(name = "age")
-    private Integer age;
+	@Column(columnDefinition = "NVARCHAR(5)", name = "gender")
+	private String gender;
 
+	@Column(columnDefinition = "NVARCHAR(5)", name = "sterilization")
+	private String sterilization;
+
+	@Column(name = "age")
+	private Integer age;
+
+	@Column(name = "microChipNumber")
+	private Integer microChipNumber;
+	
+	//必填
+	@Column(name = "suspLost", nullable = false)
+	private Boolean suspLost;
+	
+	//必填
+	// 關聯到city表，雙向多對一
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_City"))
+	private City city;
+
+	//必填
+	// 關聯到distinctArea表，雙向多對一
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_DistinctArea"))
+	private DistinctArea distinctArea;
+
+<<<<<<< HEAD
 <<<<<<< HEAD
     @Column(name = "microChipNumber")
     private Integer microChipNumber;
 =======
+=======
+>>>>>>> 39771d9 (解決rescuecase檔格式化問題)
 	@Column(columnDefinition = "NVARCHAR(10)", name = "street")
 	private String street;
 	
@@ -100,6 +139,7 @@ public class RescueCase {
 	private Double longitude;
 >>>>>>> b34f32d (更新資料初始化程式(增加breed,city先驗證存在)、更新repository、domain)
 
+<<<<<<< HEAD
     // 必填
     @Column(name = "suspLost", nullable = false)
     private Boolean suspLost;
@@ -117,6 +157,14 @@ public class RescueCase {
     @JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_DistinctArea"))
     private DistinctArea distinctArea;
 =======
+=======
+	@Column(name = "donationAmount")
+	private Integer donationAmount;
+
+	@Column(name = "viewCount")
+	private Integer viewCount;   
+
+>>>>>>> 39771d9 (解決rescuecase檔格式化問題)
 	@Column(name = "follow")
 	private Integer follow;
 	
@@ -140,6 +188,7 @@ public class RescueCase {
 	//必填
 	@Column(name = "rescueReason", columnDefinition = "nvarchar(max)", nullable = false)
 	private String rescueReason;
+<<<<<<< HEAD
 >>>>>>> b34f32d (更新資料初始化程式(增加breed,city先驗證存在)、更新repository、domain)
 
     @Column(columnDefinition = "NVARCHAR(10)", name = "street")
@@ -193,76 +242,64 @@ public class RescueCase {
 
     // 必填
     // 和rescueDemand單向多對多
+=======
+
+	@Column(name = "caseUrl", length = 255)
+	private String caseUrl;
+    
+	//必填
+	//關聯到CasePicture表，單向一對多，rescueCaseId外鍵會在CasePicture表中
+	@OneToMany
+	@JoinColumn(name = "rescueCaseId", foreignKey = @ForeignKey(name = "FK_CasePicture_RescueCase"))
+	private List<CasePicture> casePictures;
+	
+	//必填
+	//和rescueDemand單向多對多
+>>>>>>> 39771d9 (解決rescuecase檔格式化問題)
     @ManyToMany
-    @JoinTable(name = "RescueCase_RescueDemand", joinColumns = @JoinColumn(name = "rescueCaseId"), inverseJoinColumns = @JoinColumn(name = "rescueDemandId"))
+    @JoinTable(
+        name = "RescueCase_RescueDemand",
+        joinColumns = @JoinColumn(name = "rescueCaseId"),
+        inverseJoinColumns = @JoinColumn(name = "rescueDemandId")
+    )
     private List<RescueDemand> rescueDemands;
-
-    // 必填
-    // 和canAfford表為單向多對多(case找去afford)
+	
+    //必填
+    //和canAfford表為單向多對多(case找去afford)
     @ManyToMany
-    @JoinTable(name = "CanAfford_RescueCase", joinColumns = @JoinColumn(name = "rescueCaseId"), inverseJoinColumns = @JoinColumn(name = "canAffordId"))
+    @JoinTable(
+        name = "CanAfford_RescueCase",
+        joinColumns = @JoinColumn(name = "rescueCaseId"),
+        inverseJoinColumns = @JoinColumn(name = "canAffordId")
+    )
     private List<CanAfford> canAffords;
-
-    // 和RescueProgress表單向一對多(case找去RescueProgress)
+    
+    
+    //和RescueProgress表單向一對多(case找去RescueProgress)
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "rescueCaseId")
     private List<RescueProgress> rescueProgresses;
-
+	
+    
     @OneToMany(mappedBy = "rescueCase", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Follow> follows;
-
+    
+    
     // 關聯到ReportCase表，單向一對多
     @OneToMany(mappedBy = "rescueCase", cascade = CascadeType.ALL)
-    private List<ReportCase> reportCases;
-
+    private List<ReportCase> reportCases; 
+    
+	
+    
+    
     // Hibernate 進行實體的初始化需要用到空參建構子
-    public RescueCase() {
-        super();
-    }
+	public RescueCase() {
+		super();
+	}
 
-    public RescueCase(Integer rescueCaseId, String caseTitle, Member member, Species species, Breed breed,
-            FurColor furColor, String gender, String sterilization, Integer age, Integer microChipNumber,
-            Boolean suspLost, City city, DistinctArea distinctArea, String street, Double latitude, Double longitude,
-            Integer donationAmount, Integer viewCount, Integer follow, LocalDateTime publicationTime,
-            LocalDateTime lastUpdateTime, CaseState caseState, String rescueReason, String caseUrl,
-            List<CasePicture> casePictures, List<RescueDemand> rescueDemands, List<CanAfford> canAffords,
-            List<RescueProgress> rescueProgresses, List<Follow> follows) {
-        super();
-        this.rescueCaseId = rescueCaseId;
-        this.caseTitle = caseTitle;
-        this.member = member;
-        this.species = species;
-        this.breed = breed;
-        this.furColor = furColor;
-        this.gender = gender;
-        this.sterilization = sterilization;
-        this.age = age;
-        this.microChipNumber = microChipNumber;
-        this.suspLost = suspLost;
-        this.city = city;
-        this.distinctArea = distinctArea;
-        this.street = street;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.donationAmount = donationAmount;
-        this.viewCount = viewCount;
-        this.follow = follow;
-        this.publicationTime = publicationTime;
-        this.lastUpdateTime = lastUpdateTime;
-        this.caseState = caseState;
-        this.rescueReason = rescueReason;
-        this.caseUrl = caseUrl;
-        this.casePictures = casePictures;
-        this.rescueDemands = rescueDemands;
-        this.canAffords = canAffords;
-        this.rescueProgresses = rescueProgresses;
-        this.follows = follows;
-    }
 
-    public Integer getRescueCaseId() {
-        return rescueCaseId;
-    }
 
+<<<<<<< HEAD
     public void setRescueCaseId(Integer rescueCaseId) {
         this.rescueCaseId = rescueCaseId;
     }
@@ -388,6 +425,8 @@ public class RescueCase {
         this.longitude = longitude;
     }
 =======
+=======
+>>>>>>> 39771d9 (解決rescuecase檔格式化問題)
 	//設定初始值(publicationTime、lastUpdateTime、caseState為待救援id=3)，在物件永續化存入之前會觸發
 	@PrePersist
 	public void prePersist() {
@@ -413,6 +452,7 @@ public class RescueCase {
 	}
 >>>>>>> b34f32d (更新資料初始化程式(增加breed,city先驗證存在)、更新repository、domain)
 
+<<<<<<< HEAD
     public Integer getDonationAmount() {
         return donationAmount;
     }
@@ -440,103 +480,321 @@ public class RescueCase {
     public LocalDateTime getPublicationTime() {
         return publicationTime;
     }
+=======
 
-    public void setPublicationTime(LocalDateTime publicationTime) {
-        this.publicationTime = publicationTime;
-    }
+	public void setRescueCaseId(Integer rescueCaseId) {
+		this.rescueCaseId = rescueCaseId;
+	}
 
-    public LocalDateTime getLastUpdateTime() {
-        return lastUpdateTime;
-    }
+>>>>>>> 39771d9 (解決rescuecase檔格式化問題)
 
-    public void setLastUpdateTime(LocalDateTime lastUpdateTime) {
-        this.lastUpdateTime = lastUpdateTime;
-    }
+	public String getCaseTitle() {
+		return caseTitle;
+	}
 
-    public CaseState getCaseState() {
-        return caseState;
-    }
 
-    public void setCaseState(CaseState caseState) {
-        this.caseState = caseState;
-    }
+	public void setCaseTitle(String caseTitle) {
+		this.caseTitle = caseTitle;
+	}
 
-    public String getRescueReason() {
-        return rescueReason;
-    }
 
-    public void setRescueReason(String rescueReason) {
-        this.rescueReason = rescueReason;
-    }
+	public Member getMember() {
+		return member;
+	}
 
-    public String getCaseUrl() {
-        return caseUrl;
-    }
 
-    public void setCaseUrl(String caseUrl) {
-        this.caseUrl = caseUrl;
-    }
+	public void setMember(Member member) {
+		this.member = member;
+	}
 
-    public List<CasePicture> getCasePictures() {
-        return casePictures;
-    }
 
-    public void setCasePictures(List<CasePicture> casePictures) {
-        this.casePictures = casePictures;
-    }
+	public Species getSpecies() {
+		return species;
+	}
 
-    public List<RescueDemand> getRescueDemands() {
-        return rescueDemands;
-    }
 
-    public void setRescueDemands(List<RescueDemand> rescueDemands) {
-        this.rescueDemands = rescueDemands;
-    }
+	public void setSpecies(Species species) {
+		this.species = species;
+	}
 
-    public List<CanAfford> getCanAffords() {
-        return canAffords;
-    }
 
-    public void setCanAffords(List<CanAfford> canAffords) {
-        this.canAffords = canAffords;
-    }
+	public Breed getBreed() {
+		return breed;
+	}
 
-    public List<RescueProgress> getRescueProgresses() {
-        return rescueProgresses;
-    }
 
-    public void setRescueProgresses(List<RescueProgress> rescueProgresses) {
-        this.rescueProgresses = rescueProgresses;
-    }
+	public void setBreed(Breed breed) {
+		this.breed = breed;
+	}
 
-    public List<Follow> getFollows() {
-        return follows;
-    }
 
-    public void setFollows(List<Follow> follows) {
-        this.follows = follows;
-    }
+	public FurColor getFurColor() {
+		return furColor;
+	}
 
-    public List<ReportCase> getReportCases() {
-        return reportCases;
-    }
 
-    public void setReportCases(List<ReportCase> reportCases) {
-        this.reportCases = reportCases;
-    }
+	public void setFurColor(FurColor furColor) {
+		this.furColor = furColor;
+	}
 
-    @Override
-    public String toString() {
-        return "RescueCase [rescueCaseId=" + rescueCaseId + ", caseTitle=" + caseTitle + ", member=" + member
-                + ", species=" + species + ", breed=" + breed + ", furColor=" + furColor + ", gender=" + gender
-                + ", sterilization=" + sterilization + ", age=" + age + ", microChipNumber=" + microChipNumber
-                + ", suspLost=" + suspLost + ", city=" + city + ", distinctArea=" + distinctArea + ", street=" + street
-                + ", latitude=" + latitude + ", longitude=" + longitude + ", donationAmount=" + donationAmount
-                + ", viewCount=" + viewCount + ", follow=" + follow + ", publicationTime=" + publicationTime
-                + ", lastUpdateTime=" + lastUpdateTime + ", caseState=" + caseState + ", rescueReason="
-                + rescueReason + ", caseUrl=" + caseUrl + ", casePictures=" + casePictures + ", rescueDemands="
-                + rescueDemands + ", canAffords=" + canAffords + ", rescueProgresses=" + rescueProgresses + ", follows="
-                + follows + "]";
-    }
 
+	public String getGender() {
+		return gender;
+	}
+
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+
+	public String getSterilization() {
+		return sterilization;
+	}
+
+
+	public void setSterilization(String sterilization) {
+		this.sterilization = sterilization;
+	}
+
+
+	public Integer getAge() {
+		return age;
+	}
+
+
+	public void setAge(Integer age) {
+		this.age = age;
+	}
+
+
+	public Integer getMicroChipNumber() {
+		return microChipNumber;
+	}
+
+
+	public void setMicroChipNumber(Integer microChipNumber) {
+		this.microChipNumber = microChipNumber;
+	}
+
+
+	public Boolean getSuspLost() {
+		return suspLost;
+	}
+
+
+	public void setSuspLost(Boolean suspLost) {
+		this.suspLost = suspLost;
+	}
+
+
+	public City getCity() {
+		return city;
+	}
+
+
+	public void setCity(City city) {
+		this.city = city;
+	}
+
+
+	public DistinctArea getDistinctArea() {
+		return distinctArea;
+	}
+
+
+	public void setDistinctArea(DistinctArea distinctArea) {
+		this.distinctArea = distinctArea;
+	}
+
+
+	public String getStreet() {
+		return street;
+	}
+
+
+	public void setStreet(String street) {
+		this.street = street;
+	}
+
+
+	public Double getLatitude() {
+		return latitude;
+	}
+
+
+	public void setLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+
+
+	public Double getLongitude() {
+		return longitude;
+	}
+
+
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+
+
+	public Integer getDonationAmount() {
+		return donationAmount;
+	}
+
+
+	public void setDonationAmount(Integer donationAmount) {
+		this.donationAmount = donationAmount;
+	}
+
+
+	public Integer getViewCount() {
+		return viewCount;
+	}
+
+
+	public void setViewCount(Integer viewCount) {
+		this.viewCount = viewCount;
+	}
+
+
+	public Integer getFollow() {
+		return follow;
+	}
+
+
+	public void setFollow(Integer follow) {
+		this.follow = follow;
+	}
+
+
+	public LocalDateTime getPublicationTime() {
+		return publicationTime;
+	}
+
+
+	public void setPublicationTime(LocalDateTime publicationTime) {
+		this.publicationTime = publicationTime;
+	}
+
+
+	public LocalDateTime getLastUpdateTime() {
+		return lastUpdateTime;
+	}
+
+
+	public void setLastUpdateTime(LocalDateTime lastUpdateTime) {
+		this.lastUpdateTime = lastUpdateTime;
+	}
+
+
+	public CaseState getCaseState() {
+		return caseState;
+	}
+
+
+	public void setCaseState(CaseState caseState) {
+		this.caseState = caseState;
+	}
+
+
+	public String getRescueReason() {
+		return rescueReason;
+	}
+
+
+	public void setRescueReason(String rescueReason) {
+		this.rescueReason = rescueReason;
+	}
+
+
+	public String getCaseUrl() {
+		return caseUrl;
+	}
+
+
+	public void setCaseUrl(String caseUrl) {
+		this.caseUrl = caseUrl;
+	}
+
+
+	public List<CasePicture> getCasePictures() {
+		return casePictures;
+	}
+
+
+	public void setCasePictures(List<CasePicture> casePictures) {
+		this.casePictures = casePictures;
+	}
+
+
+	public List<RescueDemand> getRescueDemands() {
+		return rescueDemands;
+	}
+
+
+	public void setRescueDemands(List<RescueDemand> rescueDemands) {
+		this.rescueDemands = rescueDemands;
+	}
+
+
+	public List<CanAfford> getCanAffords() {
+		return canAffords;
+	}
+
+
+	public void setCanAffords(List<CanAfford> canAffords) {
+		this.canAffords = canAffords;
+	}
+
+
+	public List<RescueProgress> getRescueProgresses() {
+		return rescueProgresses;
+	}
+
+
+	public void setRescueProgresses(List<RescueProgress> rescueProgresses) {
+		this.rescueProgresses = rescueProgresses;
+	}
+
+
+	public List<Follow> getFollows() {
+		return follows;
+	}
+
+
+	public void setFollows(List<Follow> follows) {
+		this.follows = follows;
+	}
+
+	
+	
+	public List<ReportCase> getReportCases() {
+		return reportCases;
+	}
+
+
+	public void setReportCases(List<ReportCase> reportCases) {
+		this.reportCases = reportCases;
+	}
+
+
+
+	@Override
+	public String toString() {
+		return "RescueCase [rescueCaseId=" + rescueCaseId + ", caseTitle=" + caseTitle + ", member=" + member
+				+ ", species=" + species + ", breed=" + breed + ", furColor=" + furColor + ", gender=" + gender
+				+ ", sterilization=" + sterilization + ", age=" + age + ", microChipNumber=" + microChipNumber
+				+ ", suspLost=" + suspLost + ", city=" + city + ", distinctArea=" + distinctArea + ", street=" + street
+				+ ", latitude=" + latitude + ", longitude=" + longitude + ", donationAmount=" + donationAmount
+				+ ", viewCount=" + viewCount + ", follow=" + follow + ", publicationTime=" + publicationTime
+				+ ", lastUpdateTime=" + lastUpdateTime + ", caseState=" + caseState + ", rescueReason="
+				+ rescueReason + ", caseUrl=" + caseUrl + ", casePictures=" + casePictures + ", rescueDemands="
+				+ rescueDemands + ", canAffords=" + canAffords + ", rescueProgresses=" + rescueProgresses + ", follows="
+				+ follows + "]";
+	}
+
+
+
+	
 }
