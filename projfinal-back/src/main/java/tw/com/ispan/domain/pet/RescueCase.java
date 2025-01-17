@@ -15,6 +15,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.forRescue.CanAfford;
@@ -25,9 +27,25 @@ import tw.com.ispan.domain.pet.forRescue.RescueProgress;
 @Table(name = "RescueCase")
 public class RescueCase {
 
+<<<<<<< HEAD
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer rescueCaseId;
+=======
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer rescueCaseId;
+	
+	//必填
+	@Column(columnDefinition = "NVARCHAR(30)", name = "caseTitle", nullable = false)
+	private String caseTitle;
+	
+	//必填(但為了測試先改成非必填)
+	// 關聯到member表，雙向多對一
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@JoinColumn(name = "memberId", nullable = true, foreignKey = @ForeignKey(name = "FK_RescueCase_Member"))
+	private Member member;
+>>>>>>> b34f32d (更新資料初始化程式(增加breed,city先驗證存在)、更新repository、domain)
 
     // 必填
     @Column(columnDefinition = "NVARCHAR(30)", name = "caseTitle", nullable = false)
@@ -64,8 +82,23 @@ public class RescueCase {
     @Column(name = "age")
     private Integer age;
 
+<<<<<<< HEAD
     @Column(name = "microChipNumber")
     private Integer microChipNumber;
+=======
+	@Column(columnDefinition = "NVARCHAR(10)", name = "street")
+	private String street;
+	
+	//必填(請求成功後記得改回來)
+	// 10位數，8位小數
+	@Column(name = "latitude", precision = 10, nullable = true)
+	private Double latitude;
+	
+	//必填
+	// 11位數，8位小數
+	@Column(name = "longitude", precision = 11,  nullable = true)
+	private Double longitude;
+>>>>>>> b34f32d (更新資料初始化程式(增加breed,city先驗證存在)、更新repository、domain)
 
     // 必填
     @Column(name = "suspLost", nullable = false)
@@ -77,11 +110,37 @@ public class RescueCase {
     @JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_City"))
     private City city;
 
+<<<<<<< HEAD
     // 必填
     // 關聯到distinctArea表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     @JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_DistinctArea"))
     private DistinctArea distinctArea;
+=======
+	@Column(name = "follow")
+	private Integer follow;
+	
+	//必填
+	@Column(name = "publicationTime", nullable = false)
+	private LocalDateTime publicationTime;
+	
+	//必填
+	@Column(name = "lastUpdateTime", nullable = false)
+	private LocalDateTime lastUpdateTime;
+	
+	@Column(name = "tag", nullable = true, columnDefinition = "nvarchar(100)")
+	private String tag;
+	
+	//必填
+	// 關聯到CaseState表，單向多對一
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@JoinColumn(name = "CaseStateId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_CaseState"))
+	private CaseState caseState;
+	
+	//必填
+	@Column(name = "rescueReason", columnDefinition = "nvarchar(max)", nullable = false)
+	private String rescueReason;
+>>>>>>> b34f32d (更新資料初始化程式(增加breed,city先驗證存在)、更新repository、domain)
 
     @Column(columnDefinition = "NVARCHAR(10)", name = "street")
     private String street;
@@ -304,6 +363,7 @@ public class RescueCase {
         this.distinctArea = distinctArea;
     }
 
+<<<<<<< HEAD
     public String getStreet() {
         return street;
     }
@@ -327,6 +387,31 @@ public class RescueCase {
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
+=======
+	//設定初始值(publicationTime、lastUpdateTime、caseState為待救援id=3)，在物件永續化存入之前會觸發
+	@PrePersist
+	public void prePersist() {
+	    this.publicationTime = LocalDateTime.now();
+	    this.lastUpdateTime = LocalDateTime.now();
+//	    		Optional<CaseState> result = caseStateRepository.findById(3);
+//	    		if (result != null && result.isPresent()) {
+//	    			rescueCase.setCaseState(result.get());
+//	    		}
+	}
+	
+	//實體更新操作(save,merge)前會觸發，更改更新時間
+	@PreUpdate
+	public void preUpdate() {
+	    this.lastUpdateTime = LocalDateTime.now();
+	}
+
+	
+	
+	//getter setter
+	public Integer getRescueCaseId() {
+		return rescueCaseId;
+	}
+>>>>>>> b34f32d (更新資料初始化程式(增加breed,city先驗證存在)、更新repository、domain)
 
     public Integer getDonationAmount() {
         return donationAmount;
