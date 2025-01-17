@@ -2,8 +2,7 @@ package tw.com.ispan.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.constraints.DecimalMax;
@@ -15,7 +14,10 @@ import javax.validation.constraints.PositiveOrZero;
 import tw.com.ispan.domain.shop.ProductImage;
 import tw.com.ispan.domain.shop.ProductTag;
 
-// 輸入DTO: 接收前端傳來的數據
+/*  ProductRequest 的責任
+    1. 包含商品的整體數據（包括基本信息、價格、庫存等）。
+    2. 包含一組 ProductImageRequest，負責描述該商品的所有圖片。
+*/
 public class ProductRequest {
     // @NotBlank 只能限制String類型，其他類不為null需要在service層判斷
     @NotBlank
@@ -33,7 +35,7 @@ public class ProductRequest {
      * A. 前端做成選單，可以設定必填，但是後端也要做判斷，因為前端可以被繞過判斷(ex. Chrome devtool, postman,
      * curl)，同時為了避免惡意腳本攻擊，所以後端也要做判斷。
      */
-    HashSet<ProductTag> tags;
+    Set<ProductTag> tags;
 
     // 前端為填入框；不能為空值
     @Positive
@@ -61,7 +63,7 @@ public class ProductRequest {
     LocalDate expire;
 
     // 前端為多選: 1~5張圖片；不能為空值
-    LinkedHashSet<ProductImage> productImages;
+    List<ProductImage> productImages;
 
     // 無參建構子: 默認初始化可以留空
     public ProductRequest() {
@@ -69,10 +71,10 @@ public class ProductRequest {
     }
 
     public ProductRequest(@NotBlank String productName, String description, @NotBlank String categoryName,
-            HashSet<ProductTag> tags, @NotBlank @Positive @DecimalMax("99999999.99") BigDecimal originalPrice,
+            Set<ProductTag> tags, @NotBlank @Positive @DecimalMax("99999999.99") BigDecimal originalPrice,
             @NotBlank @Positive @DecimalMax("99999999.99") BigDecimal salePrice,
             @NotBlank @PositiveOrZero Integer stockQuantity, @NotBlank String unit, String status,
-            @NotBlank @Future LocalDate expire, @NotBlank LinkedHashSet<ProductImage> productImages) {
+            @NotBlank @Future LocalDate expire, @NotBlank List<ProductImage> productImages) {
         this.productName = productName;
         this.description = description;
         this.categoryName = categoryName;
@@ -162,16 +164,16 @@ public class ProductRequest {
         return tags;
     }
 
-    public void setTags(HashSet<ProductTag> tags) {
+    public void setTags(Set<ProductTag> tags) {
         this.tags = tags;
     }
 
-    public LinkedHashSet<ProductImage> getProductImages() {
-        return productImages;
+    public void setProductImages(List<ProductImage> productImages) {
+        this.productImages = productImages;
     }
 
-    public void setProductImages(LinkedHashSet<ProductImage> productImages) {
-        this.productImages = productImages;
+    public List<ProductImage> getProductImages() {
+        return productImages;
     }
 
 }

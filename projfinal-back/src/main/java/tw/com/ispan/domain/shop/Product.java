@@ -86,7 +86,7 @@ public class Product {
     // orphanRemoval = true，確保當某圖片從商品圖片集合中移除時，該圖片會從資料庫中刪除。
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonBackReference("product")
-    private Set<ProductImage> productImages = new LinkedHashSet<>(); // 有序不重複 (首圖為選取的第一張)
+    private List<ProductImage> productImages = new LinkedList<>(); // 有序可重複 (首圖為選取的第一張)
 
     // 雙向多對多，可反向查找
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
@@ -113,7 +113,7 @@ public class Product {
     public Product(Integer productId, String productName, String description, BigDecimal originalPrice,
             BigDecimal salePrice, Integer stockQuantity, String unit, String status, LocalDate expire,
             LocalDateTime createdAt, LocalDateTime updatedAt, Category category, Admin admin,
-            LinkedHashSet<ProductImage> productImages, Set<ProductTag> tags,
+            List<ProductImage> productImages, Set<ProductTag> tags,
             List<InventoryItem> inventoryItems, Set<WishList> wishlists) {
         this.productId = productId;
         this.productName = productName;
@@ -196,7 +196,7 @@ public class Product {
         return admin;
     }
 
-    public Set<ProductImage> getProductImages() {
+    public List<ProductImage> getProductImages() {
         return productImages;
     }
 
@@ -260,7 +260,7 @@ public class Product {
         this.admin = admin;
     }
 
-    public void setProductImages(LinkedHashSet<ProductImage> productImages) {
+    public void setProductImages(List<ProductImage> productImages) {
         this.productImages = productImages;
     }
 

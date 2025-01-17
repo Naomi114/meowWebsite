@@ -2,7 +2,6 @@ package tw.com.ispan.service.shop;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,12 +13,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
-import tw.com.ispan.domain.shop.ProductImage;
 import tw.com.ispan.domain.shop.ProductTag;
+import tw.com.ispan.dto.ProductImageRequest;
 import tw.com.ispan.dto.ProductRequest;
 import tw.com.ispan.dto.ProductResponse;
 import tw.com.ispan.repository.shop.ProductRepository;
 import tw.com.ispan.specification.ProductSpecifications;
+
+/* ProductService 中需處理以下圖片邏輯：
+	1. 檢查圖片數量是否為 1~5 張。
+	2. 驗證每張圖片的內容。
+	3. 儲存圖片並更新資料庫。
+*/
 
 @Service
 @Transactional
@@ -27,6 +32,9 @@ public class ProductService {
 
 	@Autowired
 	private ProductRepository productRepository;
+
+	@Autowired
+	private ProductImageService productImageService;
 
 	// 單筆新增
 	public ProductResponse createSingle(ProductRequest request) {
@@ -87,20 +95,33 @@ public class ProductService {
 			product.setCreatedAt(LocalDateTime.now());
 			product.setUpdatedAt(LocalDateTime.now());
 
-			// 前端傳入多張圖片url，轉換成商品圖片實體
+			// 檢查圖片數量是否符合 1~5 張的範圍
 			if (request.getProductImages() == null || request.getProductImages().isEmpty()) {
 				throw new IllegalArgumentException("商品圖片不能為空");
 			}
+			if (request.getProductImages().size() < 1 || request.getProductImages().size() > 5) {
+				throw new IllegalArgumentException("商品圖片數量必須在 1 到 5 之間");
+			}
 
-			List<ProductImage> images = request.getProductImages().stream()
-					.filter(image -> image.getImageUrl() != null && !image.getImageUrl().trim().isEmpty())
+			// 調用圖片服務處理1~5張圖片
+			/*
+			 * 型別轉換重點:
+			 * 使用 stream().map 轉換 List<ProductImage> => List<ProductImageRequest>
+			 * public void addProductImages(Product product, List<ProductImageRequest>
+			 * productImages)
+			 * public List<ProductImage> getProductImages()
+			 */
+			List<ProductImageRequest> productImageRequests = request.getProductImages().stream()
 					.map(image -> {
-						ProductImage productImage = new ProductImage();
-						productImage.setImageUrl(image.getImageUrl().trim());
-						productImage.setProduct(product); // 設置雙向關係
-						return productImage;
-					}).collect(Collectors.toList());
-			product.setProductImages(new LinkedHashSet<>(images));
+						ProductImageRequest imageRequest = new ProductImageRequest();
+						imageRequest.setImageUrl(image.getImageUrl()); // 假設兩者有相同屬性
+
+						return imageRequest;
+					})
+					.collect(Collectors.toList());
+
+			// 調用 addProductImages 方法
+			productImageService.addProductImages(product, productImageRequests);
 
 			Product savedProduct = productRepository.save(product);
 			response.setSuccess(true);
