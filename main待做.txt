@@ -8,3 +8,5 @@
     private Set<Follow> follows;
 
 3.在member中的List<rescueCase>添加@JsonBackReference
+
+4. 圖片上傳後如果件沒有成功新增或修改，要從暫存資料夾刪掉
