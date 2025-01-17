@@ -1,4 +1,4 @@
-package tw.com.ispan.util;
+package tw.com.ispan.init;
 
 import java.io.IOException;
 import java.util.List;
@@ -44,12 +44,11 @@ public class PetDataInitializer implements CommandLineRunner {
 	RescueDemandRepository rescueDemandRepository;
 	@Autowired
 	CanAffordRepository canAffordRepository;
-	
+
 	// 此方法會在專案啟動同時執行一次，進行資料初始化
 	@Override
 	public void run(String... args) throws Exception {
 
-		
 		// 存入物種資料
 		if (!speciesRepository.existsById(1)) {
 			speciesRepository.save(new Species("狗"));
@@ -60,29 +59,32 @@ public class PetDataInitializer implements CommandLineRunner {
 
 		// 存入品種資料
 		Resource catResource = new ClassPathResource("data/catBreeds.json");
-	    ObjectMapper objectMapper1 = new ObjectMapper();
-		
-	    try {
-	    	List<Breed> catBreed = objectMapper1.readValue(catResource.getInputStream(), new TypeReference<List<Breed>>() {});
-			catBreed.forEach(breed->breedRepository.save(breed));
-		} catch (IOException e) {
-			System.out.println("資料注入失敗");
-			e.printStackTrace();
-		}
-	    
-	    Resource dogResource = new ClassPathResource("data/dogBreeds.json");
-	    ObjectMapper objectMapper2 = new ObjectMapper();
-		
-	    try {
-	    	List<Breed> dogBreed = objectMapper2.readValue(dogResource.getInputStream(), new TypeReference<List<Breed>>() {});
-	    	dogBreed.forEach(breed->breedRepository.save(breed));
-		} catch (IOException e) {
-			System.out.println("資料注入失敗");
-			e.printStackTrace();
-		}
-        
+		ObjectMapper objectMapper1 = new ObjectMapper();
 
-		//存入毛色資料(主要給米克斯用)
+		try {
+			List<Breed> catBreed = objectMapper1.readValue(catResource.getInputStream(),
+					new TypeReference<List<Breed>>() {
+					});
+			catBreed.forEach(breed -> breedRepository.save(breed));
+		} catch (IOException e) {
+			System.out.println("資料注入失敗");
+			e.printStackTrace();
+		}
+
+		Resource dogResource = new ClassPathResource("data/dogBreeds.json");
+		ObjectMapper objectMapper2 = new ObjectMapper();
+
+		try {
+			List<Breed> dogBreed = objectMapper2.readValue(dogResource.getInputStream(),
+					new TypeReference<List<Breed>>() {
+					});
+			dogBreed.forEach(breed -> breedRepository.save(breed));
+		} catch (IOException e) {
+			System.out.println("資料注入失敗");
+			e.printStackTrace();
+		}
+
+		// 存入毛色資料(主要給米克斯用)
 		if (!furColorRepository.existsById(1)) {
 			furColorRepository.save(new FurColor("土黃"));
 		}
@@ -104,9 +106,8 @@ public class PetDataInitializer implements CommandLineRunner {
 		if (!furColorRepository.existsById(7)) {
 			furColorRepository.save(new FurColor("賓士"));
 		}
-		
-		
-		//存入casestate (狀態描述 ( 認養: 待認養/已認養; 救援: 待救援/已救援; 協尋: 待協尋/已尋回 三種共用: 變成小天使、案件失敗))
+
+		// 存入casestate (狀態描述 ( 認養: 待認養/已認養; 救援: 待救援/已救援; 協尋: 待協尋/已尋回 三種共用: 變成小天使、案件失敗))
 		if (!caseStateRepository.existsById(1)) {
 			caseStateRepository.save(new CaseState("待認養"));
 		}
@@ -131,8 +132,8 @@ public class PetDataInitializer implements CommandLineRunner {
 		if (!caseStateRepository.existsById(8)) {
 			caseStateRepository.save(new CaseState("案件失敗"));
 		}
-		
-		//存入RescueDemand ((尋求抓紮協助/尋求安置協助/需就醫/尋求誘捕協助))
+
+		// 存入RescueDemand ((尋求抓紮協助/尋求安置協助/需就醫/尋求誘捕協助))
 		if (!rescueDemandRepository.existsById(1)) {
 			rescueDemandRepository.save(new RescueDemand("尋求抓紮協助"));
 		}
@@ -145,9 +146,8 @@ public class PetDataInitializer implements CommandLineRunner {
 		if (!rescueDemandRepository.existsById(4)) {
 			rescueDemandRepository.save(new RescueDemand("尋求誘捕協助"));
 		}
-		
-		
-		//存入canAfford (可提供安置照顧空間/救援後可自行收編/無法負擔任何事項/願意負擔救援所需物資/願意負擔救援所需費用)
+
+		// 存入canAfford (可提供安置照顧空間/救援後可自行收編/無法負擔任何事項/願意負擔救援所需物資/願意負擔救援所需費用)
 		if (!canAffordRepository.existsById(1)) {
 			canAffordRepository.save(new CanAfford("可提供安置照顧空間"));
 		}
@@ -163,9 +163,10 @@ public class PetDataInitializer implements CommandLineRunner {
 		if (!canAffordRepository.existsById(1)) {
 			canAffordRepository.save(new CanAfford("願意負擔救援費用"));
 		}
-		
+
 		// 存入city資料
-		//臺北市、新北市、基隆市、新竹市、桃園市、新竹縣及宜蘭縣。 中部區域：包括臺中市、苗栗縣、彰化縣、南投縣及雲林縣。 南部區域：包括高雄市、臺南市、嘉義市、嘉義縣、屏東縣及澎湖縣。 東部區域：包括花蓮縣及臺東縣
+		// 臺北市、新北市、基隆市、新竹市、桃園市、新竹縣及宜蘭縣。 中部區域：包括臺中市、苗栗縣、彰化縣、南投縣及雲林縣。
+		// 南部區域：包括高雄市、臺南市、嘉義市、嘉義縣、屏東縣及澎湖縣。 東部區域：包括花蓮縣及臺東縣
 		if (!cityRepository.existsById(1)) {
 			cityRepository.save(new City("臺北市"));
 		}
@@ -233,9 +234,7 @@ public class PetDataInitializer implements CommandLineRunner {
 			cityRepository.save(new City("連江縣"));
 		}
 
-		
 		// 存入distinct資料
-		
 
 	}
 
