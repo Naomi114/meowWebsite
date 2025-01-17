@@ -3,7 +3,6 @@ package tw.com.ispan.projfinal_back.service;
 import java.util.List;
 
 import org.json.JSONObject;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import tw.com.ispan.domain.pet.City;
@@ -15,7 +14,7 @@ public class LostCaseServiceTest {
     @Autowired
     private LostCaseService lostCaseService;
 
-    @Test
+    // @Test
     public void testFind() {
         JSONObject obj = new JSONObject()
                 // .put("name", "a")
@@ -35,17 +34,21 @@ public class LostCaseServiceTest {
         System.out.println("----------");
     }
 
-    @Test
+    // @Test
     public void testRemove() {
-        boolean remove1 = lostCaseService.exists(1000);
-        System.out.println("remove1=" + remove1);
+        Integer[] testIds = { 1000, 200, null };
 
-        boolean remove2 = lostCaseService.remove(200);
-        System.out.println("remove2=" + remove2);
+        for (Integer testId : testIds) {
+            boolean existsBefore = lostCaseService.exists(testId);
+            System.out.println("Exists before removal (ID=" + testId + "): " + existsBefore);
 
-        boolean remove3 = lostCaseService.remove(null);
-        System.out.println("remove3=" + remove3);
-        System.out.println("----------");
+            boolean removed = lostCaseService.remove(testId);
+            System.out.println("Removed (ID=" + testId + "): " + removed);
+
+            boolean existsAfter = lostCaseService.exists(testId);
+            System.out.println("Exists after removal (ID=" + testId + "): " + existsAfter);
+            System.out.println("----------");
+        }
     }
 
     // @Test

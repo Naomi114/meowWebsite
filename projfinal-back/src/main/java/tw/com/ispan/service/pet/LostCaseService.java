@@ -2,7 +2,6 @@ package tw.com.ispan.service.pet;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,21 +92,20 @@ public class LostCaseService {
         if (bean != null && bean.getLostCaseId() != null) {
             if (lostCaseRepository.existsById(bean.getLostCaseId())) {
                 lostCaseRepository.deleteById(bean.getLostCaseId());
-                System.out.println(123);
                 return true;
             }
         }
         return false;
     }
 
-    public LostCase findById(Integer lostCaseId) {
-        if (lostCaseId == null) {
-            System.out.println("LostCase ID is null, returning null.");
-            return null;
+    public LostCase findById(Integer id) {
+        if (id != null) {
+            Optional<LostCase> optional = lostCaseRepository.findById(id);
+            if (optional.isPresent()) {
+                return optional.get();
+            }
         }
-        Optional<LostCase> result = lostCaseRepository.findById(lostCaseId);
-        System.out.println("Checking LostCase ID " + lostCaseId + ": " + (result.isPresent() ? "Found" : "Not Found"));
-        return result.orElse(null);
+        return null;
     }
 
     public long count(String json) {
@@ -132,21 +130,17 @@ public class LostCaseService {
 
     public boolean exists(Integer lostCaseId) {
         if (lostCaseId == null) {
-            System.out.println("LostCase ID is null, returning false.");
             return false;
         }
-        boolean exists = lostCaseRepository.existsById(lostCaseId);
-        System.out.println("Checking existence for LostCase ID " + lostCaseId + ": " + exists);
-        return exists;
+        return lostCaseRepository.existsById(lostCaseId);
     }
 
-    public boolean remove(Integer id) {
-        if (id != null && lostCaseRepository.existsById(id)) { // 驗證 ID 是否存在
-            lostCaseRepository.deleteById(id); // 使用 Repository 刪除對應的資料
-            System.out.println(789);
-            return true; // 成功刪除，回傳 true
+    public boolean remove(Integer lostCaseId) {
+        if (lostCaseId == null || !lostCaseRepository.existsById(lostCaseId)) {
+            return false; // 如果 ID 为 null 或不存在，返回 false
         }
-        return false; // 若 ID 為空或資料不存在，回傳 false
+        lostCaseRepository.deleteById(lostCaseId); // 执行删除操作
+        return true;
     }
 
     public LostCase create(String json) {

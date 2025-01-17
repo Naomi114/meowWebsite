@@ -42,19 +42,19 @@ public class LostCase {
     // private Member member;
 
     // 關聯到 Species 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Species"))
     @JsonBackReference
     private Species species;
 
     // 關聯到 Breed 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "breedId", foreignKey = @ForeignKey(name = "FK_LostCase_Breed"))
     @JsonBackReference
     private Breed breed;
 
     // 關聯到 FurColor 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "furColorId", foreignKey = @ForeignKey(name = "FK_LostCase_FurColor"))
     @JsonBackReference
     private FurColor furColor;
@@ -78,13 +78,13 @@ public class LostCase {
     private boolean suspLost;
 
     // 關聯到 City 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_City"))
     @JsonBackReference
     private City city;
 
     // 關聯到 DistinctArea 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_distinctArea"))
     @JsonBackReference
     private DistinctArea distinctArea;
@@ -142,7 +142,7 @@ public class LostCase {
     // private List<ReportCase> reportCases;
 
     // 必填，與 CaseState 單向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "CaseStateId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_CaseState"))
     private CaseState caseState;
 
