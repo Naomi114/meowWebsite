@@ -8,12 +8,12 @@ import java.util.Set;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
+// import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+// import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 // import tw.com.ispan.domain.pet.Activity;
 // import tw.com.ispan.domain.pet.ActivityParticipantList;
@@ -69,12 +69,13 @@ public class Member {
 	// private Set<ActivityParticipantList> acitvityParticipantList;
 
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-	private List<WishList> wishLists;
+	private List<WishList> wishList;
 
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	private Set<Cart> cart;
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+
 	private List<Orders> order;
 
 	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
@@ -88,8 +89,9 @@ public class Member {
 	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	// private List<LostCase> lostCase;
 
-	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	// private List<AdoptionCase> adoptionCase;
+	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval =
+	// true)
+	// private List<Order> order;
 
 	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	// private List<ReportCase> reportCase;

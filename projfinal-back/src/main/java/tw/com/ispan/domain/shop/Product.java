@@ -3,10 +3,9 @@ package tw.com.ispan.domain.shop;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -94,19 +93,19 @@ public class Product {
             CascadeType.REFRESH }, fetch = FetchType.LAZY)
     @JoinTable(name = "Product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @JsonBackReference("products")
-    private HashSet<ProductTag> tags; // 無序不重複
+    private Set<ProductTag> tags = new LinkedHashSet<>(); // 有序不重複
 
     // 單向一對多，可由商品查找庫存異動
     // 商品刪除時，保留相關的庫存異動記錄
     // cascade = CascadeType.remove 當刪除商品時，會刪除庫存異動；須排除在外
     @OneToMany(mappedBy = "product", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
             CascadeType.REFRESH }, fetch = FetchType.EAGER)
-    private ArrayList<InventoryItem> inventoryItems; // 無序可重複，隨機存取性能好
+    private List<InventoryItem> inventoryItems = new LinkedList<>(); // 無序可重複，適合頻繁插入和刪除
 
     // 雙向一對多，可反向查找
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonBackReference("products")
-    private LinkedList<WishList> wishlists; // 可重複，適合頻繁插入和刪除
+    private Set<WishList> wishlists = new LinkedHashSet<>(); // 有序不重複
 
     public Product() {
     }
@@ -114,8 +113,8 @@ public class Product {
     public Product(Integer productId, String productName, String description, BigDecimal originalPrice,
             BigDecimal salePrice, Integer stockQuantity, String unit, String status, LocalDate expire,
             LocalDateTime createdAt, LocalDateTime updatedAt, Category category, Admin admin,
-            LinkedHashSet<ProductImage> productImages, HashSet<ProductTag> tags,
-            ArrayList<InventoryItem> inventoryItems, LinkedList<WishList> wishlists) {
+            LinkedHashSet<ProductImage> productImages, Set<ProductTag> tags,
+            List<InventoryItem> inventoryItems, Set<WishList> wishlists) {
         this.productId = productId;
         this.productName = productName;
         this.description = description;
@@ -205,7 +204,7 @@ public class Product {
         return tags;
     }
 
-    public LinkedList<WishList> getWishlists() {
+    public Set<WishList> getWishlists() {
         return wishlists;
     }
 
@@ -265,19 +264,19 @@ public class Product {
         this.productImages = productImages;
     }
 
-    public void setTags(HashSet<ProductTag> tags) {
+    public void setTags(Set<ProductTag> tags) {
         this.tags = tags;
     }
 
-    public ArrayList<InventoryItem> getInventoryItems() {
+    public List<InventoryItem> getInventoryItems() {
         return inventoryItems;
     }
 
-    public void setInventoryItems(ArrayList<InventoryItem> inventoryItems) {
+    public void setInventoryItems(List<InventoryItem> inventoryItems) {
         this.inventoryItems = inventoryItems;
     }
 
-    public void setWishlists(LinkedList<WishList> wishlists) {
+    public void setWishlists(Set<WishList> wishlists) {
         this.wishlists = wishlists;
     }
 
