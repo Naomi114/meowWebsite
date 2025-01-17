@@ -3,6 +3,8 @@ package tw.com.ispan.domain.pet;
 import jakarta.persistence.*;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Table(name = "City")
 public class City {
@@ -20,16 +22,17 @@ public class City {
 	private List<DistinctArea> distinctAreas;
 
 	// 和RescueCase表雙向一對多
-	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
-	private List<RescueCase> rescueCases;
+	// @OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
+	// private List<RescueCase> rescueCases;
 
 	// 和LostCase表雙向一對多
 	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
+	@JsonManagedReference
 	private List<LostCase> lostCases;
 
 	// 和adoptionCase表雙向一對多
-	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
-	private List<AdoptionCase> adoptionCases;
+	// @OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
+	// private List<AdoptionCase> adoptionCases;
 
 	public City() {
 		super();
@@ -56,13 +59,13 @@ public class City {
 		this.city = city;
 	}
 
-	public List<RescueCase> getRescueCases() {
-		return rescueCases;
-	}
+	// public List<RescueCase> getRescueCases() {
+	// return rescueCases;
+	// }
 
-	public void setRescueCases(List<RescueCase> rescueCases) {
-		this.rescueCases = rescueCases;
-	}
+	// public void setRescueCases(List<RescueCase> rescueCases) {
+	// this.rescueCases = rescueCases;
+	// }
 
 	public List<DistinctArea> getDistinctAreas() {
 		return distinctAreas;
@@ -80,14 +83,21 @@ public class City {
 		this.lostCases = lostCases;
 	}
 
-	public List<AdoptionCase> getAdoptionCases() {
-		return adoptionCases;
+	@Override
+	public String toString() {
+		return "City [cityId=" + cityId +
+				", city=" + city +
+				", distinctAreas=" + distinctAreas +
+				// ", rescueCases=" + rescueCases +
+				", lostCases=" + lostCases + "]";
 	}
 
-	public void setAdoptionCases(List<AdoptionCase> adoptionCases) {
-		this.adoptionCases = adoptionCases;
-	}
-	
-	
+	// public List<AdoptionCase> getAdoptionCases() {
+	// return adoptionCases;
+	// }
+
+	// public void setAdoptionCases(List<AdoptionCase> adoptionCases) {
+	// this.adoptionCases = adoptionCases;
+	// }
 
 }

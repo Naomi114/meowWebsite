@@ -1,9 +1,10 @@
-package tw.com.ispan.repository.pet.banner;
+// package tw.com.ispan.repository.pet.banner;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+// import org.springframework.data.jpa.repository.JpaRepository;
 
-import tw.com.ispan.domain.pet.banner.RescueBanner;
+// import tw.com.ispan.domain.pet.banner.RescueBanner;
 
-public interface RescueBannerRepository extends JpaRepository<RescueBanner, Integer> {
+// public interface RescueBannerRepository extends JpaRepository<RescueBanner,
+// Integer> {
 
-}
+// }

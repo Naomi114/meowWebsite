@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,8 +20,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import tw.com.ispan.domain.admin.Member;
-import tw.com.ispan.domain.pet.forRescue.CanAfford;
 import tw.com.ispan.domain.pet.forRescue.RescueDemand;
 
 @Entity
@@ -35,23 +35,28 @@ public class LostCase {
     private String caseTitle;
 
     // 關聯到 Member 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    @JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Member"))
-    private Member member;
+    // @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    // @JoinColumn(name = "memberId", nullable = false, foreignKey =
+    // @ForeignKey(name = "FK_LostCase_Member"))
+    // @JsonManagedReference
+    // private Member member;
 
     // 關聯到 Species 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Species"))
+    @JsonBackReference
     private Species species;
 
     // 關聯到 Breed 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "breedId", foreignKey = @ForeignKey(name = "FK_LostCase_Breed"))
+    @JsonBackReference
     private Breed breed;
 
     // 關聯到 FurColor 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "furColorId", foreignKey = @ForeignKey(name = "FK_LostCase_FurColor"))
+    @JsonBackReference
     private FurColor furColor;
 
     @Column(columnDefinition = "NVARCHAR(5)", name = "name")
@@ -73,13 +78,15 @@ public class LostCase {
     private boolean suspLost;
 
     // 關聯到 City 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_City"))
+    @JsonBackReference
     private City city;
 
     // 關聯到 DistinctArea 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_distinctArea"))
+    @JsonBackReference
     private DistinctArea distinctArea;
 
     @Column(columnDefinition = "NVARCHAR(10)", name = "street", nullable = false)
@@ -96,9 +103,6 @@ public class LostCase {
 
     @Column(name = "viewCount")
     private Integer viewCount;
-
-    @Column(name = "follow")
-    private Integer follow;
 
     @Column(name = "publicationTime", nullable = false)
     private LocalDateTime publicationTime;
@@ -120,7 +124,7 @@ public class LostCase {
 
     // 關聯到 CasePicture 表，單向一對多
     @OneToMany
-    @JoinColumn(name = "lostCaseId", foreignKey = @ForeignKey(name = "FK_CasePicture_LostCase"))
+    @JoinColumn(name = "lostCase", foreignKey = @ForeignKey(name = "FK_CasePicture_LostCase"))
     private List<CasePicture> casePictures;
 
     // 必填，與 RescueDemand 單向多對多
@@ -128,17 +132,17 @@ public class LostCase {
     @JoinTable(name = "LostCase_RescueDemand", joinColumns = @JoinColumn(name = "lostCaseId"), inverseJoinColumns = @JoinColumn(name = "rescueDemandId"))
     private List<RescueDemand> rescueDemands;
 
-    // 關聯到 ReportCase 表，單向一對多
-    @OneToMany(mappedBy = "lostCaseId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReportCase> reportCases;
+    @OneToMany(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> follows;
 
-    // 必填，與 CanAfford 單向多對多
-    @ManyToMany
-    @JoinTable(name = "CanAfford_LostCase", joinColumns = @JoinColumn(name = "lostCaseId"), inverseJoinColumns = @JoinColumn(name = "canAffordId"))
-    private List<CanAfford> canAffords;
+    // 關聯到 ReportCase 表，雙向一對多
+    // @OneToMany(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval =
+    // true)
+    // @JsonManagedReference
+    // private List<ReportCase> reportCases;
 
     // 必填，與 CaseState 單向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "CaseStateId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_CaseState"))
     private CaseState caseState;
 
@@ -152,16 +156,18 @@ public class LostCase {
 
     // 全參數建構子
     public LostCase(
-            Integer lostCaseId, String caseTitle, Member member, Species species, Breed breed, FurColor furColor,
+            Integer lostCaseId, String caseTitle,
+            // Member member,List<ReportCase> reportCases,
+            Species species, Breed breed, FurColor furColor,
             String name, String gender, String sterilization, Integer age, Integer microChipNumber, boolean suspLost,
             City city, DistinctArea distinctArea, String street, BigDecimal latitude, BigDecimal longitude,
-            Integer donationAmount, Integer viewCount, Integer follow, LocalDateTime publicationTime,
+            Integer donationAmount, Integer viewCount, List<Follow> follows, LocalDateTime publicationTime,
             LocalDateTime lastUpdateTime, String lostExperience, String contactInformation, String featureDescription,
-            List<CasePicture> casePictures, List<RescueDemand> rescueDemands, List<ReportCase> reportCases,
-            List<CanAfford> canAffords, CaseState caseState, String caseUrl) {
+            List<CasePicture> casePictures, List<RescueDemand> rescueDemands,
+            CaseState caseState, String caseUrl) {
         this.lostCaseId = lostCaseId;
         this.caseTitle = caseTitle;
-        this.member = member;
+        // this.member = member;
         this.species = species;
         this.breed = breed;
         this.furColor = furColor;
@@ -178,7 +184,7 @@ public class LostCase {
         this.longitude = longitude;
         this.donationAmount = donationAmount;
         this.viewCount = viewCount;
-        this.follow = follow;
+        this.follows = follows;
         this.publicationTime = publicationTime;
         this.lastUpdateTime = lastUpdateTime;
         this.lostExperience = lostExperience;
@@ -186,8 +192,7 @@ public class LostCase {
         this.featureDescription = featureDescription;
         this.casePictures = casePictures;
         this.rescueDemands = rescueDemands;
-        this.reportCases = reportCases;
-        this.canAffords = canAffords;
+        // this.reportCases = reportCases;
         this.caseState = caseState;
         this.caseUrl = caseUrl;
     }
@@ -209,13 +214,13 @@ public class LostCase {
         this.caseTitle = caseTitle;
     }
 
-    public Member getMember() {
-        return member;
-    }
+    // public Member getMember() {
+    // return member;
+    // }
 
-    public void setMember(Member member) {
-        this.member = member;
-    }
+    // public void setMember(Member member) {
+    // this.member = member;
+    // }
 
     public Species getSpecies() {
         return species;
@@ -345,12 +350,12 @@ public class LostCase {
         this.viewCount = viewCount;
     }
 
-    public Integer getFollow() {
-        return follow;
+    public List<Follow> getFollow() {
+        return follows;
     }
 
-    public void setFollow(Integer follow) {
-        this.follow = follow;
+    public void setFollow(List<Follow> follows) {
+        this.follows = follows;
     }
 
     public LocalDateTime getPublicationTime() {
@@ -409,21 +414,13 @@ public class LostCase {
         this.rescueDemands = rescueDemands;
     }
 
-    public List<ReportCase> getReportCases() {
-        return reportCases;
-    }
+    // public List<ReportCase> getReportCases() {
+    // return reportCases;
+    // }
 
-    public void setReportCases(List<ReportCase> reportCases) {
-        this.reportCases = reportCases;
-    }
-
-    public List<CanAfford> getCanAffords() {
-        return canAffords;
-    }
-
-    public void setCanAffords(List<CanAfford> canAffords) {
-        this.canAffords = canAffords;
-    }
+    // public void setReportCases(List<ReportCase> reportCases) {
+    // this.reportCases = reportCases;
+    // }
 
     public CaseState getCaseState() {
         return caseState;
@@ -445,7 +442,7 @@ public class LostCase {
     public String toString() {
         return "LostCase [lostCaseId=" + lostCaseId +
                 ", caseTitle=" + caseTitle +
-                ", member=" + member +
+                // ", member=" + member +
                 ", species=" + species +
                 ", breed=" + breed +
                 ", furColor=" + furColor +
@@ -462,7 +459,7 @@ public class LostCase {
                 ", longitude=" + longitude +
                 ", donationAmount=" + donationAmount +
                 ", viewCount=" + viewCount +
-                ", follow=" + follow +
+                ", follow=" + follows +
                 ", publicationTime=" + publicationTime +
                 ", lastUpdateTime=" + lastUpdateTime +
                 ", lostExperience=" + lostExperience +
@@ -470,8 +467,7 @@ public class LostCase {
                 ", featureDescription=" + featureDescription +
                 ", casePictures=" + casePictures +
                 ", rescueDemands=" + rescueDemands +
-                ", reportCases=" + reportCases +
-                ", canAffords=" + canAffords +
+                // ", reportCases=" + reportCases +
                 ", caseState=" + caseState +
                 ", caseUrl=" + caseUrl + "]";
     }
