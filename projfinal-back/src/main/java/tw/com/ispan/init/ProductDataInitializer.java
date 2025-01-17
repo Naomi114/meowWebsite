@@ -7,14 +7,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import tw.com.ispan.config.FileStorageProperties;
 // import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
+import tw.com.ispan.domain.shop.ProductImage;
 import tw.com.ispan.domain.shop.ProductTag;
 // import tw.com.ispan.repository.admin.AdminRepository;
 import tw.com.ispan.repository.shop.CategoryRepository;
@@ -40,11 +43,17 @@ public class ProductDataInitializer implements CommandLineRunner {
     @Autowired
     private TagRepository tagRepository;
 
+    @Autowired
+    private FileStorageProperties fileStorageProperties;
+
     @Transactional
     public void run(String... args) throws Exception {
 
         // 初始化管理員資料 (待整合Jude的部分)
         // initializeAdmin();
+
+        // 初始化圖片路徑
+        uploadDir = fileStorageProperties.getUploadDir();
 
         // 初始化類別資料
         initializeCategories();
@@ -54,6 +63,7 @@ public class ProductDataInitializer implements CommandLineRunner {
 
         // 初始化商品資料
         initializeData();
+
     }
 
     // 初始化管理員資料，不然Admin實體無法持久化匯入資料庫 (待整合Jude的部分)
@@ -112,10 +122,30 @@ public class ProductDataInitializer implements CommandLineRunner {
         });
     }
 
+    private String uploadDir;
+
+    private void addProductImages(Product product) {
+        System.out.println("Upload Directory: " + fileStorageProperties.getUploadDir());
+        int numberOfImages = (int) (Math.random() * 5) + 1; // 隨機生成 1~5 張
+        for (int i = 1; i <= numberOfImages; i++) {
+            ProductImage image = new ProductImage();
+            image.setProduct(product);
+
+            // 動態生成圖片路徑
+            String imagePath = uploadDir + "/product_" + product.getProductName() + "_image" + i + ".jpg";
+            image.setImageUrl(imagePath);
+
+            image.setIsPrimary(i == 1); // 第一張圖片設為主圖片
+            image.setCreatedAt(LocalDateTime.now());
+            product.getProductImages().add(image);
+        }
+    }
+
+    // 初始化五組商品假資料
     public void initializeData() {
 
         try {
-            // 初始化五組假資料
+
             Product product1 = new Product();
             product1.setProductName("貓糧");
             product1.setDescription("優質貓糧");
@@ -123,10 +153,11 @@ public class ProductDataInitializer implements CommandLineRunner {
             product1.setSalePrice(BigDecimal.valueOf(18.00));
             product1.setStockQuantity(100);
             product1.setUnit("公斤");
-            product1.setStatus("可用");
+            product1.setStatus("上架中");
             product1.setExpire(LocalDate.parse("2025-12-31"));
             product1.setCreatedAt(LocalDateTime.now());
             product1.setUpdatedAt(LocalDateTime.now());
+            addProductImages(product1);
 
             Category category1 = categoryRepository.findById(1)
                     .orElseThrow(() -> new RuntimeException("Category not found"));
@@ -145,11 +176,12 @@ public class ProductDataInitializer implements CommandLineRunner {
             product2.setSalePrice(BigDecimal.valueOf(12.50));
             product2.setStockQuantity(200);
             product2.setUnit("個");
-            product2.setStatus("可用");
+            product2.setStatus("上架中");
             product2.setExpire(LocalDate.parse("2030-12-31"));
             product2.setCreatedAt(LocalDateTime.now());
             product2.setUpdatedAt(LocalDateTime.now());
             product2.setCategory(category1);
+            addProductImages(product2);
             // product2.setAdmin(new Admin(2, "管理員2"));
 
             Product product3 = new Product();
@@ -159,11 +191,12 @@ public class ProductDataInitializer implements CommandLineRunner {
             product3.setSalePrice(BigDecimal.valueOf(8.00));
             product3.setStockQuantity(150);
             product3.setUnit("個");
-            product3.setStatus("可用");
+            product3.setStatus("上架中");
             product3.setExpire(LocalDate.parse("2025-12-31"));
             product3.setCreatedAt(LocalDateTime.now());
             product3.setUpdatedAt(LocalDateTime.now());
             product3.setCategory(category1);
+            addProductImages(product3);
             // product3.setAdmin(new Admin(1, "管理員1"));
 
             Product product4 = new Product();
@@ -173,11 +206,12 @@ public class ProductDataInitializer implements CommandLineRunner {
             product4.setSalePrice(BigDecimal.valueOf(4.00));
             product4.setStockQuantity(300);
             product4.setUnit("個");
-            product4.setStatus("可用");
+            product4.setStatus("上架中");
             product4.setExpire(LocalDate.now());
             product4.setCreatedAt(LocalDateTime.now());
             product4.setUpdatedAt(LocalDateTime.now());
             product4.setCategory(category1);
+            addProductImages(product4);
             // product4.setAdmin(new Admin(2, "管理員2"));
 
             Product product5 = new Product();
@@ -187,11 +221,12 @@ public class ProductDataInitializer implements CommandLineRunner {
             product5.setSalePrice(BigDecimal.valueOf(22.00));
             product5.setStockQuantity(80);
             product5.setUnit("公斤");
-            product5.setStatus("可用");
+            product5.setStatus("上架中");
             product5.setExpire(LocalDate.parse("2025-06-30"));
             product5.setCreatedAt(LocalDateTime.now());
             product5.setUpdatedAt(LocalDateTime.now());
             product5.setCategory(category1);
+            addProductImages(product5);
             // product5.setAdmin(new Admin(1, "管理員1"));
 
             productRepository.save(product1);
@@ -205,4 +240,5 @@ public class ProductDataInitializer implements CommandLineRunner {
             e.printStackTrace();
         }
     }
+
 }

@@ -23,26 +23,31 @@ spring:
       hibernate.format_sql: true
     database-platform: org.hibernate.dialect.SQLServerDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+  #設定圖片緩存，讓前端能夠直接存取商城上傳的圖片
+  web:
+    resources:
+      static-locations: file:src/main/resources/images/
+
   #圖片大小限制
   servlet:
     multipart:
-      max-file-size: 5MB
-      max-request-size: 5MB
+      max-file-size: 10MB
+      max-request-size: 10MB
+    #商城圖片下載路徑 (動態路徑)
+    file:
+      storage:
+        upload-dir: C:/meowWebsite/images
 
-    #spring手動設定 HTTP 請求和回應的字符編碼
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
-
-  #圖片下載路徑
-file:
-  upload-dir: /images
-
+  #spring手動設定 HTTP 請求和回應的字符編碼
+  encoding:
+    charset: UTF-8
+    enabled: true
+    force: true
 
   #conosle顏色
   output:
