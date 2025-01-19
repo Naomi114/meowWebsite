@@ -1,11 +1,13 @@
 package tw.com.ispan.service.banner;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityNotFoundException;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.banner.LostBanner;
 import tw.com.ispan.repository.pet.LostCaseRepository;
@@ -17,39 +19,53 @@ public class LostBannerService {
 
     @Autowired
     private LostBannerRepository lostBannerRepository;
+
     @Autowired
     private LostCaseRepository lostCaseRepository;
 
-    public LostBanner create(LostBanner lostBanner) {
-        // 驗證 LostCase 是否存在
-        Optional<LostCase> lostCase = lostCaseRepository.findById(lostBanner.getLostCase().getLostCaseId());
-        if (lostCase.isPresent()) {
-            lostBanner.setLostCase(lostCase.get());
-            return lostBannerRepository.save(lostBanner);
-        }
-        throw new IllegalArgumentException("LostCase ID does not exist.");
+    /**
+     * 為指定的 LostCase 創建對應的 LostBanner
+     */
+    public LostBanner createBannerForLostCase(Integer lostCaseId, LocalDateTime onlineDate, LocalDateTime dueDate) {
+        LostCase lostCase = lostCaseRepository.findById(lostCaseId)
+                .orElseThrow(() -> new EntityNotFoundException("LostCase not found with ID: " + lostCaseId));
+
+        LostBanner lostBanner = new LostBanner();
+        lostBanner.setLostCase(lostCase);
+        lostBanner.setOnlineDate(onlineDate);
+        lostBanner.setDueDate(dueDate);
+
+        return lostBannerRepository.save(lostBanner);
     }
 
-    public Optional<LostBanner> update(Integer id, LostBanner lostBanner) {
-        return lostBannerRepository.findById(id).map(existingBanner -> {
-            // 驗證 LostCase 是否存在
-            Optional<LostCase> lostCase = lostCaseRepository.findById(lostBanner.getLostCase().getLostCaseId());
-            if (lostCase.isPresent()) {
-                existingBanner.setLostCase(lostCase.get());
-                existingBanner.setOnlineDate(lostBanner.getOnlineDate());
-                existingBanner.setDueDate(lostBanner.getDueDate());
-                return lostBannerRepository.save(existingBanner);
-            } else {
-                throw new IllegalArgumentException("LostCase ID does not exist.");
-            }
-        });
+    /**
+     * 獲取 LostBanner 根據 LostCase ID
+     */
+    public Optional<LostBanner> getBannerByLostCaseId(Integer lostCaseId) {
+        return lostBannerRepository.findByLostCase_LostCaseId(lostCaseId);
     }
 
-    public boolean deleteById(Integer id) {
-        if (lostBannerRepository.existsById(id)) {
-            lostBannerRepository.deleteById(id);
-            return true;
+    /**
+     * 更新廣告牆的日期
+     */
+    public LostBanner updateBannerDates(Integer bannerId, LocalDateTime newOnlineDate, LocalDateTime newDueDate) {
+        LostBanner lostBanner = lostBannerRepository.findById(bannerId)
+                .orElseThrow(() -> new EntityNotFoundException("LostBanner not found with ID: " + bannerId));
+
+        lostBanner.setOnlineDate(newOnlineDate);
+        lostBanner.setDueDate(newDueDate);
+
+        return lostBannerRepository.save(lostBanner);
+    }
+
+    /**
+     * 刪除廣告牆
+     */
+    public void deleteBanner(Integer bannerId) {
+        if (lostBannerRepository.existsById(bannerId)) {
+            lostBannerRepository.deleteById(bannerId);
+        } else {
+            throw new EntityNotFoundException("LostBanner not found with ID: " + bannerId);
         }
-        return false;
     }
 }

@@ -14,13 +14,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import tw.com.ispan.domain.pet.forRescue.RescueDemand;
+import tw.com.ispan.domain.pet.banner.LostBanner;
 
 @Entity
 @Table(name = "LostCase")
@@ -127,27 +126,24 @@ public class LostCase {
     @JoinColumn(name = "lostCase", foreignKey = @ForeignKey(name = "FK_CasePicture_LostCase"))
     private List<CasePicture> casePictures;
 
-    // 必填，與 RescueDemand 單向多對多
-    @ManyToMany
-    @JoinTable(name = "LostCase_RescueDemand", joinColumns = @JoinColumn(name = "lostCaseId"), inverseJoinColumns = @JoinColumn(name = "rescueDemandId"))
-    private List<RescueDemand> rescueDemands;
-
     @OneToMany(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Follow> follows;
 
-    // 關聯到 ReportCase 表，雙向一對多
-    // @OneToMany(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval =
-    // true)
-    // @JsonManagedReference
-    // private List<ReportCase> reportCases;
+    // 關聯到 ReportCase 表，單向一對多
+    @OneToMany(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReportCase> reportCases;
 
     // 必填，與 CaseState 單向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
-    @JoinColumn(name = "CaseStateId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_CaseState"))
+    @JoinColumn(name = "caseStateId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_CaseState"))
     private CaseState caseState;
 
     @Column(name = "caseUrl", length = 255)
     private String caseUrl;
+
+    // 與 LostBanner 的一對一關聯
+    @OneToOne(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
+    private LostBanner lostBanner;
 
     // 空參數建構子 (Hibernate 要求)
     public LostCase() {
@@ -157,14 +153,14 @@ public class LostCase {
     // 全參數建構子
     public LostCase(
             Integer lostCaseId, String caseTitle,
-            // Member member,List<ReportCase> reportCases,
+            // Member member,
+            List<ReportCase> reportCases,
             Species species, Breed breed, FurColor furColor,
             String name, String gender, String sterilization, Integer age, Integer microChipNumber, boolean suspLost,
             City city, DistinctArea distinctArea, String street, BigDecimal latitude, BigDecimal longitude,
             Integer donationAmount, Integer viewCount, List<Follow> follows, LocalDateTime publicationTime,
             LocalDateTime lastUpdateTime, String lostExperience, String contactInformation, String featureDescription,
-            List<CasePicture> casePictures, List<RescueDemand> rescueDemands,
-            CaseState caseState, String caseUrl) {
+            List<CasePicture> casePictures, CaseState caseState, String caseUrl, LostBanner lostBanner) {
         this.lostCaseId = lostCaseId;
         this.caseTitle = caseTitle;
         // this.member = member;
@@ -191,10 +187,10 @@ public class LostCase {
         this.contactInformation = contactInformation;
         this.featureDescription = featureDescription;
         this.casePictures = casePictures;
-        this.rescueDemands = rescueDemands;
-        // this.reportCases = reportCases;
+        this.reportCases = reportCases;
         this.caseState = caseState;
         this.caseUrl = caseUrl;
+        this.lostBanner = lostBanner;
     }
 
     // Getter & Setter
@@ -406,21 +402,13 @@ public class LostCase {
         this.casePictures = casePictures;
     }
 
-    public List<RescueDemand> getRescueDemands() {
-        return rescueDemands;
+    public List<ReportCase> getReportCases() {
+        return reportCases;
     }
 
-    public void setRescueDemands(List<RescueDemand> rescueDemands) {
-        this.rescueDemands = rescueDemands;
+    public void setReportCases(List<ReportCase> reportCases) {
+        this.reportCases = reportCases;
     }
-
-    // public List<ReportCase> getReportCases() {
-    // return reportCases;
-    // }
-
-    // public void setReportCases(List<ReportCase> reportCases) {
-    // this.reportCases = reportCases;
-    // }
 
     public CaseState getCaseState() {
         return caseState;
@@ -436,6 +424,15 @@ public class LostCase {
 
     public void setCaseUrl(String caseUrl) {
         this.caseUrl = caseUrl;
+    }
+
+    public LostBanner getLostBanner() {
+        return lostBanner;
+    }
+
+    public void setLostBanner(LostBanner lostBanner) {
+        this.lostBanner = lostBanner;
+        lostBanner.setLostCase(this); // 雙向關聯
     }
 
     @Override
@@ -466,10 +463,11 @@ public class LostCase {
                 ", contactInformation=" + contactInformation +
                 ", featureDescription=" + featureDescription +
                 ", casePictures=" + casePictures +
-                ", rescueDemands=" + rescueDemands +
-                // ", reportCases=" + reportCases +
+                ", reportCases=" + reportCases +
                 ", caseState=" + caseState +
-                ", caseUrl=" + caseUrl + "]";
+                ", caseUrl=" + caseUrl +
+                ", lostBanner=" + lostBanner +
+                "]";
     }
 
 }

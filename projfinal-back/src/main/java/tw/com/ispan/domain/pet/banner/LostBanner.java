@@ -19,8 +19,9 @@ public class LostBanner {
     @Column(name = "DueDate", nullable = false)
     private LocalDateTime dueDate;
 
+    // 與 LostCase 的一對一關聯
     @OneToOne
-    @JoinColumn(name = "lostCaseId", nullable = false, unique = true, foreignKey = @ForeignKey(name = "FK_LostBanner_LostCase"))
+    @JoinColumn(name = "lostCaseId", referencedColumnName = "lostCaseId")
     private LostCase lostCase;
 
     // Getters and Setters
