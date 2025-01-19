@@ -173,6 +173,9 @@ public class ProductRequest {
     }
 
    public Set<ProductTagRequest> getTags() {
+    if (tags == null) {
+        tags = new HashSet<>(); // 初始化為可修改的空集合
+    }
         return tags;    
     }
 

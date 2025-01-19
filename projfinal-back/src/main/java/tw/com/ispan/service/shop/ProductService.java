@@ -60,18 +60,22 @@ public class ProductService {
 			*/
 			
 			// 處理標籤 (可為0~N個標籤)
-			for (ProductTagRequest tagRequest : request.getTags()) {
-				if (tagRequest == null ||tagRequest.getTagName() == null || tagRequest.getTagName().isBlank()) {
-					product.setTags(new HashSet<>()); // 初始化為可修改的空集合
+			if (request.getTags() == null || request.getTags().isEmpty()) {
+				product.setTags(new HashSet<>()); // 若未選擇任何標籤，初始化為可修改的空集合
+			}else{
+				for (ProductTagRequest tagRequest : request.getTags()) {
+					if (tagRequest == null || tagRequest.getTagName() == null || tagRequest.getTagName().isBlank()) {
+						continue; // 跳過無效的標籤
+					}
+					ProductTag tag = tagRepository.findByTagName(tagRequest.getTagName())
+							.orElseGet(() -> {
+								ProductTag newTag = new ProductTag();
+								newTag.setTagName(tagRequest.getTagName());
+								newTag.setTagDescription(tagRequest.getTagDescription());
+								return tagRepository.save(newTag);
+							});
+					product.getTags().add(tag);
 				}
-				ProductTag tag = tagRepository.findByTagName(tagRequest.getTagName())
-						.orElseGet(() -> {
-							ProductTag newTag = new ProductTag();
-							newTag.setTagName(tagRequest.getTagName());
-							newTag.setTagDescription(tagRequest.getTagDescription());
-							return tagRepository.save(newTag);
-						});
-				product.getTags().add(tag);
 			}
 
 			/*
