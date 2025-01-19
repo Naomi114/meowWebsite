@@ -27,6 +27,7 @@ import tw.com.ispan.repository.pet.DistinctAreaRepository;
 import tw.com.ispan.repository.pet.FurColorRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.SpeciesRepository;
+import tw.com.ispan.service.banner.LostBannerService;
 
 @Service
 @Transactional
@@ -54,6 +55,9 @@ public class LostCaseService {
 
     @Autowired
     private CaseStateRepository caseStateRepository;
+
+    @Autowired
+    private LostBannerService lostBannerService;
 
     public List<LostCase> select(LostCase condition) {
         if (condition == null) {
@@ -268,4 +272,15 @@ public class LostCaseService {
         return null;
     }
 
+    /**
+     * 創建 LostCase 並自動創建對應的 LostBanner
+     */
+    public LostCase createLostCaseWithBanner(LostCase lostCase, LocalDateTime onlineDate, LocalDateTime dueDate) {
+        LostCase savedLostCase = lostCaseRepository.save(lostCase);
+
+        // 創建對應的廣告牆
+        lostBannerService.createBannerForLostCase(savedLostCase.getLostCaseId(), onlineDate, dueDate);
+
+        return savedLostCase;
+    }
 }

@@ -1,11 +1,13 @@
 // package tw.com.ispan.service.banner;
 
+// import java.time.LocalDateTime;
 // import java.util.Optional;
 
 // import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.stereotype.Service;
 // import org.springframework.transaction.annotation.Transactional;
 
+// import jakarta.persistence.EntityNotFoundException;
 // import tw.com.ispan.domain.pet.AdoptionCase;
 // import tw.com.ispan.domain.pet.banner.AdoptionBanner;
 // import tw.com.ispan.repository.pet.banner.AdoptionBannerRepository;
@@ -19,38 +21,57 @@
 // @Autowired
 // private AdoptionCaseRespository adoptionCaseRespository;
 
-// public AdoptionBanner create(AdoptionBanner adoptionBanner) {
-// // 驗證 AdoptionCase 是否存在
-// Optional<AdoptionCase> adoptionCase = adoptionCaseRespository
-// .findById(adoptionBanner.getAdoptionCase().getAdoptionCaseId());
-// if (adoptionCase.isPresent()) {
-// adoptionCase.setAdoptionCase(adoptionCase.get());
+// /**
+// * 為指定的 AdoptionCase 創建對應的 AdoptionBanner
+// */
+// public AdoptionBanner createBannerForAdoptionCase(Integer adoptionCaseId,
+// LocalDateTime onlineDate,
+// LocalDateTime dueDate) {
+// AdoptionCase adoptionCase = adoptionCaseRepository.findById(adoptionCaseId)
+// .orElseThrow(() -> new EntityNotFoundException("AdoptionCase not found with
+// ID: " + adoptionCaseId));
+
+// AdoptionBanner adoptionBanner = new AdoptionBanner();
+// adoptionBanner.setAdoptionCase(adoptionCase);
+// adoptionBanner.setOnlineDate(onlineDate);
+// adoptionBanner.setDueDate(dueDate);
+
 // return adoptionBannerRepository.save(adoptionBanner);
 // }
-// throw new IllegalArgumentException("AdoptionCase ID does not exist.");
+
+// /**
+// * 獲取 AdoptionBanner 根據 AdoptionCase ID
+// */
+// public Optional<AdoptionBanner> getBannerByAdoptionCaseId(Integer
+// adoptionCaseId) {
+// return
+// adoptionBannerRepository.findByAdoptionCase_AdoptionCaseId(adoptionCaseId);
 // }
 
-// public Optional<AdoptionBanner> update(Integer id, AdoptionBanner
-// adoptionBanner) {
-// return adoptionBannerRepository.findById(id).map(existingBanner -> {
-// Optional<AdoptionCase> adoptionCase = adoptionCaseRespository
-// .findById(adoptionBanner.getAdoptionCase().getAdoptionCaseId());
-// if (adoptionCase.isPresent()) {
-// existingBanner.setOnlineDate(adoptionBanner.getOnlineDate());
-// existingBanner.setDueDate(adoptionBanner.getDueDate());
-// existingBanner.setAdoptionCase(adoptionBanner.getAdoptionCase());
-// return adoptionBannerRepository.save(existingBanner);
+// /**
+// * 更新廣告牆的日期
+// */
+// public AdoptionBanner updateBannerDates(Integer bannerId, LocalDateTime
+// newOnlineDate, LocalDateTime newDueDate) {
+// AdoptionBanner adoptionBanner = adoptionBannerRepository.findById(bannerId)
+// .orElseThrow(() -> new EntityNotFoundException("AdoptionBanner not found with
+// ID: " + bannerId));
+
+// adoptionBanner.setOnlineDate(newOnlineDate);
+// adoptionBanner.setDueDate(newDueDate);
+
+// return adoptionBannerRepository.save(adoptionBanner);
+// }
+
+// /**
+// * 刪除廣告牆
+// */
+// public void deleteBanner(Integer bannerId) {
+// if (adoptionBannerRepository.existsById(bannerId)) {
+// adoptionBannerRepository.deleteById(bannerId);
 // } else {
-// throw new IllegalArgumentException("AdoptionCase ID does not exist.");
+// throw new EntityNotFoundException("AdoptionBanner not found with ID: " +
+// bannerId);
 // }
-// });
-// }
-
-// public boolean deleteById(Integer id) {
-// if (adoptionBannerRepository.existsById(id)) {
-// adoptionBannerRepository.deleteById(id);
-// return true;
-// }
-// return false;
 // }
 // }

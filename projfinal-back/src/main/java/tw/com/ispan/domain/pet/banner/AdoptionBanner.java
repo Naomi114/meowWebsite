@@ -29,8 +29,7 @@
 // private LocalDateTime dueDate;
 
 // @OneToOne
-// @JoinColumn(name = "adoptionCaseId", nullable = false, unique = true,
-// foreignKey = @ForeignKey(name = "FK_AdoptionBanner_AdoptCase"))
+// @JoinColumn(name = "adoptionCaseId", referencedColumnName = "adoptionCaseId")
 // private AdoptionCase adoptionCase;
 
 // // Getters and Setters

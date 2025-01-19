@@ -1,84 +1,72 @@
-// package tw.com.ispan.controller.banner;
+package tw.com.ispan.controller.banner;
 
-// import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.web.bind.annotation.DeleteMapping;
-// import org.springframework.web.bind.annotation.PathVariable;
-// import org.springframework.web.bind.annotation.PostMapping;
-// import org.springframework.web.bind.annotation.PutMapping;
-// import org.springframework.web.bind.annotation.RequestBody;
-// import org.springframework.web.bind.annotation.RequestMapping;
-// import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-// import tw.com.ispan.domain.pet.banner.LostBanner;
-// import tw.com.ispan.service.banner.LostBannerService;
+import tw.com.ispan.domain.pet.banner.LostBanner;
+import tw.com.ispan.service.banner.LostBannerService;
 
-// @RestController
-// @RequestMapping("/lostbanner")
-// public class LostBannerController {
+@RestController
+@RequestMapping("/lostBanners")
+public class LostBannerController {
 
-// @Autowired
-// private LostBannerService lostBannerService;
+    @Autowired
+    private LostBannerService lostBannerService;
 
-// /**
-// * 新增 LostBanner
-// *
-// * @param lostBanner LostBanner 資料
-// * @return 新增結果
-// */
-// @PostMapping
-// public ResponseEntity<?> createLostBanner(@RequestBody LostBanner lostBanner)
-// {
-// if (lostBanner.getLostCase() == null ||
-// lostBanner.getLostCase().getLostCaseId() == null) {
-// return ResponseEntity.badRequest().body("LostCase ID is required.");
-// }
+    /**
+     * 為 LostCase 創建廣告牆
+     */
+    @PostMapping
+    public ResponseEntity<LostBanner> createBanner(@RequestBody Map<String, Object> request) {
+        Integer lostCaseId = (Integer) request.get("lostCaseId");
+        LocalDateTime onlineDate = LocalDateTime.parse((String) request.get("onlineDate"));
+        LocalDateTime dueDate = LocalDateTime.parse((String) request.get("dueDate"));
 
-// LostBanner createdBanner = lostBannerService.create(lostBanner);
-// return ResponseEntity.ok(createdBanner);
-// }
+        LostBanner createdBanner = lostBannerService.createBannerForLostCase(lostCaseId, onlineDate, dueDate);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdBanner);
+    }
 
-// /**
-// * 更新 LostBanner
-// *
-// * @param id Banner ID
-// * @param lostBanner 更新內容
-// * @return 更新結果
-// */
-// @PutMapping("/{id}")
-// public ResponseEntity<?> updateLostBanner(@PathVariable Integer id,
-// @RequestBody LostBanner lostBanner) {
-// if (lostBanner.getLostCase() == null ||
-// lostBanner.getLostCase().getLostCaseId() == null) {
-// return ResponseEntity.badRequest().body("LostCase ID is required.");
-// }
+    /**
+     * 根據 LostCase ID 獲取廣告牆
+     */
+    @GetMapping("/{lostCaseId}")
+    public ResponseEntity<LostBanner> getBannerByLostCaseId(@PathVariable Integer lostCaseId) {
+        Optional<LostBanner> banner = lostBannerService.getBannerByLostCaseId(lostCaseId);
+        return banner.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
-// Optional<LostBanner> updatedBanner = lostBannerService.update(id,
-// lostBanner);
-// if (updatedBanner.isPresent()) {
-// return ResponseEntity.ok(updatedBanner.get());
-// } else {
-// return ResponseEntity.status(404).body("LostBanner not found with ID: " +
-// id);
-// }
-// }
+    /**
+     * 更新廣告牆日期
+     */
+    @PutMapping("/{bannerId}")
+    public ResponseEntity<LostBanner> updateBannerDates(@PathVariable Integer bannerId,
+            @RequestBody Map<String, String> request) {
+        LocalDateTime newOnlineDate = LocalDateTime.parse(request.get("onlineDate"));
+        LocalDateTime newDueDate = LocalDateTime.parse(request.get("dueDate"));
 
-// /**
-// * 根據 ID 刪除 LostBanner
-// *
-// * @param id Banner ID
-// * @return 刪除結果
-// */
-// @DeleteMapping("/{id}")
-// public ResponseEntity<?> deleteLostBanner(@PathVariable Integer id) {
-// boolean deleted = lostBannerService.deleteById(id);
-// if (deleted) {
-// return ResponseEntity.ok("LostBanner deleted successfully.");
-// } else {
-// return ResponseEntity.status(404).body("LostBanner not found with ID: " +
-// id);
-// }
-// }
-// }
+        LostBanner updatedBanner = lostBannerService.updateBannerDates(bannerId, newOnlineDate, newDueDate);
+        return ResponseEntity.ok(updatedBanner);
+    }
+
+    /**
+     * 刪除廣告牆
+     */
+    @DeleteMapping("/{bannerId}")
+    public ResponseEntity<Void> deleteBanner(@PathVariable Integer bannerId) {
+        lostBannerService.deleteBanner(bannerId);
+        return ResponseEntity.noContent().build();
+    }
+}
