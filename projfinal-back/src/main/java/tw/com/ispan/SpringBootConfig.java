@@ -8,10 +8,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SpringBootConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        /* 將前後端頁面註冊後，CORS可以跨過SOP限制 */
-        // registry.addMapping("/ajax/pages/products/**")
-        // .allowedMethods("GET", "POST", "PUT", "DELETE");
+        registry.addMapping("/products/**")
+                .allowedOrigins("http://localhost:5173") // 限制只允許前端頁面訪問
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedHeaders("*")
+                .allowCredentials(true);
 
-        // registry.addMapping("/ajax/secure/login");
+                registry.addMapping("/pages/cart/**") // 確保這裡是正確的路徑
+                .allowedOrigins("http://localhost:5173") // 限制只允許前端頁面訪問
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }

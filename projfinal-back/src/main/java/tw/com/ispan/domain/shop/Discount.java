@@ -3,6 +3,8 @@ package tw.com.ispan.domain.shop;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,6 +27,7 @@ public class Discount {
 
     @ManyToOne
     @JoinColumn(name = "adminId", nullable = false)
+    @JsonBackReference("discounts")
     private Admin admin;
 
     @Column(nullable = false)
@@ -52,7 +55,7 @@ public class Discount {
     private Double discountValue; // Nullable by default
 
     @OneToMany(mappedBy = "discount", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Discount> discountScopes;
+    private List<DiscountScope> discountScopes;
 
     // Constructors, getters, setters, toString()
 }

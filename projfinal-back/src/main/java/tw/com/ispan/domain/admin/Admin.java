@@ -1,23 +1,33 @@
 package tw.com.ispan.domain.admin;
 
-
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import tw.com.ispan.domain.shop.Discount;
+import tw.com.ispan.domain.shop.Inventory;
+import tw.com.ispan.domain.shop.Product;
 
 @Entity
 @Table(name = "admin")
-public class Admin{
+public class Admin {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer adminId;
 
-	@Column(unique = true, length = 20, nullable = false)
+	@Column(unique = true, length = 20, nullable = true)
 	private String adminName;
 
 	@Column(length = 20, nullable = false)
@@ -28,6 +38,30 @@ public class Admin{
 
 	@Column(nullable = false)
 	private LocalDateTime updateDate;
+
+	// 雙向一對多，對應Discount
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval = true)
+	@JsonManagedReference("admin") // by Naomi
+	private List<Discount> discounts;
+
+	// 雙向一對多，對應Inventory
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval = true)
+	@JsonManagedReference("admin") // by Naomi
+	private Set<Inventory> inventory;
+
+	// 雙向一對多，對應ProductBean (by Naomi)
+	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
+			CascadeType.REFRESH }, mappedBy = "admin", orphanRemoval = true)
+	@JsonManagedReference("admin")
+	private Set<Product> products = new HashSet<>();
+
+	public Admin(Integer adminId, String adminName) {
+		this.adminId = adminId;
+		this.adminName = adminName;
+	}
+
+	public Admin() {
+	}
 
 	public Integer getAdminId() {
 		return adminId;

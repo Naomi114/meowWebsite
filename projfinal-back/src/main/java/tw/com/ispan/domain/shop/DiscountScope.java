@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
-@Table(name = "discountScope")
+@Table(name = "DiscountScope")
 public class DiscountScope {
 
     @Id
@@ -27,11 +27,11 @@ public class DiscountScope {
 
     @ManyToOne
     @JoinColumn(name = "categoryId")
-    private CategoryBean category;
+    private Category category;
 
     @ManyToOne
     @JoinColumn(name = "productId")
-    private ProductBean product;
+    private Product product;
 
     @ManyToOne
     @JoinColumn(name = "birthdayMonth")
@@ -41,7 +41,7 @@ public class DiscountScope {
     }
 
     public DiscountScope(Integer discountScopeId, String discountScopeType, Discount discount,
-            CategoryBean category, ProductBean product, Member member) {
+            Category category, Product product, Member member) {
         this.discountScopeId = discountScopeId;
         this.discountScopeType = discountScopeType;
         this.discount = discount;
@@ -81,19 +81,19 @@ public class DiscountScope {
         this.discount = discount;
     }
 
-    public CategoryBean getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public void setCategory(CategoryBean category) {
+    public void setCategory(Category category) {
         this.category = category;
     }
 
-    public ProductBean getProduct() {
+    public Product getProduct() {
         return product;
     }
 
-    public void setProduct(ProductBean product) {
+    public void setProduct(Product product) {
         this.product = product;
     }
 
