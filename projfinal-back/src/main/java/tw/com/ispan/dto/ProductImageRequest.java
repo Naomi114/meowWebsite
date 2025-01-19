@@ -13,7 +13,7 @@ public class ProductImageRequest {
     @NotBlank(message = "圖片 URL 不能為空")
     private String imageUrl;
 
-    private Boolean isPrimary;
+    private Boolean isPrimary; 
 
     public String getImageUrl() {
         return imageUrl;

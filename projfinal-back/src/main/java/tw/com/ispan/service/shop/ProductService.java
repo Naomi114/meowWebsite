@@ -1,5 +1,6 @@
 package tw.com.ispan.service.shop;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -17,14 +18,12 @@ import tw.com.ispan.domain.shop.ProductTag;
 import tw.com.ispan.dto.ProductImageRequest;
 import tw.com.ispan.dto.ProductRequest;
 import tw.com.ispan.dto.ProductResponse;
+import tw.com.ispan.dto.ProductTagRequest;
 import tw.com.ispan.repository.shop.ProductRepository;
+import tw.com.ispan.repository.shop.TagRepository;
 import tw.com.ispan.specification.ProductSpecifications;
 
-/* ProductService 中需處理以下圖片邏輯：
-	1. 檢查圖片數量是否為 1~5 張。
-	2. 驗證每張圖片的內容。
-	3. 儲存圖片並更新資料庫。
-*/
+
 
 @Service
 @Transactional
@@ -32,6 +31,9 @@ public class ProductService {
 
 	@Autowired
 	private ProductRepository productRepository;
+
+	@Autowired
+	private TagRepository tagRepository;
 
 	@Autowired
 	private ProductImageService productImageService;
@@ -49,35 +51,60 @@ public class ProductService {
 			category.setCategoryName(request.getCategoryName());
 			product.setCategory(category);
 
-			// isEmpty() 適用於 String, Collection, Map, Array 的空值判斷；日期轉成字串後也可以用
-			// 其中 String 型別因為 DTO 加入 @NotBlank、controller 加入 @Valid 驗證過，所以不會為空，無須再次驗證
-			if (request.getTags() == null || request.getTags().isEmpty()) {
-				throw new IllegalArgumentException("商品標籤不能為空");
+			/* isEmpty() 適用於 String, Collection, Map, Array 的空值判斷
+				日期轉成字串後也可以用
+			 	其中 String 型別因為 
+					1. DTO 加入 @NotBlank、
+					2. controller 加入 @Valid 驗證過
+				所以不會為空，無須再次驗證
+			*/
+			
+			// 處理標籤 (可為0~N個標籤)
+			for (ProductTagRequest tagRequest : request.getTags()) {
+				if (tagRequest == null ||tagRequest.getTagName() == null || tagRequest.getTagName().isBlank()) {
+					product.setTags(new HashSet<>()); // 初始化為可修改的空集合
+				}
+				ProductTag tag = tagRepository.findByTagName(tagRequest.getTagName())
+						.orElseGet(() -> {
+							ProductTag newTag = new ProductTag();
+							newTag.setTagName(tagRequest.getTagName());
+							newTag.setTagDescription(tagRequest.getTagDescription());
+							return tagRepository.save(newTag);
+						});
+				product.getTags().add(tag);
 			}
-			List<ProductTag> tags = request.getTags().stream().map(tag -> {
-				ProductTag productTag = new ProductTag();
-				productTag.setTagName(tag.getTagName());
-				return productTag;
-			}).collect(Collectors.toList());
-			product.setTags(new HashSet<>(tags));
 
-			// compareTo 適用於 BigDecimal, BigInteger, Byte, Double, Integer, Long, Short
-			// 的空值判斷
-			if (request.getOriginalPrice() == null || request.getOriginalPrice().compareTo(null) == 0) {
+			/*
+				compareTo 適用於以下型別的空值判斷
+				BigDecimal, BigInteger, Byte, Double, Integer, Long, Short
+
+				傳回null需要另外判斷，且先判斷是否為null，才能後續比較空值，不然會出現NullpointerException
+			*/ 
+			
+			if (request.getOriginalPrice() == null) {
 				throw new IllegalArgumentException("商品原價不能為空");
 			}
+			if (request.getOriginalPrice().compareTo(BigDecimal.ZERO) == 0) {
+				throw new IllegalArgumentException("商品原價不能為零");
+			}
 			product.setOriginalPrice(request.getOriginalPrice());
-
-			if (request.getSalePrice() == null || request.getSalePrice().compareTo(null) == 0) {
+			
+			if (request.getSalePrice() == null) {
 				throw new IllegalArgumentException("商品售價不能為空");
+			}
+			if (request.getSalePrice().compareTo(BigDecimal.ZERO) == 0) {
+				throw new IllegalArgumentException("商品售價不能為零");
 			}
 			product.setSalePrice(request.getSalePrice());
-
-			if (request.getStockQuantity() == null || request.getStockQuantity() == 0) {
-				throw new IllegalArgumentException("商品售價不能為空");
+			
+			if (request.getStockQuantity() == null) {
+				throw new IllegalArgumentException("商品數量不能為空");
+			}
+			if (request.getStockQuantity() == 0) {
+				throw new IllegalArgumentException("商品數量不能為零");
 			}
 			product.setStockQuantity(request.getStockQuantity());
-
+			
 			product.setUnit(request.getUnit());
 
 			if (request.getStockQuantity() == 0) {
@@ -95,7 +122,11 @@ public class ProductService {
 			product.setCreatedAt(LocalDateTime.now());
 			product.setUpdatedAt(LocalDateTime.now());
 
-			// 檢查圖片數量是否符合 1~5 張的範圍
+			/* ProductService 中處理以下圖片邏輯：
+				1. 檢查圖片數量是否為 1~5 張。
+				2. 驗證每張圖片的內容。
+				3. 儲存圖片並更新資料庫。
+			*/
 			if (request.getProductImages() == null || request.getProductImages().isEmpty()) {
 				throw new IllegalArgumentException("商品圖片不能為空");
 			}
@@ -111,16 +142,19 @@ public class ProductService {
 			 * productImages)
 			 * public List<ProductImage> getProductImages()
 			 */
+
+			// 處理圖片
 			List<ProductImageRequest> productImageRequests = request.getProductImages().stream()
 					.map(image -> {
 						ProductImageRequest imageRequest = new ProductImageRequest();
-						imageRequest.setImageUrl(image.getImageUrl()); // 假設兩者有相同屬性
-
+						imageRequest.setImageUrl(image.getImageUrl());
+						imageRequest.setIsPrimary(imageRequest.getIsPrimary());
 						return imageRequest;
 					})
 					.collect(Collectors.toList());
+					
 
-			// 調用 addProductImages 方法
+			// 調用 addProductImages 方法: 驗證格式、儲存到資料庫
 			productImageService.addProductImages(product, productImageRequests);
 
 			Product savedProduct = productRepository.save(product);
@@ -130,6 +164,7 @@ public class ProductService {
 		} catch (Exception e) {
 			response.setSuccess(false);
 			response.setMessage("商品新增失敗: " + e.getMessage());
+			e.printStackTrace(); // 紀錄詳細錯誤
 		}
 		return response;
 	}

@@ -37,12 +37,16 @@ public class ProductController {
          * @param request 商品請求 DTO
          * @return 商品新增的響應 DTO
          */
-        @PostMapping
-        public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest request) {
-                ProductResponse response = productService.createSingle(request);
-                return response.getSuccess() ? ResponseEntity.status(HttpStatus.CREATED).body(response)
-                                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
+        @PostMapping     
+        public ResponseEntity<?> createProduct(
+            @Valid @RequestBody ProductRequest request) {
+                try {
+                    ProductResponse response = productService.createSingle(request);
+                    return ResponseEntity.ok(response);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("商品新增失敗: " + e.getMessage());
+                }
+            }
 
         /**
          * 修改商品

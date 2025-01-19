@@ -67,13 +67,22 @@ public class ProductImageService {
             Files.createDirectories(uploadPath);
         }
 
+        // 驗證圖片名稱及格式
+        if (fileName == null || fileName.isBlank()) {
+            throw new IllegalArgumentException("文件名不能為空");
+        }
+    
+        if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png")) {
+            throw new IOException("僅支持 JPG 和 PNG 格式的圖片");
+        }
+    
         // 生成唯一文件名
         String uniqueFileName = UUID.randomUUID() + "_" + fileName;
         Path filePath = uploadPath.resolve(uniqueFileName);
-
+    
         // 模擬圖片存儲
         Files.write(filePath, ("Image content for " + fileName).getBytes());
         return filePath.toString();
-    }
+    }    
 
 }

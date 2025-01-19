@@ -3,6 +3,7 @@ package tw.com.ispan.domain.shop;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,12 +89,11 @@ public class Product {
     @JsonBackReference("product")
     private List<ProductImage> productImages = new LinkedList<>(); // 有序可重複 (首圖為選取的第一張)
 
-    // 雙向多對多，可反向查找
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
-            CascadeType.REFRESH }, fetch = FetchType.LAZY)
-    @JoinTable(name = "Product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    // 雙向多對多，可反向查找；可選0~N個標籤
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
+    @JoinTable(name = "Product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id",nullable = true))
     @JsonBackReference("products")
-    private Set<ProductTag> tags = new LinkedHashSet<>(); // 有序不重複
+    private Set<ProductTag> tags = new HashSet<>(); // 無序不重複
 
     // 單向一對多，可由商品查找庫存異動
     // 商品刪除時，保留相關的庫存異動記錄
