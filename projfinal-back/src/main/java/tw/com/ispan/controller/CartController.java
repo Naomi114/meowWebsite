@@ -1,61 +1,80 @@
 package tw.com.ispan.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tw.com.ispan.dto.CartRequest;
+import tw.com.ispan.dto.CartResponse;
 import tw.com.ispan.service.shop.CartService;
 import tw.com.ispan.domain.shop.Cart;
 
-@Controller
-@RequestMapping("/pages/cart") // 修改路徑，避免與其他控制器衝突
-@CrossOrigin  // 支持跨域
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+
+import javax.validation.Valid;
+
+@RestController // Use @RestController for RESTful API responses
+@RequestMapping("/pages/cart") // Modify the path to avoid conflict with other controllers
+@CrossOrigin // Enable Cross-Origin Request Sharing
 public class CartController {
+
+    private static final Logger log = LoggerFactory.getLogger(CartController.class); // Initialize the logger
 
     @Autowired
     private CartService cartService;
 
-    // 顯示購物車中的所有商品
+    // Show all items in the cart for a specific member
     @GetMapping("/list/{memberId}")
-    @ResponseBody
     public List<Cart> getCartByMemberId(@PathVariable Integer memberId) {
         return cartService.getCartByMemberId(memberId);
     }
 
-    // 新增商品到購物車
+    // Add item to the cart using CartRequest and return a CartResponse
     @PostMapping("/add")
-    @ResponseBody
-    public String addToCart(@RequestBody Cart cart) {
-        boolean result = cartService.addToCart(cart);
-        if (result) {
-            return "Item added to cart successfully.";
-        } else {
-            return "Error: Unable to add item to cart.";
+    public ResponseEntity<CartResponse> addCartItem(@RequestBody @Valid CartRequest request) {
+        try {
+            // Perform validation or processing logic
+            CartResponse response = cartService.addCartItem(request);
+            return response.isSuccess() ? ResponseEntity.status(HttpStatus.CREATED).body(response)
+                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            // Log error and return internal server error response
+            log.error("Error adding cart item", e); // Now using the logger properly
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CartResponse(false, "Failed to add item to cart"));
         }
     }
 
-    // 更新購物車中的商品數量
+    // Update quantity of an item in the cart
     @PutMapping("/update")
-    @ResponseBody
-    public String updateCart(@RequestBody Cart cart) {
+    public ResponseEntity<String> updateCart(@RequestBody Cart cart) {
         boolean updated = cartService.updateQuantity(cart.getCartId(), cart.getQuantity());
         if (updated) {
-            return "Cart updated successfully.";
+            return ResponseEntity.ok("Cart updated successfully.");
         } else {
-            return "Error: Unable to update cart.";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Unable to update cart.");
         }
     }
 
-    // 從購物車中刪除商品
+    // Remove item from the cart
     @DeleteMapping("/remove/{cartId}")
-    @ResponseBody
-    public String removeItem(@PathVariable Long cartId) {
+    public ResponseEntity<String> removeItem(@PathVariable Long cartId) {
         boolean removed = cartService.removeItem(cartId);
         if (removed) {
-            return "Item removed from cart.";
+            return ResponseEntity.ok("Item removed from cart.");
         } else {
-            return "Error: Unable to remove item.";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Unable to remove item.");
         }
+    }
+
+    // Update cart using CartRequest and return a CartResponse
+    @PostMapping("/updateCartRequest")
+    public ResponseEntity<CartResponse> updateCart(@RequestBody @Valid CartRequest request) {
+        CartResponse response = cartService.updateCart(request);
+        return response.isSuccess() ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }

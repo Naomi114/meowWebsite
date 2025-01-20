@@ -86,6 +86,18 @@ public class ProductController {
         }
 
         /**
+         * 查詢所有商品
+         * 
+         * @return 商品列表
+         */
+        @GetMapping
+        public ResponseEntity<ProductResponse> getAllProducts() {
+                ProductResponse response = productService.findAll();
+                return response.getSuccess() ? ResponseEntity.ok(response)
+                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        /**
          * 搜尋商品
          * 
          * @param query 搜尋條件 JSON
@@ -114,5 +126,4 @@ public class ProductController {
 
                 return ResponseEntity.ok(response);
         }
-
 }
