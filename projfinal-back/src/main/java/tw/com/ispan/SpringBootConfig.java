@@ -8,14 +8,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SpringBootConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/products/**")
-                .allowedOrigins("http://localhost:5173") // 限制只允許前端頁面訪問
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+        registry.addMapping("/cart/**") // Ensure this is the correct endpoint path for your cart
+                .allowedOrigins("http://localhost:5173") // Allow frontend on port 5173 to access
+                .allowedMethods("GET", "POST", "PUT", "DELETE") // Allow necessary HTTP methods
+                .allowedHeaders("*") // Allow all headers
+                .allowCredentials(true); // Allow credentials (cookies, authentication headers)
 
-                registry.addMapping("/pages/cart/**") // 確保這裡是正確的路徑
-                .allowedOrigins("http://localhost:5173") // 限制只允許前端頁面訪問
+        registry.addMapping("/products/**") // Mapping for product-related endpoints
+                .allowedOrigins("http://localhost:5173")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
                 .allowCredentials(true);
