@@ -1,13 +1,16 @@
 package tw.com.ispan.init;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -51,9 +54,6 @@ public class ProductDataInitializer implements CommandLineRunner {
 
         // 初始化管理員資料 (待整合Jude的部分)
         // initializeAdmin();
-
-        // 初始化圖片路徑
-        uploadDir = fileStorageProperties.getUploadDir();
 
         // 初始化類別資料
         initializeCategories();
@@ -122,22 +122,30 @@ public class ProductDataInitializer implements CommandLineRunner {
         });
     }
 
-    private String uploadDir;
-
     private void addProductImages(Product product) {
-        System.out.println("Upload Directory: " + fileStorageProperties.getUploadDir());
-        int numberOfImages = (int) (Math.random() * 5) + 1; // 隨機生成 1~5 張
-        for (int i = 1; i <= numberOfImages; i++) {
-            ProductImage image = new ProductImage();
-            image.setProduct(product);
+        try {
+            Path uploadPath = fileStorageProperties.getValidatedUploadPath(); // 初始化圖片路徑
+            // System.out.println("檔案上傳路徑: " + uploadPath);
 
-            // 動態生成圖片路徑
-            String imagePath = uploadDir + "/product_" + product.getProductName() + "_image" + i + ".jpg";
-            image.setImageUrl(imagePath);
+            int numberOfImages = (int) (Math.random() * 5) + 1; // 隨機生成 1~5 張
+            for (int i = 1; i <= numberOfImages; i++) {
+                ProductImage image = new ProductImage();
+                image.setProduct(product);
 
-            image.setIsPrimary(i == 1); // 第一張圖片設為主圖片
-            image.setCreatedAt(LocalDateTime.now());
-            product.getProductImages().add(image);
+                // 動態生成圖片路徑
+                String imageExtension = (Math.random() < 0.5) ? ".jpg" : ".png"; // 隨機選擇 jpg 或 png
+                String imagePath = uploadPath
+                        .resolve("product_" + product.getProductId() + "_image" + i + imageExtension)
+                        .toString();
+                image.setImageUrl(imagePath);
+
+                image.setIsPrimary(i == 1); // 第一張圖片設為主圖片
+                image.setCreatedAt(LocalDateTime.now());
+                product.getProductImages().add(image);
+            }
+        } catch (Exception e) {
+            System.err.println("初始化圖片時出錯: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

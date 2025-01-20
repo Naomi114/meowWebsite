@@ -1,7 +1,5 @@
 package tw.com.ispan.dto;
 
-import javax.validation.constraints.NotBlank;
-
 public class ProductTagRequest {
 
     private String tagName;
@@ -11,7 +9,7 @@ public class ProductTagRequest {
     public ProductTagRequest() {
     }
 
-    public ProductTagRequest(@NotBlank String tagName, String tagDescription) {
+    public ProductTagRequest(String tagName, String tagDescription) {
         this.tagName = tagName;
         this.tagDescription = tagDescription;
     }
@@ -32,6 +30,4 @@ public class ProductTagRequest {
         this.tagDescription = tagDescription;
     }
 
-    
-    
 }

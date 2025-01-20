@@ -2,7 +2,6 @@ package tw.com.ispan.service.shop;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,16 +13,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
-import tw.com.ispan.domain.shop.ProductTag;
-import tw.com.ispan.dto.ProductImageRequest;
 import tw.com.ispan.dto.ProductRequest;
 import tw.com.ispan.dto.ProductResponse;
-import tw.com.ispan.dto.ProductTagRequest;
+import tw.com.ispan.repository.shop.CategoryRepository;
 import tw.com.ispan.repository.shop.ProductRepository;
-import tw.com.ispan.repository.shop.TagRepository;
 import tw.com.ispan.specification.ProductSpecifications;
 
-
+/*
+* isEmpty() 適用於 String, Collection, Map, Array 的空值判斷
+* 日期轉成字串後也可以用
+* 其中 String 型別因為
+* 1. DTO 加入 @NotBlank、
+* 2. controller 加入 @Valid 驗證過
+* 所以不會為空，無須再次驗證
+*/
 
 @Service
 @Transactional
@@ -33,7 +36,10 @@ public class ProductService {
 	private ProductRepository productRepository;
 
 	@Autowired
-	private TagRepository tagRepository;
+	private CategoryRepository categoryRepository;
+
+	@Autowired
+	private ProductTagService productTagService;
 
 	@Autowired
 	private ProductImageService productImageService;
@@ -48,43 +54,36 @@ public class ProductService {
 			product.setProductName(request.getProductName());
 			product.setDescription(request.getDescription());
 
-			category.setCategoryName(request.getCategoryName());
+			// 查找或創建類別: optional+精確查詢
+			Optional<Category> categoryOpt = categoryRepository.findByCategoryName(request.getCategoryName());
+			if (categoryOpt.isPresent()) {
+				category = categoryOpt.get();
+			} else {
+				// 如果類別不存在，新增類別
+				category = new Category();
+				category.setCategoryName(request.getCategoryName());
+				category.setDefaultUnit(request.getUnit()); // 使用前端提供的單位作為預設單位
+				categoryRepository.save(category);
+			}
 			product.setCategory(category);
 
-			/* isEmpty() 適用於 String, Collection, Map, Array 的空值判斷
-				日期轉成字串後也可以用
-			 	其中 String 型別因為 
-					1. DTO 加入 @NotBlank、
-					2. controller 加入 @Valid 驗證過
-				所以不會為空，無須再次驗證
-			*/
-			
-			// 處理標籤 (可為0~N個標籤)
-			if (request.getTags() == null || request.getTags().isEmpty()) {
-				product.setTags(new HashSet<>()); // 若未選擇任何標籤，初始化為可修改的空集合
-			}else{
-				for (ProductTagRequest tagRequest : request.getTags()) {
-					if (tagRequest == null || tagRequest.getTagName() == null || tagRequest.getTagName().isBlank()) {
-						continue; // 跳過無效的標籤
-					}
-					ProductTag tag = tagRepository.findByTagName(tagRequest.getTagName())
-							.orElseGet(() -> {
-								ProductTag newTag = new ProductTag();
-								newTag.setTagName(tagRequest.getTagName());
-								newTag.setTagDescription(tagRequest.getTagDescription());
-								return tagRepository.save(newTag);
-							});
-					product.getTags().add(tag);
-				}
+			// 自動設置單位
+			if (request.getUnit() == null || request.getUnit().isEmpty()) {
+				product.setUnit(category.getDefaultUnit());
+			} else {
+				product.setUnit(request.getUnit());
 			}
 
-			/*
-				compareTo 適用於以下型別的空值判斷
-				BigDecimal, BigInteger, Byte, Double, Integer, Long, Short
+			// 處理標籤 (可為0~N個標籤)
+			productTagService.addTagsToProduct(product, request.getTags());
 
-				傳回null需要另外判斷，且先判斷是否為null，才能後續比較空值，不然會出現NullpointerException
-			*/ 
-			
+			/*
+			 * compareTo 適用於以下型別的空值判斷
+			 * BigDecimal, BigInteger, Byte, Double, Integer, Long, Short
+			 * 
+			 * 傳回null需要另外判斷，且先判斷是否為null，才能後續比較空值，不然會出現NullpointerException
+			 */
+
 			if (request.getOriginalPrice() == null) {
 				throw new IllegalArgumentException("商品原價不能為空");
 			}
@@ -92,7 +91,7 @@ public class ProductService {
 				throw new IllegalArgumentException("商品原價不能為零");
 			}
 			product.setOriginalPrice(request.getOriginalPrice());
-			
+
 			if (request.getSalePrice() == null) {
 				throw new IllegalArgumentException("商品售價不能為空");
 			}
@@ -100,7 +99,7 @@ public class ProductService {
 				throw new IllegalArgumentException("商品售價不能為零");
 			}
 			product.setSalePrice(request.getSalePrice());
-			
+
 			if (request.getStockQuantity() == null) {
 				throw new IllegalArgumentException("商品數量不能為空");
 			}
@@ -108,7 +107,7 @@ public class ProductService {
 				throw new IllegalArgumentException("商品數量不能為零");
 			}
 			product.setStockQuantity(request.getStockQuantity());
-			
+
 			product.setUnit(request.getUnit());
 
 			if (request.getStockQuantity() == 0) {
@@ -126,11 +125,13 @@ public class ProductService {
 			product.setCreatedAt(LocalDateTime.now());
 			product.setUpdatedAt(LocalDateTime.now());
 
-			/* ProductService 中處理以下圖片邏輯：
-				1. 檢查圖片數量是否為 1~5 張。
-				2. 驗證每張圖片的內容。
-				3. 儲存圖片並更新資料庫。
-			*/
+			/*
+			 * ProductService 中處理以下圖片邏輯：
+			 * 1. 檢查圖片數量是否為 1~5 張。
+			 * 2. 驗證每張圖片的內容。
+			 * 3. 儲存圖片並更新資料庫。
+			 */
+
 			if (request.getProductImages() == null || request.getProductImages().isEmpty()) {
 				throw new IllegalArgumentException("商品圖片不能為空");
 			}
@@ -138,28 +139,8 @@ public class ProductService {
 				throw new IllegalArgumentException("商品圖片數量必須在 1 到 5 之間");
 			}
 
-			// 調用圖片服務處理1~5張圖片
-			/*
-			 * 型別轉換重點:
-			 * 使用 stream().map 轉換 List<ProductImage> => List<ProductImageRequest>
-			 * public void addProductImages(Product product, List<ProductImageRequest>
-			 * productImages)
-			 * public List<ProductImage> getProductImages()
-			 */
-
-			// 處理圖片
-			List<ProductImageRequest> productImageRequests = request.getProductImages().stream()
-					.map(image -> {
-						ProductImageRequest imageRequest = new ProductImageRequest();
-						imageRequest.setImageUrl(image.getImageUrl());
-						imageRequest.setIsPrimary(imageRequest.getIsPrimary());
-						return imageRequest;
-					})
-					.collect(Collectors.toList());
-					
-
-			// 調用 addProductImages 方法: 驗證格式、儲存到資料庫
-			productImageService.addProductImages(product, productImageRequests);
+			// 調用 addProductImages 方法: 驗證格式、儲存到資料庫(1~5張圖片)
+			productImageService.addProductImages(product, request.getProductImages());
 
 			Product savedProduct = productRepository.save(product);
 			response.setSuccess(true);
