@@ -56,8 +56,8 @@ public class ProductService {
 			product.setProductName(request.getProductName());
 			product.setDescription(request.getDescription());
 
-			// 獲取或創建類別，同時設定單位
-			Category category = categoryService.findOrCreateCategory(request.getCategoryName(), request.getUnit());
+			// 獲取類別，同時設定單位
+			Category category = categoryService.findCategory(request.getCategoryName(), request.getUnit());
 			product.setCategory(category);
 
 			String unit = request.getUnit();
