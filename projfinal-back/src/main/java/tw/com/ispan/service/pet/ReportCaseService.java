@@ -70,30 +70,36 @@ public class ReportCaseService {
         return reportCaseRepository.save(reportCase);
     }
 
-    public ReportCase modify(String json, Integer adminId) {
+    public ReportCase modify(String json) {
         try {
+            // 解析 JSON 请求
             JSONObject obj = new JSONObject(json);
-            Integer reportId = obj.optInt("reportId", -1);
-            boolean reportState = obj.optBoolean("reportState", false);
-            boolean hideCase = obj.optBoolean("hideCase", false); // 是否隱藏案件
+            Integer reportId = obj.optInt("reportId", -1); // 获取报告 ID
+            boolean reportState = obj.optBoolean("reportState", false); // 获取报告状态
+            boolean hideCase = obj.optBoolean("hideCase", false); // 是否隐藏案件
+            Integer adminId = obj.optInt("adminId", -1); // 获取管理员 ID
 
-            // 驗證報告 ID
+            // 验证报告 ID
             if (reportId == -1) {
                 throw new IllegalArgumentException("報告 ID 無效！");
             }
 
-            // 查詢報告
+            // 查找报告记录
             ReportCase reportCase = reportCaseRepository.findById(reportId)
                     .orElseThrow(() -> new IllegalArgumentException("找不到指定的報告！"));
 
-            // 查詢管理員
-            Admin admin = adminRepository.findById(adminId)
-                    .orElseThrow(() -> new IllegalArgumentException("無效的 adminId！"));
+            // 验证管理员 ID
+            if (adminId == -1) {
+                throw new IllegalArgumentException("管理員 ID 無效！");
+            }
 
-            // 更新報告
-            reportCase.setReportState(reportState); // 標記為已審核
-            reportCase.setAdmin(admin); // 設置審核者
-            reportCase.setUpdateDate(LocalDateTime.now());
+            Admin admin = adminRepository.findById(adminId)
+                    .orElseThrow(() -> new IllegalArgumentException("無效的管理員 ID！"));
+
+            // 更新报告状态
+            reportCase.setReportState(reportState); // 标记为已审核
+            reportCase.setAdmin(admin); // 设置审核管理员
+            reportCase.setUpdateDate(LocalDateTime.now()); // 设置最后更新时间
 
             // 隱藏案件邏輯
             if (hideCase) {
@@ -113,6 +119,7 @@ public class ReportCaseService {
                 // }
             }
 
+            // 保存并返回修改后的报告
             return reportCaseRepository.save(reportCase);
         } catch (Exception e) {
             e.printStackTrace();
