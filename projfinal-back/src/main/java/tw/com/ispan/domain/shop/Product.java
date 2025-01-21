@@ -91,7 +91,7 @@ public class Product {
 
     // 雙向多對多，可反向查找；可選0~N個標籤
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
-    @JoinTable(name = "Product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id",nullable = true))
+    @JoinTable(name = "Product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id", nullable = true))
     @JsonBackReference("products")
     private Set<ProductTag> tags = new HashSet<>(); // 無序不重複
 

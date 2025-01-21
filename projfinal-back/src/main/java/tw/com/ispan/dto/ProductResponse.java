@@ -12,20 +12,6 @@ public class ProductResponse {
     private List<Product> products; // 多商品列表
     private Long count;
 
-    // 無參建構子: 默認初始化可以留空
-    public ProductResponse() {
-    }
-
-    public ProductResponse(Product productBean) {
-
-    }
-
-    @Override
-    public String toString() {
-        return "ProductResponse [success=" + success + ", message=" + message + ", product=" + product + ", products="
-                + products + ", count=" + count + "]";
-    }
-
     public Boolean getSuccess() {
         return success;
     }

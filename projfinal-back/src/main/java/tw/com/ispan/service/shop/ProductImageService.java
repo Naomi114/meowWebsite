@@ -33,10 +33,14 @@ public class ProductImageService {
     @Autowired
     private FileStorageProperties fileStorageProperties;
 
-    public void addProductImages(Product product, List<ProductImageRequest> productImages) throws InterruptedException {
+    public void addProductImages(Product product, List<String> filenames) throws InterruptedException {
+
+        // 將文件名轉換為 ProductImageRequest
+        List<ProductImageRequest> productImages = createProductImageRequests(filenames);
+
         for (ProductImageRequest imageRequest : productImages) {
             try {
-                // 儲存圖片文件
+                // 生成 imageUrl、儲存圖片文件
                 String imagePath = saveImageToStorage(imageRequest.getFilename());
 
                 // 創建圖片實體
@@ -58,12 +62,23 @@ public class ProductImageService {
         }
     }
 
+    private List<ProductImageRequest> createProductImageRequests(List<String> filenames) {
+        return filenames.stream()
+                .map(filename -> {
+                    ProductImageRequest request = new ProductImageRequest();
+                    request.setFilename(filename); // 第一張圖片設為主圖片
+                    request.setIsPrimary(filenames.indexOf(filename) == 0);
+                    return request;
+                })
+                .toList();
+    }
+
     private String saveImageToStorage(String fileName) throws IOException {
         Path uploadPath = fileStorageProperties.getValidatedUploadPath();
 
         // 驗證圖片名稱及格式
         if (fileName == null || fileName.isBlank()) {
-            throw new IllegalArgumentException("文件名不能為空");
+            throw new IllegalArgumentException("至少提供一個圖片檔");
         }
 
         if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png")) {

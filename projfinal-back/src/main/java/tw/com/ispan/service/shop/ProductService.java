@@ -13,19 +13,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
+import tw.com.ispan.dto.ProductImageRequest;
 import tw.com.ispan.dto.ProductRequest;
 import tw.com.ispan.dto.ProductResponse;
-import tw.com.ispan.repository.shop.CategoryRepository;
 import tw.com.ispan.repository.shop.ProductRepository;
 import tw.com.ispan.specification.ProductSpecifications;
 
 /*
 * isEmpty() 適用於 String, Collection, Map, Array 的空值判斷
 * 日期轉成字串後也可以用
-* 其中 String 型別因為
+* 
+	其中 String 型別因為
 * 1. DTO 加入 @NotBlank、
 * 2. controller 加入 @Valid 驗證過
 * 所以不會為空，無須再次驗證
+
+* isPresent() 適用於精確查詢 optional<> 的空值判斷
 */
 
 @Service
@@ -36,7 +39,7 @@ public class ProductService {
 	private ProductRepository productRepository;
 
 	@Autowired
-	private CategoryRepository categoryRepository;
+	private CategoryService categoryService;
 
 	@Autowired
 	private ProductTagService productTagService;
@@ -49,30 +52,22 @@ public class ProductService {
 		ProductResponse response = new ProductResponse();
 		try {
 			Product product = new Product();
-			Category category = new Category();
 
 			product.setProductName(request.getProductName());
 			product.setDescription(request.getDescription());
 
-			// 查找或創建類別: optional+精確查詢
-			Optional<Category> categoryOpt = categoryRepository.findByCategoryName(request.getCategoryName());
-			if (categoryOpt.isPresent()) {
-				category = categoryOpt.get();
-			} else {
-				// 如果類別不存在，新增類別
-				category = new Category();
-				category.setCategoryName(request.getCategoryName());
-				category.setDefaultUnit(request.getUnit()); // 使用前端提供的單位作為預設單位
-				categoryRepository.save(category);
-			}
+			// 獲取或創建類別，同時設定單位
+			Category category = categoryService.findOrCreateCategory(request.getCategoryName(), request.getUnit());
 			product.setCategory(category);
 
-			// 自動設置單位
-			if (request.getUnit() == null || request.getUnit().isEmpty()) {
-				product.setUnit(category.getDefaultUnit());
-			} else {
-				product.setUnit(request.getUnit());
+			String unit = request.getUnit();
+			if (unit == null || unit.isEmpty()) {
+				unit = category.getDefaultUnit();
+				if (unit == null || unit.isEmpty()) {
+					throw new IllegalArgumentException("類別的預設單位未設置，無法保存商品");
+				}
 			}
+			product.setUnit(unit);
 
 			// 處理標籤 (可為0~N個標籤)
 			productTagService.addTagsToProduct(product, request.getTags());
@@ -139,8 +134,13 @@ public class ProductService {
 				throw new IllegalArgumentException("商品圖片數量必須在 1 到 5 之間");
 			}
 
-			// 調用 addProductImages 方法: 驗證格式、儲存到資料庫(1~5張圖片)
-			productImageService.addProductImages(product, request.getProductImages());
+			// 提取文件名列表 (轉換型別 List<ProductImageRequest> => List<String>)
+			List<String> filenames = request.getProductImages().stream()
+					.map(ProductImageRequest::getFilename)
+					.collect(Collectors.toList());
+
+			// 調用 ProductImageService 添加圖片
+			productImageService.addProductImages(product, filenames);
 
 			Product savedProduct = productRepository.save(product);
 			response.setSuccess(true);

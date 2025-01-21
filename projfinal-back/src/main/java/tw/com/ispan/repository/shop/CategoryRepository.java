@@ -11,7 +11,7 @@ import tw.com.ispan.domain.shop.Category;
 public interface CategoryRepository
         extends JpaRepository<Category, Integer>, JpaSpecificationExecutor<Category> {
 
-    // 商品搜尋頁>>類別模糊查詢 (還沒用到)
+    // 模糊查詢
     List<Category> findByCategoryNameContaining(String keyword);
 
     // 精確查詢

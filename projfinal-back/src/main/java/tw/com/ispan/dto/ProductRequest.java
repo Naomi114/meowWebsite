@@ -2,7 +2,6 @@ package tw.com.ispan.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,7 +53,8 @@ public class ProductRequest {
     @NotNull(message = "商品數量不能為空")
     private Integer stockQuantity;
 
-    @NotBlank
+    // 若選擇類別已存在，則進入service層後會自動帶入預設單位；所以不能使用 @NotBlank
+    // 或是新建類別、單位
     private String unit;
 
     // 自動生成：上架中、已售完 (20250116 寫入ProductService)
@@ -68,29 +68,6 @@ public class ProductRequest {
     // 前端為多選: 1~5張圖片；不能為空值
     @NotNull(message = "商品圖片不能為空")
     private List<ProductImageRequest> productImages;
-
-    // 無參建構子: 默認初始化可以留空
-    public ProductRequest() {
-
-    }
-
-    public ProductRequest(@NotBlank String productName, String description, @NotBlank String categoryName,
-            Set<ProductTagRequest> tags, @NotBlank @Positive @DecimalMax("99999999.99") BigDecimal originalPrice,
-            @NotBlank @Positive @DecimalMax("99999999.99") BigDecimal salePrice,
-            @NotBlank @PositiveOrZero Integer stockQuantity, @NotBlank String unit, String status,
-            @NotBlank @Future LocalDate expire, @NotBlank List<ProductImageRequest> productImages) {
-        this.productName = productName;
-        this.description = description;
-        this.categoryName = categoryName;
-        this.tags = tags;
-        this.originalPrice = originalPrice;
-        this.salePrice = salePrice;
-        this.stockQuantity = stockQuantity;
-        this.unit = unit;
-        this.status = status;
-        this.expire = expire;
-        this.productImages = productImages;
-    }
 
     public String getProductName() {
         return productName;
@@ -164,23 +141,23 @@ public class ProductRequest {
         this.categoryName = categoryName;
     }
 
-    public void setProductImages(List<ProductImageRequest> productImages) {
-        this.productImages = productImages;
+    public Set<ProductTagRequest> getTags() {
+        if (tags == null) {
+            tags = new HashSet<>(); // 初始化為可修改的空集合
+        }
+        return tags;
+    }
+
+    public void setTags(Set<ProductTagRequest> tags) {
+        this.tags = tags;
     }
 
     public List<ProductImageRequest> getProductImages() {
         return productImages;
     }
 
-   public Set<ProductTagRequest> getTags() {
-    if (tags == null) {
-        tags = new HashSet<>(); // 初始化為可修改的空集合
-    }
-        return tags;    
-    }
-
-    public void setTags(Set<ProductTagRequest> tags) {
-        this.tags = tags;
+    public void setProductImages(List<ProductImageRequest> productImages) {
+        this.productImages = productImages;
     }
 
 }
