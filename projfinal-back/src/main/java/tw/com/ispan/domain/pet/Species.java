@@ -29,8 +29,8 @@ public class Species {
     @JsonManagedReference
     private List<LostCase> lostCases;
 
-    // @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
-    // private List<RescueCase> rescueCases;
+    @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
+    private List<RescueCase> rescueCases;
 
     // @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
     // private List<AdoptionCase> adoptionCase;
@@ -61,13 +61,13 @@ public class Species {
         this.species = species;
     }
 
-    // public List<RescueCase> getRescueCases() {
-    // return rescueCases;
-    // }
+    public List<RescueCase> getRescueCases() {
+        return rescueCases;
+    }
 
-    // public void setRescueCases(List<RescueCase> rescueCases) {
-    // this.rescueCases = rescueCases;
-    // }
+    public void setRescueCases(List<RescueCase> rescueCases) {
+        this.rescueCases = rescueCases;
+    }
 
     public List<LostCase> getLostCases() {
         return lostCases;
@@ -82,7 +82,7 @@ public class Species {
         return "Species [speciesId=" + speciesId +
                 ", species=" + species +
                 ", lostCases=" + lostCases +
-                // ", rescueCases=" + rescueCases +
+                ", rescueCases=" + rescueCases +
                 "]";
     }
 

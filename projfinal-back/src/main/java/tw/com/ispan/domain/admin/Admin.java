@@ -9,7 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 // import tw.com.ispan.domain.shop.Discount;
-// import tw.com.ispan.domain.shop.InventoryBean;
+// import tw.com.ispan.domain.shop.Inventory;
 // import tw.com.ispan.domain.shop.ProductBean;
 
 @Entity
@@ -24,6 +24,10 @@ public class Admin {
 
 	@Column(length = 20, nullable = false)
 	private String password;
+
+	public Admin() {
+		// 這是默認構造函數，Hibernate 需要
+	}
 
 	@Column(nullable = false)
 	private LocalDateTime createDate;
@@ -41,7 +45,7 @@ public class Admin {
 	// @OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval =
 	// true)
 	// @JsonManagedReference("admin") // by Naomi
-	// private Set<InventoryBean> inventory = new HashSet<>();
+	// private Set<Inventory> inventory = new HashSet<>();
 
 	// 雙向一對多，對應ProductBean (by Naomi)
 	// @OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval =

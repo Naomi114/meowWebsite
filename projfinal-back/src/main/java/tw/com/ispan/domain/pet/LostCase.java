@@ -103,10 +103,10 @@ public class LostCase {
     @Column(name = "viewCount")
     private Integer viewCount;
 
-    @Column(name = "publicationTime", nullable = false)
+    @Column(name = "publicationTime", nullable = true)
     private LocalDateTime publicationTime;
 
-    @Column(name = "lastUpdateTime", nullable = false)
+    @Column(name = "lastUpdateTime", nullable = true)
     private LocalDateTime lastUpdateTime;
 
     @Lob
@@ -145,6 +145,9 @@ public class LostCase {
     @OneToOne(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
     private LostBanner lostBanner;
 
+    @Column(name = "isHidden", nullable = false)
+    private Boolean isHidden = false; // 默認為不隱藏
+
     // 空參數建構子 (Hibernate 要求)
     public LostCase() {
         super();
@@ -160,7 +163,8 @@ public class LostCase {
             City city, DistinctArea distinctArea, String street, BigDecimal latitude, BigDecimal longitude,
             Integer donationAmount, Integer viewCount, List<Follow> follows, LocalDateTime publicationTime,
             LocalDateTime lastUpdateTime, String lostExperience, String contactInformation, String featureDescription,
-            List<CasePicture> casePictures, CaseState caseState, String caseUrl, LostBanner lostBanner) {
+            List<CasePicture> casePictures, CaseState caseState, String caseUrl, LostBanner lostBanner,
+            Boolean isHidden) {
         this.lostCaseId = lostCaseId;
         this.caseTitle = caseTitle;
         // this.member = member;
@@ -191,6 +195,7 @@ public class LostCase {
         this.caseState = caseState;
         this.caseUrl = caseUrl;
         this.lostBanner = lostBanner;
+        this.isHidden = isHidden;
     }
 
     // Getter & Setter
@@ -435,6 +440,14 @@ public class LostCase {
         lostBanner.setLostCase(this); // 雙向關聯
     }
 
+    public Boolean getIsHidden() {
+        return isHidden;
+    }
+
+    public void setIsHidden(Boolean isHidden) {
+        this.isHidden = isHidden;
+    }
+
     @Override
     public String toString() {
         return "LostCase [lostCaseId=" + lostCaseId +
@@ -456,17 +469,18 @@ public class LostCase {
                 ", longitude=" + longitude +
                 ", donationAmount=" + donationAmount +
                 ", viewCount=" + viewCount +
-                ", follow=" + follows +
                 ", publicationTime=" + publicationTime +
                 ", lastUpdateTime=" + lastUpdateTime +
                 ", lostExperience=" + lostExperience +
                 ", contactInformation=" + contactInformation +
                 ", featureDescription=" + featureDescription +
                 ", casePictures=" + casePictures +
+                ", follows=" + follows +
                 ", reportCases=" + reportCases +
                 ", caseState=" + caseState +
                 ", caseUrl=" + caseUrl +
                 ", lostBanner=" + lostBanner +
+                ", isHidden=" + isHidden +
                 "]";
     }
 

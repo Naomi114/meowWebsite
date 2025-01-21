@@ -29,8 +29,8 @@ public class Breed {
     @JsonManagedReference
     private List<LostCase> lostCases;
 
-    // @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
-    // private List<RescueCase> rescueCases;
+    @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
+    private List<RescueCase> rescueCases;
 
     // @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
     // private List<AdoptionCase> adoptionCases;
@@ -52,13 +52,13 @@ public class Breed {
         this.breed = breed;
     }
 
-    // public List<RescueCase> getRescueCases() {
-    // return rescueCases;
-    // }
+    public List<RescueCase> getRescueCases() {
+        return rescueCases;
+    }
 
-    // public void setRescueCases(List<RescueCase> rescueCases) {
-    // this.rescueCases = rescueCases;
-    // }
+    public void setRescueCases(List<RescueCase> rescueCases) {
+        this.rescueCases = rescueCases;
+    }
 
     public List<LostCase> getLostCases() {
         return lostCases;
@@ -73,7 +73,7 @@ public class Breed {
         return "Breed [breedId=" + breedId +
                 ", breed=" + breed +
                 ", lostCases=" + lostCases +
-                // ", rescueCases="+ rescueCases +
+                ", rescueCases=" + rescueCases +
                 // ", adoptionCases=" + adoptionCases +
                 "]";
     }

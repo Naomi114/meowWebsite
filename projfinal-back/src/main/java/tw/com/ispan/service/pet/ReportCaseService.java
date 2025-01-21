@@ -1,5 +1,6 @@
 package tw.com.ispan.service.pet;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,61 +8,171 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.ReportCase;
+import tw.com.ispan.repository.admin.AdminRepository;
+import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.ReportCaseRepository;
+import tw.com.ispan.repository.pet.RescueCaseRepository;
 
 @Service
 public class ReportCaseService {
 
     @Autowired
     private ReportCaseRepository reportCaseRepository;
+    @Autowired
+    private RescueCaseRepository rescueCaseRepository;
+    @Autowired
+    private LostCaseRepository lostCaseRepository;
+    // @Autowired
+    // private AdoptionCaseRepository adoptionCaseRepository;
+    @Autowired
+    private AdminRepository adminRepository;
 
-    public LostCase insert(LostCase bean) {
-        if (bean != null && bean.getLostCaseId() != null) {
-            if (!reportCaseRepository.existsById(bean.getLostCaseId())) {
-                return reportCaseRepository.save(bean);
-            }
+    public ReportCase review(Integer reportCaseId, Integer adminId, boolean isApproved, boolean hideCase) {
+        // 確認舉報案件是否存在
+        ReportCase reportCase = reportCaseRepository.findById(reportCaseId)
+                .orElseThrow(() -> new IllegalArgumentException("舉報案件不存在！"));
+
+        // 更新審核狀態
+        reportCase.setReportState(isApproved); // true 表示審核完成
+        reportCase.setUpdateDate(LocalDateTime.now());
+
+        // 設置修改者 (Admin)
+        if (adminId != null) {
+            Admin admin = adminRepository.findById(adminId)
+                    .orElseThrow(() -> new IllegalArgumentException("管理員不存在！"));
+            reportCase.setAdmin(admin);
+        } else {
+            throw new IllegalArgumentException("審核時必須指定管理員！");
         }
-        return null;
+
+        // 隱藏案件邏輯
+        if (hideCase) {
+            if (reportCase.getLostCase() != null) {
+                LostCase lostCase = reportCase.getLostCase();
+                lostCaseRepository.save(lostCase);
+            }
+            // else if (reportCase.getRescueCase() != null) {
+            // RescueCase rescueCase = reportCase.getRescueCase();
+            // rescueCase.setIsHidden(true); // 隱藏救援案件
+            // rescueCaseRepository.save(rescueCase);
+            // }
+            // else if (reportCase.getAdoptionCase() != null) {
+            // AdoptionCase adoptionCase = reportCase.getAdoptionCase();
+            // adoptionCase.setIsHidden(true); // 隱藏領養案件
+            // adoptionCaseRepository.save(adoptionCase);
+            // }
+        }
+
+        // 保存舉報案件的審核結果
+        return reportCaseRepository.save(reportCase);
     }
 
-    public boolean delete(LostCase bean) {
-        if (bean != null && bean.getLostCaseId() != null) {
-            if (reportCaseRepository.existsById(bean.getLostCaseId())) {
-                reportCaseRepository.deleteById(bean.getLostCaseId());
-                return true;
+    public ReportCase modify(String json, Integer adminId) {
+        try {
+            JSONObject obj = new JSONObject(json);
+            Integer reportId = obj.optInt("reportId", -1);
+            boolean reportState = obj.optBoolean("reportState", false);
+            boolean hideCase = obj.optBoolean("hideCase", false); // 是否隱藏案件
+
+            // 驗證報告 ID
+            if (reportId == -1) {
+                throw new IllegalArgumentException("報告 ID 無效！");
             }
+
+            // 查詢報告
+            ReportCase reportCase = reportCaseRepository.findById(reportId)
+                    .orElseThrow(() -> new IllegalArgumentException("找不到指定的報告！"));
+
+            // 查詢管理員
+            Admin admin = adminRepository.findById(adminId)
+                    .orElseThrow(() -> new IllegalArgumentException("無效的 adminId！"));
+
+            // 更新報告
+            reportCase.setReportState(reportState); // 標記為已審核
+            reportCase.setAdmin(admin); // 設置審核者
+            reportCase.setUpdateDate(LocalDateTime.now());
+
+            // 隱藏案件邏輯
+            if (hideCase) {
+                if (reportCase.getLostCase() != null) {
+                    LostCase lostCase = reportCase.getLostCase();
+                    lostCaseRepository.save(lostCase);
+                }
+                // else if (reportCase.getRescueCase() != null) {
+                // RescueCase rescueCase = reportCase.getRescueCase();
+                // rescueCase.setIsHidden(true); // 隱藏救援案件
+                // rescueCaseRepository.save(rescueCase);
+                // }
+                // else if (reportCase.getAdoptionCase() != null) {
+                // AdoptionCase adoptionCase = reportCase.getAdoptionCase();
+                // adoptionCase.setIsHidden(true); // 隱藏領養案件
+                // adoptionCaseRepository.save(adoptionCase);
+                // }
+            }
+
+            return reportCaseRepository.save(reportCase);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("修改報告失敗：" + e.getMessage());
         }
-        return false;
     }
 
-    public LostCase findById(Integer id) {
+    public ReportCase create(String json) {
+        try {
+            JSONObject obj = new JSONObject(json);
+
+            // 獲取報告參數
+            Integer rescueCaseId = obj.optInt("rescueCaseId", -1);
+            Integer lostCaseId = obj.optInt("lostCaseId", -1);
+            Integer adoptionCaseId = obj.optInt("adoptionCaseId", -1);
+            String reportTitle = obj.optString("reportTitle");
+            String reportNotes = obj.optString("reportNotes");
+
+            // 驗證必填字段
+            if ((rescueCaseId == -1 && lostCaseId == -1 && adoptionCaseId == -1) || reportTitle == null
+                    || reportNotes == null) {
+                throw new IllegalArgumentException("必須指定一種類型的案件進行舉報，且標題和內容為必填項！");
+            }
+
+            // 確保只有一種類型的案件被舉報
+            if ((rescueCaseId != -1 ? 1 : 0) + (lostCaseId != -1 ? 1 : 0) + (adoptionCaseId != -1 ? 1 : 0) > 1) {
+                throw new IllegalArgumentException("只能舉報一種類型的案件！");
+            }
+
+            // 檢查唯一性 existsByRescueCaseIdAndLostCaseIdAndAdoptionCaseIdAndReportTitle
+            // adoptionCaseId
+            if (reportCaseRepository.existsByRescueCaseIdAndLostCaseIdAndAdoptionCaseIdAndReportTitle(
+                    rescueCaseId, lostCaseId, adoptionCaseId, reportTitle)) {
+                throw new IllegalArgumentException("該舉報案件已經存在！");
+            }
+
+            // 創建報告
+            ReportCase reportCase = new ReportCase();
+            reportCase.setRescueCase(
+                    rescueCaseId != -1 ? rescueCaseRepository.findById(rescueCaseId).orElse(null) : null);
+            reportCase.setLostCase(lostCaseId != -1 ? lostCaseRepository.findById(lostCaseId).orElse(null) : null);
+            reportCase.setReportDate(LocalDateTime.now());
+            reportCase.setReportTitle(reportTitle);
+            reportCase.setReportNotes(reportNotes);
+            reportCase.setReportState(false); // 初始狀態為未審核
+            reportCase.setAdmin(null); // 創建時沒有管理員
+
+            return reportCaseRepository.save(reportCase);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("創建報告失敗：" + e.getMessage());
+        }
+    }
+
+    public ReportCase findById(Integer id) {
         if (id != null) {
-            Optional<LostCase> optional = reportCaseRepository.findById(id);
+            Optional<ReportCase> optional = reportCaseRepository.findById(id);
             if (optional.isPresent()) {
                 return optional.get();
             }
-        }
-        return null;
-    }
-
-    public long count(String json) {
-        try {
-            JSONObject obj = new JSONObject(json);
-            return reportCaseRepository.count(obj);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public List<LostCase> find(String json) {
-        try {
-            JSONObject obj = new JSONObject(json);
-            return reportCaseRepository.find(obj);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return null;
     }
@@ -81,7 +192,32 @@ public class ReportCaseService {
         return true;
     }
 
-    public List<ReportCase> select(ReportCase condition) {
+    public ReportCase insert(ReportCase bean) {
+        if (bean != null && bean.getReportId() != null) {
+            if (!reportCaseRepository.existsById(bean.getReportId())) {
+                return reportCaseRepository.save(bean);
+            }
+        }
+        return null;
+    }
 
+    public long count(String json) {
+        try {
+            JSONObject obj = new JSONObject(json);
+            return reportCaseRepository.count(obj);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<ReportCase> find(String json) {
+        try {
+            JSONObject obj = new JSONObject(json);
+            return reportCaseRepository.find(obj);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

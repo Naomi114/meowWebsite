@@ -4,10 +4,11 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import tw.com.ispan.domain.pet.LostCase;
+import tw.com.ispan.domain.pet.ReportCase;
 
 public interface ReportCaseDAO {
+
     public abstract Long count(JSONObject param);
 
-    public abstract List<LostCase> find(JSONObject param);
+    public abstract List<ReportCase> find(JSONObject param);
 }

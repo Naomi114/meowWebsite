@@ -29,8 +29,8 @@ public class FurColor {
     @JsonManagedReference
     private List<LostCase> lostCases;
 
-    // @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
-    // private List<RescueCase> rescueCases;
+    @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
+    private List<RescueCase> rescueCases;
 
     // @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
     // private List<AdoptionCase> adoptionCase;
@@ -62,13 +62,13 @@ public class FurColor {
         this.furColor = furColor;
     }
 
-    // public List<RescueCase> getRescueCases() {
-    // return rescueCases;
-    // }
+    public List<RescueCase> getRescueCases() {
+        return rescueCases;
+    }
 
-    // public void setRescueCases(List<RescueCase> rescueCases) {
-    // this.rescueCases = rescueCases;
-    // }
+    public void setRescueCases(List<RescueCase> rescueCases) {
+        this.rescueCases = rescueCases;
+    }
 
     public List<LostCase> getLostCases() {
         return lostCases;
@@ -80,9 +80,8 @@ public class FurColor {
 
     @Override
     public String toString() {
-        return "FurColor [furColorId=" + furColorId +
-                ", furColor=" + furColor +
-                ", lostCases=" + lostCases + "]";
+        return "FurColor [furColorId=" + furColorId + ", furColor=" + furColor + ", lostCases=" + lostCases
+                + ", rescueCases=" + rescueCases + "]";
     }
 
 }
