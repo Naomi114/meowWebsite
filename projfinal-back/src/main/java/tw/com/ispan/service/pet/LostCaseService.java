@@ -11,7 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// import tw.com.ispan.domain.admin.Member;
+import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.Breed;
 import tw.com.ispan.domain.pet.CaseState;
 import tw.com.ispan.domain.pet.City;
@@ -19,7 +19,7 @@ import tw.com.ispan.domain.pet.DistinctArea;
 import tw.com.ispan.domain.pet.FurColor;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.Species;
-// import tw.com.ispan.repository.admin.MemberRepository;
+import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.pet.BreedRepository;
 import tw.com.ispan.repository.pet.CaseStateRepository;
 import tw.com.ispan.repository.pet.CityRepository;
@@ -35,8 +35,8 @@ public class LostCaseService {
     @Autowired
     private LostCaseRepository lostCaseRepository;
 
-    // @Autowired
-    // private MemberRepository memberRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Autowired
     private SpeciesRepository speciesRepository;
@@ -69,6 +69,10 @@ public class LostCaseService {
 
         if (condition.getLostCaseId() != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("lostCaseId"), condition.getLostCaseId()));
+        }
+
+        if (condition.getMember() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("memberId"), condition.getMember()));
         }
 
         if (condition.getCaseTitle() != null && !condition.getCaseTitle().trim().isEmpty()) {
@@ -153,6 +157,7 @@ public class LostCaseService {
 
             // 解析 JSON 参数
             String caseTitle = obj.optString("caseTitle");
+            Integer memberId = obj.optInt("memberId");
             Integer speciesId = obj.optInt("speciesId");
             Integer breedId = obj.optInt("breedId");
             Integer furColorId = obj.optInt("furColorId");
@@ -174,13 +179,16 @@ public class LostCaseService {
             String caseUrl = obj.optString("caseUrl", null);
 
             // 验证必填字段
-            if (caseTitle == null || speciesId == null || breedId == null || furColorId == null || cityId == null
+            if (caseTitle == null || memberId == null || speciesId == null || breedId == null || furColorId == null
+                    || cityId == null
                     || distinctAreaId == null || street == null || sterilization == null || latitude == null
                     || longitude == null || caseStateId == null) {
                 throw new IllegalArgumentException("必填字段不能为空！");
             }
 
             // 查询关联对象
+            Member member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new IllegalArgumentException("无效的 memberId"));
             Species species = speciesRepository.findById(speciesId)
                     .orElseThrow(() -> new IllegalArgumentException("无效的 speciesId"));
             Breed breed = breedRepository.findById(breedId)
@@ -197,6 +205,7 @@ public class LostCaseService {
             // 构建实体
             LostCase lostCase = new LostCase();
             lostCase.setCaseTitle(caseTitle);
+            lostCase.setMember(member);
             lostCase.setSpecies(species);
             lostCase.setBreed(breed);
             lostCase.setFurColor(furColor);

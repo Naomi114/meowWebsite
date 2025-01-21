@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -19,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.banner.LostBanner;
 
 @Entity
@@ -34,11 +36,10 @@ public class LostCase {
     private String caseTitle;
 
     // 關聯到 Member 表，雙向多對一
-    // @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    // @JoinColumn(name = "memberId", nullable = false, foreignKey =
-    // @ForeignKey(name = "FK_LostCase_Member"))
-    // @JsonManagedReference
-    // private Member member;
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Member"))
+    @JsonManagedReference
+    private Member member;
 
     // 關聯到 Species 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
@@ -156,7 +157,7 @@ public class LostCase {
     // 全參數建構子
     public LostCase(
             Integer lostCaseId, String caseTitle,
-            // Member member,
+            Member member,
             List<ReportCase> reportCases,
             Species species, Breed breed, FurColor furColor,
             String name, String gender, String sterilization, Integer age, Integer microChipNumber, boolean suspLost,
@@ -167,7 +168,7 @@ public class LostCase {
             Boolean isHidden) {
         this.lostCaseId = lostCaseId;
         this.caseTitle = caseTitle;
-        // this.member = member;
+        this.member = member;
         this.species = species;
         this.breed = breed;
         this.furColor = furColor;
@@ -215,13 +216,13 @@ public class LostCase {
         this.caseTitle = caseTitle;
     }
 
-    // public Member getMember() {
-    // return member;
-    // }
+    public Member getMember() {
+        return member;
+    }
 
-    // public void setMember(Member member) {
-    // this.member = member;
-    // }
+    public void setMember(Member member) {
+        this.member = member;
+    }
 
     public Species getSpecies() {
         return species;
@@ -452,7 +453,7 @@ public class LostCase {
     public String toString() {
         return "LostCase [lostCaseId=" + lostCaseId +
                 ", caseTitle=" + caseTitle +
-                // ", member=" + member +
+                ", member=" + member +
                 ", species=" + species +
                 ", breed=" + breed +
                 ", furColor=" + furColor +

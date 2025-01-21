@@ -26,6 +26,7 @@ public class LostCaseDAOImpl implements LostCaseDAO {
     @Override
     public Long count(JSONObject param) {
         // 解析传入的 JSON 参数
+        Integer memberId = param.isNull("memberId") ? null : param.getInt("memberId");
         Integer speciesId = param.isNull("speciesId") ? null : param.getInt("speciesId");
         Integer breedId = param.isNull("breedId") ? null : param.getInt("breedId");
         Integer furColorId = param.isNull("furColorId") ? null : param.getInt("furColorId");
@@ -44,6 +45,11 @@ public class LostCaseDAOImpl implements LostCaseDAO {
 
         // 动态构建 WHERE 条件
         List<Predicate> predicates = new ArrayList<>();
+
+        // 条件：memberId
+        if (memberId != null) {
+            predicates.add(criteriaBuilder.equal(root.get("member").get("memberId"), memberId));
+        }
 
         // 条件：speciesId
         if (speciesId != null) {

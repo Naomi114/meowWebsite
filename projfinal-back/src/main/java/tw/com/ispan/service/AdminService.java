@@ -1,6 +1,5 @@
 package tw.com.ispan.service;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
