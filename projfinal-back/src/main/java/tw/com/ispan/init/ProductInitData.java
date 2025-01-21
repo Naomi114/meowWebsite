@@ -1,11 +1,9 @@
 package tw.com.ispan.init;
 
 import java.math.BigDecimal;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -13,12 +11,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import tw.com.ispan.config.FileStorageProperties;
 // import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
-import tw.com.ispan.domain.shop.ProductImage;
-import tw.com.ispan.dto.ProductImageRequest;
 // import tw.com.ispan.repository.admin.AdminRepository;
 import tw.com.ispan.repository.shop.ProductRepository;
 import tw.com.ispan.service.shop.CategoryService;
@@ -27,7 +22,7 @@ import tw.com.ispan.service.shop.ProductTagService;
 
 @Component
 @Profile("dev") // 分離測試和開發環境
-public class ProductDataInitializer implements CommandLineRunner {
+public class ProductInitData implements CommandLineRunner {
 
     // @Autowired
     // private AdminRepository adminRepository;
@@ -78,20 +73,20 @@ public class ProductDataInitializer implements CommandLineRunner {
     // }
 
     private void initializeCategories() {
-        // 類別名稱與默認單位的映射
-        Map<String, String> categories = Map.of(
-                "寵物用品", "個",
-                "玩具", "個",
-                "飼料", "包",
-                "保健品", "罐",
-                "清潔用品", "包");
-
-        // 遍歷類別
-        categories.forEach((categoryName, defaultUnit) -> {
-            Category category = categoryService.findOrCreateCategory(categoryName, defaultUnit);
-            System.out.println("初始化類別: " + category.getCategoryName() + "，單位: " + category.getDefaultUnit());
+        List<CategoryInitData> categories = List.of(
+                new CategoryInitData("寵物用品", "個", "所有寵物相關商品"),
+                new CategoryInitData("玩具", "個", "各類寵物玩具"),
+                new CategoryInitData("飼料", "包", "各種寵物飼料"),
+                new CategoryInitData("保健品", "罐", "寵物專用保健產品"),
+                new CategoryInitData("清潔用品", "包", "清潔與衛生用品"));
+    
+        categories.forEach(data -> {
+            Category category = categoryService.saveOrUpdateCategory(data.getCategoryName(), data.getCategoryDescription(),data.getDefaultUnit());
+            category.setCategoryDescription(data.getCategoryDescription());
+            System.out.println("初始化類別: " + category.getCategoryName() + "，單位: " + category.getDefaultUnit() +
+                    "，描述: " + category.getCategoryDescription());
         });
-    }
+    }  
 
     private void initializeTags() {
         List<String> tags = List.of("純天然", "純手作", "低敏", "無添加");
@@ -105,7 +100,7 @@ public class ProductDataInitializer implements CommandLineRunner {
     public void initializeData() {
 
         try {
-            Category category1 = categoryService.findOrCreateCategory("飼料", "包");
+            Category category1 = categoryService.findCategory("飼料", "包");
             System.out.println("抓取類別: " + category1.getCategoryName() + "，預設單位: " + category1.getDefaultUnit());
             Product product1 = new Product();
             product1.setProductName("貓糧");
@@ -134,7 +129,7 @@ public class ProductDataInitializer implements CommandLineRunner {
              * 手動創建的實體處於分離狀態（detached），不能直接關聯到其他實體。
              * 還是需要從adminRepository中查找對應的管理員實體。
              */
-            Category category2 = categoryService.findOrCreateCategory("寵物用品", "個");
+            Category category2 = categoryService.findCategory("寵物用品", "個");
             Product product2 = new Product();
             product2.setProductName("狗項圈");
             product2.setDescription("耐用的皮革狗項圈");
@@ -155,7 +150,7 @@ public class ProductDataInitializer implements CommandLineRunner {
             }
             // product2.setAdmin(new Admin(2, "管理員2"));
 
-            Category category3 = categoryService.findOrCreateCategory("玩具", "個");
+            Category category3 = categoryService.findCategory("玩具", "個");
             Product product3 = new Product();
             product3.setProductName("貓抓板");
             product3.setDescription("耐用的貓抓板");
@@ -176,7 +171,7 @@ public class ProductDataInitializer implements CommandLineRunner {
             }
             // product3.setAdmin(new Admin(1, "管理員1"));
 
-            Category category4 = categoryService.findOrCreateCategory("寵物用品", "個");
+            Category category4 = categoryService.findCategory("寵物用品", "個");
             Product product4 = new Product();
             product4.setProductName("狗玩具");
             product4.setDescription("耐用的狗玩具");
@@ -197,7 +192,7 @@ public class ProductDataInitializer implements CommandLineRunner {
             }
             // product4.setAdmin(new Admin(2, "管理員2"));
 
-            Category category5 = categoryService.findOrCreateCategory("清潔用品", "包");
+            Category category5 = categoryService.findCategory("清潔用品", "包");
             Product product5 = new Product();
             product5.setProductName("貓砂");
             product5.setDescription("高效吸水貓砂");

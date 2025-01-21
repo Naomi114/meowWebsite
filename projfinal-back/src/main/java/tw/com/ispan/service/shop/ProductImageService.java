@@ -53,8 +53,8 @@ public class ProductImageService {
                 // 保存到商品圖片集合
                 product.getProductImages().add(productImage);
 
-                // 提交到 GitHub
-                commitAndPushToGitHub("新增圖片: " + imageRequest.getFilename());
+                // 提交到 GitHub (測試階段先註解，上線再解開)
+                // commitAndPushToGitHub("新增圖片: " + imageRequest.getFilename());
 
             } catch (IOException e) {
                 throw new RuntimeException("圖片存儲失敗: " + e.getMessage());
