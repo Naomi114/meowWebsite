@@ -14,7 +14,7 @@ public class CaseState {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CaseStateId")
-    private Integer CaseStateId;
+    private Integer caseStateId;
 
     @Column(name = "CaseStatement", columnDefinition = "NVARCHAR(5)", nullable = false)
     private String caseStatement;
@@ -25,6 +25,12 @@ public class CaseState {
 		super();
 	}
 
+	
+	public CaseState(Integer caseStateId) {
+		super();
+		this.caseStateId = caseStateId;
+	}
+
 
 	public CaseState(String caseStatement) {
 		super();
@@ -33,13 +39,13 @@ public class CaseState {
 
 
 	public Integer getCaseStateId() {
-		return CaseStateId;
+		return caseStateId;
 	}
 
 
 
 	public void setCaseStateId(Integer caseStateId) {
-		CaseStateId = caseStateId;
+		this.caseStateId = caseStateId;
 	}
 
 
@@ -58,7 +64,7 @@ public class CaseState {
 
 	@Override
 	public String toString() {
-		return "CaseState [CaseStateId=" + CaseStateId + ", caseStatement=" + caseStatement + "]";
+		return "CaseState [CaseStateId=" + caseStateId + ", caseStatement=" + caseStatement + "]";
 	}
     
     

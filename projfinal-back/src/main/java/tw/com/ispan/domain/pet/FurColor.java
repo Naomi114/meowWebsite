@@ -2,7 +2,7 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -25,27 +25,30 @@ public class FurColor {
     @Column(name = "furColor", nullable = false, length = 20)
     private String furColor;
 
-    @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<LostCase> lostCases;
+    //改為單向，一個毛色不須知道有哪些案件 
+//    @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
+//    private List<LostCase> lostCases;
+//
+//    @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
+//    private List<RescueCase> rescueCases;
+//    
+//    @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
+//    private List<AdoptionCase> adoptionCase;
 
-    // @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
-    // private List<RescueCase> rescueCases;
-
-    // @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
-    // private List<AdoptionCase> adoptionCase;
-
-    // constructor
+    
+    
+    //constructor
     public FurColor() {
-        super();
-    }
+		super();
+	}
+    
+	public FurColor(String furColor) {
+		super();
+		this.furColor = furColor;
+	}
 
-    public FurColor(String furColor) {
-        super();
-        this.furColor = furColor;
-    }
 
-    // Getters and Setters
+	// Getters and Setters
     public Integer getFurColorId() {
         return furColorId;
     }
@@ -61,28 +64,4 @@ public class FurColor {
     public void setFurColor(String furColor) {
         this.furColor = furColor;
     }
-
-    // public List<RescueCase> getRescueCases() {
-    // return rescueCases;
-    // }
-
-    // public void setRescueCases(List<RescueCase> rescueCases) {
-    // this.rescueCases = rescueCases;
-    // }
-
-    public List<LostCase> getLostCases() {
-        return lostCases;
-    }
-
-    public void setLostCases(List<LostCase> lostCases) {
-        this.lostCases = lostCases;
-    }
-
-    @Override
-    public String toString() {
-        return "FurColor [furColorId=" + furColorId +
-                ", furColor=" + furColor +
-                ", lostCases=" + lostCases + "]";
-    }
-
 }

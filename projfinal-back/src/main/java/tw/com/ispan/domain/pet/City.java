@@ -1,9 +1,19 @@
 package tw.com.ispan.domain.pet;
 
-import jakarta.persistence.*;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "City")
@@ -19,20 +29,23 @@ public class City {
 	// 和DistinctArea表單向一對多
 	@OneToMany(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "city_id")
+	@JsonIgnore
 	private List<DistinctArea> distinctAreas;
 
 	// 和RescueCase表雙向一對多
-	// @OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
-	// private List<RescueCase> rescueCases;
+	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
+	@JsonBackReference("rescueCase-city")
+	private List<RescueCase> rescueCases;
 
 	// 和LostCase表雙向一對多
 	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
-	@JsonManagedReference
+	@JsonBackReference("lostCases-city")
 	private List<LostCase> lostCases;
 
 	// 和adoptionCase表雙向一對多
-	// @OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
-	// private List<AdoptionCase> adoptionCases;
+	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
+	@JsonBackReference("adoptionCases-city")
+	private List<AdoptionCase> adoptionCases;
 
 	public City() {
 		super();
@@ -59,13 +72,13 @@ public class City {
 		this.city = city;
 	}
 
-	// public List<RescueCase> getRescueCases() {
-	// return rescueCases;
-	// }
+	public List<RescueCase> getRescueCases() {
+		return rescueCases;
+	}
 
-	// public void setRescueCases(List<RescueCase> rescueCases) {
-	// this.rescueCases = rescueCases;
-	// }
+	public void setRescueCases(List<RescueCase> rescueCases) {
+		this.rescueCases = rescueCases;
+	}
 
 	public List<DistinctArea> getDistinctAreas() {
 		return distinctAreas;
@@ -83,21 +96,14 @@ public class City {
 		this.lostCases = lostCases;
 	}
 
-	@Override
-	public String toString() {
-		return "City [cityId=" + cityId +
-				", city=" + city +
-				", distinctAreas=" + distinctAreas +
-				// ", rescueCases=" + rescueCases +
-				", lostCases=" + lostCases + "]";
+	public List<AdoptionCase> getAdoptionCases() {
+		return adoptionCases;
 	}
 
-	// public List<AdoptionCase> getAdoptionCases() {
-	// return adoptionCases;
-	// }
-
-	// public void setAdoptionCases(List<AdoptionCase> adoptionCases) {
-	// this.adoptionCases = adoptionCases;
-	// }
+	public void setAdoptionCases(List<AdoptionCase> adoptionCases) {
+		this.adoptionCases = adoptionCases;
+	}
+	
+	
 
 }

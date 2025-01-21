@@ -2,7 +2,7 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -25,26 +25,35 @@ public class Species {
     @Column(name = "species", nullable = false, length = 10)
     private String species;
 
-    @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<LostCase> lostCases;
+//改為單向
+//    @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
+//    @JsonBackReference("lostCases-species")
+//    private List<LostCase> lostCases;
+//
+//    @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
+//    @JsonBackReference("rescueCase-species")
+//    private List<RescueCase> rescueCases;
+//    
+//    @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
+//    @JsonBackReference("adoptionCase-species")
+//    private List<AdoptionCase> adoptionCase;	
 
-    // @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
-    // private List<RescueCase> rescueCases;
-
-    // @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
-    // private List<AdoptionCase> adoptionCase;
-
+    
+    
     public Species() {
-        super();
-    }
+		super();
+	}
 
-    public Species(String species) {
-        super();
-        this.species = species;
-    }
+	
 
-    // Getters and Setters
+	public Species(String species) {
+		super();
+		this.species = species;
+	}
+
+
+
+	// Getters and Setters
     public Integer getSpeciesId() {
         return speciesId;
     }
@@ -61,29 +70,5 @@ public class Species {
         this.species = species;
     }
 
-    // public List<RescueCase> getRescueCases() {
-    // return rescueCases;
-    // }
-
-    // public void setRescueCases(List<RescueCase> rescueCases) {
-    // this.rescueCases = rescueCases;
-    // }
-
-    public List<LostCase> getLostCases() {
-        return lostCases;
-    }
-
-    public void setLostCases(List<LostCase> lostCases) {
-        this.lostCases = lostCases;
-    }
-
-    @Override
-    public String toString() {
-        return "Species [speciesId=" + speciesId +
-                ", species=" + species +
-                ", lostCases=" + lostCases +
-                // ", rescueCases=" + rescueCases +
-                "]";
-    }
-
+    
 }

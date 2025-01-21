@@ -2,7 +2,7 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -25,15 +25,18 @@ public class Breed {
     @Column(name = "breed", nullable = false, columnDefinition = "NVARCHAR(50)")
     private String breed;
 
-    @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<LostCase> lostCases;
+//    @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
+//    @JsonBackReference("lostCases-breed")
+//    private List<LostCase> lostCases;
+//
+//    @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
+//    @JsonBackReference("rescueCase-breed")
+//    private List<RescueCase> rescueCases;
+//    
+//    @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
+//    @JsonBackReference("adoptionCase-breed")
+//    private List<AdoptionCase> adoptionCases;
 
-    // @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
-    // private List<RescueCase> rescueCases;
-
-    // @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
-    // private List<AdoptionCase> adoptionCases;
 
     // Getters and Setters
     public Integer getBreedId() {
@@ -52,30 +55,11 @@ public class Breed {
         this.breed = breed;
     }
 
-    // public List<RescueCase> getRescueCases() {
-    // return rescueCases;
-    // }
-
-    // public void setRescueCases(List<RescueCase> rescueCases) {
-    // this.rescueCases = rescueCases;
-    // }
-
-    public List<LostCase> getLostCases() {
-        return lostCases;
-    }
-
-    public void setLostCases(List<LostCase> lostCases) {
-        this.lostCases = lostCases;
-    }
-
-    @Override
-    public String toString() {
-        return "Breed [breedId=" + breedId +
-                ", breed=" + breed +
-                ", lostCases=" + lostCases +
-                // ", rescueCases="+ rescueCases +
-                // ", adoptionCases=" + adoptionCases +
-                "]";
-    }
-
+	@Override
+	public String toString() {
+		return "Breed [breedId=" + breedId + ", breed=" + breed + "]";
+	}    
+    
+    
 }
+
