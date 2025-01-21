@@ -19,7 +19,7 @@ public class RescueBanner {
     @Column(name = "DueDate", nullable = false)
     private LocalDateTime dueDate;
 
-    @OneToOne
+    @OneToOne(optional = false) // 確保 lostCase 是非空關聯
     @JoinColumn(name = "rescueCaseId", nullable = false, unique = true, foreignKey = @ForeignKey(name = "FK_RescueBanner_RescueCase"))
     private RescueCase rescueCase;
 

@@ -25,8 +25,8 @@ public class Breed {
     @Column(name = "breed", nullable = false, columnDefinition = "NVARCHAR(50)")
     private String breed;
 
-    @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
     @JsonManagedReference
+    @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
     private List<LostCase> lostCases;
 
     @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)

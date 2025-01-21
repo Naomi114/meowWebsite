@@ -38,6 +38,17 @@ public class LostBannerService {
         return lostBannerRepository.save(lostBanner);
     }
 
+    public void saveLostBannerWithLostCase(LostCase lostCase, LostBanner lostBanner) {
+        // 先保存 LostCase
+        LostCase savedLostCase = lostCaseRepository.save(lostCase);
+
+        // 設置已保存的 LostCase 到 LostBanner
+        lostBanner.setLostCase(savedLostCase);
+
+        // 然後保存 LostBanner
+        lostBannerRepository.save(lostBanner);
+    }
+
     /**
      * 獲取 LostBanner 根據 LostCase ID
      */

@@ -58,8 +58,8 @@ public class LostCaseService {
     @Autowired
     private CaseStateRepository caseStateRepository;
 
-    @Autowired
-    private LostBannerRepository lostBannerRepository;
+    // @Autowired
+    // private LostBannerRepository lostBannerRepository;
 
     @Autowired
     private LostBannerService lostBannerService;
@@ -232,13 +232,6 @@ public class LostCaseService {
             lostCase.setCaseUrl(caseUrl);
             lostCase.setPublicationTime(LocalDateTime.now());
             lostCase.setLastUpdateTime(LocalDateTime.now());
-
-            // 創建對應的 LostBanner
-            LostBanner lostBanner = new LostBanner();
-            lostBanner.setLostCase(lostCase);
-            lostBanner.setOnlineDate(LocalDateTime.now());
-            lostBanner.setDueDate(LocalDateTime.now().plusDays(30)); // 設置廣告到期時間
-            lostBannerRepository.save(lostBanner);
 
             // 保存并返回
             return lostCaseRepository.save(lostCase);

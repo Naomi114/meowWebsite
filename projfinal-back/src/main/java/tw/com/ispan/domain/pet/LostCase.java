@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -37,8 +36,8 @@ public class LostCase {
 
     // 關聯到 Member 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    @JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Member"))
-    @JsonManagedReference
+    @JoinColumn(name = "memberId", nullable = true, foreignKey = @ForeignKey(name = "FK_LostCase_Member"))
+    @JsonBackReference
     private Member member;
 
     // 關聯到 Species 表，雙向多對一

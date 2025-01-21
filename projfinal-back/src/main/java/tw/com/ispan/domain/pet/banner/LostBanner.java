@@ -20,7 +20,7 @@ public class LostBanner {
     private LocalDateTime dueDate;
 
     // 與 LostCase 的一對一關聯
-    @OneToOne
+    @OneToOne(optional = false) // 確保 lostCase 是非空關聯
     @JoinColumn(name = "lostCaseId", nullable = false, unique = true, foreignKey = @ForeignKey(name = "FK_LostBanner_LostCase"))
     private LostCase lostCase;
 

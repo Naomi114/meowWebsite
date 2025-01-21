@@ -28,7 +28,7 @@ public class AdoptionBanner {
     @Column(name = "DueDate", nullable = false)
     private LocalDateTime dueDate;
 
-    @OneToOne
+    @OneToOne(optional = false) // 確保 lostCase 是非空關聯
     @JoinColumn(name = "adoptionCaseId", nullable = false, unique = true, foreignKey = @ForeignKey(name = "FK_AdoptionBanner_AdoptionCase"))
     private AdoptionCase adoptionCase;
 

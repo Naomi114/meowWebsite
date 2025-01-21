@@ -108,8 +108,8 @@ public class Admin {
 	@Override
 	public String toString() {
 		return "Admin [adminId=" + adminId + ", adminName=" + adminName + ", password=" + password + ", createDate="
-				+ createDate + ", updateDate=" + updateDate + ", discounts=" +
-				// discounts + ", inventory=" + inventory+
+				+ createDate + ", updateDate=" + updateDate +
+				// ", discounts=" + discounts + ", inventory=" + inventory+
 				", getAdminId()=" + getAdminId() + ", getAdminName()=" + getAdminName() + ", getPassword()="
 				+ getPassword() + ", getCreateDate()=" + getCreateDate() + ", getUpdateDate()=" + getUpdateDate()
 				+ ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString()

@@ -23,7 +23,7 @@ spring:
       hibernate.format_sql: true
     database-platform: org.hibernate.dialect.SQLServerDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl

@@ -26,12 +26,12 @@ public class FurColor {
     private String furColor;
 
     @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
-    @JsonManagedReference
     private List<LostCase> lostCases;
 
     @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
     private List<RescueCase> rescueCases;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
     private List<AdoptionCase> adoptionCase;
 
