@@ -18,7 +18,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-// import tw.com.ispan.domain.admin.Member;
+import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.forRescue.CanAfford;
 import tw.com.ispan.domain.pet.forRescue.RescueDemand;
 import tw.com.ispan.domain.pet.forRescue.RescueProgress;
@@ -37,10 +37,9 @@ public class RescueCase {
 
     // 必填(但為了測試先改成非必填)
     // 關聯到member表，雙向多對一
-    // @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    // @JoinColumn(name = "memberId", nullable = true, foreignKey = @ForeignKey(name
-    // = "FK_RescueCase_Member"))
-    // private Member member;
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @JoinColumn(name = "memberId", nullable = true, foreignKey = @ForeignKey(name = "FK_RescueCase_Member"))
+    private Member member;
 
     // 必填
     // 關聯到species表，雙向多對一
@@ -159,8 +158,11 @@ public class RescueCase {
     private List<Follow> follows;
 
     // 關聯到ReportCase表，單向一對多
-    // @OneToMany(mappedBy = "rescueCase", cascade = CascadeType.ALL)
-    // private List<ReportCase> reportCases;
+    @OneToMany(mappedBy = "rescueCase", cascade = CascadeType.ALL)
+    private List<ReportCase> reportCases;
+
+    @Column(name = "isHidden", nullable = false)
+    private Boolean isHidden = false; // 默認為不隱藏
 
     // Hibernate 進行實體的初始化需要用到空參建構子
     public RescueCase() {
@@ -201,13 +203,13 @@ public class RescueCase {
         this.caseTitle = caseTitle;
     }
 
-    // public Member getMember() {
-    // return member;
-    // }
+    public Member getMember() {
+        return member;
+    }
 
-    // public void setMember(Member member) {
-    // this.member = member;
-    // }
+    public void setMember(Member member) {
+        this.member = member;
+    }
 
     public Species getSpecies() {
         return species;
@@ -417,19 +419,27 @@ public class RescueCase {
         this.follows = follows;
     }
 
-    // public List<ReportCase> getReportCases() {
-    // return reportCases;
-    // }
+    public List<ReportCase> getReportCases() {
+        return reportCases;
+    }
 
-    // public void setReportCases(List<ReportCase> reportCases) {
-    // this.reportCases = reportCases;
-    // }
+    public void setReportCases(List<ReportCase> reportCases) {
+        this.reportCases = reportCases;
+    }
+
+    public Boolean getIsHidden() {
+        return isHidden;
+    }
+
+    public void setIsHidden(Boolean isHidden) {
+        this.isHidden = isHidden;
+    }
 
     @Override
     public String toString() {
         return "RescueCase [rescueCaseId=" + rescueCaseId +
                 ", caseTitle=" + caseTitle +
-                // ", member=" + member +
+                ", member=" + member +
                 ", species=" + species +
                 ", breed=" + breed +
                 ", furColor=" + furColor +
@@ -456,7 +466,8 @@ public class RescueCase {
                 ", canAffords=" + canAffords +
                 ", rescueProgresses=" + rescueProgresses +
                 ", follows=" + follows +
-                // ", reportCases=" + reportCases +
+                ", reportCases=" + reportCases +
+                ", isHidden=" + isHidden +
                 "]";
     }
 

@@ -149,10 +149,10 @@ public class ReportCaseService {
                 throw new IllegalArgumentException("只能舉報一種類型的案件！");
             }
 
-            // 檢查唯一性 existsByRescueCaseIdAndLostCaseIdAndAdoptionCaseIdAndReportTitle
-            // adoptionCaseId
-            if (reportCaseRepository.existsByRescueCaseIdAndLostCaseIdAndAdoptionCaseIdAndReportTitle(
-                    rescueCaseId, lostCaseId, adoptionCaseId, reportTitle)) {
+            // 檢查唯一性
+            if (reportCaseRepository
+                    .existsByRescueCase_RescueCaseIdAndLostCase_LostCaseIdAndAdoptionCase_AdoptionCaseIdAndReportTitle(
+                            rescueCaseId, lostCaseId, adoptionCaseId, reportTitle)) {
                 throw new IllegalArgumentException("該舉報案件已經存在！");
             }
 

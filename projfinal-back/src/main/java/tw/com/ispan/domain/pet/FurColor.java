@@ -32,8 +32,8 @@ public class FurColor {
     @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
     private List<RescueCase> rescueCases;
 
-    // @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
-    // private List<AdoptionCase> adoptionCase;
+    @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
+    private List<AdoptionCase> adoptionCase;
 
     // constructor
     public FurColor() {
@@ -78,10 +78,18 @@ public class FurColor {
         this.lostCases = lostCases;
     }
 
+    public List<AdoptionCase> getAdoptionCase() {
+        return adoptionCase;
+    }
+
+    public void setAdoptionCase(List<AdoptionCase> adoptionCase) {
+        this.adoptionCase = adoptionCase;
+    }
+
     @Override
     public String toString() {
         return "FurColor [furColorId=" + furColorId + ", furColor=" + furColor + ", lostCases=" + lostCases
-                + ", rescueCases=" + rescueCases + "]";
+                + ", rescueCases=" + rescueCases + ", adoptionCase=" + adoptionCase + "]";
     }
 
 }

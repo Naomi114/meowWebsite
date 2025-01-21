@@ -32,8 +32,8 @@ public class Species {
     @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
     private List<RescueCase> rescueCases;
 
-    // @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
-    // private List<AdoptionCase> adoptionCase;
+    @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
+    private List<AdoptionCase> adoptionCase;
 
     public Species() {
         super();
@@ -77,13 +77,18 @@ public class Species {
         this.lostCases = lostCases;
     }
 
+    public List<AdoptionCase> getAdoptionCase() {
+        return adoptionCase;
+    }
+
+    public void setAdoptionCase(List<AdoptionCase> adoptionCase) {
+        this.adoptionCase = adoptionCase;
+    }
+
     @Override
     public String toString() {
-        return "Species [speciesId=" + speciesId +
-                ", species=" + species +
-                ", lostCases=" + lostCases +
-                ", rescueCases=" + rescueCases +
-                "]";
+        return "Species [speciesId=" + speciesId + ", species=" + species + ", lostCases=" + lostCases
+                + ", rescueCases=" + rescueCases + ", adoptionCase=" + adoptionCase + "]";
     }
 
 }

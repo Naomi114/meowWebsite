@@ -34,8 +34,8 @@ public class DistinctArea {
 	private List<LostCase> lostCases;
 
 	// 和adoptionCase表雙向一對多
-	// @OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
-	// private List<AdoptionCase> adoptionCase;
+	@OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
+	private List<AdoptionCase> adoptionCase;
 
 	public DistinctArea() {
 		super();
@@ -51,7 +51,7 @@ public class DistinctArea {
 		return distinctAreaId;
 	}
 
-	public void setDistinctAreaId(int distinctAreaId) {
+	public void setDistinctAreaId(Integer distinctAreaId) {
 		this.distinctAreaId = distinctAreaId;
 	}
 
@@ -71,12 +71,26 @@ public class DistinctArea {
 		this.rescueCases = rescueCases;
 	}
 
+	public List<LostCase> getLostCases() {
+		return lostCases;
+	}
+
+	public void setLostCases(List<LostCase> lostCases) {
+		this.lostCases = lostCases;
+	}
+
+	public List<AdoptionCase> getAdoptionCase() {
+		return adoptionCase;
+	}
+
+	public void setAdoptionCase(List<AdoptionCase> adoptionCase) {
+		this.adoptionCase = adoptionCase;
+	}
+
 	@Override
 	public String toString() {
-		return "DistinctArea [distinctAreaId=" + distinctAreaId +
-				", distinctAreaName=" + distinctAreaName +
-				", rescueCases=" + rescueCases +
-				", lostCases=" + lostCases + "]";
+		return "DistinctArea [distinctAreaId=" + distinctAreaId + ", distinctAreaName=" + distinctAreaName
+				+ ", rescueCases=" + rescueCases + ", lostCases=" + lostCases + ", adoptionCase=" + adoptionCase + "]";
 	}
 
 }

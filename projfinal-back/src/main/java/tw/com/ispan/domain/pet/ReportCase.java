@@ -34,10 +34,9 @@ public class ReportCase {
     @JoinColumn(name = "lostCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_LostCase"), nullable = true)
     private LostCase lostCase;
 
-    // @ManyToOne
-    // @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name =
-    // "FK_ReportCase_AdoptionCase"), nullable = true)
-    // private AdoptionCase adoptionCase;
+    @ManyToOne
+    @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_ReportCase_AdoptionCase"), nullable = true)
+    private AdoptionCase adoptionCase;
 
     // 關聯到 Member 表，單向多對一
     @ManyToOne(optional = false)

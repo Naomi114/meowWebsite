@@ -31,8 +31,8 @@ public class City {
 	private List<LostCase> lostCases;
 
 	// 和adoptionCase表雙向一對多
-	// @OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
-	// private List<AdoptionCase> adoptionCases;
+	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
+	private List<AdoptionCase> adoptionCases;
 
 	public City() {
 		super();
@@ -83,21 +83,17 @@ public class City {
 		this.lostCases = lostCases;
 	}
 
-	@Override
-	public String toString() {
-		return "City [cityId=" + cityId +
-				", city=" + city +
-				", distinctAreas=" + distinctAreas +
-				", rescueCases=" + rescueCases +
-				", lostCases=" + lostCases + "]";
+	public List<AdoptionCase> getAdoptionCases() {
+		return adoptionCases;
 	}
 
-	// public List<AdoptionCase> getAdoptionCases() {
-	// return adoptionCases;
-	// }
+	public void setAdoptionCases(List<AdoptionCase> adoptionCases) {
+		this.adoptionCases = adoptionCases;
+	}
 
-	// public void setAdoptionCases(List<AdoptionCase> adoptionCases) {
-	// this.adoptionCases = adoptionCases;
-	// }
-
+	@Override
+	public String toString() {
+		return "City [cityId=" + cityId + ", city=" + city + ", distinctAreas=" + distinctAreas + ", rescueCases="
+				+ rescueCases + ", lostCases=" + lostCases + ", adoptionCases=" + adoptionCases + "]";
+	}
 }

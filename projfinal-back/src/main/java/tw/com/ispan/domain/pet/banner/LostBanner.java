@@ -21,7 +21,7 @@ public class LostBanner {
 
     // 與 LostCase 的一對一關聯
     @OneToOne
-    @JoinColumn(name = "lostCaseId", referencedColumnName = "lostCaseId")
+    @JoinColumn(name = "lostCaseId", nullable = false, unique = true, foreignKey = @ForeignKey(name = "FK_LostBanner_LostCase"))
     private LostCase lostCase;
 
     // Getters and Setters

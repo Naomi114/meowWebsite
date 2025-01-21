@@ -20,7 +20,7 @@ public class RescueBanner {
     private LocalDateTime dueDate;
 
     @OneToOne
-    @JoinColumn(name = "rescueCaseId", referencedColumnName = "rescueCaseId")
+    @JoinColumn(name = "rescueCaseId", nullable = false, unique = true, foreignKey = @ForeignKey(name = "FK_RescueBanner_RescueCase"))
     private RescueCase rescueCase;
 
     // Getters and Setters

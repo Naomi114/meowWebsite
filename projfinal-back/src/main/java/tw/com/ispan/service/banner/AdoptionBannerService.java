@@ -8,7 +8,6 @@
 // import org.springframework.transaction.annotation.Transactional;
 
 // import jakarta.persistence.EntityNotFoundException;
-// import tw.com.ispan.domain.pet.AdoptionCase;
 // import tw.com.ispan.domain.pet.banner.AdoptionBanner;
 // import tw.com.ispan.repository.pet.banner.AdoptionBannerRepository;
 
