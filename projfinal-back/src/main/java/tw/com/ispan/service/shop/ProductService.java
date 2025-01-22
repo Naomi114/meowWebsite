@@ -119,8 +119,6 @@ public class ProductService {
 			}
 			product.setStockQuantity(request.getStockQuantity());
 
-			product.setUnit(request.getUnit());
-
 			if (request.getStockQuantity() == 0) {
 				product.setStatus("已售完");
 			} else {
