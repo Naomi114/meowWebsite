@@ -20,32 +20,39 @@ public class CartItem implements Serializable {
     @JsonProperty("cartItemId") // 確保 JSON 解析
     private Integer cartItemId;
 
+    // 與 Cart 類別的關聯
     @ManyToOne
     @JoinColumn(name = "cartId", nullable = false)
     @JsonIgnore // 避免循環依賴導致的 JSON 序列化錯誤
     private Cart cart;
 
+    // 與 Product 類別的關聯
     @OneToOne
     @JoinColumn(name = "productId", nullable = false)
     private Product product;
 
+    // 與 Orders 類別的關聯
     @ManyToOne
-    @JoinColumn(name = "orderId")
+    @JoinColumn(name = "orderId")  // 假設這是訂單ID
     @JsonIgnore // 避免循環依賴
     private Orders order;
 
+    // cartItem的狀態
     @Column(name = "cartItemStatus")
     @JsonProperty("cartItemStatus")
     private String cartItemStatus;
 
+    // 創建時間
     @Column(name = "createDate")
     @JsonProperty("createDate")
     private LocalDateTime createDate;
 
+    // 更新時間
     @Column(name = "updateDate")
     @JsonProperty("updateDate")
     private LocalDateTime updateDate;
 
+    // 購物車項目的數量
     @Column(name = "cartItemQuantity", nullable = false)
     @JsonProperty("quantity")
     private Integer cartItemQuantity;

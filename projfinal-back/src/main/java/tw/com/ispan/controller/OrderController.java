@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.persistence.criteria.Order;
 import tw.com.ispan.domain.shop.Orders;
-import tw.com.ispan.dto.OrderRequest;
 import tw.com.ispan.dto.PaymentRequest;
+import tw.com.ispan.repository.shop.OrderRequest;
 import tw.com.ispan.service.shop.OrderService;
 
 @RestController

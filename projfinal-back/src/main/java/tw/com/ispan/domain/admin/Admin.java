@@ -8,9 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-// import tw.com.ispan.domain.shop.Discount;
-// import tw.com.ispan.domain.shop.Inventory;
-// import tw.com.ispan.domain.shop.ProductBean;
+import tw.com.ispan.domain.shop.Inventory;
+import tw.com.ispan.domain.shop.Product;
 
 @Entity
 @Table(name = "admin")

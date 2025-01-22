@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import tw.com.ispan.domain.shop.Category;
+import tw.com.ispan.domain.shop.CartItem;
 
 public interface CategoryRepository
         extends JpaRepository<Category, Integer>, JpaSpecificationExecutor<Category> {
