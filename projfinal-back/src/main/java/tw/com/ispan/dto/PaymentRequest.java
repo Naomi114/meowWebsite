@@ -1,12 +1,21 @@
 package tw.com.ispan.dto;
 
 public class PaymentRequest {
+    private String paymentStatus; // 付款状态，例如 "success" 或 "failed"
     private String creditCardNumber;
     private String cardExpiryDate;
     private String cardCVV;
     private double amount;
 
     // Getters and setters
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
     public String getCreditCardNumber() {
         return creditCardNumber;
     }

@@ -2,37 +2,27 @@ package tw.com.ispan.domain.shop;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import tw.com.ispan.domain.admin.Discount;
+import jakarta.persistence.*;
 import tw.com.ispan.domain.admin.Member;
+import tw.com.ispan.domain.admin.Discount;
 
 @Entity
-@Table(name = "Orders") // order 為Hibernate保留字，所以改為orders (by Naomi 20250115)
+@Table(name = "Orders")
 public class Orders {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer orderId; // 改為 Long 類型
+    private Integer orderId; 
 
-    @ManyToOne
-    @JoinColumn(name = "memberId", nullable = false)
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 
     @ManyToOne
-    @JoinColumn(name = "discountId", nullable = true) // 折扣可以為 null
+    @JoinColumn(name = "discount_id", nullable = true)
     private Discount discount;
 
     @Column(nullable = false)
@@ -59,9 +49,9 @@ public class Orders {
     public Orders() {
     }
 
-    public Orders(Integer orderId, Member member, List<OrderItem> orderItems, Discount discount, String shippingAddress,
-            LocalDateTime orderDate, String creditCard, String orderStatus, String feedback, Double subtotalPrice,
-            Double finalPrice) {
+    public Orders(Integer orderId, Member member, List<OrderItem> orderItems, Discount discount, 
+                  String shippingAddress, LocalDateTime orderDate, String creditCard, 
+                  String orderStatus, String feedback, Double subtotalPrice, Double finalPrice) {
         this.orderId = orderId;
         this.member = member;
         this.orderItems = orderItems;
@@ -77,17 +67,17 @@ public class Orders {
 
     @Override
     public String toString() {
-        return "Order [orderId=" + orderId + ", member=" + member + ", orderItems=" + orderItems + ", discount="
-                + discount + ", shippingAddress=" + shippingAddress + ", orderDate=" + orderDate + ", creditCard="
-                + creditCard + ", orderStatus=" + orderStatus + ", feedback=" + feedback + ", subtotalPrice="
-                + subtotalPrice + ", finalPrice=" + finalPrice + "]";
+        return "Orders [orderId=" + orderId + ", member=" + member + ", orderItems=" + orderItems + 
+               ", discount=" + discount + ", shippingAddress=" + shippingAddress + ", orderDate=" + orderDate + 
+               ", creditCard=" + creditCard + ", orderStatus=" + orderStatus + ", feedback=" + feedback + 
+               ", subtotalPrice=" + subtotalPrice + ", finalPrice=" + finalPrice + "]";
     }
 
-    public Integer getOrderId() { // 改為 Long 類型
+    public Integer getOrderId() { 
         return orderId;
     }
 
-    public void setOrderId(Integer orderId) { // 改為 Long 類型
+    public void setOrderId(Integer orderId) { 
         this.orderId = orderId;
     }
 
@@ -169,5 +159,10 @@ public class Orders {
 
     public void setFinalPrice(Double finalPrice) {
         this.finalPrice = finalPrice;
+    }
+
+    public void setMemberId(Member memberId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setMemberId'");
     }
 }
