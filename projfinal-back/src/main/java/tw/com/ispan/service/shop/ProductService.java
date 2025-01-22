@@ -13,9 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
+import tw.com.ispan.dto.CategoryRequest;
+import tw.com.ispan.dto.CategoryResponse;
 import tw.com.ispan.dto.ProductImageRequest;
 import tw.com.ispan.dto.ProductRequest;
 import tw.com.ispan.dto.ProductResponse;
+import tw.com.ispan.dto.ProductTagRequest;
+import tw.com.ispan.dto.ProductTagResponse;
 import tw.com.ispan.repository.shop.ProductRepository;
 import tw.com.ispan.specification.ProductSpecifications;
 
@@ -56,21 +60,33 @@ public class ProductService {
 			product.setProductName(request.getProductName());
 			product.setDescription(request.getDescription());
 
-			// 獲取類別，同時設定單位
-			Category category = categoryService.findCategory(request.getCategoryName(), request.getUnit());
+			// 關鍵: 使用 buildCategoryRequest 構建 CategoryRequest
+			CategoryRequest categoryRequest = categoryService.buildCategoryRequestFromProduct(request);
+
+			// 查詢或創建類別
+			CategoryResponse categoryResponse = categoryService.createOrUpdateCategory(categoryRequest);
+			if (!categoryResponse.getSuccess()) {
+				throw new IllegalArgumentException("類別操作失敗: " + categoryResponse.getMessage());
+			}
+
+			// 查詢完整的 Category 實體並設置到商品
+			Category category = categoryService.findCategoryEntity(categoryResponse.getCategoryName());
 			product.setCategory(category);
 
+			// 確保商品單位設置正確
 			String unit = request.getUnit();
 			if (unit == null || unit.isEmpty()) {
-				unit = category.getDefaultUnit();
+				unit = categoryResponse.getDefaultUnit();
 				if (unit == null || unit.isEmpty()) {
-					throw new IllegalArgumentException("類別的預設單位未設置，無法保存商品");
+					throw new IllegalArgumentException("類別的預設單位未設置或提供");
 				}
 			}
 			product.setUnit(unit);
 
-			// 處理標籤 (可為0~N個標籤)
-			productTagService.addTagsToProduct(product, request.getTags());
+			// 查詢或建立標籤 (可為0~N個標籤)
+			ProductTagRequest productTagRequest = productTagService.buildTagRequestFromProduct(request);
+
+			ProductTagResponse productTagResponse = productTagService.createTag(productTagRequest);
 
 			/*
 			 * compareTo 適用於以下型別的空值判斷
@@ -153,80 +169,6 @@ public class ProductService {
 		}
 		return response;
 	}
-
-	// 批量新增: 前端管理者頁面可以一次新增多個商品 (有空再做..)
-	// public ProductResponse createBatch(List<ProductRequest> requests) {
-	// ProductResponse response = new ProductResponse();
-	// try {
-	// Product product = new Product();
-	// Category category = new Category();
-	// product.setProductName(requests.getProductName());
-	// product.setDescription(requests.getDescription());
-	// category.setCategoryName(request.getCategoryName());
-	// product.setCategory(category);
-	// // isEmpty() 適用於 String, Collection, Map, Array 的空值判斷；日期轉成字串後也可以用
-	// // 其中 String 型別因為 DTO 加入 @NotBlank、controller 加入 @Valid 驗證過，所以不會為空，無須再次驗證
-	// if (request.getTags() == null || request.getTags().isEmpty()) {
-	// throw new IllegalArgumentException("商品標籤不能為空");
-	// }
-	// List<ProductTag> tags = request.getTags().stream().map(tag -> {
-	// ProductTag productTag = new ProductTag();
-	// productTag.setTagName(tag.getTagName());
-	// return productTag;
-	// }).collect(Collectors.toList());
-	// product.setTags(new HashSet<>(tags));
-	// // compareTo 適用於 BigDecimal, BigInteger, Byte, Double, Integer, Long, Short
-	// // 的空值判斷
-	// if (request.getOriginalPrice() == null ||
-	// request.getOriginalPrice().compareTo(null) == 0) {
-	// throw new IllegalArgumentException("商品原價不能為空");
-	// }
-	// product.setOriginalPrice(request.getOriginalPrice());
-	// if (request.getSalePrice() == null || request.getSalePrice().compareTo(null)
-	// == 0) {
-	// throw new IllegalArgumentException("商品售價不能為空");
-	// }
-	// product.setSalePrice(request.getSalePrice());
-	// if (request.getStockQuantity() == null || request.getStockQuantity() == 0) {
-	// throw new IllegalArgumentException("商品售價不能為空");
-	// }
-	// product.setStockQuantity(request.getStockQuantity());
-	// product.setUnit(request.getUnit());
-	// if (request.getStockQuantity() == 0) {
-	// product.setStatus("已售完");
-	// } else {
-	// product.setStatus("上架中");
-	// }
-	// if (request.getExpire() == null || request.getExpire().toString().isEmpty())
-	// {
-	// throw new IllegalArgumentException("商品到期日不能為空");
-	// }
-	// product.setExpire(request.getExpire());
-	// // 前端傳入多張圖片url，轉換成商品圖片實體
-	// if (request.getProductImages() == null ||
-	// request.getProductImages().isEmpty()) {
-	// throw new IllegalArgumentException("商品圖片不能為空");
-	// }
-	// List<ProductImage> images = request.getProductImages().stream()
-	// .filter(image -> image.getImageUrl() != null &&
-	// !image.getImageUrl().trim().isEmpty())
-	// .map(image -> {
-	// ProductImage productImage = new ProductImage();
-	// productImage.setImageUrl(image.getImageUrl().trim());
-	// productImage.setProduct(product); // 設置雙向關係
-	// return productImage;
-	// }).collect(Collectors.toList());
-	// product.setProductImages(new LinkedHashSet<>(images));
-	// List<Product> savedProducts = productRepository.saveAll(products);
-	// response.setSuccess(true);
-	// response.setProducts(savedProducts);
-	// response.setMessage("批量新增成功");
-	// } catch (Exception e) {
-	// response.setSuccess(false);
-	// response.setMessage("批量新增失敗: " + e.getMessage());
-	// }
-	// return response;
-	// }
 
 	// 單筆刪除
 	public ProductResponse deleteSingle(Integer productId) {
@@ -338,7 +280,7 @@ public class ProductService {
 		return response;
 	}
 
-	// 動態查詢: Specification類的應用
+	// 動態多條件查詢: Specification類的應用
 	public ProductResponse findBatch(Specification<Product> spec) {
 		ProductResponse response = new ProductResponse();
 
@@ -352,4 +294,5 @@ public class ProductService {
 
 		return response;
 	}
+
 }

@@ -31,12 +31,7 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    /**
-     * 新增商品
-     * 
-     * @param request 商品請求 DTO
-     * @return 商品新增的響應 DTO
-     */
+    // 新增商品
     @PostMapping
     public ResponseEntity<?> createProduct(
             @Valid @RequestBody ProductRequest request) {
@@ -48,13 +43,7 @@ public class ProductController {
         }
     }
 
-    /**
-     * 修改商品
-     * 
-     * @param id      商品 ID
-     * @param request 修改請求 DTO
-     * @return 修改後的響應 DTO
-     */
+    // 修改商品
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Integer id,
             @Valid @RequestBody ProductRequest request) {
@@ -63,12 +52,7 @@ public class ProductController {
                 : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    /**
-     * 刪除商品
-     * 
-     * @param id 商品 ID
-     * @return 操作結果
-     */
+    // 刪除商品
     @DeleteMapping("/{id}")
     public ResponseEntity<ProductResponse> deleteProduct(@PathVariable Integer id) {
         ProductResponse response = productService.deleteSingle(id);
@@ -76,12 +60,7 @@ public class ProductController {
                 : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    /**
-     * 查詢單個商品
-     * 
-     * @param id 商品 ID
-     * @return 查詢結果 DTO
-     */
+    // 查詢單個商品
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Integer id) {
         ProductResponse response = productService.findSingle(id);
@@ -89,12 +68,7 @@ public class ProductController {
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
-    /**
-     * 搜尋商品
-     * 
-     * @param query 搜尋條件 JSON
-     * @return 商品列表
-     */
+    // 搜尋商品
     @PostMapping("/search")
     public ResponseEntity<ProductResponse> searchProducts(
             @RequestParam(required = false) String productName,

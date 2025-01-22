@@ -139,7 +139,7 @@ public class Product {
         return "ProductBean [productId=" + productId + ", productName=" + productName + ", description=" + description
                 + ", originalPrice=" + originalPrice + ", salePrice=" + salePrice + ", stockQuantity=" + stockQuantity
                 + ", unit=" + unit + ", status=" + status + ", expire=" + expire + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt + ", category=" + category + ", admin=" + admin + ", productImages="
+                + ", updatedAt=" + updatedAt + ", category=" + category + ", adminId=" + admin + ", productImages="
                 + productImages + ", tags=" + tags + ", inventoryItems=" + inventoryItems + ", wishlists=" + wishlists
                 + "]";
     }

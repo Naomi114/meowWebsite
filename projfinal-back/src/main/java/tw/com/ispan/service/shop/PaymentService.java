@@ -1,3 +1,4 @@
+package tw.com.ispan.service.shop;
 // package tw.com.ispan.service;
 
 // import org.springframework.stereotype.Service;
