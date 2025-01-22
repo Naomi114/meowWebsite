@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import tw.com.ispan.domain.admin.Discount;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
@@ -21,7 +22,7 @@ public class Orders {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer orderId;
+    private Integer orderId; // 改為 Long 類型
 
     @ManyToOne
     @JoinColumn(name = "memberId", nullable = false)
@@ -31,7 +32,7 @@ public class Orders {
     private List<OrderItem> orderItems;
 
     @ManyToOne
-    @JoinColumn(name = "discountId", nullable = false)
+    @JoinColumn(name = "discountId", nullable = true) // 折扣可以為 null
     private Discount discount;
 
     @Column(nullable = false)
@@ -82,11 +83,11 @@ public class Orders {
                 + subtotalPrice + ", finalPrice=" + finalPrice + "]";
     }
 
-    public Integer getOrderId() {
+    public Integer getOrderId() { // 改為 Long 類型
         return orderId;
     }
 
-    public void setOrderId(Integer orderId) {
+    public void setOrderId(Integer orderId) { // 改為 Long 類型
         this.orderId = orderId;
     }
 
@@ -169,5 +170,4 @@ public class Orders {
     public void setFinalPrice(Double finalPrice) {
         this.finalPrice = finalPrice;
     }
-
 }

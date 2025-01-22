@@ -1,6 +1,9 @@
 package tw.com.ispan.domain.shop;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -9,13 +12,17 @@ import java.time.LocalDateTime;
 @Table(name = "cartitem")
 public class CartItem implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cartItemId")
+    @JsonProperty("cartItemId") // 確保 JSON 解析
     private Integer cartItemId;
 
     @ManyToOne
     @JoinColumn(name = "cartId", nullable = false)
+    @JsonIgnore // 避免循環依賴導致的 JSON 序列化錯誤
     private Cart cart;
 
     @OneToOne
@@ -24,21 +31,27 @@ public class CartItem implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "orderId")
+    @JsonIgnore // 避免循環依賴
     private Orders order;
 
     @Column(name = "cartItemStatus")
+    @JsonProperty("cartItemStatus")
     private String cartItemStatus;
 
     @Column(name = "createDate")
+    @JsonProperty("createDate")
     private LocalDateTime createDate;
 
     @Column(name = "updateDate")
+    @JsonProperty("updateDate")
     private LocalDateTime updateDate;
 
     @Column(name = "cartItemQuantity", nullable = false)
+    @JsonProperty("quantity")
     private Integer cartItemQuantity;
 
     // Getters and Setters
+
     public Integer getCartItemId() {
         return cartItemId;
     }
@@ -104,10 +117,13 @@ public class CartItem implements Serializable {
     }
 
     // Additional Methods for Handling Product Fields
+
+    @JsonProperty("quantity")
     public Integer getQuantity() {
         return this.cartItemQuantity;
     }
 
+    @JsonProperty("quantity")
     public void setQuantity(Integer quantity) {
         this.cartItemQuantity = quantity;
     }
