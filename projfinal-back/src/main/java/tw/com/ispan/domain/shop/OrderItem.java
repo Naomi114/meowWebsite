@@ -19,11 +19,11 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "orderId", nullable = false)
-    private Orders order;
+    private Orders order; // This is a reference to the Order object, not just an orderId
 
     @ManyToOne
     @JoinColumn(name = "productId", nullable = false)
-    private Product product;
+    private Product product; // This is a reference to the Product object, not just a productId
 
     @Column(nullable = false)
     private Integer orderQuantity;
@@ -32,24 +32,26 @@ public class OrderItem {
     private Double purchasedPrice;
 
     @Column(nullable = false)
-    private String status; // 20250114 Naomi 新增 (ref. InventoryService)
+    private String status; // Added in 2025-01-14 Naomi (ref. InventoryService)
 
     public OrderItem() {
     }
 
     public OrderItem(Integer orderItemId, Orders order, Product product, Integer orderQuantity,
-            Double purchasedPrice) {
+            Double purchasedPrice, String status) {
         this.orderItemId = orderItemId;
         this.order = order;
         this.product = product;
         this.orderQuantity = orderQuantity;
         this.purchasedPrice = purchasedPrice;
+        this.status = status;
     }
 
     @Override
     public String toString() {
         return "OrderItem [orderItemId=" + orderItemId + ", order=" + order + ", product=" + product
-                + ", orderQuantity=" + orderQuantity + ", purchasedPrice=" + purchasedPrice + "]";
+                + ", orderQuantity=" + orderQuantity + ", purchasedPrice=" + purchasedPrice + ", status=" + status
+                + "]";
     }
 
     public Integer getOrderItemId() {

@@ -29,6 +29,7 @@ import tw.com.ispan.domain.admin.Admin;
 @Entity
 @Table(name = "Product")
 public class Product {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer productId;
@@ -135,8 +136,13 @@ public class Product {
                 + ", originalPrice=" + originalPrice + ", salePrice=" + salePrice + ", stockQuantity=" + stockQuantity
                 + ", unit=" + unit + ", status=" + status + ", expire=" + expire + ", createdAt=" + createdAt
                 + ", updatedAt=" + updatedAt + ", category=" + category + ", admin=" + admin + ", productImages="
-                + productImages + ", tags=" + tags + ", inventoryItems=" + inventoryItems + ", wishlists=" + wishlists
-                + "]";
+                + productImages
+                + ", tags=" + tags + ", inventoryItems=" + inventoryItems + ", wishlists=" + wishlists + "]";
+    }
+
+    // Getter for the sale price (add this method)
+    public BigDecimal getPrice() {
+        return salePrice; // You can return either originalPrice or salePrice based on your logic
     }
 
     // Getters and Setters
