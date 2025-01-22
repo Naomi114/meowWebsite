@@ -3,6 +3,7 @@ package tw.com.ispan.domain.shop;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,12 +86,11 @@ public class Product {
     private List<ProductImage> productImages = new LinkedList<>(); // Ordered and duplicates allowed (first image is
                                                                    // selected)
 
-    // Many-to-many relationship with ProductTag (bi-directional)
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
-            CascadeType.REFRESH }, fetch = FetchType.LAZY)
-    @JoinTable(name = "Product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    // 雙向多對多，可反向查找；可選0~N個標籤
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
+    @JoinTable(name = "Product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id", nullable = true))
     @JsonBackReference("products")
-    private Set<ProductTag> tags = new LinkedHashSet<>(); // Ordered, no duplicates
+    private Set<ProductTag> tags = new HashSet<>(); // 無序不重複
 
     // One-to-many relationship with InventoryItem (unidirectional)
     @OneToMany(mappedBy = "product", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,

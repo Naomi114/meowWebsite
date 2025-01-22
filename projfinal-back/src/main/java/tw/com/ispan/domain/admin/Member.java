@@ -1,9 +1,9 @@
 package tw.com.ispan.domain.admin;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
+// import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -31,6 +31,10 @@ public class Member {
 	@Column(length = 20, nullable = false)
 	private String password;
 
+	public Member() {
+		// 這是默認構造函數，Hibernate 需要
+	}
+
 	@Column(length = 70, nullable = false)
 	private String name;
 
@@ -44,7 +48,7 @@ public class Member {
 	private String address;
 
 	@Column(nullable = false)
-	private Date birthday;
+	private LocalDate birthday;
 
 	@Column(nullable = false)
 	private LocalDateTime createDate;
@@ -64,10 +68,6 @@ public class Member {
 	// Getters and Setters
 	public Integer getMemberId() {
 		return memberId;
-	}
-
-	public void setMemberId(Integer memberId) {
-		this.memberId = memberId;
 	}
 
 	public String getNickName() {
@@ -118,11 +118,11 @@ public class Member {
 		this.address = address;
 	}
 
-	public Date getBirthday() {
+	public LocalDate getBirthday() {
 		return birthday;
 	}
 
-	public void setBirthday(Date birthday) {
+	public void setBirthday(LocalDate birthday) {
 		this.birthday = birthday;
 	}
 

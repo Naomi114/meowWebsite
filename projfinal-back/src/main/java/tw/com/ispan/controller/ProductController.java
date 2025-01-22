@@ -18,106 +18,69 @@ import tw.com.ispan.specification.ProductSpecifications;
 @RequestMapping("/products")
 public class ProductController {
 
-        @Autowired
-        private ProductService productService;
+    @Autowired
+    private ProductService productService;
 
-        /**
-         * 新增商品
-         * 
-         * @param request 商品請求 DTO
-         * @return 商品新增的響應 DTO
-         */
-        @PostMapping
-        public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest request) {
-                ProductResponse response = productService.createSingle(request);
-                return response.getSuccess() ? ResponseEntity.status(HttpStatus.CREATED).body(response)
-                                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    // 新增商品
+    @PostMapping
+    public ResponseEntity<?> createProduct(
+            @Valid @RequestBody ProductRequest request) {
+        try {
+            ProductResponse response = productService.createSingle(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("商品新增失敗: " + e.getMessage());
         }
+    }
 
-        /**
-         * 修改商品
-         * 
-         * @param id      商品 ID
-         * @param request 修改請求 DTO
-         * @return 修改後的響應 DTO
-         */
-        @PutMapping("/{id}")
-        public ResponseEntity<ProductResponse> updateProduct(@PathVariable Integer id,
-                        @Valid @RequestBody ProductRequest request) {
-                ProductResponse response = productService.updateSingle(id, request);
-                return response.getSuccess() ? ResponseEntity.ok(response)
-                                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
+    // 修改商品
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Integer id,
+            @Valid @RequestBody ProductRequest request) {
+        ProductResponse response = productService.updateSingle(id, request);
+        return response.getSuccess() ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
 
-        /**
-         * 刪除商品
-         * 
-         * @param id 商品 ID
-         * @return 操作結果
-         */
-        @DeleteMapping("/{id}")
-        public ResponseEntity<ProductResponse> deleteProduct(@PathVariable Integer id) {
-                ProductResponse response = productService.deleteSingle(id);
-                return response.getSuccess() ? ResponseEntity.ok(response)
-                                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
+    // 刪除商品
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ProductResponse> deleteProduct(@PathVariable Integer id) {
+        ProductResponse response = productService.deleteSingle(id);
+        return response.getSuccess() ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
 
-        /**
-         * 查詢單個商品
-         * 
-         * @param id 商品 ID
-         * @return 查詢結果 DTO
-         */
-        @GetMapping("/{id}")
-        public ResponseEntity<ProductResponse> getProductById(@PathVariable Integer id) {
-                ProductResponse response = productService.findSingle(id);
-                return response.getSuccess() ? ResponseEntity.ok(response)
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+    // 查詢單個商品
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Integer id) {
+        ProductResponse response = productService.findSingle(id);
+        return response.getSuccess() ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
 
-        /**
-         * 查詢所有商品
-         * 
-         * @return 商品列表
-         */
-        @GetMapping
-        public ResponseEntity<ProductResponse> getAllProducts() {
-                ProductResponse response = productService.findAll();
-                return response.getSuccess() ? ResponseEntity.ok(response)
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+    // 搜尋商品
+    @PostMapping("/search")
+    public ResponseEntity<ProductResponse> searchProducts(
+            @RequestParam(required = false) String productName,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) Integer minStock,
+            @RequestParam(required = false) Integer maxStock) {
 
-        /**
-         * 搜尋商品
-         * 
-         * @param productName 商品名稱
-         * @param minPrice    最低價格
-         * @param maxPrice    最高價格
-         * @param minStock    最低庫存
-         * @param maxStock    最高庫存
-         * @return 商品列表
-         */
-        @PostMapping("/search")
-        public ResponseEntity<ProductResponse> searchProducts(
-                        @RequestParam(required = false) String productName,
-                        @RequestParam(required = false) BigDecimal minPrice,
-                        @RequestParam(required = false) BigDecimal maxPrice,
-                        @RequestParam(required = false) Integer minStock,
-                        @RequestParam(required = false) Integer maxStock) {
+        // 動態構建 Specification 條件
+        Specification<Product> spec = Specification.where(
+                productName != null ? ProductSpecifications.hasProductName(productName) : null)
+                .and(minPrice != null && maxPrice != null
+                        ? ProductSpecifications.priceBetween(minPrice, maxPrice)
+                        : null)
+                .and(minStock != null && maxStock != null
+                        ? ProductSpecifications.stockBetween(minStock, maxStock)
+                        : null);
 
-                // 动态构建 Specification 条件
-                Specification<Product> spec = Specification.where(
-                                productName != null ? ProductSpecifications.hasProductName(productName) : null)
-                                .and(minPrice != null && maxPrice != null
-                                                ? ProductSpecifications.priceBetween(minPrice, maxPrice)
-                                                : null)
-                                .and(minStock != null && maxStock != null
-                                                ? ProductSpecifications.stockBetween(minStock, maxStock)
-                                                : null);
+        // 調用 Service 層查詢方法
+        ProductResponse response = productService.findBatch(spec);
 
-                // 调用 Service 层查询方法
-                ProductResponse response = productService.findBatch(spec);
+        return ResponseEntity.ok(response);
+    }
 
-                return ResponseEntity.ok(response);
-        }
 }

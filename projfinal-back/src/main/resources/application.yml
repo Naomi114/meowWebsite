@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: projfinal-back
@@ -17,8 +20,8 @@ spring:
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     url: jdbc:sqlserver://localhost:1433;database=meowdb;trustServerCertificate=true
-    username: admin
-    password: a123
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:a123}
 
   #Hibernate/JPA的相關設定
   jpa:
@@ -32,20 +35,21 @@ spring:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
-  #設定圖片緩存，讓前端能夠直接存取商城上傳的圖片
+  #靜態資源目錄添加到外部目錄，讓前端能夠直接存取商城上傳的圖片；
   web:
     resources:
-      static-locations: file:src/main/resources/images/
+      static-locations: file:C:/meowWebsite/images/
 
   #圖片大小限制
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
-    #商城圖片下載路徑 (動態路徑)
-    file:
-      storage:
-        upload-dir: C:/meowWebsite/images
+      max-file-size: 5MB
+      max-request-size: 20MB
+#商城圖片下載路徑 (動態路徑)
+file:
+  storage:
+    uploadDir: C:/meowWebsite/images #指向實際的存儲目錄
+    baseUrl: ${BASE_URL:http://localhost:8080/images} #對應圖片的訪問 URL
 
   #spring手動設定 HTTP 請求和回應的字符編碼
   encoding:

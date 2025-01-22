@@ -12,6 +12,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -26,9 +27,10 @@ public class Category {
     @Column(unique = true)
     private String categoryName;
 
+    @Lob
     private String categoryDescription;
 
-    @Column(nullable = false, length = 10)
+    @Column(length = 10)
     private String defaultUnit;
 
     // 雙向關係的一對多端，可反向查找
@@ -48,6 +50,10 @@ public class Category {
         this.categoryDescription = categoryDescription;
         this.defaultUnit = defaultUnit;
         this.products = products;
+    }
+
+    // 接收參數 CategoryServiceIntegrationTest
+    public Category(String categoryName, String defaultUnit) {
     }
 
     @Override

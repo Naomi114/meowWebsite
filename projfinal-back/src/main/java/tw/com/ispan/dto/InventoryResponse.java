@@ -2,14 +2,12 @@ package tw.com.ispan.dto;
 
 import java.util.List;
 
-import tw.com.ispan.domain.shop.Product;
+import tw.com.ispan.domain.shop.InventoryItem;
 
-// 輸出DTO: 返回給前端的數據，經過計算或格式化
-public class ProductResponse {
+public class InventoryResponse {
     private Boolean success;
     private String message;
-    private Product product; // 單商品數據
-    private List<Product> products; // 多商品列表
+    private List<InventoryItem> inventoryItems; // 盤點項目列表
     private Long count;
 
     public Boolean getSuccess() {
@@ -28,20 +26,12 @@ public class ProductResponse {
         this.message = message;
     }
 
-    public Product getProduct() {
-        return product;
+    public List<InventoryItem> getInventoryItems() {
+        return inventoryItems;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public void setInventoryItems(List<InventoryItem> inventoryItems) {
+        this.inventoryItems = inventoryItems;
     }
 
     public Long getCount() {
