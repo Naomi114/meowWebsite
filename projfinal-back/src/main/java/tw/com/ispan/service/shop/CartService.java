@@ -2,8 +2,18 @@ package tw.com.ispan.service.shop;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.shop.Cart;
+import tw.com.ispan.domain.shop.CartItem;
+import tw.com.ispan.domain.shop.Product;
+import tw.com.ispan.dto.CartRequest;
+import tw.com.ispan.dto.CartResponse;
+import tw.com.ispan.repository.shop.CartItemRepository;
 import tw.com.ispan.repository.shop.CartRepository;
+import tw.com.ispan.repository.shop.ProductRepository;
+import tw.com.ispan.repository.admin.MemberRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,64 +25,136 @@ public class CartService {
     @Autowired
     private CartRepository cartRepository;
 
-    // 根據 memberId 獲取購物車資料
-    public List<Cart> getCartByMemberId(Integer memberId) {
-        return cartRepository.findByMember_memberId(memberId);  // 使用 findByMember_memberId 查詢
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
+    // Get cart items by member ID
+    public List<CartItem> getCartItemsByMemberId(Integer memberId) {
+        return cartItemRepository.findByCart_Member_Id(memberId);
     }
 
-    // 添加商品到購物車並更新資料庫
-    public boolean addToCart(Cart cart) {
-        // 檢查該商品是否已經在購物車中
-        Cart existingCart = cartRepository.findByMemberAndProductId(cart.getMember(), cart.getProductId());
-        if (existingCart != null) {
-            // 如果商品已存在，則更新商品數量
-            existingCart.setQuantity(existingCart.getQuantity() + cart.getQuantity());
-            cartRepository.save(existingCart); // 更新資料庫
-        } else {
-            // 若商品不存在，則新增商品到購物車
-            cart.setLastUpdatedDate(LocalDateTime.now()); // 設置更新日期
-            cartRepository.save(cart); // 新增商品到購物車
+    // Get the cart by member ID
+    public Cart getCartByMemberId(Integer memberId) {
+        return cartRepository.findByMember_Id(memberId);
+    }
+
+    // Find a cart item by its ID
+    public CartItem findCartItemById(Integer cartItemId) {
+        return cartItemRepository.findById(cartItemId).orElse(null);
+    }
+
+    @Transactional
+    public CartResponse addCartItem(CartRequest request) {
+        Optional<Member> optionalMember = memberRepository.findById(request.getMemberId());
+        if (optionalMember.isEmpty()) {
+            return new CartResponse(false, "Member not found.");
         }
-        return true;
+        Member member = optionalMember.get();
+
+        Product product = productRepository.findById(request.getProductId()).orElse(null);
+        if (product == null) {
+            return new CartResponse(false, "Product not found.");
+        }
+
+        Cart cart = cartRepository.findByMember_Id(member.getId());
+        if (cart == null) {
+            cart = createCart(member.getId());
+        }
+
+        CartItem existingItem = cartItemRepository.findByCart_Member_IdAndProduct_ProductId(member.getId(),
+                request.getProductId());
+        if (existingItem != null) {
+            existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
+            existingItem.setLastUpdatedDate(LocalDateTime.now());
+            cartItemRepository.save(existingItem);
+            return new CartResponse(true, "Item quantity updated in cart.");
+        }
+
+        CartItem cartItem = new CartItem();
+        cartItem.setCart(cart);
+        cartItem.setProduct(product);
+        cartItem.setQuantity(request.getQuantity());
+        cartItem.setProductName(product.getProductName());
+        cartItem.setSalePrice(product.getSalePrice().doubleValue());
+        cartItem.setLastUpdatedDate(LocalDateTime.now());
+        cartItemRepository.save(cartItem);
+
+        return new CartResponse(true, "Item added to cart successfully.");
     }
 
-    // 更新購物車商品數量
-    public boolean updateQuantity(Long cartId, int quantity) {
-        // 根據 cartId 查找購物車商品
-        Optional<Cart> cartOptional = cartRepository.findById(cartId); // 使用 Optional 來處理可能為 null 的情況
-        if (cartOptional.isPresent()) {
-            Cart cart = cartOptional.get(); // 取出 Cart 物件
-            // 更新數量
-            cart.setQuantity(quantity);
-            cartRepository.save(cart); // 保存更新後的商品
+    // Update the quantity of a cart item
+    @Transactional
+    public boolean updateCartItemQuantity(Integer cartItemId, int quantity) {
+        return cartItemRepository.findById(cartItemId).map(cartItem -> {
+            cartItem.setQuantity(quantity);
+            cartItem.setLastUpdatedDate(LocalDateTime.now());
+            cartItemRepository.save(cartItem);
+            return true;
+        }).orElse(false);
+    }
+
+    // Add a new updateCartItem method to match controller expectations
+    public boolean updateCartItem(Integer cartItemId, Integer quantity) {
+        return updateCartItemQuantity(cartItemId, quantity);
+    }
+
+    // Remove a cart item
+    @Transactional
+    public boolean removeCartItem(Integer cartItemId) {
+        if (cartItemRepository.existsById(cartItemId)) {
+            cartItemRepository.deleteById(cartItemId);
             return true;
         }
-        return false;  // 如果找不到商品，返回 false
+        return false;
     }
 
-    // 從購物車中刪除商品
-    public boolean removeItem(Long cartId) {
-        // 確認是否存在該商品
-        if (cartRepository.existsById(cartId)) {
-            cartRepository.deleteById(cartId);  // 刪除商品
-            return true;
+    // Clear all cart items for a member
+    @Transactional
+    public void clearCartByMemberId(Integer memberId) {
+        List<CartItem> cartItems = cartItemRepository.findByCart_Member_Id(memberId);
+        if (!cartItems.isEmpty()) {
+            cartItemRepository.deleteAll(cartItems);
         }
-        return false;  // 如果商品不存在，返回 false
     }
 
-    // 結帳並刪除已勾選的商品
-    public void checkout(List<Long> cartIds) {
-        // 根據 cartIds 刪除已勾選的商品
-        cartRepository.deleteByCartIdIn(cartIds);  // 刪除指定 cartIds 的商品
+    // Update the cart with a CartRequest
+    @Transactional
+    public CartResponse updateCart(CartRequest request) {
+        return memberRepository.findById(request.getMemberId()).map(member -> {
+            CartItem cartItem = cartItemRepository.findByCart_Member_IdAndProduct_ProductId(member.getId(),
+                    request.getProductId());
+            if (cartItem == null) {
+                return new CartResponse(false, "Item not found in cart.");
+            }
+            cartItem.setQuantity(request.getQuantity());
+            cartItem.setLastUpdatedDate(LocalDateTime.now());
+            cartItemRepository.save(cartItem);
+            return new CartResponse(true, "Cart updated successfully.");
+        }).orElse(new CartResponse(false, "Member not found."));
     }
 
-    // 根據 cartId 查找購物車商品 (新增此方法)
-    public Cart findById(Long cartId) {
-        return cartRepository.findById(cartId).orElse(null);  // 根據 cartId 查找購物車商品
+    // Checkout and remove items from the cart
+    @Transactional
+    public void checkout(List<Integer> cartItemIds) {
+        if (!CollectionUtils.isEmpty(cartItemIds)) {
+            cartItemRepository.deleteAllByCartItemIdIn(cartItemIds);
+        }
     }
 
-    // 更新購物車資料 (新增此方法)
-    public void updateCart(Cart cart) {
-        cartRepository.save(cart);  // 更新購物車資料
+    // Create a cart for a member
+    @Transactional
+    public Cart createCart(Integer memberId) {
+        return memberRepository.findById(memberId).map(member -> {
+            Cart cart = new Cart();
+            cart.setMember(member);
+            cart.setLastUpdatedDate(LocalDateTime.now());
+            return cartRepository.save(cart);
+        }).orElse(null);
     }
 }

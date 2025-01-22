@@ -6,18 +6,36 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class SpringBootConfig implements WebMvcConfigurer {
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/products/**")
-                .allowedOrigins("http://localhost:5173") // 限制只允許前端頁面訪問
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+        @Override
+        public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/cart/**")
+                                .allowedOrigins("http://localhost:5173") // Allow frontend at localhost:5173
+                                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                                .allowedHeaders("*")
+                                .allowCredentials(true);
 
-                registry.addMapping("/pages/cart/**") // 確保這裡是正確的路徑
-                .allowedOrigins("http://localhost:5173") // 限制只允許前端頁面訪問
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedHeaders("*")
-                .allowCredentials(true);
-    }
+                registry.addMapping("/products/**")
+                                .allowedOrigins("http://localhost:5173") // Allow frontend at localhost:5173
+                                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                                .allowedHeaders("*")
+                                .allowCredentials(true);
+
+                registry.addMapping("/products/**")
+                                .allowedOrigins("http://localhost:5173") // Allow frontend at localhost:5173
+                                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                                .allowedHeaders("*")
+                                .allowCredentials(true);
+
+                registry.addMapping("/pages/cart/**")
+                                .allowedOrigins("http://localhost:5173")
+                                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                                .allowedHeaders("*")
+                                .allowCredentials(true);
+
+                registry.addMapping("/pages/ecpay/send/**")
+                                .allowedOrigins("http://localhost:5173") // Allow frontend at localhost:5173
+                                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                                .allowedHeaders("*")
+                                .allowCredentials(true);
+        }
 }
