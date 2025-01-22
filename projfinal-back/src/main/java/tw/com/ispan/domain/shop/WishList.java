@@ -45,7 +45,8 @@ public class WishList {
 
     @Override
     public String toString() {
-        return "WishListBean [wishlistId=" + wishlistId + ", member=" + member + ", product=" + product + ", addedAt="
+        return "WishListBean [wishlistId=" + wishlistId + ", member=" + member + ", product=" + product
+                + ", addedAt="
                 + addedAt + "]";
     }
 
@@ -55,14 +56,6 @@ public class WishList {
 
     public void setWishlistId(Integer wishlistId) {
         this.wishlistId = wishlistId;
-    }
-
-    public Member getMember() {
-        return member;
-    }
-
-    public void setMember(Member member) {
-        this.member = member;
     }
 
     public Product getProduct() {
@@ -79,6 +72,14 @@ public class WishList {
 
     public void setAddedAt(LocalDateTime addedAt) {
         this.addedAt = addedAt;
+    }
+
+    public Member getMember() {
+        return member;
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
     }
 
 }

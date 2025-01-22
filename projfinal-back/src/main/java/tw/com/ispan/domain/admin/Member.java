@@ -1,19 +1,17 @@
 package tw.com.ispan.domain.admin;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
+// import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-// import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-// import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 // import tw.com.ispan.domain.pet.Activity;
 // import tw.com.ispan.domain.pet.ActivityParticipantList;
@@ -22,8 +20,11 @@ import jakarta.persistence.Table;
 // import tw.com.ispan.domain.pet.LostCase;
 // import tw.com.ispan.domain.pet.ReportCase;
 // import tw.com.ispan.domain.pet.RescueCase;
-import tw.com.ispan.domain.shop.Cart;
-import tw.com.ispan.domain.shop.Orders;
+// import tw.com.ispan.domain.pet.forAdopt.AdoptionCaseApply;
+// import tw.com.ispan.domain.shop.Cart;
+// import tw.com.ispan.domain.shop.Order;
+// import tw.com.ispan.domain.shop.WishListBean;
+// import tw.com.ispan.domain.shop.Cart;
 import tw.com.ispan.domain.shop.WishList;
 
 @Entity
@@ -39,6 +40,10 @@ public class Member {
 	@Column(length = 20, nullable = false)
 	private String password;
 
+	public Member() {
+		// 這是默認構造函數，Hibernate 需要
+	}
+
 	@Column(length = 70, nullable = false)
 	private String name;
 
@@ -52,7 +57,7 @@ public class Member {
 	private String address;
 
 	@Column(nullable = false)
-	private Date birthday;
+	private LocalDate birthday;
 
 	@Column(nullable = false)
 	private LocalDateTime createDate;
@@ -68,40 +73,77 @@ public class Member {
 	// CascadeType.REMOVE })
 	// private Set<ActivityParticipantList> acitvityParticipantList;
 
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private List<WishList> wishList;
 
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-	private Set<Cart> cart;
+	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
+	// CascadeType.REMOVE })
+	// private Set<Cart> cart;
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-
-	private List<Orders> order;
+	// @OneToMany(mappedBy= "member", cascade = CascadeType.ALL, orphanRemoval =
+	// true)
+	// private List<Orders> order;
 
 	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
 	// CascadeType.REMOVE })
 	// private List<RescueCase> rescueCases;
+	//
 
-	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
+	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST
 	// CascadeType.REMOVE }, orphanRemoval = true)
-	// private Set<Follow> follow;
+	// rivate Set<Follow> follow = new HashSet<>();
+
+	//
+	//
+
+	// private List<AdoptionCase> adoptionCase = new ArrayList<>();
 
 	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	// private List<LostCase> lostCase;
+	// private List<ReportCase> reportCase = new ArrayList<>();
 
-	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval =
-	// true)
-	// private List<Order> order;
-
+	// // 雙向一對多，最後meeting加的
 	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	// private List<ReportCase> reportCase;
+	// private Set<AdoptionCaseApply> adoptionCaseApply = new HashSet<>();
+
+	// public Member(Integer memberId, String nickName, String password, String
+	// name, String email, String phone,
+	// String address, LocalDate birthday, LocalDateTime createDate, LocalDat
+	//
+	// me updateDate,
+	// Set<Activity> activity,
+	//
+	//
+	// // List<WishListBean> wishList, Set<Cart> cart,List<Order> order,
+	//
+	// List<AdoptionCase> adoptionCase, List<ReportCase> reportCase,
+	// Set<AdoptionCaseApply> adoptionCaseApply) {
+	//
+	//
+	// this.nickName = nickName;
+	// this.password = password;
+	//
+	//
+	// his.email = email;
+	// this.phone = phone;
+	// his.address = address;
+	// this.birthday = birthday;
+	// this.createDate = createDate;
+	// his.updateDate = updateDate;
+	// this.activity = activity;
+	// this.acitvityParticipantList = acitvityParticipantList;
+	// // this.wishList = wishList;
+	// // this.cart = cart;
+	// // this.order = order;
+	// this.rescueCases = rescueCases;
+	// his.follow = follow;
+	// this.lostCase = lostCase;
+	// this.adoptionCase = adoptionCase;
+	// this.reportCase = reportCase;
+	// this.adoptionCaseApply = adoptionCaseApply;
+	//
 
 	public Integer getMemberId() {
 		return memberId;
-	}
-
-	public void setMemberId(Integer memberId) {
-		this.memberId = memberId;
 	}
 
 	public String getNickName() {
@@ -152,11 +194,11 @@ public class Member {
 		this.address = address;
 	}
 
-	public Date getBirthday() {
+	public LocalDate getBirthday() {
 		return birthday;
 	}
 
-	public void setBirthday(Date birthday) {
+	public void setBirthday(LocalDate birthday) {
 		this.birthday = birthday;
 	}
 
@@ -175,13 +217,13 @@ public class Member {
 	public void setUpdateDate(LocalDateTime updateDate) {
 		this.updateDate = updateDate;
 	}
-
-	// public String getStatus() {
-	// return status;
-	// }
-
-	// public void setStatus(String status) {
-	// this.status = status;
-	// }
-
 }
+// + ", a
+// // ", wishList=" + wish
+// ", adoptionCase=" + adoptionCase + ", reportCase=" + reportCase + ",
+// + adoptionCaseApply + ", getClass()=" + getClass() + ", hashCode()=" + has
+// + getMember
+//
+// + ", getAddress()=" + getAddress() + ", getBirthday()=" + getBirthda
+// + getCreateDa
+//

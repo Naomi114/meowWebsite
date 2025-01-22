@@ -28,6 +28,8 @@ public class ProductRequest {
     @NotBlank(message = "商品類別不能為空")
     private String categoryName;
 
+    private String categoryDescription;
+
     // 前端為多選；可為0~N個標籤
     /*
      * Q. 如果前端做成選單，還需要判斷空值嗎?
@@ -35,6 +37,8 @@ public class ProductRequest {
      * curl)，同時為了避免惡意腳本攻擊，所以後端也要做判斷。
      */
     private Set<ProductTagRequest> tags;
+
+    private String tagDescription;
 
     // 前端為填入框；不能為空值
     @Positive(message = "價格必須為正數")
@@ -158,6 +162,22 @@ public class ProductRequest {
 
     public void setProductImages(List<ProductImageRequest> productImages) {
         this.productImages = productImages;
+    }
+
+    public String getCategoryDescription() {
+        return categoryDescription;
+    }
+
+    public void setCategoryDescription(String categoryDescription) {
+        this.categoryDescription = categoryDescription;
+    }
+
+    public String getTagDescription() {
+        return tagDescription;
+    }
+
+    public void setTagDescription(String tagDescription) {
+        this.tagDescription = tagDescription;
     }
 
 }
