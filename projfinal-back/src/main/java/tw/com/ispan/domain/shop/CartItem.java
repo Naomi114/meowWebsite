@@ -2,18 +2,20 @@ package tw.com.ispan.domain.shop;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "CartItem")
+@Table(name = "cartitem")
 public class CartItem implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cartItemId")
     private Integer cartItemId;
 
     @ManyToOne
-    @JoinColumn(name = "cartID", nullable = false)
+    @JoinColumn(name = "cartId", nullable = false)
     private Cart cart;
 
     @OneToOne
@@ -99,5 +101,30 @@ public class CartItem implements Serializable {
 
     public void setCartItemQuantity(Integer cartItemQuantity) {
         this.cartItemQuantity = cartItemQuantity;
+    }
+
+    // Additional Methods for Handling Product Fields
+    public Integer getQuantity() {
+        return this.cartItemQuantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.cartItemQuantity = quantity;
+    }
+
+    public void setProductName(String productName) {
+        if (this.product != null) {
+            this.product.setProductName(productName);
+        }
+    }
+
+    public void setSalePrice(Double salePrice) {
+        if (this.product != null) {
+            this.product.setSalePrice(BigDecimal.valueOf(salePrice));
+        }
+    }
+
+    public void setLastUpdatedDate(LocalDateTime lastUpdatedDate) {
+        this.updateDate = lastUpdatedDate;
     }
 }

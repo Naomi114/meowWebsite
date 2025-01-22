@@ -1,22 +1,12 @@
 package tw.com.ispan.controller;
 
 import java.math.BigDecimal;
-
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.dto.ProductRequest;
@@ -100,7 +90,11 @@ public class ProductController {
         /**
          * 搜尋商品
          * 
-         * @param query 搜尋條件 JSON
+         * @param productName 商品名稱
+         * @param minPrice    最低價格
+         * @param maxPrice    最高價格
+         * @param minStock    最低庫存
+         * @param maxStock    最高庫存
          * @return 商品列表
          */
         @PostMapping("/search")
@@ -111,7 +105,7 @@ public class ProductController {
                         @RequestParam(required = false) Integer minStock,
                         @RequestParam(required = false) Integer maxStock) {
 
-                // 動態構建 Specification 條件
+                // 动态构建 Specification 条件
                 Specification<Product> spec = Specification.where(
                                 productName != null ? ProductSpecifications.hasProductName(productName) : null)
                                 .and(minPrice != null && maxPrice != null
@@ -121,7 +115,7 @@ public class ProductController {
                                                 ? ProductSpecifications.stockBetween(minStock, maxStock)
                                                 : null);
 
-                // 調用 Service 層查詢方法
+                // 调用 Service 层查询方法
                 ProductResponse response = productService.findBatch(spec);
 
                 return ResponseEntity.ok(response);

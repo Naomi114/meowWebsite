@@ -5,45 +5,33 @@ import tw.com.ispan.domain.admin.Member;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(name = "cart") // Database table name (lowercase to maintain consistency with standard naming
-                      // conventions)
+@Table(name = "cart")
+@JsonIgnoreProperties({ "cart", "member" })
 public class Cart implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cartId") // Explicitly specify column name in database
-    private Long cartId; // Primary key, Long type
+    @Column(name = "cartId")
+    private Integer cartId; // This is the primary key field
 
-    @ManyToOne // One member can have multiple cart items
-    @JoinColumn(name = "memberId", nullable = false) // Foreign key linking to the Member entity
-    private Member member;
+    @OneToOne // One member can only have one cart
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member; // The member related to this cart
 
-    @Column(name = "lastUpdatedDate", nullable = false) // Date when the cart was last updated
-    private LocalDateTime lastUpdatedDate;
-
-    @Column(name = "productId", nullable = false) // Product ID
-    private Integer productId;
-
-    @Column(name = "productName", nullable = false) // Product name
-    private String productName;
-
-    @Column(name = "salePrice", nullable = false) // Sale price of the product
-    private Double salePrice;
-
-    @Column(name = "quantity", nullable = false) // Quantity of the product in the cart
-    private Integer quantity;
-
-    @Transient // Indicates that this field should not be stored in the database
-    private Boolean selected; // Whether the item is selected (for front-end display)
+    @Column(name = "lastUpdatedDate", nullable = false)
+    private LocalDateTime lastUpdatedDate; // Timestamp of the last update
 
     // Getters and Setters
-    public Long getCartId() {
+    public Integer getCartId() {
         return cartId;
     }
 
-    public void setCartId(Long cartId) {
+    public void setCartId(Integer cartId) {
         this.cartId = cartId;
     }
 
@@ -61,45 +49,5 @@ public class Cart implements Serializable {
 
     public void setLastUpdatedDate(LocalDateTime lastUpdatedDate) {
         this.lastUpdatedDate = lastUpdatedDate;
-    }
-
-    public Integer getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Integer productId) {
-        this.productId = productId;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public Double getSalePrice() {
-        return salePrice;
-    }
-
-    public void setSalePrice(Double salePrice) {
-        this.salePrice = salePrice;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Boolean getSelected() {
-        return selected;
-    }
-
-    public void setSelected(Boolean selected) {
-        this.selected = selected;
     }
 }
