@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,6 +32,8 @@ import tw.com.ispan.domain.pet.RescueCase;
 
 @Entity
 @Table(name = "Member")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "memberId" // 使用 memberId 作為唯一標識符
+)
 public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

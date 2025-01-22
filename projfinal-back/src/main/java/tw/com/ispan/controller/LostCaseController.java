@@ -2,10 +2,11 @@ package tw.com.ispan.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,124 +26,70 @@ public class LostCaseController {
     @Autowired
     private LostCaseService lostCaseService;
 
-    @PostMapping
-    public LostCaseResponse create(@RequestBody String json) {
-        LostCaseResponse responseBean = new LostCaseResponse();
+    /**
+     * 更新 LostCase 的資訊
+     * 
+     * @param lostCaseId 走失案件的 ID
+     * @param json       請求體，包含要更新的欄位
+     * @return 更新後的 LostCase
+     */
+    @PutMapping("/{Id}")
+    public ResponseEntity<LostCase> updateLostCase(
+            @PathVariable Integer lostCaseId,
+            @RequestBody String json) {
 
-        JSONObject obj = new JSONObject(json);
-        Integer id = obj.isNull("memberId") ? null : obj.getInt("memberId");
+        JSONObject param = new JSONObject(json);
+        LostCase updatedLostCase = lostCaseService.modify(lostCaseId, param);
 
-        if (id == null) {
-            responseBean.setSuccess(false);
-            responseBean.setMessage("id是必要欄位");
-        } else if (lostCaseService.exists(id)) {
-            responseBean.setSuccess(false);
-            responseBean.setMessage("id已存在");
-        } else {
-            LostCase insert = lostCaseService.create(json);
-            if (insert == null) {
-                responseBean.setSuccess(false);
-                responseBean.setMessage("新增失敗");
-            } else {
-                responseBean.setSuccess(true);
-                responseBean.setMessage("新增成功");
-            }
-        }
-        return responseBean;
+        return ResponseEntity.ok(updatedLostCase);
     }
 
-    @PutMapping("/{id}")
-    public String modify(@PathVariable Integer id, @RequestBody String entity) {
-        JSONObject responseJson = new JSONObject();
-        if (id == null) {
-            responseJson.put("success", false);
-            responseJson.put("message", "Id是必要欄位");
-        } else if (!lostCaseService.exists(id)) {
-            responseJson.put("success", false);
-            responseJson.put("message", "Id不存在");
-        } else {
-            LostCase update = lostCaseService.modify(entity);
-            if (update == null) {
-                responseJson.put("success", false);
-                responseJson.put("message", "修改失敗");
-            } else {
-                responseJson.put("success", true);
-                responseJson.put("message", "修改成功");
-            }
-        }
-        return responseJson.toString();
+    /**
+     * 根據 ID 刪除 LostCase，並刪除對應的 Banner
+     * 
+     * @param lostCaseId 走失案件的 ID
+     * @return 成功刪除返回 204 No Content
+     */
+    @DeleteMapping("/{Id}")
+    public ResponseEntity<Void> deleteLostCase(@PathVariable Integer lostCaseId) {
+        lostCaseService.delete(lostCaseId);
+        return ResponseEntity.noContent().build(); // 204 No Content
     }
 
-    @DeleteMapping("/{pk}")
-    public String remove(@PathVariable("pk") Integer id) {
-        JSONObject responseJson = new JSONObject();
-
-        if (id == null) {
-            responseJson.put("success", false);
-            responseJson.put("message", "id是必要欄位");
-            return responseJson.toString();
-        } else if (!lostCaseService.exists(id)) {
-            responseJson.put("success", false);
-            responseJson.put("message", "id不存在");
-            return responseJson.toString();
-        }
-
-        boolean delete = lostCaseService.remove(id);
-        if (!delete) {
-            responseJson.put("success", false);
-            responseJson.put("message", "刪除失敗");
-        } else {
-            responseJson.put("success", true);
-            responseJson.put("message", "刪除成功");
-        }
-
-        return responseJson.toString();
+    /**
+     * 根據 ID 查詢 LostCase
+     * 
+     * @param lostCaseId 走失案件的 ID
+     * @return LostCase 的資料
+     */
+    @GetMapping("/{Id}")
+    public ResponseEntity<LostCase> getLostCaseById(@PathVariable Integer lostCaseId) {
+        Optional<LostCase> lostCase = lostCaseService.findById(lostCaseId);
+        return lostCase.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/{id}")
-    public String findByPrimaryKey(@PathVariable(name = "id") Integer id) {
-        JSONObject responseJson = new JSONObject();
-        JSONArray array = new JSONArray();
+    /**
+     * 創建 LostCase 並自動創建對應的 Banner
+     *
+     * @param json 請求體，包含 LostCase 的資訊
+     * @return 創建的 LostCase
+     */
+    @PostMapping("/create")
+    public ResponseEntity<LostCase> createLostCase(@RequestBody String json) {
+        JSONObject param = new JSONObject(json);
+        LostCase createdLostCase = lostCaseService.create(param);
+        return ResponseEntity.ok(createdLostCase);
+    }
 
-        if (id != null) {
-            LostCase lostCase = lostCaseService.findById(id); // 调用 service 层方法查询 LostCase
-            if (lostCase != null) {
-                JSONObject item = new JSONObject()
-                        .put("lostCaseId", lostCase.getLostCaseId())
-                        .put("caseTitle", lostCase.getCaseTitle())
-                        .put("species", lostCase.getSpecies() != null ? lostCase.getSpecies().getSpecies() : null)
-                        .put("breed", lostCase.getBreed() != null ? lostCase.getBreed().getBreedId() : null)
-                        .put("furColor", lostCase.getFurColor() != null ? lostCase.getFurColor().getFurColorId() : null)
-                        .put("gender", lostCase.getGender())
-                        .put("age", lostCase.getAge())
-                        .put("microChipNumber", lostCase.getMicroChipNumber())
-                        .put("suspLost", lostCase.isSuspLost())
-                        .put("city", lostCase.getCity() != null ? lostCase.getCity().getCityId() : null)
-                        .put("distinctArea",
-                                lostCase.getDistinctArea() != null ? lostCase.getDistinctArea().getDistinctAreaId()
-                                        : null)
-                        .put("street", lostCase.getStreet())
-                        .put("latitude", lostCase.getLatitude())
-                        .put("longitude", lostCase.getLongitude())
-                        .put("donationAmount", lostCase.getDonationAmount())
-                        .put("viewCount", lostCase.getViewCount())
-                        .put("follow", lostCase.getFollow())
-                        .put("publicationTime",
-                                lostCase.getPublicationTime() != null ? lostCase.getPublicationTime().toString() : null)
-                        .put("lastUpdateTime",
-                                lostCase.getLastUpdateTime() != null ? lostCase.getLastUpdateTime().toString() : null)
-                        .put("lostExperience", lostCase.getLostExperience())
-                        .put("contactInformation", lostCase.getContactInformation())
-                        .put("featureDescription", lostCase.getFeatureDescription())
-                        .put("caseState",
-                                lostCase.getCaseState() != null ? lostCase.getCaseState().getCaseStateId() : null)
-                        .put("caseUrl", lostCase.getCaseUrl());
-                array.put(item); // 将数据添加到 JSON 数组中
-            }
-        }
-
-        responseJson.put("list", array); // 将 JSON 数组封装到 JSON 对象中
-        return responseJson.toString(); // 返回 JSON 字符串
+    /**
+     * 查詢所有 LostCase，支援模糊查詢
+     */
+    @PostMapping("/search")
+    public ResponseEntity<List<LostCase>> searchLostCases(@RequestBody String json) {
+        JSONObject param = new JSONObject(json);
+        List<LostCase> cases = lostCaseService.searchLostCases(param);
+        return ResponseEntity.ok(cases);
     }
 
     @PostMapping("/find")
@@ -152,9 +99,9 @@ public class LostCaseController {
         long count = lostCaseService.count(json);
         responseBean.setCount(count);
 
-        List<LostCase> products = lostCaseService.find(json);
-        if (products != null && !products.isEmpty()) {
-            responseBean.setList(products);
+        List<LostCase> lostCases = lostCaseService.find(json);
+        if (lostCases != null && !lostCases.isEmpty()) {
+            responseBean.setList(lostCases);
         } else {
             responseBean.setList(new ArrayList<>());
         }

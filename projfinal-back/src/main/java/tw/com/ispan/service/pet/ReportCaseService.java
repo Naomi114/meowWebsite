@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import tw.com.ispan.domain.admin.Admin;
+import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.ReportCase;
 import tw.com.ispan.repository.admin.AdminRepository;
+import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.ReportCaseRepository;
 import tw.com.ispan.repository.pet.RescueCaseRepository;
@@ -29,6 +31,8 @@ public class ReportCaseService {
     // private AdoptionCaseRepository adoptionCaseRepository;
     @Autowired
     private AdminRepository adminRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
     public ReportCase review(Integer reportCaseId, Integer adminId, boolean isApproved, boolean hideCase) {
         // 確認舉報案件是否存在
@@ -132,6 +136,7 @@ public class ReportCaseService {
             JSONObject obj = new JSONObject(json);
 
             // 獲取報告參數
+            Integer memberId = obj.optInt("memberId", 0);
             Integer rescueCaseId = obj.optInt("rescueCaseId", -1);
             Integer lostCaseId = obj.optInt("lostCaseId", -1);
             Integer adoptionCaseId = obj.optInt("adoptionCaseId", -1);
@@ -139,6 +144,10 @@ public class ReportCaseService {
             String reportNotes = obj.optString("reportNotes");
 
             // 驗證必填字段
+            if (memberId == 0) {
+                throw new IllegalArgumentException("必須指定舉報者 ID！");
+            }
+
             if ((rescueCaseId == -1 && lostCaseId == -1 && adoptionCaseId == -1) || reportTitle == null
                     || reportNotes == null) {
                 throw new IllegalArgumentException("必須指定一種類型的案件進行舉報，且標題和內容為必填項！");
@@ -148,6 +157,10 @@ public class ReportCaseService {
             if ((rescueCaseId != -1 ? 1 : 0) + (lostCaseId != -1 ? 1 : 0) + (adoptionCaseId != -1 ? 1 : 0) > 1) {
                 throw new IllegalArgumentException("只能舉報一種類型的案件！");
             }
+
+            // 確認 memberId 是否存在
+            Member member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new IllegalArgumentException("舉報者不存在！"));
 
             // 檢查唯一性
             if (reportCaseRepository
@@ -160,7 +173,12 @@ public class ReportCaseService {
             ReportCase reportCase = new ReportCase();
             reportCase.setRescueCase(
                     rescueCaseId != -1 ? rescueCaseRepository.findById(rescueCaseId).orElse(null) : null);
-            reportCase.setLostCase(lostCaseId != -1 ? lostCaseRepository.findById(lostCaseId).orElse(null) : null);
+            reportCase.setLostCase(
+                    lostCaseId != -1 ? lostCaseRepository.findById(lostCaseId).orElse(null) : null);
+            // reportCase.setAdoptionCase(
+            // adoptionCaseId != -1 ?
+            // adoptionCaseRepository.findById(adoptionCaseId).orElse(null) : null);
+            reportCase.setMember(member); // 設置舉報者
             reportCase.setReportDate(LocalDateTime.now());
             reportCase.setReportTitle(reportTitle);
             reportCase.setReportNotes(reportNotes);

@@ -2,7 +2,8 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,6 +16,10 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "DistinctArea")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "distinctAreaId" // 使用
+																										// distinctAreaId
+																										// 作為唯一標識符
+)
 public class DistinctArea {
 
 	@Id
@@ -29,7 +34,6 @@ public class DistinctArea {
 	private List<RescueCase> rescueCases;
 
 	// 和LostCase表雙向一對多
-	@JsonManagedReference
 	@OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
 	private List<LostCase> lostCases;
 

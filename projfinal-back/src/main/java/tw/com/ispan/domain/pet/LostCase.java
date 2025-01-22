@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -20,14 +21,17 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
-import tw.com.ispan.domain.pet.banner.LostBanner;
+import tw.com.ispan.domain.pet.Banner.Banner;
 
 @Entity
 @Table(name = "LostCase")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "lostCaseId" // 使用 lostCaseId
+                                                                                                  // 作為唯一標識符
+)
 public class LostCase {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 自增流水號
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "lostCaseId")
     private Integer lostCaseId;
 
@@ -37,25 +41,21 @@ public class LostCase {
     // 關聯到 Member 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     @JoinColumn(name = "memberId", nullable = true, foreignKey = @ForeignKey(name = "FK_LostCase_Member"))
-    @JsonBackReference
     private Member member;
 
     // 關聯到 Species 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Species"))
-    @JsonBackReference
     private Species species;
 
     // 關聯到 Breed 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "breedId", foreignKey = @ForeignKey(name = "FK_LostCase_Breed"))
-    @JsonBackReference
     private Breed breed;
 
     // 關聯到 FurColor 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "furColorId", foreignKey = @ForeignKey(name = "FK_LostCase_FurColor"))
-    @JsonBackReference
     private FurColor furColor;
 
     @Column(columnDefinition = "NVARCHAR(5)", name = "name")
@@ -79,13 +79,11 @@ public class LostCase {
     // 關聯到 City 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_City"))
-    @JsonBackReference
     private City city;
 
     // 關聯到 DistinctArea 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_distinctArea"))
-    @JsonBackReference
     private DistinctArea distinctArea;
 
     @Column(columnDefinition = "NVARCHAR(10)", name = "street", nullable = false)
@@ -141,9 +139,8 @@ public class LostCase {
     @Column(name = "caseUrl", length = 255)
     private String caseUrl;
 
-    // 與 LostBanner 的一對一關聯
     @OneToOne(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
-    private LostBanner lostBanner;
+    private Banner banner;
 
     @Column(name = "isHidden", nullable = false)
     private Boolean isHidden = false; // 默認為不隱藏
@@ -163,7 +160,7 @@ public class LostCase {
             City city, DistinctArea distinctArea, String street, BigDecimal latitude, BigDecimal longitude,
             Integer donationAmount, Integer viewCount, List<Follow> follows, LocalDateTime publicationTime,
             LocalDateTime lastUpdateTime, String lostExperience, String contactInformation, String featureDescription,
-            List<CasePicture> casePictures, CaseState caseState, String caseUrl, LostBanner lostBanner,
+            List<CasePicture> casePictures, CaseState caseState, String caseUrl, Banner banner,
             Boolean isHidden) {
         this.lostCaseId = lostCaseId;
         this.caseTitle = caseTitle;
@@ -194,7 +191,7 @@ public class LostCase {
         this.reportCases = reportCases;
         this.caseState = caseState;
         this.caseUrl = caseUrl;
-        this.lostBanner = lostBanner;
+        this.banner = banner;
         this.isHidden = isHidden;
     }
 
@@ -431,21 +428,20 @@ public class LostCase {
         this.caseUrl = caseUrl;
     }
 
-    public LostBanner getLostBanner() {
-        return lostBanner;
-    }
-
-    public void setLostBanner(LostBanner lostBanner) {
-        this.lostBanner = lostBanner;
-        lostBanner.setLostCase(this); // 雙向關聯
-    }
-
     public Boolean getIsHidden() {
         return isHidden;
     }
 
     public void setIsHidden(Boolean isHidden) {
         this.isHidden = isHidden;
+    }
+
+    public Banner getBanner() {
+        return banner;
+    }
+
+    public void setBanners(Banner banner) {
+        this.banner = banner;
     }
 
     @Override
@@ -479,7 +475,7 @@ public class LostCase {
                 ", reportCases=" + reportCases +
                 ", caseState=" + caseState +
                 ", caseUrl=" + caseUrl +
-                ", lostBanner=" + lostBanner +
+                ", banner=" + banner +
                 ", isHidden=" + isHidden +
                 "]";
     }

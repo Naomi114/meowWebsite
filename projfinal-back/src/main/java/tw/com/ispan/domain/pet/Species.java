@@ -2,7 +2,8 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,6 +16,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Species")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "speciesId" // 使用 speciesId 作為唯一標識符
+)
 public class Species {
 
     @Id
@@ -25,7 +28,6 @@ public class Species {
     @Column(name = "species", nullable = false, length = 10)
     private String species;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
     private List<LostCase> lostCases;
 
