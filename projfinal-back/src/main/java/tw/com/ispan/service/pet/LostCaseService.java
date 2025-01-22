@@ -7,7 +7,10 @@ import java.util.Optional;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,11 +63,21 @@ public class LostCaseService {
     private BannerRepository bannerRepository;
 
     /**
-     * 查詢所有 LostCase，支援模糊查詢
+     * 查詢所有 LostCase，支援模糊查詢、分頁與排序
      */
     @Transactional(readOnly = true)
-    public List<LostCase> searchLostCases(JSONObject param) {
-        return lostCaseRepository.findAll((Specification<LostCase>) (root, query, criteriaBuilder) -> {
+    public Page<LostCase> searchLostCases(JSONObject param) {
+        int start = param.optInt("start", 0); // 預設從第 0 筆開始
+        int rows = param.optInt("rows", 10); // 預設每頁 10 筆
+        String sortField = param.optString("sort", "lostCaseId"); // 預設排序欄位
+        boolean sortDirection = param.optBoolean("dir", false); // false = 升序，true = 降序
+
+        // 設定分頁與排序
+        Sort sort = sortDirection ? Sort.by(sortField).descending() : Sort.by(sortField).ascending();
+        Pageable pageable = PageRequest.of(start / rows, rows, sort);
+
+        // 使用 Specification 進行條件查詢
+        return lostCaseRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             // 模糊查詢 caseTitle
@@ -110,7 +123,7 @@ public class LostCaseService {
             predicates.add(criteriaBuilder.equal(root.get("isHidden"), false));
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        });
+        }, pageable);
     }
 
     /**
@@ -151,7 +164,7 @@ public class LostCaseService {
         // 先存儲 LostCase
         LostCase savedLostCase = lostCaseRepository.save(lostCase);
 
-        // 🔴 檢查這段是否存在：確保 LostCase 建立後自動產生 Banner
+        // 檢查這段是否存在：確保 LostCase 建立後自動產生 Banner
         Banner banner = new Banner();
         banner.setLostCase(savedLostCase);
         banner.setBannerType(BannerType.LOST);
@@ -209,25 +222,5 @@ public class LostCaseService {
         lostCase.setLastUpdateTime(LocalDateTime.now());
 
         return lostCaseRepository.save(lostCase);
-    }
-
-    public long count(String json) {
-        try {
-            JSONObject obj = new JSONObject(json);
-            return lostCaseRepository.count(obj);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public List<LostCase> find(String json) {
-        try {
-            JSONObject obj = new JSONObject(json);
-            return lostCaseRepository.find(obj);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }

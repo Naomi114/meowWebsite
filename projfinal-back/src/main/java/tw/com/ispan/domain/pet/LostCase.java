@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -39,8 +40,9 @@ public class LostCase {
     private String caseTitle;
 
     // 關聯到 Member 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "memberId", nullable = true, foreignKey = @ForeignKey(name = "FK_LostCase_Member"))
+    @JsonBackReference
     private Member member;
 
     // 關聯到 Species 表，雙向多對一

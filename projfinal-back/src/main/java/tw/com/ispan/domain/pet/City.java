@@ -2,6 +2,7 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -31,6 +32,7 @@ public class City {
 	// 和DistinctArea表單向一對多
 	@OneToMany(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "city_id")
+	@JsonBackReference
 	private List<DistinctArea> distinctAreas;
 
 	// 和RescueCase表雙向一對多
