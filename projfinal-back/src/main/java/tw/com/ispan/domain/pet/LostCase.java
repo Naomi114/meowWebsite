@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,12 +12,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import tw.com.ispan.domain.pet.banner.LostBanner;
+import tw.com.ispan.domain.admin.Member;
+import tw.com.ispan.domain.pet.forRescue.CanAfford;
+import tw.com.ispan.domain.pet.forRescue.RescueDemand;
 
 @Entity
 @Table(name = "LostCase")
@@ -33,33 +34,26 @@ public class LostCase {
     @Column(columnDefinition = "NVARCHAR(30)", name = "caseTitle", nullable = false)
     private String caseTitle;
 
-    // 關聯到 Member 表，雙向多對一
-    // @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    // @JoinColumn(name = "memberId", nullable = false, foreignKey =
-    // @ForeignKey(name = "FK_LostCase_Member"))
-    // @JsonManagedReference
-    // private Member member;
+    // 關聯到member表，雙向多對一
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Member"))
+    private Member member;
 
-    // 關聯到 Species 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST })
-    @JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Species"))
-    @JsonBackReference
-    private Species species;
+    //必填
+  	// 關聯到species表，雙向多對一
+  	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+  	@JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Species"))
+  	private Species species;
 
-    // 關聯到 Breed 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST })
-    @JoinColumn(name = "breedId", foreignKey = @ForeignKey(name = "FK_LostCase_Breed"))
-    @JsonBackReference
-    private Breed breed;
+ // 關聯到breed表，雙向多對一
+ 	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+ 	@JoinColumn(name = "breedId", foreignKey = @ForeignKey(name = "FK_LostCase_Breed"))
+ 	private Breed breed;
 
-    // 關聯到 FurColor 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST })
-    @JoinColumn(name = "furColorId", foreignKey = @ForeignKey(name = "FK_LostCase_FurColor"))
-    @JsonBackReference
-    private FurColor furColor;
-
-    @Column(columnDefinition = "NVARCHAR(5)", name = "name")
-    private String name;
+ // 關聯到furColor表，雙向多對一
+ 	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+ 	@JoinColumn(name = "furColorId", foreignKey = @ForeignKey(name = "FK_LostCase_FurColor"))
+ 	private FurColor furColor;
 
     @Column(columnDefinition = "NVARCHAR(5)", name = "gender")
     private String gender;
@@ -76,26 +70,26 @@ public class LostCase {
     @Column(name = "suspLost")
     private boolean suspLost;
 
-    // 關聯到 City 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST })
+    // 關聯到city表，雙向多對一
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     @JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_City"))
-    @JsonBackReference
     private City city;
 
-    // 關聯到 DistinctArea 表，雙向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST })
-    @JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_distinctArea"))
-    @JsonBackReference
+    // 關聯到distinctArea表，雙向多對一
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_distinctAreaArea"))
     private DistinctArea distinctArea;
 
     @Column(columnDefinition = "NVARCHAR(10)", name = "street", nullable = false)
     private String street;
 
+    // 10位數，8位小數
     @Column(name = "latitude", precision = 10, scale = 8, nullable = false)
-    private BigDecimal latitude;
+    private BigDecimal latitude;// 經度
 
+    // 11位數，8位小數
     @Column(name = "longitude", precision = 11, scale = 8, nullable = false)
-    private BigDecimal longitude;
+    private BigDecimal longitude;// 緯度
 
     @Column(name = "donationAmount")
     private Integer donationAmount;
@@ -103,12 +97,18 @@ public class LostCase {
     @Column(name = "viewCount")
     private Integer viewCount;
 
+    @Column(name = "follow")
+    private Integer follow;
+
     @Column(name = "publicationTime", nullable = false)
     private LocalDateTime publicationTime;
 
     @Column(name = "lastUpdateTime", nullable = false)
     private LocalDateTime lastUpdateTime;
 
+	@Column(name = "tag", nullable = true, columnDefinition = "nvarchar(100)")
+	private String tag;
+    
     @Lob
     @Column(name = "lostExperience")
     private String lostExperience;
@@ -121,79 +121,12 @@ public class LostCase {
     @Column(name = "featureDescription")
     private String featureDescription;
 
-    // 關聯到 CasePicture 表，單向一對多
+    // 關聯到CasePicture表，單向一對多，rescueCaseId外鍵會在CasePicture表中
     @OneToMany
-    @JoinColumn(name = "lostCase", foreignKey = @ForeignKey(name = "FK_CasePicture_LostCase"))
+    @JoinColumn(name = "lostCaseId", foreignKey = @ForeignKey(name = "FK_CasePicture_LostCase"))
     private List<CasePicture> casePictures;
-
-    @OneToMany(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Follow> follows;
-
-    // 關聯到 ReportCase 表，單向一對多
-    @OneToMany(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReportCase> reportCases;
-
-    // 必填，與 CaseState 單向多對一
-    @ManyToOne(cascade = { CascadeType.PERSIST })
-    @JoinColumn(name = "caseStateId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_CaseState"))
-    private CaseState caseState;
-
-    @Column(name = "caseUrl", length = 255)
-    private String caseUrl;
-
-    // 與 LostBanner 的一對一關聯
-    @OneToOne(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
-    private LostBanner lostBanner;
-
-    // 空參數建構子 (Hibernate 要求)
-    public LostCase() {
-        super();
-    }
-
-    // 全參數建構子
-    public LostCase(
-            Integer lostCaseId, String caseTitle,
-            // Member member,
-            List<ReportCase> reportCases,
-            Species species, Breed breed, FurColor furColor,
-            String name, String gender, String sterilization, Integer age, Integer microChipNumber, boolean suspLost,
-            City city, DistinctArea distinctArea, String street, BigDecimal latitude, BigDecimal longitude,
-            Integer donationAmount, Integer viewCount, List<Follow> follows, LocalDateTime publicationTime,
-            LocalDateTime lastUpdateTime, String lostExperience, String contactInformation, String featureDescription,
-            List<CasePicture> casePictures, CaseState caseState, String caseUrl, LostBanner lostBanner) {
-        this.lostCaseId = lostCaseId;
-        this.caseTitle = caseTitle;
-        // this.member = member;
-        this.species = species;
-        this.breed = breed;
-        this.furColor = furColor;
-        this.name = name;
-        this.gender = gender;
-        this.sterilization = sterilization;
-        this.age = age;
-        this.microChipNumber = microChipNumber;
-        this.suspLost = suspLost;
-        this.city = city;
-        this.distinctArea = distinctArea;
-        this.street = street;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.donationAmount = donationAmount;
-        this.viewCount = viewCount;
-        this.follows = follows;
-        this.publicationTime = publicationTime;
-        this.lastUpdateTime = lastUpdateTime;
-        this.lostExperience = lostExperience;
-        this.contactInformation = contactInformation;
-        this.featureDescription = featureDescription;
-        this.casePictures = casePictures;
-        this.reportCases = reportCases;
-        this.caseState = caseState;
-        this.caseUrl = caseUrl;
-        this.lostBanner = lostBanner;
-    }
-
-    // Getter & Setter
+      
+    // Getters and Setters
     public Integer getLostCaseId() {
         return lostCaseId;
     }
@@ -210,19 +143,13 @@ public class LostCase {
         this.caseTitle = caseTitle;
     }
 
-    // public Member getMember() {
-    // return member;
-    // }
-
-    // public void setMember(Member member) {
-    // this.member = member;
-    // }
-
-    public Species getSpecies() {
+ 
+    
+    public Species getspecies() {
         return species;
     }
 
-    public void setSpecies(Species species) {
+    public void setspecies(Species species) {
         this.species = species;
     }
 
@@ -240,14 +167,6 @@ public class LostCase {
 
     public void setFurColor(FurColor furColor) {
         this.furColor = furColor;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getGender() {
@@ -282,11 +201,11 @@ public class LostCase {
         this.microChipNumber = microChipNumber;
     }
 
-    public boolean isSuspLost() {
+    public Boolean getSuspLost() {
         return suspLost;
     }
 
-    public void setSuspLost(boolean suspLost) {
+    public void setSuspLost(Boolean suspLost) {
         this.suspLost = suspLost;
     }
 
@@ -346,12 +265,12 @@ public class LostCase {
         this.viewCount = viewCount;
     }
 
-    public List<Follow> getFollow() {
-        return follows;
+    public Integer getFollow() {
+        return follow;
     }
 
-    public void setFollow(List<Follow> follows) {
-        this.follows = follows;
+    public void setFollow(Integer follow) {
+        this.follow = follow;
     }
 
     public LocalDateTime getPublicationTime() {
@@ -368,6 +287,14 @@ public class LostCase {
 
     public void setLastUpdateTime(LocalDateTime lastUpdateTime) {
         this.lastUpdateTime = lastUpdateTime;
+    }
+
+    public List<CasePicture> getCasePictures() {
+        return casePictures;
+    }
+
+    public void setCasePictures(List<CasePicture> casePictures) {
+        this.casePictures = casePictures;
     }
 
     public String getLostExperience() {
@@ -393,81 +320,4 @@ public class LostCase {
     public void setFeatureDescription(String featureDescription) {
         this.featureDescription = featureDescription;
     }
-
-    public List<CasePicture> getCasePictures() {
-        return casePictures;
-    }
-
-    public void setCasePictures(List<CasePicture> casePictures) {
-        this.casePictures = casePictures;
-    }
-
-    public List<ReportCase> getReportCases() {
-        return reportCases;
-    }
-
-    public void setReportCases(List<ReportCase> reportCases) {
-        this.reportCases = reportCases;
-    }
-
-    public CaseState getCaseState() {
-        return caseState;
-    }
-
-    public void setCaseState(CaseState caseState) {
-        this.caseState = caseState;
-    }
-
-    public String getCaseUrl() {
-        return caseUrl;
-    }
-
-    public void setCaseUrl(String caseUrl) {
-        this.caseUrl = caseUrl;
-    }
-
-    public LostBanner getLostBanner() {
-        return lostBanner;
-    }
-
-    public void setLostBanner(LostBanner lostBanner) {
-        this.lostBanner = lostBanner;
-        lostBanner.setLostCase(this); // 雙向關聯
-    }
-
-    @Override
-    public String toString() {
-        return "LostCase [lostCaseId=" + lostCaseId +
-                ", caseTitle=" + caseTitle +
-                // ", member=" + member +
-                ", species=" + species +
-                ", breed=" + breed +
-                ", furColor=" + furColor +
-                ", name=" + name +
-                ", gender=" + gender +
-                ", sterilization=" + sterilization +
-                ", age=" + age +
-                ", microChipNumber=" + microChipNumber +
-                ", suspLost=" + suspLost +
-                ", city=" + city +
-                ", distinctArea=" + distinctArea +
-                ", street=" + street +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
-                ", donationAmount=" + donationAmount +
-                ", viewCount=" + viewCount +
-                ", follow=" + follows +
-                ", publicationTime=" + publicationTime +
-                ", lastUpdateTime=" + lastUpdateTime +
-                ", lostExperience=" + lostExperience +
-                ", contactInformation=" + contactInformation +
-                ", featureDescription=" + featureDescription +
-                ", casePictures=" + casePictures +
-                ", reportCases=" + reportCases +
-                ", caseState=" + caseState +
-                ", caseUrl=" + caseUrl +
-                ", lostBanner=" + lostBanner +
-                "]";
-    }
-
 }

@@ -21,6 +21,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.ToString;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.forRescue.CanAfford;
 import tw.com.ispan.domain.pet.forRescue.RescueDemand;
@@ -50,6 +51,7 @@ public class RescueCase {
 	// 關聯到member表，雙向多對一
 	@ManyToOne(cascade = { CascadeType.PERSIST})
 	@JoinColumn(name = "memberId", nullable = true, foreignKey = @ForeignKey(name = "FK_RescueCase_Member"))
+	@ToString.Exclude
 	private Member member;
 
 	//必填
@@ -519,8 +521,7 @@ public class RescueCase {
 
 	@Override
 	public String toString() {
-		return "RescueCase [rescueCaseId=" + rescueCaseId + ", caseTitle=" + caseTitle + ", member=" + member
-				+ ", species=" + species + ", breed=" + breed + ", furColor=" + furColor + ", gender=" + gender
+		return "RescueCase [rescueCaseId=" + rescueCaseId + ", caseTitle=" + caseTitle + ", species=" + species + ", breed=" + breed + ", furColor=" + 	furColor + ", gender=" + gender
 				+ ", sterilization=" + sterilization + ", age=" + age + ", microChipNumber=" + microChipNumber
 				+ ", suspLost=" + suspLost + ", city=" + city + ", distinctArea=" + distinctArea + ", street=" + street
 				+ ", latitude=" + latitude + ", longitude=" + longitude + ", donationAmount=" + donationAmount
