@@ -1,5 +1,7 @@
 package tw.com.ispan.domain.shop;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,7 +31,7 @@ public class OrderItem {
     private Integer orderQuantity;
 
     @Column(nullable = false)
-    private Double purchasedPrice;
+    private BigDecimal purchasedPrice;
 
     @Column(nullable = false)
     private String status; // Added in 2025-01-14 Naomi (ref. InventoryService)
@@ -38,7 +40,7 @@ public class OrderItem {
     }
 
     public OrderItem(Integer orderItemId, Orders order, Product product, Integer orderQuantity,
-            Double purchasedPrice, String status) {
+    BigDecimal purchasedPrice, String status) {
         this.orderItemId = orderItemId;
         this.order = order;
         this.product = product;
@@ -86,11 +88,11 @@ public class OrderItem {
         this.orderQuantity = orderQuantity;
     }
 
-    public Double getPurchasedPrice() {
+    public BigDecimal getPurchasedPrice() {
         return purchasedPrice;
     }
 
-    public void setPurchasedPrice(Double purchasedPrice) {
+    public void setPurchasedPrice(BigDecimal purchasedPrice) {
         this.purchasedPrice = purchasedPrice;
     }
 
@@ -100,5 +102,20 @@ public class OrderItem {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    // Added setter methods for orderId and productId
+    public void setOrderId(Integer orderId) {
+        if (this.order == null) {
+            this.order = new Orders(); // Initialize the order object if it's null
+        }
+        this.order.setOrderId(orderId); // Assuming Orders has a setOrderId method
+    }
+
+    public void setProductId(Integer productId) {
+        if (this.product == null) {
+            this.product = new Product(); // Initialize the product object if it's null
+        }
+        this.product.setProductId(productId); // Assuming Product has a setProductId method
     }
 }

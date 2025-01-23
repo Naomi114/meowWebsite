@@ -2,10 +2,8 @@ package tw.com.ispan.domain.shop;
 
 import jakarta.persistence.*;
 import tw.com.ispan.domain.admin.Member;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -39,8 +37,8 @@ public class Cart implements Serializable {
         return member;
     }
 
-    public void setMember(Member member) {
-        this.member = member;
+    public void setMember(Member member2) {
+        this.member = member2;
     }
 
     public LocalDateTime getLastUpdatedDate() {

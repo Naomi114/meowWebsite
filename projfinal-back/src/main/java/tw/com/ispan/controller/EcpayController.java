@@ -24,7 +24,7 @@ public class EcpayController {
 
     // 接收 ECPay 的回传数据
     @PostMapping("/return")
-    public String ecpayReturn(@RequestBody String body) {
+    public ResponseEntity<String> ecpayReturn(@RequestBody String body) {
         System.out.println("ECPay return received at " + System.currentTimeMillis());
         System.out.println("Body: " + body);
 
@@ -34,8 +34,11 @@ public class EcpayController {
             Map<String, Object> responseMap = objectMapper.readValue(body, Map.class);
 
             // 从回传数据中获取订单ID和支付状态
-            String orderId = (String) responseMap.get("OrderId");
+            String orderIdString = (String) responseMap.get("OrderId");
             String paymentStatus = (String) responseMap.get("PaymentStatus");
+
+            // Convert orderId from String to Integer
+            Integer orderId = Integer.parseInt(orderIdString);
 
             // 根据支付状态处理订单
             if ("Success".equals(paymentStatus)) {
@@ -46,15 +49,15 @@ public class EcpayController {
                 orderService.clearCartForOrder(orderId);
 
                 // 返回成功消息
-                return "Payment processed successfully";
+                return ResponseEntity.ok("Payment processed successfully");
             } else {
                 // 如果支付失败，返回失败消息
-                return "Payment failed";
+                return ResponseEntity.status(400).body("Payment failed");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "Error processing payment return"; // 出现异常时返回错误信息
+            return ResponseEntity.status(500).body("Error processing payment return"); // 出现异常时返回错误信息
         }
     }
 

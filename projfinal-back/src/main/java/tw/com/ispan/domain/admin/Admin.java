@@ -16,7 +16,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import tw.com.ispan.domain.shop.Discount;
 import tw.com.ispan.domain.shop.Inventory;
 import tw.com.ispan.domain.shop.Product;
 
