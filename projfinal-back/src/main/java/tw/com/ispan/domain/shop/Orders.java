@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import jakarta.persistence.*;
 import tw.com.ispan.domain.admin.Member;
-import tw.com.ispan.domain.admin.Discount;
 
 @Entity
 @Table(name = "Orders")
@@ -12,7 +11,7 @@ public class Orders {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer orderId; 
+    private Integer orderId;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "member_id", nullable = false)
@@ -49,9 +48,9 @@ public class Orders {
     public Orders() {
     }
 
-    public Orders(Integer orderId, Member member, List<OrderItem> orderItems, Discount discount, 
-                  String shippingAddress, LocalDateTime orderDate, String creditCard, 
-                  String orderStatus, String feedback, Double subtotalPrice, Double finalPrice) {
+    public Orders(Integer orderId, Member member, List<OrderItem> orderItems, Discount discount,
+            String shippingAddress, LocalDateTime orderDate, String creditCard,
+            String orderStatus, String feedback, Double subtotalPrice, Double finalPrice) {
         this.orderId = orderId;
         this.member = member;
         this.orderItems = orderItems;
@@ -67,17 +66,17 @@ public class Orders {
 
     @Override
     public String toString() {
-        return "Orders [orderId=" + orderId + ", member=" + member + ", orderItems=" + orderItems + 
-               ", discount=" + discount + ", shippingAddress=" + shippingAddress + ", orderDate=" + orderDate + 
-               ", creditCard=" + creditCard + ", orderStatus=" + orderStatus + ", feedback=" + feedback + 
-               ", subtotalPrice=" + subtotalPrice + ", finalPrice=" + finalPrice + "]";
+        return "Orders [orderId=" + orderId + ", member=" + member + ", orderItems=" + orderItems +
+                ", discount=" + discount + ", shippingAddress=" + shippingAddress + ", orderDate=" + orderDate +
+                ", creditCard=" + creditCard + ", orderStatus=" + orderStatus + ", feedback=" + feedback +
+                ", subtotalPrice=" + subtotalPrice + ", finalPrice=" + finalPrice + "]";
     }
 
-    public Integer getOrderId() { 
+    public Integer getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Integer orderId) { 
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 

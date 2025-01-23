@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import tw.com.ispan.domain.admin.Discount;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity

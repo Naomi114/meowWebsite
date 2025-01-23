@@ -11,14 +11,14 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-// import tw.com.ispan.domain.admin.Admin;
+import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.dto.CategoryRequest;
 import tw.com.ispan.dto.CategoryResponse;
 import tw.com.ispan.dto.ProductTagRequest;
 import tw.com.ispan.dto.ProductTagResponse;
-// import tw.com.ispan.repository.admin.AdminRepository;
+import tw.com.ispan.repository.admin.AdminRepository;
 import tw.com.ispan.repository.shop.ProductRepository;
 import tw.com.ispan.service.shop.CategoryService;
 import tw.com.ispan.service.shop.ProductImageService;
@@ -28,8 +28,8 @@ import tw.com.ispan.service.shop.ProductTagService;
 @Profile("dev") // 分離測試和開發環境
 public class ProductInitData implements CommandLineRunner {
 
-    // @Autowired
-    // private AdminRepository adminRepository;
+    @Autowired
+    private AdminRepository adminRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -45,9 +45,8 @@ public class ProductInitData implements CommandLineRunner {
 
     @Transactional
     public void run(String... args) throws Exception {
-
-        // 初始化管理員資料 (待整合Jude的部分)
-        // initializeAdmin();
+        // 初始化管理員資料
+        initializeAdmins();
 
         // 初始化類別資料
         initializeCategories();
@@ -59,22 +58,22 @@ public class ProductInitData implements CommandLineRunner {
         initializeData();
     }
 
-    // 初始化管理員資料，不然Admin實體無法持久化匯入資料庫 (待整合Jude的部分)
-    /*
-     * JpaSpecificationExecutor 的方法如 findAll(Specification<T>) 和
-     * count(Specification<T>) 是支持的，但 exists(Specification<T>) 不被內建支持。
-     * 如果希望基於 Specification 檢查是否存在，可以通過 count 方法模擬：
-     */
-    // private void initializeAdmin() {
-    // String adminName = "admin";
-    // Admin admin = new Admin();
-    // admin.setAdminName(adminName);
-    // admin.setPassword("a123"); // 預設密碼
-    // admin.setCreateDate(LocalDateTime.now());
-    // admin.setUpdateDate(LocalDateTime.now());
-    // adminRepository.save(admin);
-    // System.out.println("新增管理員: " + adminName);
-    // }
+    private void initializeAdmins() {
+        Admin admin = new Admin();
+        admin.setAdminName("admin");
+        admin.setPassword("AAA");
+        admin.setCreateDate(LocalDateTime.now());
+        admin.setUpdateDate(LocalDateTime.now());
+
+        // 檢查是否已存在相同的 admin (by Naomi)
+        String adminTmp = admin.getAdminName();
+        if (adminRepository.findByAdminName(adminTmp) != null) {
+            System.out.println("adminName 已存在: " + adminTmp);
+        } else {
+            adminRepository.save(admin);
+        }
+        System.out.println("商城初始化管理員成功！");
+    }
 
     private void initializeCategories() {
         List<CategoryInitData> categories = List.of(
@@ -131,14 +130,23 @@ public class ProductInitData implements CommandLineRunner {
 
     // 初始化五組商品假資料
     public void initializeData() {
-
         try {
-            CategoryResponse categoryResponse1 = categoryService.findCategory("飼料");
+            Admin admin = adminRepository.findByAdminName("admin")
+                    .orElseThrow(() -> new IllegalArgumentException("管理員不存在"));
+
+            // 查找類別
+            Category category1 = categoryService.findCategoryEntity("飼料");
+            Category category2 = categoryService.findCategoryEntity("寵物用品");
+            Category category3 = categoryService.findCategoryEntity("玩具");
+            Category category4 = categoryService.findCategoryEntity("玩具");
+            Category category5 = categoryService.findCategoryEntity("清潔用品");
 
             Product product1 = new Product();
+            product1.setAdmin(admin);
             product1.setProductName("貓糧");
             product1.setDescription("優質貓糧");
-            product1.setUnit(categoryResponse1.getDefaultUnit());
+            product1.setCategory(category1);
+            product1.setUnit(category1.getDefaultUnit());
             product1.setOriginalPrice(BigDecimal.valueOf(20.00));
             product1.setSalePrice(BigDecimal.valueOf(18.00));
             product1.setStockQuantity(100);
@@ -155,18 +163,12 @@ public class ProductInitData implements CommandLineRunner {
                 System.err.println("圖片初始化失敗: " + e.getMessage());
             }
 
-            // product1.setAdmin(new Admin(1, "管理員1"));
-            /*
-             * 假設 adminId 1 是 "管理員1"；
-             * 手動創建的實體處於分離狀態（detached），不能直接關聯到其他實體。
-             * 還是需要從adminRepository中查找對應的管理員實體。
-             */
-            CategoryResponse categoryResponse2 = categoryService.findCategory("寵物用品");
-
             Product product2 = new Product();
+            product2.setAdmin(admin);
             product2.setProductName("狗項圈");
             product2.setDescription("耐用的皮革狗項圈");
-            product2.setUnit(categoryResponse2.getDefaultUnit());
+            product2.setCategory(category2);
+            product2.setUnit(category2.getDefaultUnit());
             product2.setOriginalPrice(BigDecimal.valueOf(15.00));
             product2.setSalePrice(BigDecimal.valueOf(12.50));
             product2.setStockQuantity(200);
@@ -180,14 +182,13 @@ public class ProductInitData implements CommandLineRunner {
             } catch (Exception e) {
                 System.err.println("圖片初始化失敗: " + e.getMessage());
             }
-            // product2.setAdmin(new Admin(2, "管理員2"));
-
-            CategoryResponse categoryResponse3 = categoryService.findCategory("玩具");
 
             Product product3 = new Product();
+            product3.setAdmin(admin);
             product3.setProductName("貓抓板");
             product3.setDescription("耐用的貓抓板");
-            product3.setUnit(categoryResponse3.getDefaultUnit());
+            product3.setCategory(category3);
+            product3.setUnit(category3.getDefaultUnit());
             product3.setOriginalPrice(BigDecimal.valueOf(10.00));
             product3.setSalePrice(BigDecimal.valueOf(8.00));
             product3.setStockQuantity(150);
@@ -201,14 +202,13 @@ public class ProductInitData implements CommandLineRunner {
             } catch (Exception e) {
                 System.err.println("圖片初始化失敗: " + e.getMessage());
             }
-            // product3.setAdmin(new Admin(1, "管理員1"));
-
-            CategoryResponse categoryResponse4 = categoryService.findCategory("寵物用品");
 
             Product product4 = new Product();
+            product4.setAdmin(admin);
             product4.setProductName("狗玩具");
             product4.setDescription("耐用的狗玩具");
-            product4.setUnit(categoryResponse4.getDefaultUnit());
+            product4.setCategory(category4);
+            product4.setUnit(category4.getDefaultUnit());
             product4.setOriginalPrice(BigDecimal.valueOf(5.00));
             product4.setSalePrice(BigDecimal.valueOf(4.00));
             product4.setStockQuantity(300);
@@ -222,14 +222,13 @@ public class ProductInitData implements CommandLineRunner {
             } catch (Exception e) {
                 System.err.println("圖片初始化失敗: " + e.getMessage());
             }
-            // product4.setAdmin(new Admin(2, "管理員2"));
-
-            CategoryResponse categoryResponse5 = categoryService.findCategory("清潔用品");
 
             Product product5 = new Product();
+            product5.setAdmin(admin);
             product5.setProductName("貓砂");
             product5.setDescription("高效吸水貓砂");
-            product5.setUnit(categoryResponse5.getDefaultUnit());
+            product5.setCategory(category5);
+            product5.setUnit(category5.getDefaultUnit());
             product5.setOriginalPrice(BigDecimal.valueOf(25.00));
             product5.setSalePrice(BigDecimal.valueOf(22.00));
             product5.setStockQuantity(80);
@@ -243,7 +242,6 @@ public class ProductInitData implements CommandLineRunner {
             } catch (Exception e) {
                 System.err.println("圖片初始化失敗: " + e.getMessage());
             }
-            // product5.setAdmin(new Admin(1, "管理員1"));
 
             productRepository.save(product1);
             productRepository.save(product2);

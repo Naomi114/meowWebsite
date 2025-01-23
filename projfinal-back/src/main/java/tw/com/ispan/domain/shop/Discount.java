@@ -1,4 +1,4 @@
-package tw.com.ispan.domain.admin;
+package tw.com.ispan.domain.shop;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,7 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import tw.com.ispan.domain.shop.DiscountScope;
+import tw.com.ispan.domain.admin.Admin;
 
 @Entity
 @Table(name = "Discount")

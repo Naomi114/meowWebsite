@@ -51,7 +51,7 @@ public class OrderService {
         double totalPrice = 0;
         List<CartItem> cartItems = cartItemRepository.findByCart_CartId(orderRequest.getCartId());
         for (CartItem item : cartItems) {
-            BigDecimal itemPrice = item.getProduct().getPrice();
+            BigDecimal itemPrice = item.getProduct().getSalePrice(); // getPrice => getSalePrice (by Naomi)
             BigDecimal totalItemPrice = itemPrice.multiply(new BigDecimal(item.getQuantity()));
             totalPrice += totalItemPrice.doubleValue();
         }
@@ -65,7 +65,7 @@ public class OrderService {
             orderItem.setOrderId(savedOrder.getOrderId());
             orderItem.setProductId(item.getProduct().getProductId());
             orderItem.setOrderQuantity(item.getQuantity());
-            orderItem.setPurchasedPrice(item.getProduct().getPrice());
+            orderItem.setPurchasedPrice(item.getProduct().getSalePrice()); // getPrice => getSalePrice (by Naomi)
             orderItemRepository.save(orderItem);
         }
 
@@ -77,7 +77,7 @@ public class OrderService {
     /**
      * Process payment for an order
      *
-     * @param orderId The order ID
+     * @param orderId        The order ID
      * @param paymentRequest The payment request
      * @return The updated Orders object
      */
@@ -85,21 +85,21 @@ public class OrderService {
     public Orders processPayment(Integer orderId, PaymentRequest paymentRequest) {
         Orders orders = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-    
+
         if ("success".equals(paymentRequest.getPaymentStatus())) {
             orders.setOrderStatus("已付款");
         } else {
             orders.setOrderStatus("付款失敗");
         }
-    
-        return orderRepository.save(orders);  // Return Orders object, not Sort.Order
+
+        return orderRepository.save(orders); // Return Orders object, not Sort.Order
     }
 
     /**
      * Update the order status
      *
      * @param orderId The order ID
-     * @param status The new status
+     * @param status  The new status
      * @return The updated Orders object
      */
     @Transactional
@@ -107,7 +107,7 @@ public class OrderService {
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("訂單未找到"));
 
-        order.setOrderStatus(status);  // Corrected method to set order status
+        order.setOrderStatus(status); // Corrected method to set order status
 
         return orderRepository.save(order);
     }
@@ -121,7 +121,7 @@ public class OrderService {
     public void clearCartForOrder(Integer orderId) {
         // Make sure you're using the result of findByOrderId as a List<CartItem>
         List<CartItem> cartItems = cartItemRepository.findByOrder_OrderId(orderId);
-        
+
         // Now delete all items in the cart
         cartItemRepository.deleteAll(cartItems);
     }
