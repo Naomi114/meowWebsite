@@ -3,6 +3,7 @@ package tw.com.ispan.controller;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,15 +35,17 @@ public class WishListController {
     @DeleteMapping
     public ResponseEntity<WishListResponse> removeFromWishList(@RequestBody @Valid WishListRequest request) {
         WishListResponse response = wishListService.removeWishList(request);
-        return ResponseEntity.ok(response);
+        return response.getSuccess()
+                ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    // 模糊查詢願望清單
-    @GetMapping("/search")
-    public ResponseEntity<WishListResponse> searchWishList(
-            @RequestParam Integer memberId,
-            @RequestParam String productName) {
-        WishListResponse response = wishListService.searchWishList(memberId, productName);
-        return ResponseEntity.ok(response);
+    // 會員查詢
+    @GetMapping
+    public ResponseEntity<WishListResponse> findAllWishListsByMember(@RequestParam Integer memberId) {
+        WishListResponse response = wishListService.findAllWishListsByMember(memberId);
+        return response.getSuccess()
+                ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }

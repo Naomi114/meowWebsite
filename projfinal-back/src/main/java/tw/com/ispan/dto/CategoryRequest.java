@@ -3,6 +3,8 @@ package tw.com.ispan.dto;
 import javax.validation.constraints.NotBlank;
 
 public class CategoryRequest {
+    private Integer categoryId;
+
     @NotBlank(message = "類別名稱不能為空")
     private String categoryName;
 
@@ -33,6 +35,14 @@ public class CategoryRequest {
 
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
 }

@@ -83,4 +83,12 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    // 搜尋所有商品 (by Mark)
+    @GetMapping
+    public ResponseEntity<ProductResponse> getAllProducts() {
+        ProductResponse response = productService.findAll();
+        return response.getSuccess() ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
 }

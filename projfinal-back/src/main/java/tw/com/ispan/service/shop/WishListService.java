@@ -33,32 +33,42 @@ public class WishListService {
 	public WishListResponse addWishList(WishListRequest request) {
 		WishListResponse response = new WishListResponse();
 		try {
+			// 驗證會員是否存在
 			Member member = memberRepository.findById(request.getMemberId())
 					.orElseThrow(() -> new IllegalArgumentException("會員不存在"));
 
+			// 驗證商品是否存在
 			Product product = productRepository.findById(request.getProductId())
 					.orElseThrow(() -> new IllegalArgumentException("商品不存在"));
 
+			// 檢查是否已存在於願望清單
 			if (wishListRepository.existsByMemberAndProduct(member, product)) {
-				throw new IllegalArgumentException("該商品已存在於願望清單中");
+				response.setSuccess(false);
+				response.setMessage("該商品已存在於願望清單中");
+				return response;
 			}
 
+			// 建立願望清單實體
 			WishList wishList = new WishList();
-			wishList.setMember(member);
-			wishList.setProduct(product);
-			wishList.setAddedAt(LocalDateTime.now());
+			wishList.setMember(member); // 設置會員
+			wishList.setProduct(product); // 設置商品
+			wishList.setAddedAt(LocalDateTime.now()); // 設置加入時間
 
+			// 儲存願望清單
 			wishListRepository.save(wishList);
+
+			// 回應成功結果
 			response.setSuccess(true);
 			response.setMessage("商品已成功加入願望清單");
 		} catch (Exception e) {
+			// 回應失敗結果
 			response.setSuccess(false);
 			response.setMessage("商品加入願望清單失敗: " + e.getMessage());
 		}
 		return response;
 	}
 
-	// 從願望清單移除商品
+	// 從收藏清單移除商品
 	public WishListResponse removeWishList(WishListRequest request) {
 		WishListResponse response = new WishListResponse();
 		try {
@@ -81,22 +91,36 @@ public class WishListService {
 		return response;
 	}
 
-	// 模糊查詢願望清單
-	public WishListResponse searchWishList(Integer memberId, String productName) {
+	// 會員查詢收藏清單
+	public WishListResponse findAllWishListsByMember(Integer memberId) {
 		WishListResponse response = new WishListResponse();
 		try {
+			// 驗證會員是否存在
 			Member member = memberRepository.findById(memberId)
 					.orElseThrow(() -> new IllegalArgumentException("會員不存在"));
 
-			List<WishList> wishLists = wishListRepository.findByMemberAndProductProductNameContaining(member,
-					productName);
+			// 查詢會員的所有願望清單
+			List<WishList> wishLists = wishListRepository.findByMember(member);
+
+			// 若清單為空，將 wishlists 設為 null
+			if (wishLists == null || wishLists.isEmpty()) {
+				response.setWishlists(null);
+				response.setCount(null); // 無願望清單時 count 為 null
+			} else {
+				response.setWishlists(wishLists);
+				response.setCount((long) wishLists.size()); // 設定願望清單的大小
+			}
+
 			response.setSuccess(true);
-			response.setWishlists(wishLists);
-			response.setCount((long) wishLists.size());
+
 		} catch (Exception e) {
+			// 異常處理：設置失敗訊息並將 wishlists 和 count 設為 null
 			response.setSuccess(false);
+			response.setWishlists(null);
+			response.setCount(null);
 			response.setMessage("查詢失敗: " + e.getMessage());
 		}
 		return response;
 	}
+
 }

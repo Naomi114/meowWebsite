@@ -1,12 +1,14 @@
 package tw.com.ispan.init;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.repository.admin.AdminRepository;
 
 @Component
+@Order(1) // 初始化優先執行(by Naomi)
 public class LoginDataAdmin implements CommandLineRunner {
 
     private final AdminRepository adminRepository;

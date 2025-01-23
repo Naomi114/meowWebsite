@@ -13,13 +13,12 @@ import tw.com.ispan.domain.shop.WishList;
 public interface WishListRepository
         extends JpaRepository<WishList, Integer>, JpaSpecificationExecutor<WishList> {
 
-    boolean existsByMemberAndProduct(Member memberId, Product product);
+    boolean existsByMemberAndProduct(Member member, Product product);
 
-    // 精確查詢
-    Optional<WishList> findByMemberAndProduct(Member memberId, Product product);
+    // 移除收藏
+    Optional<WishList> findByMemberAndProduct(Member member, Product product);
 
-    // 模糊查詢
-    // 根據 Member 和 Product 的 productName 屬性進行模糊查詢
-    List<WishList> findByMemberAndProductProductNameContaining(Member member, String productName);
+    // 查詢收藏
+    List<WishList> findByMember(Member member);
 
 }

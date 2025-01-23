@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ import tw.com.ispan.service.shop.ProductImageService;
 import tw.com.ispan.service.shop.ProductTagService;
 
 @Component
+@Order(2)
 @Profile("dev") // 分離測試和開發環境
 public class ProductInitData implements CommandLineRunner {
 

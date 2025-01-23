@@ -274,7 +274,6 @@ public class ProductService {
 			response.setSuccess(false);
 			response.setMessage("商品不存在");
 		}
-
 		return response;
 	}
 
@@ -293,4 +292,15 @@ public class ProductService {
 		return response;
 	}
 
+	// 查詢所有商品 (by Mark)
+	public ProductResponse findAll() {
+		ProductResponse response = new ProductResponse();
+		List<Product> products = productRepository.findAll();
+
+		response.setSuccess(!products.isEmpty());
+		response.setProducts(products);
+		response.setMessage(products.isEmpty() ? "未找到任何商品" : "商品查詢成功");
+
+		return response;
+	}
 }
