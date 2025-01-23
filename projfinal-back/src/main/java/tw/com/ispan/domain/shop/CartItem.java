@@ -1,9 +1,10 @@
 package tw.com.ispan.domain.shop;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference; // Ensure this import
+import com.fasterxml.jackson.annotation.JsonManagedReference; // Ensure this import
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-
+import tw.com.ispan.domain.admin.Discount;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,44 +18,49 @@ public class CartItem implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cartItemId")
-    @JsonProperty("cartItemId") // 確保 JSON 解析
+    @JsonProperty("cartItemId") // Ensure JSON parsing includes cartItemId
     private Integer cartItemId;
 
-    // 與 Cart 類別的關聯
+    // Many-to-One relationship with Cart (Back reference to prevent circular
+    // dependencies)
     @ManyToOne
     @JoinColumn(name = "cartId", nullable = false)
-    @JsonIgnore // 避免循環依賴導致的 JSON 序列化錯誤
+    @JsonBackReference("cart-items-cart") // Unique back reference name for Cart
     private Cart cart;
 
-    // 與 Product 類別的關聯
+    // One-to-One relationship with Product
     @OneToOne
-    @JoinColumn(name = "productId", nullable = false)
+    @JoinColumn(name = "product_Id", nullable = false)
+    @JsonManagedReference("cart-items-product") // Managed side for serialization
     private Product product;
 
-    // 與 Orders 類別的關聯
+    // Many-to-One relationship with Orders (Avoid circular reference with
+    // @JsonBackReference)
     @ManyToOne
-    @JoinColumn(name = "orderId")  // 假設這是訂單ID
-    @JsonIgnore // 避免循環依賴
+    @JoinColumn(name = "orderId") // Assuming this is the order ID
+    @JsonBackReference("cart-items-order") // Unique back reference name for Orders
     private Orders order;
 
-    // cartItem的狀態
+    // Many-to-One relationship with Discount (Ensure this field exists)
+    @ManyToOne
+    @JoinColumn(name = "discountId") // This should match the FK in your database
+    @JsonBackReference("cart-items-discount") // This is the back reference name for Discount
+    private Discount discount;
+
     @Column(name = "cartItemStatus")
-    @JsonProperty("cartItemStatus")
+    @JsonProperty("cartItemStatus") // Ensure JSON field maps correctly
     private String cartItemStatus;
 
-    // 創建時間
     @Column(name = "createDate")
-    @JsonProperty("createDate")
+    @JsonProperty("createDate") // Ensure JSON field maps correctly
     private LocalDateTime createDate;
 
-    // 更新時間
     @Column(name = "updateDate")
-    @JsonProperty("updateDate")
+    @JsonProperty("updateDate") // Ensure JSON field maps correctly
     private LocalDateTime updateDate;
 
-    // 購物車項目的數量
     @Column(name = "cartItemQuantity", nullable = false)
-    @JsonProperty("quantity")
+    @JsonProperty("quantity") // Map 'cartItemQuantity' to 'quantity' in JSON
     private Integer cartItemQuantity;
 
     // Getters and Setters
@@ -91,6 +97,14 @@ public class CartItem implements Serializable {
         this.order = order;
     }
 
+    public Discount getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Discount discount) {
+        this.discount = discount;
+    }
+
     public String getCartItemStatus() {
         return cartItemStatus;
     }
@@ -125,7 +139,7 @@ public class CartItem implements Serializable {
 
     // Additional Methods for Handling Product Fields
 
-    @JsonProperty("quantity")
+    @JsonProperty("quantity") // Ensure this maps to 'quantity' in JSON
     public Integer getQuantity() {
         return this.cartItemQuantity;
     }
@@ -135,12 +149,14 @@ public class CartItem implements Serializable {
         this.cartItemQuantity = quantity;
     }
 
+    // Set the product name if the product is present
     public void setProductName(String productName) {
         if (this.product != null) {
             this.product.setProductName(productName);
         }
     }
 
+    // Set the sale price if the product is present
     public void setSalePrice(Double salePrice) {
         if (this.product != null) {
             this.product.setSalePrice(BigDecimal.valueOf(salePrice));

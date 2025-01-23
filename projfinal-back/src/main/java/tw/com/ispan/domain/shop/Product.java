@@ -88,7 +88,7 @@ public class Product {
     // Many-to-many relationship with ProductTag (bi-directional)
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
             CascadeType.REFRESH }, fetch = FetchType.LAZY)
-    @JoinTable(name = "Product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @JoinTable(name = "Product_tag", joinColumns = @JoinColumn(name = "productid"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @JsonBackReference("products")
     private Set<ProductTag> tags = new LinkedHashSet<>(); // Ordered, no duplicates
 
@@ -132,15 +132,15 @@ public class Product {
 
     @Override
     public String toString() {
-        return "ProductBean [productId=" + productId + ", productName=" + productName + ", description=" + description
+        return "Product [productId=" + productId + ", productName=" + productName + ", description=" + description
                 + ", originalPrice=" + originalPrice + ", salePrice=" + salePrice + ", stockQuantity=" + stockQuantity
                 + ", unit=" + unit + ", status=" + status + ", expire=" + expire + ", createdAt=" + createdAt
                 + ", updatedAt=" + updatedAt + ", category=" + category + ", admin=" + admin + ", productImages="
-                + productImages
-                + ", tags=" + tags + ", inventoryItems=" + inventoryItems + ", wishlists=" + wishlists + "]";
+                + productImages + ", tags=" + tags + ", inventoryItems=" + inventoryItems + ", wishlists=" + wishlists
+                + "]";
     }
 
-    // Getter for the sale price (add this method)
+    // Getter for the sale price
     public BigDecimal getPrice() {
         return salePrice; // You can return either originalPrice or salePrice based on your logic
     }

@@ -14,8 +14,16 @@ public class CartItemResponse {
     // Constructor to populate from CartItem entity
     public CartItemResponse(CartItem cartItem) {
         this.cartItemId = cartItem.getCartItemId();
-        this.productName = cartItem.getProduct().getProductName(); // Accessing productName from the Product entity
-        this.salePrice = cartItem.getProduct().getSalePrice(); // Accessing salePrice from the Product entity
+
+        // Ensure the product is not null to avoid NullPointerException
+        if (cartItem.getProduct() != null) {
+            this.productName = cartItem.getProduct().getProductName(); // Accessing productName from the Product entity
+            this.salePrice = cartItem.getProduct().getSalePrice(); // Accessing salePrice from the Product entity
+        } else {
+            this.productName = "Unknown Product"; // Provide default value if product is missing
+            this.salePrice = BigDecimal.ZERO; // Provide default value if product price is missing
+        }
+
         this.cartItemQuantity = cartItem.getCartItemQuantity();
     }
 

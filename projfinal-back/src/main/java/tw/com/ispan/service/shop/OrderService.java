@@ -16,7 +16,7 @@ import tw.com.ispan.repository.shop.CartItemRepository;
 import tw.com.ispan.repository.shop.OrderItemRepository;
 import tw.com.ispan.repository.shop.OrderRepository;
 import tw.com.ispan.repository.shop.ProductRepository;
-import tw.com.ispan.repository.shop.OrderRequest; // Ensure this import is correct
+import tw.com.ispan.repository.shop.OrderRequest;
 
 @Service
 public class OrderService {
@@ -44,10 +44,11 @@ public class OrderService {
         Orders order = new Orders();
         order.setMemberId(orderRequest.getMemberId());
         order.setShippingAddress(orderRequest.getShippingAddress());
-        order.setCreditCard(orderRequest.getCreditCard());
-        order.setOrderStatus("待支付");
+        order.setCreditCard(orderRequest.getCreditCard()); // Ensure you handle encryption for credit card data
+        order.setOrderStatus("待支付"); // Initial status as "Pending Payment"
         order.setOrderDate(LocalDateTime.now());
 
+        // Calculate total price
         double totalPrice = 0;
         List<CartItem> cartItems = cartItemRepository.findByCart_CartId(orderRequest.getCartId());
         for (CartItem item : cartItems) {
@@ -69,6 +70,7 @@ public class OrderService {
             orderItemRepository.save(orderItem);
         }
 
+        // Clear cart items only after the order is successfully saved
         cartItemRepository.deleteAll(cartItems);
 
         return savedOrder;
@@ -77,29 +79,31 @@ public class OrderService {
     /**
      * Process payment for an order
      *
-     * @param orderId The order ID
+     * @param orderId        The order ID
      * @param paymentRequest The payment request
      * @return The updated Orders object
      */
     @Transactional
     public Orders processPayment(Integer orderId, PaymentRequest paymentRequest) {
-        Orders orders = orderRepository.findById(orderId)
+        Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-    
+
+        // Check payment status and update order status
         if ("success".equals(paymentRequest.getPaymentStatus())) {
-            orders.setOrderStatus("已付款");
+            order.setOrderStatus("已付款"); // Paid
         } else {
-            orders.setOrderStatus("付款失敗");
+            order.setOrderStatus("付款失敗"); // Payment failed
+            // You may consider throwing an exception or logging the error here
         }
-    
-        return orderRepository.save(orders);  // Return Orders object, not Sort.Order
+
+        return orderRepository.save(order);
     }
 
     /**
      * Update the order status
      *
      * @param orderId The order ID
-     * @param status The new status
+     * @param status  The new status
      * @return The updated Orders object
      */
     @Transactional
@@ -107,7 +111,7 @@ public class OrderService {
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("訂單未找到"));
 
-        order.setOrderStatus(status);  // Corrected method to set order status
+        order.setOrderStatus(status); // Corrected method to set order status
 
         return orderRepository.save(order);
     }
@@ -119,10 +123,15 @@ public class OrderService {
      */
     @Transactional
     public void clearCartForOrder(Integer orderId) {
-        // Make sure you're using the result of findByOrderId as a List<CartItem>
+        // Ensure you're using the correct cart items for the given order
         List<CartItem> cartItems = cartItemRepository.findByOrder_OrderId(orderId);
-        
+
         // Now delete all items in the cart
         cartItemRepository.deleteAll(cartItems);
+    }
+
+    public Orders getOrderById(int orderId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getOrderById'");
     }
 }
