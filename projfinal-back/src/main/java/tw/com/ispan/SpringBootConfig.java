@@ -6,12 +6,36 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class SpringBootConfig implements WebMvcConfigurer {
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        /* 將前後端頁面註冊後，CORS可以跨過SOP限制 */
-        // registry.addMapping("/ajax/pages/products/**")
-        // .allowedMethods("GET", "POST", "PUT", "DELETE");
+        @Override
+        public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/cart/**")
+                                .allowedOrigins("http://localhost:5173") // Allow frontend at localhost:5173
+                                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                                .allowedHeaders("*")
+                                .allowCredentials(true);
 
-        // registry.addMapping("/ajax/secure/login");
-    }
+                registry.addMapping("/products/**")
+                                .allowedOrigins("http://localhost:5173") // Allow frontend at localhost:5173
+                                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                                .allowedHeaders("*")
+                                .allowCredentials(true);
+
+                registry.addMapping("/products/**")
+                                .allowedOrigins("http://localhost:5173") // Allow frontend at localhost:5173
+                                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                                .allowedHeaders("*")
+                                .allowCredentials(true);
+
+                registry.addMapping("/pages/cart/**")
+                                .allowedOrigins("http://localhost:5173")
+                                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                                .allowedHeaders("*")
+                                .allowCredentials(true);
+
+                registry.addMapping("/pages/ecpay/send/**")
+                                .allowedOrigins("http://localhost:5173") // Allow frontend at localhost:5173
+                                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                                .allowedHeaders("*")
+                                .allowCredentials(true);
+        }
 }

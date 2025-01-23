@@ -31,7 +31,7 @@ public class ProductImage {
     private LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "FK_imageId", foreignKey = @ForeignKey(name = "fkc_image_id"))
+    @JoinColumn(name = "FK_productId", foreignKey = @ForeignKey(name = "fkc_product_id"))
     @JsonManagedReference("productImages")
     private Product product;
 

@@ -34,6 +34,9 @@ public class ProductImageService {
     private FileStorageProperties fileStorageProperties;
 
     public void addProductImages(Product product, List<String> filenames) throws InterruptedException {
+        if (filenames == null || filenames.isEmpty()) {
+            throw new IllegalArgumentException("圖片文件名列表不能為空");
+        }
 
         // 將文件名轉換為 ProductImageRequest
         List<ProductImageRequest> productImages = createProductImageRequests(filenames);
@@ -48,6 +51,9 @@ public class ProductImageService {
                 productImage.setImageUrl(imagePath);
                 productImage.setIsPrimary(imageRequest.getIsPrimary()); // 第一張圖片設為主圖片
                 productImage.setCreatedAt(LocalDateTime.now());
+                productImage.setProduct(product); // 設置 Product 外鍵
+
+                // 保存圖片到資料庫
                 productImageRepository.save(productImage);
 
                 // 保存到商品圖片集合

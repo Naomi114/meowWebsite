@@ -1,38 +1,50 @@
-// package tw.com.ispan.dto;
+package tw.com.ispan.dto;
 
-// public class PaymentRequest {
+public class PaymentRequest {
+    private String paymentStatus; // 付款状态，例如 "success" 或 "failed"
+    private String creditCardNumber;
+    private String cardExpiryDate;
+    private String cardCVV;
+    private double amount;
 
-// private double amount; // 支付金额
-// private String description; // 交易描述
-// private String itemName; // 商品名称
+    // Getters and setters
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
 
-// // Getters 和 Setters
-// public double getAmount() {
-// return amount;
-// }
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
 
-// public void setAmount(double amount) {
-// this.amount = amount;
-// }
+    public String getCreditCardNumber() {
+        return creditCardNumber;
+    }
 
-// public String getDescription() {
-// return description;
-// }
+    public void setCreditCardNumber(String creditCardNumber) {
+        this.creditCardNumber = creditCardNumber;
+    }
 
-// public void setDescription(String description) {
-// this.description = description;
-// }
+    public String getCardExpiryDate() {
+        return cardExpiryDate;
+    }
 
-// public String getItemName() {
-// return itemName;
-// }
+    public void setCardExpiryDate(String cardExpiryDate) {
+        this.cardExpiryDate = cardExpiryDate;
+    }
 
-// public void setItemName(String itemName) {
-// this.itemName = itemName;
-// }
+    public String getCardCVV() {
+        return cardCVV;
+    }
 
-// public String getOrderId() {
-// // TODO Auto-generated method stub
-// throw new UnsupportedOperationException("Unimplemented method 'getOrderId'");
-// }
-// }
+    public void setCardCVV(String cardCVV) {
+        this.cardCVV = cardCVV;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+}

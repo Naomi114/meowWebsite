@@ -2,24 +2,27 @@ package tw.com.ispan.domain.shop;
 
 import jakarta.persistence.*;
 import tw.com.ispan.domain.admin.Member;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
-@Table(name = "Cart")
+@Table(name = "cart")
+@JsonIgnoreProperties({ "cart", "member" })
 public class Cart implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer cartId;
+    @Column(name = "cartId")
+    private Integer cartId; // This is the primary key field
 
-    @OneToOne
-    @JoinColumn(name = "memberId", nullable = false)
-    private Member member;
+    @OneToOne // One member can only have one cart
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member; // The member related to this cart
 
     @Column(name = "lastUpdatedDate", nullable = false)
-    private LocalDateTime lastUpdatedDate;
+    private LocalDateTime lastUpdatedDate; // Timestamp of the last update
 
     // Getters and Setters
     public Integer getCartId() {
@@ -34,8 +37,8 @@ public class Cart implements Serializable {
         return member;
     }
 
-    public void setMember(Member member) {
-        this.member = member;
+    public void setMember(Member member2) {
+        this.member = member2;
     }
 
     public LocalDateTime getLastUpdatedDate() {

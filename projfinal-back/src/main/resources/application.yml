@@ -12,6 +12,10 @@ spring:
   profiles:
     active: "dev"
 
+    
+    web:
+    resources:
+      static-locations: classpath:/static/
   #資料庫連線設定
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver

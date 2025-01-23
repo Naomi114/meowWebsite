@@ -1,5 +1,7 @@
 package tw.com.ispan.domain.shop;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,37 +21,39 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "orderId", nullable = false)
-    private Orders order;
+    private Orders order; // This is a reference to the Order object, not just an orderId
 
     @ManyToOne
     @JoinColumn(name = "productId", nullable = false)
-    private Product product;
+    private Product product; // This is a reference to the Product object, not just a productId
 
     @Column(nullable = false)
     private Integer orderQuantity;
 
     @Column(nullable = false)
-    private Double purchasedPrice;
+    private BigDecimal purchasedPrice;
 
     @Column(nullable = false)
-    private String status; // 20250114 Naomi 新增 (ref. InventoryService)
+    private String status; // Added in 2025-01-14 Naomi (ref. InventoryService)
 
     public OrderItem() {
     }
 
     public OrderItem(Integer orderItemId, Orders order, Product product, Integer orderQuantity,
-            Double purchasedPrice) {
+    BigDecimal purchasedPrice, String status) {
         this.orderItemId = orderItemId;
         this.order = order;
         this.product = product;
         this.orderQuantity = orderQuantity;
         this.purchasedPrice = purchasedPrice;
+        this.status = status;
     }
 
     @Override
     public String toString() {
         return "OrderItem [orderItemId=" + orderItemId + ", order=" + order + ", product=" + product
-                + ", orderQuantity=" + orderQuantity + ", purchasedPrice=" + purchasedPrice + "]";
+                + ", orderQuantity=" + orderQuantity + ", purchasedPrice=" + purchasedPrice + ", status=" + status
+                + "]";
     }
 
     public Integer getOrderItemId() {
@@ -84,11 +88,11 @@ public class OrderItem {
         this.orderQuantity = orderQuantity;
     }
 
-    public Double getPurchasedPrice() {
+    public BigDecimal getPurchasedPrice() {
         return purchasedPrice;
     }
 
-    public void setPurchasedPrice(Double purchasedPrice) {
+    public void setPurchasedPrice(BigDecimal purchasedPrice) {
         this.purchasedPrice = purchasedPrice;
     }
 
@@ -98,5 +102,20 @@ public class OrderItem {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    // Added setter methods for orderId and productId
+    public void setOrderId(Integer orderId) {
+        if (this.order == null) {
+            this.order = new Orders(); // Initialize the order object if it's null
+        }
+        this.order.setOrderId(orderId); // Assuming Orders has a setOrderId method
+    }
+
+    public void setProductId(Integer productId) {
+        if (this.product == null) {
+            this.product = new Product(); // Initialize the product object if it's null
+        }
+        this.product.setProductId(productId); // Assuming Product has a setProductId method
     }
 }

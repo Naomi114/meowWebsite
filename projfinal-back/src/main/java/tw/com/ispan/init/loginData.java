@@ -35,6 +35,12 @@ public class loginData implements CommandLineRunner {
             String password = generatePassword(); // 生成隨機的大寫字母作為密碼
             String email = generateEmail(name); // 根據名字生成電子郵件
 
+            // 檢查是否已存在相同的 email 或 nickname (by Naomi)
+            if (memberRepository.existsByEmail(email)) {
+                System.out.println("Email 已存在，跳過插入: " + email);
+                continue;
+            }
+
             // nickname 直接設置為 name
             String nickname = name;
 
