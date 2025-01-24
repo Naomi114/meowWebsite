@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.sql.ast.tree.expression.Distinct;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +18,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.forAdopt.AdoptionCaseApply;
@@ -52,7 +51,7 @@ public class AdoptionCase {
     @JoinColumn(name = "furColorId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_FurColor"))
     private FurColor furColor;
 
-    @Column(name = "gender", columnDefinition = "nvarchar(5)")
+    @Column(name = "gender", columnDefinition = "nvarchar(10)")
     private String gender;
 
     @Column(name = "sterilization", columnDefinition = "nvarchar(5)")
@@ -81,10 +80,10 @@ public class AdoptionCase {
     private String street;
 
     // 10位數，8位小數
-    @Column(name = "latitude", precision = 10, scale = 8, nullable = false)
+    @Column(name = "latitude", precision = 10, scale = 8, nullable = true)
     private BigDecimal latitude;
 
-    @Column(name = "longitude", precision = 11, scale = 8, nullable = false)
+    @Column(name = "longitude", precision = 11, scale = 8, nullable = true)
     private BigDecimal longitude;
 
     @Column(name = "viewCount")
@@ -99,7 +98,7 @@ public class AdoptionCase {
     @Column(name = "lastUpdateTime", nullable = false)
     private LocalDateTime lastUpdateTime;
 
-    @Column(name = "length=20", nullable = false)
+    @Column(name = "title", columnDefinition = "NVARCHAR(max)")
     private String title;
 
     @Column(name = "story", columnDefinition = "NVARCHAR(max)", nullable = false)
@@ -111,11 +110,13 @@ public class AdoptionCase {
     @Column(name = "adoptedCondition", columnDefinition = "NVARCHAR(max)", nullable = false)
     private String adoptedCondition;
 
-    @Column(name = "status", columnDefinition = "NVARCHAR(20)", nullable = false)
-    private Integer status;
+    @Column(name = "note", columnDefinition = "NVARCHAR(max)")
+    private String note;
 
-    @Column(name = "note", columnDefinition = "NVARCHAR(max)", nullable = false)
-    private Integer note;
+    // 單向多對一,外鍵,對應CaseState表
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @JoinColumn(name = "CaseStateId", nullable = false, foreignKey = @ForeignKey(name = "FK__AdoptionCaseState"))
+    private CaseState caseState;
 
     // 關聯到CasePicture表，單向一對多，外鍵在一方
     @OneToMany
@@ -143,11 +144,11 @@ public class AdoptionCase {
     public AdoptionCase(Integer adoptionCaseId, String caseTitle, Member member, Species species, Breed breed,
             FurColor furColor, String gender, String sterilization, Integer age, Integer microChipNumber,
             Boolean susLost, City city, DistinctArea distinctArea, String street, BigDecimal latitude,
-            BigDecimal longitude,
-            Integer viewCount, Integer follow, LocalDateTime publicationTime, LocalDateTime lastUpdateTime,
-            String title, String story, String healthCondition, String adoptedCondition, Integer status, Integer note,
+            BigDecimal longitude, Integer viewCount, Integer follow, LocalDateTime publicationTime,
+            LocalDateTime lastUpdateTime,
+            String title, String story, String healthCondition, String adoptedCondition, Integer status, String note,
             List<CasePicture> casePictures, Set<Follow> follows, List<ReportCase> reportCase,
-            Set<AdoptionCaseApply> adoptionCaseApply) {
+            Set<AdoptionCaseApply> adoptionCaseApply, CaseState caseState) {
         this.adoptionCaseId = adoptionCaseId;
         this.caseTitle = caseTitle;
         this.member = member;
@@ -172,12 +173,13 @@ public class AdoptionCase {
         this.story = story;
         this.healthCondition = healthCondition;
         this.adoptedCondition = adoptedCondition;
-        this.status = status;
+
         this.note = note;
         this.casePictures = casePictures;
         this.follows = follows;
         this.reportCase = reportCase;
         this.adoptionCaseApply = adoptionCaseApply;
+        this.caseState = caseState; // 確保在構造時就初始化 caseState
     }
 
     public Integer getAdoptionCaseId() {
@@ -308,6 +310,34 @@ public class AdoptionCase {
         this.city = city;
     }
 
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
+
+    public DistinctArea getDistinctArea() {
+        return distinctArea;
+    }
+
+    public void setDistinctArea(DistinctArea distinctArea) {
+        this.distinctArea = distinctArea;
+    }
+
+    public void setReportCase(List<ReportCase> reportCase) {
+        this.reportCase = reportCase;
+    }
+
+    public Set<AdoptionCaseApply> getAdoptionCaseApply() {
+        return adoptionCaseApply;
+    }
+
+    public void setAdoptionCaseApply(Set<AdoptionCaseApply> adoptionCaseApply) {
+        this.adoptionCaseApply = adoptionCaseApply;
+    }
+
     public DistinctArea getDistintId() {
         return distinctArea;
     }
@@ -330,6 +360,14 @@ public class AdoptionCase {
 
     public void setLatitude(BigDecimal latitude) {
         this.latitude = latitude;
+    }
+
+    public CaseState getCaseState() {
+        return caseState;
+    }
+
+    public void setCaseState(CaseState caseState) {
+        this.caseState = caseState;
     }
 
     public BigDecimal getLongitude() {
@@ -404,19 +442,11 @@ public class AdoptionCase {
         this.adoptedCondition = adoptedCondition;
     }
 
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public Integer getNote() {
+    public String getNote() {
         return note;
     }
 
-    public void setNote(Integer note) {
+    public void setNote(String note) {
         this.note = note;
     }
 
@@ -429,7 +459,7 @@ public class AdoptionCase {
                 + ", latitude=" + latitude + ", longitude=" + longitude + ", viewCount=" + viewCount + ", follow="
                 + follow + ", publicationTime=" + publicationTime + ", lastUpdateTime=" + lastUpdateTime + ", title="
                 + title + ", story=" + story + ", healthCondition=" + healthCondition + ", adoptedCondition="
-                + adoptedCondition + ", status=" + status + ", note=" + note + ", casePictures=" + casePictures
+                + adoptedCondition + ", note=" + note + ", casePictures=" + casePictures
                 + ", follows=" + follows + ", reportCase=" + reportCase + ", adoptionCaseApplys=" + adoptionCaseApply
                 + "]";
     }
