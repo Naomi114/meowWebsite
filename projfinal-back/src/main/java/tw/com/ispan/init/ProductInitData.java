@@ -4,13 +4,16 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.domain.shop.Category;
@@ -78,39 +81,25 @@ public class ProductInitData implements CommandLineRunner {
     }
 
     private void initializeCategories() {
-        List<CategoryInitData> categories = List.of(
-                new CategoryInitData("寵物用品", "個", "所有寵物相關商品"),
-                new CategoryInitData("玩具", "個", "各類寵物玩具"),
-                new CategoryInitData("飼料", "包", "各種寵物飼料"),
-                new CategoryInitData("保健品", "罐", "寵物專用保健產品"),
-                new CategoryInitData("清潔用品", "包", "清潔與衛生用品"));
+        Set<CategoryRequest> categories = Set.of(
+                new CategoryRequest("寵物用品", "所有寵物相關商品","個"),
+                new CategoryRequest("玩具", "各類寵物玩具", "個"),
+                new CategoryRequest("飼料", "各種寵物飼料", "包"),
+                new CategoryRequest("保健品", "寵物專用保健產品", "罐"),
+                new CategoryRequest("清潔用品", "清潔與衛生用品", "包"));
 
-        categories.forEach(this::processCategory);
-    }
-
-    @Transactional
-    private void processCategory(CategoryInitData data) {
-        try {
-            // 使用 CategoryService 進行新增或更新
-            CategoryRequest request = new CategoryRequest();
-            request.setCategoryName(data.getCategoryName());
-            request.setCategoryDescription(data.getCategoryDescription());
-            request.setUnit(data.getDefaultUnit());
-
-            CategoryResponse response = categoryService.createOrUpdateCategory(request);
-
-            // 記錄初始化結果
-            if (response.getSuccess()) {
-                System.out.println("初始化類別成功: " + response.getCategoryName());
-            } else {
-                System.err.println("初始化類別失敗: " + response.getMessage());
+        categories.forEach(categoryRequest -> {
+            try {
+                CategoryResponse response = categoryService.createOrUpdateCategory(categoryRequest);
+                if (response.getSuccess()) {
+                    System.out.println("成功初始化類別: " + categoryRequest.getCategoryName());
+                } else {
+                    System.err.println("初始化類別失敗: " + response.getMessage());
+                }
+            } catch (Exception e) {
+                System.err.println("初始化類別失敗: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("初始化類別時發生錯誤: " + data.getCategoryName());
-            e.printStackTrace();
-            // 重要：拋出異常以便 Spring 正確處理事務
-            throw e;
-        }
+        });
     }
 
     private void initializeTags() {
@@ -156,14 +145,12 @@ public class ProductInitData implements CommandLineRunner {
             product1.setExpire(LocalDate.parse("2025-12-31"));
             product1.setCreatedAt(LocalDateTime.now());
             product1.setUpdatedAt(LocalDateTime.now());
-
-            // 提供文件名列表
-            List<String> filenames1 = List.of("image11.jpg", "image12.jpg");
-            try {
-                productImageService.addProductImages(product1, filenames1);
-            } catch (Exception e) {
-                System.err.println("圖片初始化失敗: " + e.getMessage());
-            }
+            // 傳入本地真實圖片，改寫中~~~~~~~
+            // List<MultipartFile> filenames1 = List.of(
+            //     new MockMultipartFile("image11.jpg", new byte[0]),
+            //     new MockMultipartFile("image12.jpg", new byte[0])
+            // );
+            // productImageService.initializeProductImages(product1, filenames1);
 
             Product product2 = new Product();
             product2.setAdmin(admin);
@@ -179,11 +166,7 @@ public class ProductInitData implements CommandLineRunner {
             product2.setCreatedAt(LocalDateTime.now());
             product2.setUpdatedAt(LocalDateTime.now());
             List<String> filenames2 = List.of("image2.jpg");
-            try {
-                productImageService.addProductImages(product2, filenames2);
-            } catch (Exception e) {
-                System.err.println("圖片初始化失敗: " + e.getMessage());
-            }
+            productImageService.initializeProductImages(product2, filenames2);
 
             Product product3 = new Product();
             product3.setAdmin(admin);
@@ -199,11 +182,7 @@ public class ProductInitData implements CommandLineRunner {
             product3.setCreatedAt(LocalDateTime.now());
             product3.setUpdatedAt(LocalDateTime.now());
             List<String> filenames3 = List.of("image3.jpg");
-            try {
-                productImageService.addProductImages(product3, filenames3);
-            } catch (Exception e) {
-                System.err.println("圖片初始化失敗: " + e.getMessage());
-            }
+            productImageService.initializeProductImages(product3, filenames3);
 
             Product product4 = new Product();
             product4.setAdmin(admin);
@@ -219,11 +198,7 @@ public class ProductInitData implements CommandLineRunner {
             product4.setCreatedAt(LocalDateTime.now());
             product4.setUpdatedAt(LocalDateTime.now());
             List<String> filenames4 = List.of("image41.jpg", "image42.jpg", "image43.jpg");
-            try {
-                productImageService.addProductImages(product4, filenames4);
-            } catch (Exception e) {
-                System.err.println("圖片初始化失敗: " + e.getMessage());
-            }
+            productImageService.initializeProductImages(product4, filenames4);
 
             Product product5 = new Product();
             product5.setAdmin(admin);
@@ -239,11 +214,7 @@ public class ProductInitData implements CommandLineRunner {
             product5.setCreatedAt(LocalDateTime.now());
             product5.setUpdatedAt(LocalDateTime.now());
             List<String> filenames5 = List.of("image5.png");
-            try {
-                productImageService.addProductImages(product5, filenames5);
-            } catch (Exception e) {
-                System.err.println("圖片初始化失敗: " + e.getMessage());
-            }
+            productImageService.initializeProductImages(product5, filenames5);
 
             productRepository.save(product1);
             productRepository.save(product2);

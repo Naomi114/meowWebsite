@@ -13,6 +13,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import org.springframework.web.multipart.MultipartFile;
+
 /*  ProductRequest 的責任
     1. 包含商品的整體數據（包括基本信息、價格、庫存等）。
     2. 包含一組 ProductImageRequest，負責描述該商品的所有圖片。
@@ -63,15 +65,15 @@ public class ProductRequest {
 
     // 自動生成：上架中、已售完 (20250116 寫入ProductService)
     // 手動調整：隱藏 (未完成)--應該寫入 adminService
-    @NotBlank
-    private String status;
+    // @NotBlank
+    // private String status;
 
     @Future
     private LocalDate expire;
 
     // 前端為多選: 1~5張圖片；不能為空值
     @NotNull(message = "商品圖片不能為空")
-    private List<ProductImageRequest> productImages;
+    private List<MultipartFile> productImages;
 
     public String getProductName() {
         return productName;
@@ -121,13 +123,13 @@ public class ProductRequest {
         this.unit = unit;
     }
 
-    public String getStatus() {
-        return status;
-    }
+    // public String getStatus() {
+    //     return status;
+    // }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    // public void setStatus(String status) {
+    //     this.status = status;
+    // }
 
     public LocalDate getExpire() {
         return expire;
@@ -156,11 +158,11 @@ public class ProductRequest {
         this.tags = tags;
     }
 
-    public List<ProductImageRequest> getProductImages() {
+    public List<MultipartFile> getProductImages() {
         return productImages;
     }
 
-    public void setProductImages(List<ProductImageRequest> productImages) {
+    public void setProductImages(List<MultipartFile> productImages) {
         this.productImages = productImages;
     }
 

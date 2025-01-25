@@ -2,6 +2,7 @@ package tw.com.ispan.service.shop;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,18 +33,26 @@ public class CategoryService {
             Optional<Category> existingCategory = categoryRepository.findByCategoryName(request.getCategoryName());
             Category category;
             if (existingCategory.isPresent()) {
+                // 更新類別
                 category = existingCategory.get();
-                if (request.getUnit() != null && !request.getUnit().isEmpty()) {
-                    category.setDefaultUnit(request.getUnit());
+                if (request.getDefaultUnit() != null && !request.getDefaultUnit().isEmpty()) {
+                    category.setDefaultUnit(request.getDefaultUnit());
+                }
+                if (request.getCategoryDescription() != null) {
+                    category.setCategoryDescription(request.getCategoryDescription());
                 }
             } else {
-                if (request.getUnit() == null || request.getUnit().isEmpty()) {
-                    throw new IllegalArgumentException("新增類別時必須提供預設單位");
-                }
+                // 新增類別
                 category = new Category();
                 category.setCategoryName(request.getCategoryName());
                 category.setCategoryDescription(request.getCategoryDescription());
-                category.setDefaultUnit(request.getUnit());
+                category.setDefaultUnit(request.getDefaultUnit());
+
+                // 驗證必要屬性是否設置
+                if (category.getCategoryName() == null || category.getDefaultUnit() == null) {
+                    throw new IllegalArgumentException("類別名稱或預設單位不能為空");
+                }
+
                 categoryRepository.save(category);
             }
             response.setCategoryName(category.getCategoryName());
@@ -89,7 +98,7 @@ public class CategoryService {
                 Category category = categoryOpt.get();
                 category.setCategoryName(request.getCategoryName());
                 category.setCategoryDescription(request.getCategoryDescription());
-                category.setDefaultUnit(request.getUnit());
+                category.setDefaultUnit(request.getDefaultUnit());
                 Category updatedCategory = categoryRepository.save(category);
 
                 // 設置返回
@@ -155,18 +164,47 @@ public class CategoryService {
         return response;
     }
 
-    // 轉換 CategoryResponse => Category
+    // 商品上架，處理類別
+	public void processCategory(Product product, Set<CategoryRequest> categoryRequests) {
+        if (categoryRequests == null || categoryRequests.isEmpty()) {
+            throw new IllegalArgumentException("必須提供至少一個類別");
+        }
+    
+        for (CategoryRequest categoryRequest : categoryRequests) {
+            // 查詢或創建類別
+            CategoryResponse categoryResponse = createOrUpdateCategory(categoryRequest);
+            if (!categoryResponse.getSuccess()) {
+                throw new IllegalArgumentException("類別操作失敗: " + categoryResponse.getMessage());
+            }
+    
+            // 查詢完整的 Category 實體
+            Category category = findCategoryEntity(categoryResponse.getCategoryName());
+            product.setCategory(category);
+    
+            // 設定商品單位
+            String unit = categoryRequest.getDefaultUnit();
+            if (unit == null || unit.isEmpty()) {
+                unit = categoryResponse.getDefaultUnit();
+                if (unit == null || unit.isEmpty()) {
+                    throw new IllegalArgumentException("類別的預設單位未設置或提供");
+                }
+            }
+            product.setUnit(unit);
+        }
+    }
+    
+    // 查詢實體 CategoryResponse => Category
     public Category findCategoryEntity(String categoryName) {
         return categoryRepository.findByCategoryName(categoryName)
                 .orElseThrow(() -> new IllegalArgumentException("類別不存在: " + categoryName));
     }
 
-    // 單選類別型別轉換: ProductRequest => CategoryRequest
+    // 型別轉換: ProductRequest => CategoryRequest
     public CategoryRequest buildCategoryRequestFromProduct(ProductRequest request) {
         CategoryRequest categoryRequest = new CategoryRequest();
         categoryRequest.setCategoryName(request.getCategoryName());
         categoryRequest.setCategoryDescription(request.getCategoryDescription());
-        categoryRequest.setUnit(request.getUnit());
+        categoryRequest.setDefaultUnit(request.getUnit());
         return categoryRequest;
     }
 }

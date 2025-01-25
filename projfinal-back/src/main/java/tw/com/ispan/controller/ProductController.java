@@ -1,12 +1,26 @@
 package tw.com.ispan.controller;
 
 import java.math.BigDecimal;
+import java.util.List;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.dto.ProductRequest;
@@ -22,16 +36,29 @@ public class ProductController {
     private ProductService productService;
 
     // 新增商品
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createProduct(
-            @Valid @RequestBody ProductRequest request) {
+            @RequestPart("productRequest") ProductRequest productRequest,
+            @RequestPart("productImages") List<MultipartFile> filenames
+    ) {
         try {
-            ProductResponse response = productService.createSingle(request);
+            ProductResponse response = productService.createSingle(productRequest,filenames);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("商品新增失敗: " + e.getMessage());
         }
     }
+
+    // @PostMapping
+    // public ResponseEntity<?> createProduct(
+    //         @Valid @RequestBody ProductRequest request) {
+    //     try {
+    //         ProductResponse response = productService.createSingle(request);
+    //         return ResponseEntity.ok(response);
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("商品新增失敗: " + e.getMessage());
+    //     }
+    // }
 
     // 修改商品
     @PutMapping("/{id}")

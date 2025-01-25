@@ -11,7 +11,17 @@ public class CategoryRequest {
     private String categoryDescription;
 
     @NotBlank(message = "新建類別單位不能為空")
-    private String unit;
+    private String defaultUnit;
+
+    public CategoryRequest() {
+    }
+
+    public CategoryRequest(@NotBlank(message = "類別名稱不能為空") String categoryName, String categoryDescription,
+            @NotBlank(message = "新建類別單位不能為空") String defaultUnit) {
+        this.categoryName = categoryName;
+        this.categoryDescription = categoryDescription;
+        this.defaultUnit = defaultUnit;
+    }
 
     public String getCategoryName() {
         return categoryName;
@@ -29,12 +39,12 @@ public class CategoryRequest {
         this.categoryDescription = categoryDescription;
     }
 
-    public String getUnit() {
-        return unit;
+    public String getDefaultUnit() {
+        return defaultUnit;
     }
 
-    public void setUnit(String unit) {
-        this.unit = unit;
+    public void setDefaultUnit(String defaultUnit) {
+        this.defaultUnit = defaultUnit;
     }
 
     public Integer getCategoryId() {

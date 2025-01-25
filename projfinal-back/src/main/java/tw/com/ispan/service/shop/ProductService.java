@@ -4,22 +4,18 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
-import tw.com.ispan.dto.CategoryRequest;
-import tw.com.ispan.dto.CategoryResponse;
-import tw.com.ispan.dto.ProductImageRequest;
 import tw.com.ispan.dto.ProductRequest;
 import tw.com.ispan.dto.ProductResponse;
-import tw.com.ispan.dto.ProductTagRequest;
-import tw.com.ispan.dto.ProductTagResponse;
 import tw.com.ispan.repository.shop.ProductRepository;
 import tw.com.ispan.specification.ProductSpecifications;
 
@@ -52,7 +48,7 @@ public class ProductService {
 	private ProductImageService productImageService;
 
 	// 單筆新增
-	public ProductResponse createSingle(ProductRequest request) {
+	public ProductResponse createSingle(ProductRequest request, List<MultipartFile> filenames) {
 		ProductResponse response = new ProductResponse();
 		try {
 			Product product = new Product();
@@ -60,33 +56,14 @@ public class ProductService {
 			product.setProductName(request.getProductName());
 			product.setDescription(request.getDescription());
 
-			// 關鍵: 使用 buildCategoryRequest 構建 CategoryRequest
-			CategoryRequest categoryRequest = categoryService.buildCategoryRequestFromProduct(request);
+			// 處理類別(1種)
+			categoryService.processCategory(product, Set.of(categoryService.buildCategoryRequestFromProduct(request)));
 
-			// 查詢或創建類別
-			CategoryResponse categoryResponse = categoryService.createOrUpdateCategory(categoryRequest);
-			if (!categoryResponse.getSuccess()) {
-				throw new IllegalArgumentException("類別操作失敗: " + categoryResponse.getMessage());
-			}
+			// 處理標籤(0~N個)
+			productTagService.processProductTags(product, request.getTags());
 
-			// 查詢完整的 Category 實體並設置到商品
-			Category category = categoryService.findCategoryEntity(categoryResponse.getCategoryName());
-			product.setCategory(category);
-
-			// 確保商品單位設置正確
-			String unit = request.getUnit();
-			if (unit == null || unit.isEmpty()) {
-				unit = categoryResponse.getDefaultUnit();
-				if (unit == null || unit.isEmpty()) {
-					throw new IllegalArgumentException("類別的預設單位未設置或提供");
-				}
-			}
-			product.setUnit(unit);
-
-			// 查詢或建立標籤 (可為0~N個標籤)
-			ProductTagRequest productTagRequest = productTagService.buildTagRequestFromProduct(request);
-
-			ProductTagResponse productTagResponse = productTagService.createTag(productTagRequest);
+			// 處理商品圖片(1~5張)
+			productImageService.processProductImage(product, filenames);
 
 			/*
 			 * compareTo 適用於以下型別的空值判斷
@@ -133,28 +110,6 @@ public class ProductService {
 			// 創建時間和更新時間自動生成
 			product.setCreatedAt(LocalDateTime.now());
 			product.setUpdatedAt(LocalDateTime.now());
-
-			/*
-			 * ProductService 中處理以下圖片邏輯：
-			 * 1. 檢查圖片數量是否為 1~5 張。
-			 * 2. 驗證每張圖片的內容。
-			 * 3. 儲存圖片並更新資料庫。
-			 */
-
-			if (request.getProductImages() == null || request.getProductImages().isEmpty()) {
-				throw new IllegalArgumentException("商品圖片不能為空");
-			}
-			if (request.getProductImages().size() < 1 || request.getProductImages().size() > 5) {
-				throw new IllegalArgumentException("商品圖片數量必須在 1 到 5 之間");
-			}
-
-			// 提取文件名列表 (轉換型別 List<ProductImageRequest> => List<String>)
-			List<String> filenames = request.getProductImages().stream()
-					.map(ProductImageRequest::getFilename)
-					.collect(Collectors.toList());
-
-			// 調用 ProductImageService 添加圖片
-			productImageService.addProductImages(product, filenames);
 
 			Product savedProduct = productRepository.save(product);
 			response.setSuccess(true);
@@ -303,4 +258,8 @@ public class ProductService {
 
 		return response;
 	}
+
+	
+
+	
 }

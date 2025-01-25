@@ -268,6 +268,14 @@ public class Product {
         this.tags = tags;
     }
 
+    public void addTag(ProductTag tag) {
+        this.tags.add(tag);
+    }
+
+    public void removeTag(ProductTag tag) {
+        this.tags.remove(tag);
+    }
+
     public List<InventoryItem> getInventoryItems() {
         return inventoryItems;
     }
