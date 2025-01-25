@@ -61,6 +61,7 @@ public class PetDataInitializer implements CommandLineRunner {
 
 		// 存入品種資料(狗貓放在同一表格，貓breedId為1~53 狗breedId 54~186)
 		//檢查邏輯為breed資料表內是否有id 1-53的資料，返回的list如果不是共53筆就做新增 (其實邏輯不太對，但基本上有執行過資料注入就應該一次是53筆，就先這樣吧)
+		System.out.println("要注入品種資料");
 		List<Integer> catList = breedRepository.findBreedIdsInRange(1,53);
 		if(catList.size() != 53) {
 			Resource catResource = new ClassPathResource("data/catBreeds.json");

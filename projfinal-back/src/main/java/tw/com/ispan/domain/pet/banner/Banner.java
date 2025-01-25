@@ -1,4 +1,4 @@
-package tw.com.ispan.domain.pet.Banner;
+package tw.com.ispan.domain.pet.banner;
 
 import jakarta.persistence.*;
 import tw.com.ispan.domain.pet.AdoptionCase;

@@ -2,6 +2,7 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -16,8 +17,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Species")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "speciesId" // 使用 speciesId 作為唯一標識符
-)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "speciesId")
 public class Species {
 
     @Id

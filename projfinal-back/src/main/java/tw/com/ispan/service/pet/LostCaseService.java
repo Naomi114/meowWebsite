@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.criteria.Predicate;
 import tw.com.ispan.domain.pet.LostCase;
-import tw.com.ispan.domain.pet.Banner.Banner;
-import tw.com.ispan.domain.pet.Banner.BannerType;
+import tw.com.ispan.domain.pet.banner.Banner;
+import tw.com.ispan.domain.pet.banner.BannerType;
 import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.pet.BannerRepository;
 import tw.com.ispan.repository.pet.BreedRepository;

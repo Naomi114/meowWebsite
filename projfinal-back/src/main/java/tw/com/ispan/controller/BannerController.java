@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import tw.com.ispan.domain.pet.Banner.Banner;
-import tw.com.ispan.domain.pet.Banner.BannerType;
+import tw.com.ispan.domain.pet.banner.Banner;
+import tw.com.ispan.domain.pet.banner.BannerType;
 import tw.com.ispan.service.banner.BannerService;
 
 @RestController

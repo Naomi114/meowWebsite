@@ -3,7 +3,10 @@ package tw.com.ispan.domain.pet;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -18,11 +21,13 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.ToString;
 import tw.com.ispan.domain.admin.Member;
+import tw.com.ispan.domain.pet.banner.Banner;
 import tw.com.ispan.domain.pet.forRescue.CanAfford;
 import tw.com.ispan.domain.pet.forRescue.RescueDemand;
 import tw.com.ispan.domain.pet.forRescue.RescueProgress;
@@ -37,6 +42,7 @@ import tw.com.ispan.domain.pet.forRescue.RescueProgress;
         @Index(name = "idx_city", columnList = "cityId"),
         @Index(name = "idx_distinctArea", columnList = "distinctAreaId")
     })
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "rescueCaseId")
 public class RescueCase {
 
 	@Id
@@ -47,10 +53,10 @@ public class RescueCase {
 	@Column(columnDefinition = "NVARCHAR(30)", name = "caseTitle", nullable = false)
 	private String caseTitle;
 	
-	//必填(但為了測試先改成非必填)
+	//必填
 	// 關聯到member表，雙向多對一
 	@ManyToOne(cascade = { CascadeType.PERSIST})
-	@JoinColumn(name = "memberId", nullable = true, foreignKey = @ForeignKey(name = "FK_RescueCase_Member"))
+	@JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_Member"))
 	@ToString.Exclude
 	private Member member;
 
@@ -58,13 +64,11 @@ public class RescueCase {
 	// 關聯到species表，雙向多對一
 	@ManyToOne(cascade = { CascadeType.PERSIST})
 	@JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_Species"))
-	@JsonManagedReference ("rescueCase-species")
 	private Species species;
 
 	// 關聯到breed表，雙向多對一
 	@ManyToOne(cascade = { CascadeType.PERSIST})
 	@JoinColumn(name = "breedId", foreignKey = @ForeignKey(name = "FK_RescueCase_Breed"))
-	@JsonManagedReference("rescueCase-breed")
 	private Breed breed;
 
 	// 關聯到furColor表，雙向多對一
@@ -92,14 +96,12 @@ public class RescueCase {
 	// 關聯到city表，雙向多對一
 	@ManyToOne(cascade = { CascadeType.PERSIST})
 	@JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_City"))
-	@JsonManagedReference("rescueCase-city")
 	private City city;
 
 	//必填
 	// 關聯到distinctArea表，雙向多對一
 	@ManyToOne(cascade = { CascadeType.PERSIST})
 	@JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_DistinctArea"))
-	@JsonManagedReference("rescueCase-distinctArea")
 	private DistinctArea distinctArea;
 
 	@Column(columnDefinition = "NVARCHAR(10)", name = "street")
@@ -190,9 +192,11 @@ public class RescueCase {
     @OneToMany(mappedBy = "rescueCase", cascade =  CascadeType.PERSIST)
     private List<ReportCase> reportCases; 
     
-    //關聯到rescueBanner表，雙向一對一
-//    @OneToOne(mappedBy = "rescueCase", cascade =  CascadeType.All, orphanRemoval = true)
-//    private RescueBanner rescueBanner;
+    @OneToOne(mappedBy = "rescueCase", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Banner banner;
+
+    @Column(name = "isHidden", nullable = false)
+    private Boolean isHidden = false; // 默認為不隱藏
    
     
     

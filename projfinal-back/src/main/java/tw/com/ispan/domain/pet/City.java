@@ -2,8 +2,10 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,6 +19,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "City")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "cityId")
 public class City {
 
 	@Id
@@ -34,17 +37,15 @@ public class City {
 
 	// 和RescueCase表雙向一對多
 	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
-	@JsonBackReference("rescueCase-city")
+//	 @JsonManagedReference("rescueCase-city")
 	private List<RescueCase> rescueCases;
 
 	// 和LostCase表雙向一對多
 	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
-	@JsonBackReference("lostCases-city")
 	private List<LostCase> lostCases;
 
 	// 和adoptionCase表雙向一對多
 	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
-	@JsonBackReference("adoptionCases-city")
 	private List<AdoptionCase> adoptionCases;
 
 	public City() {

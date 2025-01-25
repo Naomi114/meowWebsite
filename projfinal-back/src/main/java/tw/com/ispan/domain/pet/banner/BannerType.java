@@ -1,4 +1,4 @@
-package tw.com.ispan.domain.pet.Banner;
+package tw.com.ispan.domain.pet.banner;
 
 public enum BannerType {
     LOST("遺失", 1),
