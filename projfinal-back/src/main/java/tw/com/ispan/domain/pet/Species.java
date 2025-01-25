@@ -2,7 +2,8 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,6 +16,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Species")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "speciesId" // 使用 speciesId 作為唯一標識符
+)
 public class Species {
 
     @Id
@@ -25,35 +28,25 @@ public class Species {
     @Column(name = "species", nullable = false, length = 10)
     private String species;
 
-//改為單向
-//    @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
-//    @JsonBackReference("lostCases-species")
-//    private List<LostCase> lostCases;
-//
-//    @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
-//    @JsonBackReference("rescueCase-species")
-//    private List<RescueCase> rescueCases;
-//    
-//    @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
-//    @JsonBackReference("adoptionCase-species")
-//    private List<AdoptionCase> adoptionCase;	
+    @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
+    private List<LostCase> lostCases;
 
-    
-    
+    @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
+    private List<RescueCase> rescueCases;
+
+    @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
+    private List<AdoptionCase> adoptionCase;
+
     public Species() {
-		super();
-	}
+        super();
+    }
 
-	
+    public Species(String species) {
+        super();
+        this.species = species;
+    }
 
-	public Species(String species) {
-		super();
-		this.species = species;
-	}
-
-
-
-	// Getters and Setters
+    // Getters and Setters
     public Integer getSpeciesId() {
         return speciesId;
     }
@@ -70,5 +63,34 @@ public class Species {
         this.species = species;
     }
 
-    
+    public List<RescueCase> getRescueCases() {
+        return rescueCases;
+    }
+
+    public void setRescueCases(List<RescueCase> rescueCases) {
+        this.rescueCases = rescueCases;
+    }
+
+    public List<LostCase> getLostCases() {
+        return lostCases;
+    }
+
+    public void setLostCases(List<LostCase> lostCases) {
+        this.lostCases = lostCases;
+    }
+
+    public List<AdoptionCase> getAdoptionCase() {
+        return adoptionCase;
+    }
+
+    public void setAdoptionCase(List<AdoptionCase> adoptionCase) {
+        this.adoptionCase = adoptionCase;
+    }
+
+    @Override
+    public String toString() {
+        return "Species [speciesId=" + speciesId + ", species=" + species + ", lostCases=" + lostCases
+                + ", rescueCases=" + rescueCases + ", adoptionCase=" + adoptionCase + "]";
+    }
+
 }

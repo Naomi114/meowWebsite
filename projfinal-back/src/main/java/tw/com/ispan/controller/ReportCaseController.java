@@ -1,20 +1,22 @@
 package tw.com.ispan.controller;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tw.com.ispan.domain.pet.ReportCase;
+import tw.com.ispan.dto.ReportCaseResponse;
 import tw.com.ispan.service.pet.ReportCaseService;
 
 @RestController
@@ -24,74 +26,129 @@ public class ReportCaseController {
     @Autowired
     private ReportCaseService reportCaseService;
 
-    // 1. 新增 ReportCase
     @PostMapping
-    public ReportCase createReportCase(@RequestBody ReportCase reportCase) {
-        reportCase.setReportDate(LocalDateTime.now()); // 設定當前時間為報告日期
-        return reportCaseService.save(reportCase);
-    }
+    public ResponseEntity<String> createReportCase(@RequestBody String requestBody) {
+        JSONObject responseJson = new JSONObject();
 
-    // 2. 查詢所有 ReportCases
-    @GetMapping
-    public List<ReportCase> getAllReportCases() {
-        return reportCaseService.findAll();
-    }
+        try {
+            // 调用 Service 的 create 方法
+            ReportCase newReportCase = reportCaseService.create(requestBody);
 
-    // 3. 根據 ID 查詢 ReportCase
-    @GetMapping("/{id}")
-    public ReportCase getReportCaseById(@PathVariable Integer id) {
-        Optional<ReportCase> reportCase = reportCaseService.findById(id);
-        if (reportCase.isPresent()) {
-            return reportCase.get();
-        } else {
-            throw new IllegalArgumentException("找不到指定的 ReportCase，ID: " + id);
+            // 構建成功響應
+            responseJson.put("success", true);
+            responseJson.put("message", "舉報案件創建成功！");
+            responseJson.put("data", new JSONObject()
+                    .put("reportCaseId", newReportCase.getReportId())
+                    .put("reportTitle", newReportCase.getReportTitle())
+                    .put("reportDate", newReportCase.getReportDate().toString())
+                    .put("reportNotes", newReportCase.getReportNotes())
+                    .put("reportState", newReportCase.isReportState()));
+            return ResponseEntity.ok(responseJson.toString());
+
+        } catch (IllegalArgumentException e) {
+            // 處理非法參數異常
+            responseJson.put("success", false);
+            responseJson.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(responseJson.toString());
+
+        } catch (Exception e) {
+            // 處理其他異常
+            responseJson.put("success", false);
+            responseJson.put("message", "舉報案件創建失敗：" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseJson.toString());
         }
     }
 
-    // /**
-    // * 根據 memberId 查詢 ReportCase
-    // *
-    // * @param memberId 會員的 ID
-    // * @return 與該會員相關的 ReportCase 列表
-    // */
-    // @GetMapping("/{memberId}")
-    // public ResponseEntity<?> getReportCasesByMemberId(@PathVariable Integer
-    // memberId) {
-    // List<ReportCase> reportCases = reportCaseService.findByMemberId(memberId);
-    // if (!reportCases.isEmpty()) {
-    // return ResponseEntity.ok(reportCases);
-    // } else {
-    // return ResponseEntity.status(404).body("No ReportCases found for memberId: "
-    // + memberId);
-    // }
-    // }
+    @PutMapping("/review/{Id}")
+    public ResponseEntity<String> reviewReport(
+            @PathVariable Integer reportCaseId,
+            @RequestParam Integer adminId,
+            @RequestParam boolean isApproved,
+            @RequestParam boolean hideCase) {
 
-    // 4. 更新 ReportCase
+        JSONObject responseJson = new JSONObject();
+
+        try {
+            // 调用服务层的 review 方法进行处理
+            ReportCase updatedReportCase = reportCaseService.review(reportCaseId, adminId, isApproved, hideCase);
+
+            // 构建成功的响应
+            responseJson.put("success", true);
+            responseJson.put("message", "審核成功！");
+            responseJson.put("data", new JSONObject()
+                    .put("reportCaseId", updatedReportCase.getReportId())
+                    .put("isApproved", updatedReportCase.isReportState())
+                    .put("adminId", adminId)
+                    .put("hideCase", hideCase));
+            return ResponseEntity.ok(responseJson.toString());
+
+        } catch (IllegalArgumentException e) {
+            // 参数无效的错误处理
+            responseJson.put("success", false);
+            responseJson.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(responseJson.toString());
+        } catch (Exception e) {
+            // 其他异常的错误处理
+            responseJson.put("success", false);
+            responseJson.put("message", "審核失敗：" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseJson.toString());
+        }
+    }
+
     @PutMapping("/{id}")
-    public ReportCase updateReportCase(@PathVariable Integer id, @RequestBody ReportCase reportCase) {
-        Optional<ReportCase> existingReportCase = reportCaseService.findById(id);
-        if (existingReportCase.isPresent()) {
-            ReportCase update = existingReportCase.get();
-            // update.setRescueCase(reportCase.getRescueCase());
-            update.setLostCase(reportCase.getLostCase());
-            // update.setAdoptionCase(reportCase.getAdoptionCase());
-            // update.setMember(reportCase.getMember());
-            update.setReportType(reportCase.getReportType());
-            update.setReportNotes(reportCase.getReportNotes());
-            return reportCaseService.save(update);
-        } else {
-            throw new IllegalArgumentException("找不到指定的 ReportCase，ID: " + id);
+    public ResponseEntity<String> modifyReportCase(@RequestBody String requestBody) {
+        JSONObject responseJson = new JSONObject();
+
+        try {
+            // 调用 Service 的 modify 方法，传递请求体中的 JSON
+            ReportCase updatedReportCase = reportCaseService.modify(requestBody);
+
+            // 若成功，返回修改後的報告信息
+            if (updatedReportCase != null) {
+                responseJson.put("success", true);
+                responseJson.put("message", "報告案件修改成功！");
+                responseJson.put("data", new JSONObject()
+                        .put("reportCaseId", updatedReportCase.getReportId())
+                        .put("reportTitle", updatedReportCase.getReportTitle())
+                        .put("reportDate", updatedReportCase.getReportDate().toString())
+                        .put("reportNotes", updatedReportCase.getReportNotes())
+                        .put("reportState", updatedReportCase.isReportState())
+                        .put("updateDate", updatedReportCase.getUpdateDate().toString()));
+                return ResponseEntity.ok(responseJson.toString());
+            } else {
+                responseJson.put("success", false);
+                responseJson.put("message", "修改失敗！");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseJson.toString());
+            }
+
+        } catch (IllegalArgumentException e) {
+            // 處理非法參數異常
+            responseJson.put("success", false);
+            responseJson.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(responseJson.toString());
+
+        } catch (Exception e) {
+            // 處理其他異常
+            responseJson.put("success", false);
+            responseJson.put("message", "修改報告失敗：" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseJson.toString());
         }
     }
 
-    // 5. 刪除 ReportCase
-    @DeleteMapping("/{id}")
-    public String deleteReportCase(@PathVariable Integer id) {
-        if (reportCaseService.existsById(id)) {
-            reportCaseService.deleteById(id);
-            return "刪除成功，ID: " + id;
+    @PostMapping("/find")
+    public ReportCaseResponse find(@RequestBody String json) {
+        ReportCaseResponse responseBean = new ReportCaseResponse();
+
+        long count = reportCaseService.count(json);
+        responseBean.setCount(count);
+
+        List<ReportCase> products = reportCaseService.find(json);
+        if (products != null && !products.isEmpty()) {
+            responseBean.setList(products);
         } else {
-            return "找不到指定的 ReportCase，ID: " + id;
+            responseBean.setList(new ArrayList<>());
         }
+
+        return responseBean;
     }
 }
