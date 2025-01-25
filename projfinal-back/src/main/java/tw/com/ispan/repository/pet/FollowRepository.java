@@ -1,6 +1,10 @@
 package tw.com.ispan.repository.pet;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import tw.com.ispan.domain.admin.Member;
@@ -24,4 +28,18 @@ public interface FollowRepository extends JpaRepository<Follow, Integer> {
     void deleteByLostCaseAndMember(LostCase lostCase, Member member);
     @Transactional
     void deleteByAdoptionCaseAndMember(AdoptionCase adoptionCase, Member member);
+    
+    
+    //計算某 RescueCase 被追蹤的總數
+    @Query("SELECT COUNT(f) FROM Follow f WHERE f.rescueCase.rescueCaseId = :caseId")
+    int countByRescueCaseId(Integer caseId);
+    @Query("SELECT COUNT(f) FROM Follow f WHERE f.lostCase.lostCaseId = :caseId")
+    int countByLostCaseId(Integer caseId);
+    @Query("SELECT COUNT(f) FROM Follow f WHERE f.adoptionCase.adoptionCaseId = :caseId")
+    int countByAdoptionCaseId(Integer caseId);
+    
+    //用於發送通知給有追蹤特定案件的會員(依caseId查出會員id清單)
+    @Query("SELECT f.member.memberId FROM Follow f WHERE f.rescueCase.rescueCaseId = :caseId")
+    List<Integer> findMemberIdsByRescueCaseId(@Param("caseId") Integer caseId);
+    
 }

@@ -2,7 +2,9 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
@@ -16,9 +18,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "FurColor")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "furColorId" // 使用 furColorId
-                                                                                                  // 作為唯一標識符
-)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "furColorId")                                                                                           // 作為唯一標識符
+
 public class FurColor {
 
     @Id
@@ -28,13 +29,16 @@ public class FurColor {
 
     @Column(name = "furColor", nullable = false, length = 20)
     private String furColor;
-
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
     private List<LostCase> lostCases;
-
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
     private List<RescueCase> rescueCases;
-
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
     private List<AdoptionCase> adoptionCase;
 

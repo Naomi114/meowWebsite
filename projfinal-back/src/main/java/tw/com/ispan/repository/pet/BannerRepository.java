@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import tw.com.ispan.domain.pet.Banner.Banner;
-import tw.com.ispan.domain.pet.Banner.BannerType;
+import tw.com.ispan.domain.pet.banner.Banner;
+import tw.com.ispan.domain.pet.banner.BannerType;
 
 public interface BannerRepository extends JpaRepository<Banner, Integer> {
 

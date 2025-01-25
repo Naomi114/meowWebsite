@@ -2,8 +2,9 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,6 +18,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "City")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "cityId")
 public class City {
 
 	@Id
@@ -25,26 +27,25 @@ public class City {
 
 	@Column(name = "city", columnDefinition = "NVARCHAR(5)", nullable = false)
 	private String city;
-
-	// 和DistinctArea表單向一對多
-	@OneToMany(cascade = CascadeType.PERSIST)
-	@JoinColumn(name = "city_id")
+	
+	// 和DistrictArea表雙向一對多
+	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
 	@JsonIgnore
-	private List<DistinctArea> distinctAreas;
+	private List<DistrictArea> districtAreas;
 
 	// 和RescueCase表雙向一對多
 	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
-	@JsonBackReference("rescueCase-city")
+	@JsonIgnore
 	private List<RescueCase> rescueCases;
 
 	// 和LostCase表雙向一對多
 	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
-	@JsonBackReference("lostCases-city")
+	@JsonIgnore
 	private List<LostCase> lostCases;
 
 	// 和adoptionCase表雙向一對多
 	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
-	@JsonBackReference("adoptionCases-city")
+	@JsonIgnore
 	private List<AdoptionCase> adoptionCases;
 
 	public City() {
@@ -80,12 +81,12 @@ public class City {
 		this.rescueCases = rescueCases;
 	}
 
-	public List<DistinctArea> getDistinctAreas() {
-		return distinctAreas;
+	public List<DistrictArea> getDistrictAreas() {
+		return districtAreas;
 	}
 
-	public void setDistinctAreas(List<DistinctArea> distinctAreas) {
-		this.distinctAreas = distinctAreas;
+	public void setDistrictAreas(List<DistrictArea> districtAreas) {
+		this.districtAreas = districtAreas;
 	}
 
 	public List<LostCase> getLostCases() {
@@ -103,7 +104,5 @@ public class City {
 	public void setAdoptionCases(List<AdoptionCase> adoptionCases) {
 		this.adoptionCases = adoptionCases;
 	}
-	
-	
 
 }

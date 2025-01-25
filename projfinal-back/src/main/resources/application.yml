@@ -20,12 +20,12 @@ spring:
     show-sql: true
     database-platform: org.hibernate.dialect.SQLServerDialect
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
-  #Redis資料庫連接資訊
+  #Redis資料庫連接資訊(冠)
   data:
     redis:
       host: 127.0.0.1 # Redis 伺服器地址
@@ -42,17 +42,17 @@ spring:
       max-request-size: 5MB
       enabled: true
 
-    #spring手動設定 HTTP 請求和回應的字符編碼
+    #spring手動設定 HTTP 請求和回應的字符編碼(冠)
     encoding:
       charset: UTF-8
       enabled: true
       force: true
 
-  #寵物圖片暫存路徑
+  #寵物圖片暫存路徑(冠)
 file:
   tmp-upload-dir: /src/main/resources/upload/tmp/pet/images
 
-  #寵物圖片上傳路徑
+  #寵物圖片上傳路徑(冠)
   final-upload-dir: /src/main/resources/upload/final/pet/images
 
   #conosle顏色
@@ -68,18 +68,18 @@ jwt:
   token:
     expire: 10
 
-#google座標api
+#google座標api(冠)
 google:
   api:
     key: AIzaSyATLMpyW2m1qnNAAQf0rZSpcl6TadBobBg
 
-#message API
+#message API(冠)
 Channel:
   Access:
     Token: "bHAiA50c1WQlH3fIjjz8PynVtkZf50BGYZT4jm/nCKCCnuzlyQloKiyZehAhCy4i/Ul42mUG7BUUNMwVxGQq2BFESxObRGLVKNH10flSwU4fjmbJf/12sr+3CQ866g1QZmMtX4Xsv8hGG9ZryLBtGgdB04t89/1O/w1cDnyilFU="
   Secrete: ad5f41710e2d45702d5065650ce7d03f
 
-#執行 RestTemplate請求時日誌會打印 HTTP 請求與回應的詳細資訊(用於檢查請求地址正確性)
+#執行 RestTemplate請求時日誌會打印 HTTP 請求與回應的詳細資訊(用於檢查請求地址正確性)(冠)
 logging:
   level:
     org:
@@ -89,18 +89,18 @@ logging:
             RestTemplate: DEBUG
       apache:
         http: DEBUG
-#Domain Name
+#Domain Name(冠)
 DomainName:
   url: http://localhost:8080
 
-#開發用公開網域url
+#開發用公開網域url(冠)
 ngrok:
   url: https://586f-1-160-6-252.ngrok-free.app
 
-#linebot跳轉
+#linebot跳轉(冠)
 lineBot: https://line.me/R/ti/p/@310pndih
 
-#line login相關設定
+#line login相關設定(冠)
 line:
   login:
     redirect-uri: ${DomainName.url}/line/callback

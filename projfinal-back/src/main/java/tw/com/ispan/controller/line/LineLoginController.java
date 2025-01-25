@@ -42,24 +42,24 @@ public class LineLoginController {
 	public ResponseEntity<String> authorizeUser(@RequestParam(required = false) Integer memberId) {
 
 		// 準備透過line登入不用驗證是會員!!!記得要排除於驗證jwt路徑中
-		
+
 		String state = loginService.generateState(); // 生成state
 
 		// 如果有 memberId，則與 state 一起保存
 		if (memberId != null) {
 			stateRedisService.saveStateWithMemberId(state, memberId);
-			System.out.println(456456);
 		} else {
 			stateRedisService.saveState(state); // 僅保存 state
 		}
 		System.out.println("state=" + state);
 		String authorizeUrl = loginService.generateAuthorizeUrl(state); // 構造授權 URL
-		return ResponseEntity.ok(authorizeUrl); // 返回給前端
+		return ResponseEntity.ok(authorizeUrl); // 超連結返回給前端
 	}
 
-//	 此為用戶點擊授權連結後，line會發出一個callback request(自定義於平台中)，url中夾帶code(line生成的)和state(我生成的)
-//	 https://yourdomain.com/callback?code=abcd1234&state=xyz789
-//	 state是OAuth 2.0和OpenID Connect授權流程中的一個安全機制，旨在防止跨站請求偽造（CSRF）攻擊，並確保授權請求的完整性
+	// 此為用戶點擊授權連結後，line會發出一個callback
+	// request(自定義於平台中)，url中夾帶code(line生成的)和state(我生成的)
+	// https://yourdomain.com/callback?code=abcd1234&state=xyz789
+	// state是OAuth 2.0和OpenID Connect授權流程中的一個安全機制，旨在防止跨站請求偽造（CSRF）攻擊，並確保授權請求的完整性
 	@GetMapping("/callback")
 	public ResponseEntity<String> handleCallback(@RequestParam String code, @RequestParam String state,
 			HttpServletResponse response) throws IOException {
@@ -72,7 +72,7 @@ public class LineLoginController {
 		}
 		// 獲取memberId，如果為null則是非會員情境
 		Integer memberId = stateRedisService.getMemberIdByState(state);
-		System.out.println("找到會員id為"+memberId+"，即將綁定lineid");
+		System.out.println("找到會員id為" + memberId + "，即將綁定lineid");
 		// 驗證成功且獲取memberId使用完後，刪除 state
 		stateRedisService.deleteState(state);
 
@@ -93,7 +93,7 @@ public class LineLoginController {
 		if (loginService.isLineUserExists(profile.getUserId())) {
 			System.out.println("LINE 用戶已存在，跳過新增操作");
 		} else {
-			//第一次line登入~
+			// 第一次line登入~
 			if (memberId != null) {
 				// 已註冊會員情境：綁定 LINE ID 到會員
 				loginService.bindLineInfoToMember(memberId, profile);

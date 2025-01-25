@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
@@ -22,13 +23,11 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
-import tw.com.ispan.domain.pet.Banner.Banner;
+import tw.com.ispan.domain.pet.banner.Banner;
 
 @Entity
 @Table(name = "LostCase")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "lostCaseId" // 使用 lostCaseId
-                                                                                                  // 作為唯一標識符
-)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "lostCaseId") // 使用 lostCaseId作為唯一標識符                                                                                               
 public class LostCase {
 
     @Id
@@ -42,22 +41,24 @@ public class LostCase {
     // 關聯到 Member 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "memberId", nullable = true, foreignKey = @ForeignKey(name = "FK_LostCase_Member"))
-    @JsonBackReference
     private Member member;
 
     // 關聯到 Species 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Species"))
+//    @JsonManagedReference ("lostCase-species")
     private Species species;
 
     // 關聯到 Breed 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "breedId", foreignKey = @ForeignKey(name = "FK_LostCase_Breed"))
+//    @JsonManagedReference("lostCase-breed")
     private Breed breed;
 
     // 關聯到 FurColor 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "furColorId", foreignKey = @ForeignKey(name = "FK_LostCase_FurColor"))
+//    @JsonManagedReference("lostCase-furColor")
     private FurColor furColor;
 
     @Column(columnDefinition = "NVARCHAR(5)", name = "name")

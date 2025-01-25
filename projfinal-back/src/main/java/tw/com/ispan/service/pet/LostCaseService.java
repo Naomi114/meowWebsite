@@ -16,14 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.criteria.Predicate;
 import tw.com.ispan.domain.pet.LostCase;
-import tw.com.ispan.domain.pet.Banner.Banner;
-import tw.com.ispan.domain.pet.Banner.BannerType;
+import tw.com.ispan.domain.pet.banner.Banner;
+import tw.com.ispan.domain.pet.banner.BannerType;
 import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.pet.BannerRepository;
 import tw.com.ispan.repository.pet.BreedRepository;
 import tw.com.ispan.repository.pet.CaseStateRepository;
 import tw.com.ispan.repository.pet.CityRepository;
-import tw.com.ispan.repository.pet.DistinctAreaRepository;
+import tw.com.ispan.repository.pet.DistrictAreaRepository;
 import tw.com.ispan.repository.pet.FurColorRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.SpeciesRepository;
@@ -51,7 +51,7 @@ public class LostCaseService {
     private CityRepository cityRepository;
 
     @Autowired
-    private DistinctAreaRepository distinctAreaRepository;
+    private DistrictAreaRepository distinctAreaRepository;
 
     @Autowired
     private CaseStateRepository caseStateRepository;
@@ -142,7 +142,7 @@ public class LostCaseService {
                 .orElseThrow(() -> new IllegalArgumentException("無效的 furColorId")));
         lostCase.setCity(cityRepository.findById(param.getInt("cityId"))
                 .orElseThrow(() -> new IllegalArgumentException("無效的 cityId")));
-        lostCase.setDistinctArea(distinctAreaRepository.findById(param.getInt("distinctAreaId"))
+        lostCase.setDistrictArea(distinctAreaRepository.findById(param.getInt("distinctAreaId"))
                 .orElseThrow(() -> new IllegalArgumentException("無效的 distinctAreaId")));
         lostCase.setStreet(param.getString("street"));
         lostCase.setGender(param.optString("gender", null));
