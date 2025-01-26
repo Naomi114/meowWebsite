@@ -6,12 +6,13 @@ import java.util.List;
 import java.util.Set;
 import jakarta.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import tw.com.ispan.domain.shop.Cart;
 import tw.com.ispan.domain.shop.Orders;
 import tw.com.ispan.domain.shop.WishList;
 
 @Entity
-@Table(name = "Member")
+@Table(name = "Member")  // Ensure using table name "Member"
 public class Member {
 
     @Id
@@ -49,14 +50,14 @@ public class Member {
     private List<WishList> wishList;
 
     @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
-    private Set<Cart> cart; // This is the Set<Cart> field.
+    private Set<Cart> cart;  // Set<Cart> for cart field
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Orders> orders;
+    @JsonBackReference  // Prevent infinite recursion by referencing the back end of the relationship
+    private List<Orders> orders;  // Orders placed by the member
 
     // Constructors
-    public Member() {
-    }
+    public Member() {}
 
     public Member(Integer memberId, String nickName, String password, String name, String email, String phone, String address, 
                   Date birthday, LocalDateTime createDate, LocalDateTime updateDate, List<WishList> wishList, Set<Cart> cart, List<Orders> orders) {

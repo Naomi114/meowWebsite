@@ -7,5 +7,5 @@ import tw.com.ispan.domain.admin.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Integer> {
     // Find member by memberId
-    Optional<Member> findById(Integer memberId);
+    Optional<Member> findById(Member memberId);
 }

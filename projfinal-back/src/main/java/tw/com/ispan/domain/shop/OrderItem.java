@@ -1,46 +1,41 @@
 package tw.com.ispan.domain.shop;
 
 import java.math.BigDecimal;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "OrderItem")
+@Table(name = "order_item")
 public class OrderItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderItemId;
 
-    @ManyToOne
-    @JoinColumn(name = "orderId", nullable = false)
-    private Orders order; // This is a reference to the Order object, not just an orderId
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    @JsonBackReference  // Prevent infinite recursion when serializing
+    private Orders order;  // Link back to the Orders entity
 
-    @ManyToOne
-    @JoinColumn(name = "productId", nullable = false)
-    private Product product; // This is a reference to the Product object, not just a productId
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;  // Link to Product entity
 
     @Column(nullable = false)
     private Integer orderQuantity;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal purchasedPrice;
 
     @Column(nullable = false)
-    private String status; // Added in 2025-01-14 Naomi (ref. InventoryService)
+    private String status;
 
-    public OrderItem() {
-    }
+    // Default constructor
+    public OrderItem() {}
 
+    // Constructor with all fields
     public OrderItem(Integer orderItemId, Orders order, Product product, Integer orderQuantity,
-    BigDecimal purchasedPrice, String status) {
+                     BigDecimal purchasedPrice, String status) {
         this.orderItemId = orderItemId;
         this.order = order;
         this.product = product;
@@ -49,13 +44,7 @@ public class OrderItem {
         this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return "OrderItem [orderItemId=" + orderItemId + ", order=" + order + ", product=" + product
-                + ", orderQuantity=" + orderQuantity + ", purchasedPrice=" + purchasedPrice + ", status=" + status
-                + "]";
-    }
-
+    // Getters and Setters
     public Integer getOrderItemId() {
         return orderItemId;
     }
@@ -104,18 +93,28 @@ public class OrderItem {
         this.status = status;
     }
 
-    // Added setter methods for orderId and productId
+    // Helper methods to set the foreign keys
     public void setOrderId(Integer orderId) {
         if (this.order == null) {
-            this.order = new Orders(); // Initialize the order object if it's null
+            this.order = new Orders();
         }
-        this.order.setOrderId(orderId); // Assuming Orders has a setOrderId method
+        this.order.setOrderId(orderId);
     }
 
     public void setProductId(Integer productId) {
         if (this.product == null) {
-            this.product = new Product(); // Initialize the product object if it's null
+            this.product = new Product();
         }
-        this.product.setProductId(productId); // Assuming Product has a setProductId method
+        this.product.setProductId(productId);
+    }
+
+    @Override
+    public String toString() {
+        return "OrderItem [orderItemId=" + orderItemId + 
+               ", order=" + (order != null ? order.getOrderId() : "null") +
+               ", product=" + (product != null ? product.getProductId() : "null") +
+               ", orderQuantity=" + orderQuantity + 
+               ", purchasedPrice=" + purchasedPrice + 
+               ", status=" + status + "]";
     }
 }

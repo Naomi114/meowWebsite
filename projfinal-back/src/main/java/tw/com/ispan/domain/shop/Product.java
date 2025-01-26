@@ -70,37 +70,35 @@ public class Product {
     // Many-to-one relationship with Category (bi-directional)
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "FK_categoryId", foreignKey = @ForeignKey(name = "fkc_category_id"))
-    @JsonBackReference("products")
+    @JsonBackReference("product-category")  // Updated unique reference name
     private Category category;
 
     // Many-to-one relationship with Admin (bi-directional)
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "FK_adminId", foreignKey = @ForeignKey(name = "fkc_admin_id"))
-    @JsonBackReference("products")
+    @JsonBackReference("product-admin")  // Updated unique reference name
     private Admin admin;
 
     // One-to-many relationship with ProductImage (bi-directional)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @JsonBackReference("product")
-    private List<ProductImage> productImages = new LinkedList<>(); // Ordered and duplicates allowed (first image is
-                                                                   // selected)
+    @JsonBackReference("product-images")  // Updated unique reference name
+    private List<ProductImage> productImages = new LinkedList<>(); // Ordered and duplicates allowed (first image is selected)
 
     // Many-to-many relationship with ProductTag (bi-directional)
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
             CascadeType.REFRESH }, fetch = FetchType.LAZY)
     @JoinTable(name = "Product_tag", joinColumns = @JoinColumn(name = "productid"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    @JsonBackReference("products")
+    @JsonBackReference("product-tags")  // Updated unique reference name
     private Set<ProductTag> tags = new LinkedHashSet<>(); // Ordered, no duplicates
 
     // One-to-many relationship with InventoryItem (unidirectional)
     @OneToMany(mappedBy = "product", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
             CascadeType.REFRESH }, fetch = FetchType.EAGER)
-    private List<InventoryItem> inventoryItems = new LinkedList<>(); // Unordered, duplicates allowed (frequent
-                                                                     // insertion and deletion)
+    private List<InventoryItem> inventoryItems = new LinkedList<>(); // Unordered, duplicates allowed (frequent insertion and deletion)
 
     // One-to-many relationship with WishList (bi-directional)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @JsonBackReference("products")
+    @JsonBackReference("product-wishlists")  // Updated unique reference name
     private Set<WishList> wishlists = new LinkedHashSet<>(); // Ordered, no duplicates
 
     public Product() {
