@@ -25,17 +25,9 @@ public class LoginDataAdmin implements CommandLineRunner {
         admin.setPassword("AAA"); // 設置 password
         admin.setCreateDate(LocalDateTime.now()); // 設置創建時間
         admin.setUpdateDate(LocalDateTime.now()); // 設置更新時間
-
-        // 檢查是否已存在相同的 admin (by Naomi)
-        String adminTmp = admin.getAdminName();
-        if (adminRepository.findByAdminName(adminTmp) != null) {
-            System.out.println("adminName 已存在: " + adminTmp);
-        } else {
-            adminRepository.save(admin);
-        }
-
         // 儲存到資料庫
         adminRepository.save(admin);
+        System.out.println("adminName 設定後：" + admin.getAdminName()); // 🔹 除錯輸出
 
         System.out.println("資料已成功插入到 Admin 表格");
     }

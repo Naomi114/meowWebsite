@@ -150,11 +150,16 @@ public class CartService {
     // Create a cart for a member
     @Transactional
     public Cart createCart(Integer memberId) {
-            return memberRepository.findById(memberId).map(member -> {
+        return memberRepository.findById(memberId).map(member -> {
             Cart cart = new Cart();
             cart.setMember(member);
             cart.setLastUpdatedDate(LocalDateTime.now());
             return cartRepository.save(cart);
         }).orElse(null);
+    }
+
+    public CartItem getCartItemById(Integer cartItemId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCartItemById'");
     }
 }

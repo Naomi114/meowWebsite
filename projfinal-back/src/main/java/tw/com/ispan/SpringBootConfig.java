@@ -8,32 +8,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SpringBootConfig implements WebMvcConfigurer {
         @Override
         public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/cart/**")
-                                .allowedOrigins("http://localhost:5173") // Allow frontend at localhost:5173
-                                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                                .allowedHeaders("*")
-                                .allowCredentials(true);
-
-                registry.addMapping("/products/**")
-                                .allowedOrigins("http://localhost:5173") // Allow frontend at localhost:5173
-                                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                                .allowedHeaders("*")
-                                .allowCredentials(true);
-
-                registry.addMapping("/products/**")
-                                .allowedOrigins("http://localhost:5173") // Allow frontend at localhost:5173
-                                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                                .allowedHeaders("*")
-                                .allowCredentials(true);
-
-                registry.addMapping("/pages/cart/**")
+                registry.addMapping("/**")
                                 .allowedOrigins("http://localhost:5173")
-                                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                                .allowedHeaders("*")
-                                .allowCredentials(true);
-
-                registry.addMapping("/pages/ecpay/send/**")
-                                .allowedOrigins("http://localhost:5173") // Allow frontend at localhost:5173
                                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                                 .allowedHeaders("*")
                                 .allowCredentials(true);
