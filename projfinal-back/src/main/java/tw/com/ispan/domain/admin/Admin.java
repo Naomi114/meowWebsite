@@ -42,13 +42,12 @@ public class Admin {
 
 	// One-to-many relationship with Inventory
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval = true)
-	@JsonManagedReference("admin-inventory") // Unique reference for Inventory
 	private Set<Inventory> inventory = new HashSet<>();
 
 	// One-to-many relationship with Product
 	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
 			CascadeType.REFRESH }, mappedBy = "admin", orphanRemoval = true)
-	@JsonManagedReference("admin-products") // Unique reference for Products
+	@JsonManagedReference("admin") // Unique reference for Products
 	private Set<Product> products = new HashSet<>();
 
 	// Constructors

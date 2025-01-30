@@ -49,7 +49,7 @@ public class ProductInitData implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
         // 初始化管理員資料
-        initializeAdmins();
+        // initializeAdmins();
 
         // 初始化類別資料
         initializeCategories();
@@ -61,22 +61,25 @@ public class ProductInitData implements CommandLineRunner {
         initializeData();
     }
 
-    private void initializeAdmins() {
-        Admin admin = new Admin();
-        admin.setAdminName("admin");
-        admin.setPassword("AAA");
-        admin.setCreateDate(LocalDateTime.now());
-        admin.setUpdateDate(LocalDateTime.now());
-
-        // 檢查是否已存在相同的 admin (by Naomi)
-        String adminTmp = admin.getAdminName();
-        if (adminRepository.findByAdminName(adminTmp) != null) {
-            System.out.println("adminName 已存在: " + adminTmp);
-        } else {
-            adminRepository.save(admin);
-        }
-        System.out.println("商城初始化管理員成功！");
-    }
+    // private void initializeAdmins() {
+    //     String adminName = "admin"; // 你的管理員名稱
+    
+    //     // 檢查 `adminName` 是否已存在，避免違反 UNIQUE KEY
+    //     if (adminRepository.findByAdminName(adminName).isPresent()) {
+    //         System.out.println("管理員 " + adminName + " 已存在，跳過初始化");
+    //         return;
+    //     }
+    
+    //     // 🔹 若不存在，則新增
+    //     Admin admin = new Admin();
+    //     admin.setAdminName(adminName);
+    //     admin.setPassword("AAA");
+    //     admin.setCreateDate(LocalDateTime.now());
+    //     admin.setUpdateDate(LocalDateTime.now());
+    
+    //     adminRepository.save(admin);
+    //     System.out.println("初始化管理員成功：" + adminName);
+    // }
 
     private void initializeCategories() {
         Set<CategoryRequest> categories = Set.of(

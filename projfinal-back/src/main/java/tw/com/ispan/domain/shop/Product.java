@@ -71,7 +71,7 @@ public class Product {
     // cascade = CascadeType.remove 會導致刪除商品時刪除商品類別；只有新增、修改、更新同步
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "FK_categoryId", foreignKey = @ForeignKey(name = "fkc_category_id"))
-    @JsonBackReference("product-category")  // Updated unique reference name
+    @JsonBackReference("products")
     private Category category;
 
     // 雙向多對一，可反向查找
@@ -79,7 +79,7 @@ public class Product {
     // cascade = CascadeType.remove 會導致刪除商品時刪除管理員；須排除在外
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "FK_adminId", foreignKey = @ForeignKey(name = "fkc_admin_id"))
-    @JsonBackReference("product-admin")  // Updated unique reference name
+    @JsonBackReference("products")
     private Admin admin;
 
     // 雙向一對多，可反向查找
@@ -136,7 +136,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return "Product [productId=" + productId + ", productName=" + productName + ", description=" + description
+        return "ProductBean [productId=" + productId + ", productName=" + productName + ", description=" + description
                 + ", originalPrice=" + originalPrice + ", salePrice=" + salePrice + ", stockQuantity=" + stockQuantity
                 + ", unit=" + unit + ", status=" + status + ", expire=" + expire + ", createdAt=" + createdAt
                 + ", updatedAt=" + updatedAt + ", category=" + category + ", adminId=" + admin + ", productImages="
