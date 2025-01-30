@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 import tw.com.ispan.domain.shop.Cart;
@@ -21,8 +24,8 @@ public class Member {
     @Column(unique = true, length = 20, nullable = false)
     private String nickName;
 
-	@Column(length = 20, nullable = false)
-	private String password;
+    @Column(length = 20, nullable = false)
+    private String password;
 
     @Column(length = 70, nullable = false)
     private String name;
@@ -36,8 +39,8 @@ public class Member {
     @Column(length = 100, nullable = false)
     private String address;
 
-	@Column(nullable = false)
-	private LocalDate birthday;
+    @Column(nullable = false)
+    private LocalDate birthday;
 
     @Column(nullable = false)
     private LocalDateTime createDate;
@@ -46,6 +49,7 @@ public class Member {
     private LocalDateTime updateDate;
 
     @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
+    @JsonBackReference("member")
     private List<WishList> wishList;
 
     @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
@@ -58,8 +62,10 @@ public class Member {
     public Member() {
     }
 
-    public Member(Integer memberId, String nickName, String password, String name, String email, String phone, String address, 
-    LocalDate birthday, LocalDateTime createDate, LocalDateTime updateDate, List<WishList> wishList, Set<Cart> cart, List<Orders> orders) {
+    public Member(Integer memberId, String nickName, String password, String name, String email, String phone,
+            String address,
+            LocalDate birthday, LocalDateTime createDate, LocalDateTime updateDate, List<WishList> wishList,
+            Set<Cart> cart, List<Orders> orders) {
         this.memberId = memberId;
         this.nickName = nickName;
         this.password = password;
@@ -132,13 +138,13 @@ public class Member {
         this.address = address;
     }
 
-	public LocalDate getBirthday() {
-		return birthday;
-	}
+    public LocalDate getBirthday() {
+        return birthday;
+    }
 
-	public void setBirthday(LocalDate birthday) {
-		this.birthday = birthday;
-	}
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
 
     public LocalDateTime getCreateDate() {
         return createDate;

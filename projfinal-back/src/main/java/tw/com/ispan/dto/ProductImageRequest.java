@@ -1,6 +1,10 @@
 package tw.com.ispan.dto;
 
+import java.util.List;
+
 import javax.validation.constraints.NotBlank;
+
+import org.springframework.web.multipart.MultipartFile;
 
 /*  ProductImageRequest 的責任
     1. 負責單張圖片的數據傳遞
@@ -12,18 +16,10 @@ import javax.validation.constraints.NotBlank;
 public class ProductImageRequest {
 
     @NotBlank(message = "檔案名稱不能為空")
-    private String filename;
+    private List<MultipartFile> filename;
 
     // 前端提供主圖勾選
     private Boolean isPrimary;
-
-    public String getFilename() {
-        return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
 
     public Boolean getIsPrimary() {
         return isPrimary;
@@ -31,5 +27,13 @@ public class ProductImageRequest {
 
     public void setIsPrimary(Boolean isPrimary) {
         this.isPrimary = isPrimary;
+    }
+
+    public List<MultipartFile> getFilename() {
+        return filename;
+    }
+
+    public void setFilename(List<MultipartFile> filename) {
+        this.filename = filename;
     }
 }

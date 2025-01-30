@@ -3,6 +3,7 @@ package tw.com.ispan.dto;
 import java.util.List;
 
 import tw.com.ispan.domain.shop.Category;
+import tw.com.ispan.domain.shop.Product;
 
 public class CategoryResponse {
     private Boolean success;
@@ -10,6 +11,7 @@ public class CategoryResponse {
     private String categoryName;
     private String categoryDescription;
     private String defaultUnit;
+    private List<Product> products;
     private List<Category> categories;
 
     public Boolean getSuccess() {
@@ -50,6 +52,14 @@ public class CategoryResponse {
 
     public void setCategoryDescription(String categoryDescription) {
         this.categoryDescription = categoryDescription;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
     }
 
     public List<Category> getCategories() {

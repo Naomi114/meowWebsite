@@ -2,11 +2,14 @@ package tw.com.ispan.service.shop;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.domain.shop.ProductTag;
 import tw.com.ispan.dto.ProductRequest;
 import tw.com.ispan.dto.ProductTagRequest;
@@ -94,7 +97,45 @@ public class ProductTagService {
         return response;
     }
 
-    // 多選標籤型別轉換: ProductRequest => ProductTagRequest
+    // 商品上架，處理標籤
+	public void processProductTags(Product product, Set<ProductTagRequest> tagRequests) {
+        if (tagRequests == null || tagRequests.isEmpty()) {
+            return; // 如果標籤列表為空，直接返回
+        }
+
+        // 過濾重複的標籤名稱
+        Set<String> uniqueTagNames = tagRequests.stream()
+                .map(ProductTagRequest::getTagName)
+                .filter(tagName -> tagName != null && !tagName.isEmpty())
+                .collect(Collectors.toSet());
+
+        // 遍歷標籤名稱，新增或關聯標籤
+        for (String tagName : uniqueTagNames) {
+            ProductTag tag = findOrCreateTag(tagName);
+            product.addTag(tag); // 假設 Product 中有 addTag 方法
+        }
+    }
+
+    // 尋找或建立標籤
+    public ProductTag findOrCreateTag(String tagName) {
+        if (tagName == null || tagName.isEmpty()) {
+            throw new IllegalArgumentException("標籤名稱不能為空");
+        }
+    
+        // 查找是否已存在
+        Optional<ProductTag> existingTag = productTagRepository.findByTagName(tagName);
+        if (existingTag.isPresent()) {
+            return existingTag.get();
+        }
+    
+        // 不存在則創建
+        ProductTag newTag = new ProductTag();
+        newTag.setTagName(tagName);
+        productTagRepository.save(newTag);
+        return newTag;
+    }    
+
+    // 型別轉換: ProductRequest => ProductTagRequest
     public ProductTagRequest buildTagRequestFromProduct(ProductRequest productRequest) {
         ProductTagRequest tagRequest = new ProductTagRequest();
         tagRequest.setTagName(productRequest.getTags().stream()

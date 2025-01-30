@@ -1,12 +1,28 @@
 package tw.com.ispan.controller;
 
 import java.math.BigDecimal;
+import java.util.List;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.dto.ProductRequest;
@@ -21,15 +37,25 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     // 新增商品
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createProduct(
-            @Valid @RequestBody ProductRequest request) {
+            @RequestPart("productRequest") String productRequestJson,  // 先以 String 接收 JSON
+            @RequestPart(value = "productImages", required = false) List<MultipartFile> productImages) {
+
         try {
-            ProductResponse response = productService.createSingle(request);
+            // **解析 JSON**
+            ProductRequest productRequest = objectMapper.readValue(productRequestJson, ProductRequest.class);
+
+            // **呼叫 Service 層來處理**
+            ProductResponse response = productService.createSingle(productRequest, productImages);
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("商品新增失敗: " + e.getMessage());
+            return ResponseEntity.badRequest().body("商品新增失敗: " + e.getMessage());
         }
     }
 
@@ -81,6 +107,14 @@ public class ProductController {
         ProductResponse response = productService.findBatch(spec);
 
         return ResponseEntity.ok(response);
+    }
+
+    // 搜尋所有商品 (by Mark)
+    @GetMapping
+    public ResponseEntity<ProductResponse> getAllProducts() {
+        ProductResponse response = productService.findAll();
+        return response.getSuccess() ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
 }

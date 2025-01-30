@@ -102,7 +102,7 @@ public class Product {
             CascadeType.REFRESH }, fetch = FetchType.EAGER)
     private List<InventoryItem> inventoryItems = new LinkedList<>(); // 無序可重複，適合頻繁插入和刪除
 
-    // 雙向一對多，可反向查找
+    // 雙向一對多，可反向查找 (刪除願望清單，會員商品列表也會同步? 合理??)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonBackReference("products")
     private Set<WishList> wishlists = new LinkedHashSet<>(); // 有序不重複
@@ -266,6 +266,14 @@ public class Product {
 
     public void setTags(Set<ProductTag> tags) {
         this.tags = tags;
+    }
+
+    public void addTag(ProductTag tag) {
+        this.tags.add(tag);
+    }
+
+    public void removeTag(ProductTag tag) {
+        this.tags.remove(tag);
     }
 
     public List<InventoryItem> getInventoryItems() {

@@ -23,6 +23,7 @@ public class WishList {
 
     @ManyToOne
     @JoinColumn(name = "memberId", nullable = false)
+    @JsonManagedReference("wishlists")
     private Member member;
 
     @ManyToOne
