@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.domain.shop.Category;

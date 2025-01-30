@@ -22,11 +22,11 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     List<CartItem> findTop1000ByCart_Member_Id(Integer memberId);
 
     // 根據 cartId 刪除商品
-    void deleteByCart_CartIdIn(List<Integer> cartIds);
+    void deleteByCart_CartIdIn(List<Integer> cartId);
 
     // 根據訂單 ID 尋找購物車商品
     List<CartItem> findByOrder_OrderId(Integer orderId);
 
     // 刪除指定的 CartItem
-    void deleteAllByCartItemIdIn(List<Integer> cartItemIds);
+    void deleteAllByCartItemIdIn(List<Integer> cartItemId);
 }

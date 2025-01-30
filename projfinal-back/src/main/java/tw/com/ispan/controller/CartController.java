@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tw.com.ispan.domain.shop.CartItem;
+import tw.com.ispan.dto.CartItemResponse;
 import tw.com.ispan.dto.CartRequest;
 import tw.com.ispan.dto.CartResponse;
 import tw.com.ispan.service.shop.CartService;
@@ -83,18 +84,6 @@ public class CartController {
     }
 
     // Update the quantity of an item in the cart
-    @PutMapping("/update")
-    public ResponseEntity<String> updateCart(@RequestBody CartItem cartItem) {
-        try {
-            boolean updated = cartService.updateCartItemQuantity(cartItem.getCartItemId(), cartItem.getQuantity());
-            return updated ? ResponseEntity.ok("Cart item updated successfully.")
-                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Unable to update cart item.");
-        } catch (Exception e) {
-            log.error("Error updating cart item", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: Unable to update cart item.");
-        }
-    }
-
     // Delete a specified item from the cart
     @DeleteMapping("/delete/{cartItemId}")
     public ResponseEntity<String> deleteCartItem(@PathVariable Integer cartItemId) {
@@ -121,16 +110,25 @@ public class CartController {
     }
 
     // Update the cart using a CartRequest
-    @PostMapping("/updateCartRequest")
-    public ResponseEntity<CartResponse> updateCart(@RequestBody @Valid CartRequest request) {
+    @PutMapping("/update")
+    public ResponseEntity<String> updateCart(@RequestBody CartItem cartItem) {
         try {
-            CartResponse response = cartService.updateCart(request);
-            return response.isSuccess() ? ResponseEntity.ok(response)
-                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            // Update the cart item quantity
+            boolean updated = cartService.updateCartItemQuantity(cartItem.getCartItemId(), cartItem.getQuantity());
+
+            // Return success or failure message
+            if (updated) {
+                // Return updated CartItemResponse
+                CartItem updatedCartItem = cartService.getCartItemById(cartItem.getCartItemId());
+                CartItemResponse response = new CartItemResponse(updatedCartItem); // Convert CartItem to
+                                                                                   // CartItemResponse
+                return ResponseEntity.ok("Cart item updated successfully: " + response);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Unable to update cart item.");
+            }
         } catch (Exception e) {
-            log.error("Error updating cart with request", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CartResponse(false, "Failed to update cart"));
+            log.error("Error updating cart item", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: Unable to update cart item.");
         }
     }
 }

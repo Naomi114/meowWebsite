@@ -74,3 +74,7 @@ jwt:
 google:
   api:
     key: AIzaSyATLMpyW2m1qnNAAQf0rZSpcl6TadBobBg
+
+jackson:
+  serialization:
+    fail-on-empty-beans: false

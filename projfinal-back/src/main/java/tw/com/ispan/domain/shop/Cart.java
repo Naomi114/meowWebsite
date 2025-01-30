@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import tw.com.ispan.domain.admin.Member;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -23,6 +24,9 @@ public class Cart implements Serializable {
 
     @Column(name = "lastUpdatedDate", nullable = false)
     private LocalDateTime lastUpdatedDate; // Timestamp of the last update
+
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CartItem> cartItems; // List of cart items related to this cart
 
     // Getters and Setters
     public Integer getCartId() {
@@ -47,5 +51,13 @@ public class Cart implements Serializable {
 
     public void setLastUpdatedDate(LocalDateTime lastUpdatedDate) {
         this.lastUpdatedDate = lastUpdatedDate;
+    }
+
+    public List<CartItem> getCartItems() {
+        return cartItems;
+    }
+
+    public void setCartItems(List<CartItem> cartItems) {
+        this.cartItems = cartItems;
     }
 }
