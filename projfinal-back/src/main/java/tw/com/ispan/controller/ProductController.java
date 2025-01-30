@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.dto.ProductRequest;
 import tw.com.ispan.dto.ProductResponse;
@@ -35,30 +37,27 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     // 新增商品
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createProduct(
-            @RequestPart("productRequest") ProductRequest productRequest,
-            @RequestPart("productImages") List<MultipartFile> filenames
-    ) {
+            @RequestPart("productRequest") String productRequestJson,  // 先以 String 接收 JSON
+            @RequestPart(value = "productImages", required = false) List<MultipartFile> productImages) {
+
         try {
-            ProductResponse response = productService.createSingle(productRequest,filenames);
+            // **解析 JSON**
+            ProductRequest productRequest = objectMapper.readValue(productRequestJson, ProductRequest.class);
+
+            // **呼叫 Service 層來處理**
+            ProductResponse response = productService.createSingle(productRequest, productImages);
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("商品新增失敗: " + e.getMessage());
+            return ResponseEntity.badRequest().body("商品新增失敗: " + e.getMessage());
         }
     }
-
-    // @PostMapping
-    // public ResponseEntity<?> createProduct(
-    //         @Valid @RequestBody ProductRequest request) {
-    //     try {
-    //         ProductResponse response = productService.createSingle(request);
-    //         return ResponseEntity.ok(response);
-    //     } catch (Exception e) {
-    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("商品新增失敗: " + e.getMessage());
-    //     }
-    // }
 
     // 修改商品
     @PutMapping("/{id}")

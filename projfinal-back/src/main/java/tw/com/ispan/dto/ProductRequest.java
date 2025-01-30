@@ -20,6 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
     2. 包含一組 ProductImageRequest，負責描述該商品的所有圖片。
 */
 public class ProductRequest {
+    @NotBlank(message = "管理員帳號不能為空")
+    private String adminId;
+
     // @NotBlank 只能限制String類型，其他類不為null需要在service層判斷
     @NotBlank(message = "商品名稱不能為空")
     private String productName;

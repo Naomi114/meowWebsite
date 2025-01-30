@@ -1,13 +1,18 @@
 package tw.com.ispan.service.shop;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +21,6 @@ import jakarta.transaction.Transactional;
 import tw.com.ispan.config.FileStorageProperties;
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.domain.shop.ProductImage;
-import tw.com.ispan.dto.ProductImageRequest;
 import tw.com.ispan.repository.shop.ProductImageRepository;
 
 /*  圖片服務需實現以下功能：
@@ -35,30 +39,62 @@ public class ProductImageService {
     @Autowired
     private FileStorageProperties fileStorageProperties;
 
-    // 初始化圖片資料
-    public void initializeProductImages(Product product, List<MultipartFile> filenames) {
-        try {
-            // 將文件名列表轉換為 ProductImageRequest 列表
-            filenames.stream()
-                    .map(filename -> {
-                        ProductImageRequest request = new ProductImageRequest();
-                        request.setFilename(List.of(filename));
-                        // 第一張圖片設為主圖片
-                        request.setIsPrimary(filenames.indexOf(filename) == 0);
-                        return request;
-                    })
-                    .toList();
+    // 初始化：從本地讀取圖片並儲存 URL
+    public void initializeProductImages(Product product, List<String> filenames) {
+        List<MultipartFile> multipartFiles = getMultipartFilesByNames(filenames);
+        processProductImage(product, multipartFiles);
+    }
 
-            // 調用 processProductImage 方法處理圖片
-            processProductImage(product, filenames);
+    // 上線後：處理使用者上傳的圖片
+    public String saveUploadedFile(MultipartFile file) throws IOException {
+        String fileExtension = getFileExtension(file.getOriginalFilename());
+        String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+        Path filePath = fileStorageProperties.getValidatedUploadPath().resolve(uniqueFileName);
 
-            System.out.println("圖片初始化成功");
-        } catch (Exception e) {
-            System.err.println("圖片初始化失敗: " + e.getMessage());
+        // 儲存圖片
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        // 回傳圖片的 URL
+        return fileStorageProperties.getBaseUrl() + "/" + uniqueFileName;
+    }
+
+    // 透過圖片名稱列表，轉換成 `MultipartFile`
+    private List<MultipartFile> getMultipartFilesByNames(List<String> filenames) {
+        Path uploadPath = fileStorageProperties.getValidatedUploadPath();
+        return filenames.stream()
+                .map(name -> uploadPath.resolve(name).toFile())
+                .filter(File::exists)
+                .map(this::convertFileToMultipartFile)
+                .collect(Collectors.toList());
+    }
+
+    // 讀取本地檔案並轉換為 `MultipartFile`
+    private MultipartFile convertFileToMultipartFile(File file) {
+        try (FileInputStream input = new FileInputStream(file)) {
+            return new MockMultipartFile(
+                    file.getName(), file.getName(),
+                    "image/" + getFileExtension(file.getName()),
+                    IOUtils.toByteArray(input)
+            );
+        } catch (IOException e) {
+            throw new RuntimeException("無法讀取圖片檔案: " + file.getAbsolutePath(), e);
         }
     }
 
-    // 
+    //驗證&取得檔案副檔名
+    private String getFileExtension(String fileName) throws IOException{
+        // 驗證圖片名稱及格式
+        if (fileName == null || fileName.isBlank()) {
+            throw new IllegalArgumentException("至少提供一個圖片檔");
+        }
+
+        if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png")) {
+            throw new IOException("僅支持 JPG 和 PNG 格式的圖片");
+        }
+        int lastIndex = fileName.lastIndexOf(".");
+        return (lastIndex == -1) ? "" : fileName.substring(lastIndex);
+    }
+
     public void processProductImage(Product product, List<MultipartFile> filenames) {
         if (filenames == null || filenames.isEmpty()) {
             throw new IllegalArgumentException("商品圖片不能為空");
@@ -69,10 +105,10 @@ public class ProductImageService {
             throw new IllegalArgumentException("商品圖片數量必須在 1 到 5 之間");
         }
 
-        for (MultipartFile imageRequest : filenames) {
+        for (MultipartFile imagefFile : filenames) {
             try {
                 // 儲存圖片到存儲系統
-                String imageUrl = saveImageToStorage(imageRequest.getOriginalFilename());
+                String imageUrl = saveImageToStorage(imagefFile);
 
                 // 創建 ProductImage 實體
                 ProductImage productImage = new ProductImage();
@@ -97,31 +133,17 @@ public class ProductImageService {
         }
     }
 
-    private String saveImageToStorage(String fileName) throws IOException {
-        Path uploadPath = fileStorageProperties.getValidatedUploadPath();
-
-        // 驗證圖片名稱及格式
-        if (fileName == null || fileName.isBlank()) {
-            throw new IllegalArgumentException("至少提供一個圖片檔");
-        }
-
-        if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png")) {
-            throw new IOException("僅支持 JPG 和 PNG 格式的圖片");
-        }
-
+    private String saveImageToStorage(MultipartFile file) throws IOException {
         // 生成唯一文件名
-        String uniqueFileName = UUID.randomUUID() + "_" + fileName;
-        Path filePath = uploadPath.resolve(uniqueFileName);
-        Files.write(filePath, ("Image content for " + fileName).getBytes());
+        String fileExtension = getFileExtension(file.getOriginalFilename());
+        String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+        Path filePath = fileStorageProperties.getValidatedUploadPath().resolve(uniqueFileName);
 
-        // 使用配置文件中的 base-url
+        // 儲存圖片
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
         return fileStorageProperties.getBaseUrl() + "/" + uniqueFileName;
 
-        // 動態生成 URL (是否更好用? 待測)
-        // return ServletUriComponentsBuilder.fromCurrentContextPath()
-        // .path("/images/")
-        // .path(uniqueFileName)
-        // .toUriString();
     }
 
     private void commitAndPushToGitHub(String commitMessage) throws IOException, InterruptedException {

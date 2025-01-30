@@ -42,6 +42,7 @@ spring:
   #圖片大小限制
   servlet:
     multipart:
+      enabled: true
       max-file-size: 5MB
       max-request-size: 20MB
 #商城圖片下載路徑 (動態路徑)

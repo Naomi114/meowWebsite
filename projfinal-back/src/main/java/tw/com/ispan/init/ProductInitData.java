@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -145,12 +144,8 @@ public class ProductInitData implements CommandLineRunner {
             product1.setExpire(LocalDate.parse("2025-12-31"));
             product1.setCreatedAt(LocalDateTime.now());
             product1.setUpdatedAt(LocalDateTime.now());
-            // 傳入本地真實圖片，改寫中~~~~~~~
-            // List<MultipartFile> filenames1 = List.of(
-            //     new MockMultipartFile("image11.jpg", new byte[0]),
-            //     new MockMultipartFile("image12.jpg", new byte[0])
-            // );
-            // productImageService.initializeProductImages(product1, filenames1);
+            List<String> filenames1 = List.of("image11.jpg", "image12.jpg");
+            productImageService.initializeProductImages(product1, filenames1);
 
             Product product2 = new Product();
             product2.setAdmin(admin);
@@ -213,7 +208,7 @@ public class ProductInitData implements CommandLineRunner {
             product5.setExpire(LocalDate.parse("2025-06-30"));
             product5.setCreatedAt(LocalDateTime.now());
             product5.setUpdatedAt(LocalDateTime.now());
-            List<String> filenames5 = List.of("image5.png");
+            List<String> filenames5 = List.of("image5.jpg");
             productImageService.initializeProductImages(product5, filenames5);
 
             productRepository.save(product1);
