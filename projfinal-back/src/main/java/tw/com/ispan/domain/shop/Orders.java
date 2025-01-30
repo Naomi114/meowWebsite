@@ -21,7 +21,7 @@ public class Orders {
     @JsonBackReference  // Prevents infinite recursion when serializing
     private Member member;  // Member
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference  // Prevents infinite recursion when serializing
     private List<OrderItem> orderItems;  // List of Order Items
 
@@ -104,8 +104,5 @@ public class Orders {
     public Double getFinalPrice() { return finalPrice; }
     public void setFinalPrice(Double finalPrice) { this.finalPrice = finalPrice; }
 
-    public void setMember(Integer member2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setMember'");
-    }
+    // Removed the setMember method that was unimplemented, leaving it as is.
 }

@@ -126,10 +126,10 @@ public class OrderController {
             int memberId = (int) requestBody.get("member");
             String creditCard = (String) requestBody.get("creditCard");
             String shippingAddress = (String) requestBody.get("shippingAddress");
-    
+
             // Call service to create new order
             boolean isSubmitted = orderService.submitOrder(cartId, memberId, creditCard, shippingAddress);
-    
+
             if (isSubmitted) {
                 return ResponseEntity.ok("訂單已成功提交");
             } else {

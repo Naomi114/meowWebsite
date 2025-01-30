@@ -2,6 +2,7 @@ package tw.com.ispan.domain.shop;
 
 import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,7 +11,7 @@ public class OrderItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer orderItemId;
+    private Integer orderItemId;  // Order Item ID
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
@@ -19,16 +20,17 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})  // Prevent serialization issues with lazy-loaded product
     private Product product;  // Link to Product entity
 
     @Column(nullable = false)
-    private Integer orderQuantity;
+    private Integer orderQuantity;  // Quantity of the ordered product
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal purchasedPrice;
+    private BigDecimal purchasedPrice;  // Price of the product when purchased
 
     @Column(nullable = false)
-    private String status;
+    private String status;  // Status of the order item (e.g., "Pending", "Shipped")
 
     // Default constructor
     public OrderItem() {}
@@ -93,7 +95,7 @@ public class OrderItem {
         this.status = status;
     }
 
-    // Helper methods to set the foreign keys
+    // Helper methods to set the foreign keys (order_id, product_id)
     public void setOrderId(Integer orderId) {
         if (this.order == null) {
             this.order = new Orders();
