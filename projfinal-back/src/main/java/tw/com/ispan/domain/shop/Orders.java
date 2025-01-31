@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import tw.com.ispan.domain.admin.Member;
-import tw.com.ispan.domain.admin.Discount;
 
 @Entity
 @Table(name = "orders")  // Ensure using table name "orders"

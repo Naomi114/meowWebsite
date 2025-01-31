@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference; // Ensure this import
 import com.fasterxml.jackson.annotation.JsonManagedReference; // Ensure this import
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import tw.com.ispan.domain.admin.Discount;
+import tw.com.ispan.domain.shop.Discount;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

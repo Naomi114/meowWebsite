@@ -58,7 +58,7 @@ public class OrderService {
         double totalPrice = 0;
         List<CartItem> cartItems = cartItemRepository.findByCart_CartId(orderRequest.getCartId());
         for (CartItem item : cartItems) {
-            BigDecimal itemPrice = item.getProduct().getPrice();
+            BigDecimal itemPrice = item.getProduct().getSalePrice(); // getPrice => getSalePrice (by Naomi)
             BigDecimal totalItemPrice = itemPrice.multiply(new BigDecimal(item.getQuantity()));
             totalPrice += totalItemPrice.doubleValue();
         }
@@ -72,7 +72,7 @@ public class OrderService {
             orderItem.setOrder(savedOrder);
             orderItem.setProduct(item.getProduct());
             orderItem.setOrderQuantity(item.getQuantity());
-            orderItem.setPurchasedPrice(item.getProduct().getPrice());
+            orderItem.setPurchasedPrice(item.getProduct().getSalePrice());
             orderItem.setStatus("待出貨");  // Set default status
             orderItemRepository.save(orderItem);
         }
@@ -108,7 +108,7 @@ public class OrderService {
             double totalPrice = 0;
             List<CartItem> cartItems = cart.getCartItems();
             for (CartItem item : cartItems) {
-                BigDecimal itemPrice = item.getProduct().getPrice();
+                BigDecimal itemPrice = item.getProduct().getSalePrice(); //getPrice => getSalePrice (by Naomi)
                 BigDecimal totalItemPrice = itemPrice.multiply(new BigDecimal(item.getQuantity()));
                 totalPrice += totalItemPrice.doubleValue();
             }
@@ -129,7 +129,7 @@ public class OrderService {
                 orderItem.setOrder(savedOrder);
                 orderItem.setProduct(item.getProduct());
                 orderItem.setOrderQuantity(item.getQuantity());
-                orderItem.setPurchasedPrice(item.getProduct().getPrice());
+                orderItem.setPurchasedPrice(item.getProduct().getSalePrice());
                 orderItem.setStatus("待出貨");
                 orderItemRepository.save(orderItem);
             }

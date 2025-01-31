@@ -29,4 +29,5 @@ SpringToolSuite4.exe - 捷徑
 hs_err_pid*
 replay_pid*
 
-.codegpt
+# 商品假資料
+.images

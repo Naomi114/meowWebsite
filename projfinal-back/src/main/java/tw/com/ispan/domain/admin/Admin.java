@@ -2,6 +2,7 @@ package tw.com.ispan.domain.admin;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import tw.com.ispan.domain.shop.Discount;
 import tw.com.ispan.domain.shop.Inventory;
 import tw.com.ispan.domain.shop.Product;
 
@@ -18,11 +19,15 @@ public class Admin {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer adminId;
 
-	@Column(unique = true, length = 20, nullable = true)
+	@Column(unique = true, length = 20, nullable = false)
 	private String adminName;
 
 	@Column(length = 20, nullable = false)
 	private String password;
+
+	public Admin() {
+		// 這是默認構造函數，Hibernate 需要
+	}
 
 	@Column(nullable = false)
 	private LocalDateTime createDate;
@@ -37,22 +42,25 @@ public class Admin {
 
 	// One-to-many relationship with Inventory
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval = true)
-	@JsonManagedReference("admin-inventory") // Unique reference for Inventory
 	private Set<Inventory> inventory = new HashSet<>();
 
 	// One-to-many relationship with Product
 	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
 			CascadeType.REFRESH }, mappedBy = "admin", orphanRemoval = true)
-	@JsonManagedReference("admin-products") // Unique reference for Products
+	@JsonManagedReference("admin") // Unique reference for Products
 	private Set<Product> products = new HashSet<>();
 
 	// Constructors
-	public Admin(Integer adminId, String adminName) {
+	public Admin(Integer adminId, String adminName, String password, LocalDateTime createDate, LocalDateTime updateDate
+	// ,List<Discount> discounts, Set<InventoryBean> inventory
+	) {
 		this.adminId = adminId;
 		this.adminName = adminName;
-	}
-
-	public Admin() {
+		this.password = password;
+		this.createDate = createDate;
+		this.updateDate = updateDate;
+		// this.discounts = discounts;
+		// this.inventory = inventory;
 	}
 
 	// Getters and setters

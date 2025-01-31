@@ -1,9 +1,12 @@
 package tw.com.ispan.domain.admin;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -38,7 +41,7 @@ public class Member {
     private String address;
 
     @Column(nullable = false)
-    private Date birthday;
+    private LocalDate birthday;
 
     @Column(nullable = false)
     private LocalDateTime createDate;
@@ -47,6 +50,7 @@ public class Member {
     private LocalDateTime updateDate;
 
     @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
+    @JsonBackReference("member")
     private List<WishList> wishList;
 
     @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
@@ -59,8 +63,10 @@ public class Member {
     // Constructors
     public Member() {}
 
-    public Member(Integer memberId, String nickName, String password, String name, String email, String phone, String address, 
-                  Date birthday, LocalDateTime createDate, LocalDateTime updateDate, List<WishList> wishList, Set<Cart> cart, List<Orders> orders) {
+    public Member(Integer memberId, String nickName, String password, String name, String email, String phone,
+            String address,
+            LocalDate birthday, LocalDateTime createDate, LocalDateTime updateDate, List<WishList> wishList,
+            Set<Cart> cart, List<Orders> orders) {
         this.memberId = memberId;
         this.nickName = nickName;
         this.password = password;
@@ -133,11 +139,11 @@ public class Member {
         this.address = address;
     }
 
-    public Date getBirthday() {
+    public LocalDate getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
     }
 
