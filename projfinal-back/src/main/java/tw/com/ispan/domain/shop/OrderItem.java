@@ -3,6 +3,7 @@ package tw.com.ispan.domain.shop;
 import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,31 +12,37 @@ public class OrderItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer orderItemId;  // Order Item ID
+    private Integer orderItemId;  // 訂單項目 ID
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
-    @JsonBackReference  // Prevent infinite recursion when serializing
-    private Orders order;  // Link back to the Orders entity
+    @JsonBackReference  // 防止序列化時的循環引用
+    private Orders order;  // 關聯到 Orders
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})  // Prevent serialization issues with lazy-loaded product
-    private Product product;  // Link to Product entity
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})  // 避免 Hibernate 懶加載問題
+    private Product product;  // 關聯到商品
 
     @Column(nullable = false)
-    private Integer orderQuantity;  // Quantity of the ordered product
+    private Integer orderQuantity;  // 訂購數量
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal purchasedPrice;  // Price of the product when purchased
+    private BigDecimal purchasedPrice;  // 當前購買時的價格
 
     @Column(nullable = false)
-    private String status;  // Status of the order item (e.g., "Pending", "Shipped")
+    private String status;  // 訂單狀態（如："備貨中"、"已發貨"）
 
-    // Default constructor
+    // **新增方法**：提供商品名稱，確保前端可以獲取
+    @JsonProperty("productName")
+    public String getProductName() {
+        return (product != null) ? product.getProductName() : "未知商品";
+    }
+
+    // 預設建構子
     public OrderItem() {}
 
-    // Constructor with all fields
+    // 全部欄位建構子
     public OrderItem(Integer orderItemId, Orders order, Product product, Integer orderQuantity,
                      BigDecimal purchasedPrice, String status) {
         this.orderItemId = orderItemId;
@@ -95,7 +102,7 @@ public class OrderItem {
         this.status = status;
     }
 
-    // Helper methods to set the foreign keys (order_id, product_id)
+    // 設定 orderId（輔助方法）
     public void setOrderId(Integer orderId) {
         if (this.order == null) {
             this.order = new Orders();
@@ -103,6 +110,7 @@ public class OrderItem {
         this.order.setOrderId(orderId);
     }
 
+    // 設定 productId（輔助方法）
     public void setProductId(Integer productId) {
         if (this.product == null) {
             this.product = new Product();
@@ -115,6 +123,7 @@ public class OrderItem {
         return "OrderItem [orderItemId=" + orderItemId + 
                ", order=" + (order != null ? order.getOrderId() : "null") +
                ", product=" + (product != null ? product.getProductId() : "null") +
+               ", productName=" + getProductName() +
                ", orderQuantity=" + orderQuantity + 
                ", purchasedPrice=" + purchasedPrice + 
                ", status=" + status + "]";
