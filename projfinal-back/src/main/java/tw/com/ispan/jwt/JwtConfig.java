@@ -13,7 +13,7 @@ public class JwtConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jsonWebTokenInterceptor)
-                .addPathPatterns("/ajax/pages/products/**");
+                .addPathPatterns("/index/**");
 
     }
 }

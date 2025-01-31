@@ -46,7 +46,7 @@ public class AdoptionCaseController {
         }
     }
 
-    // 更新 AdoptionCase 的 status 和 note
+    // 更新註記 status 和 note
     @PutMapping("/{adoptionCaseId}")
     public AdoptionCase updateAdoptionCase(@PathVariable Integer adoptionCaseId,
             @RequestBody AdoptioncaseDTO dto) {
