@@ -31,8 +31,8 @@ public class ProductRequest {
 
     // 前端為單選；不能為空值
     @NotBlank(message = "商品類別不能為空")
-    private String categoryName;
-
+    private Integer categoryId; // 用於接收 ID
+    private String categoryName; // 用於查詢時顯示名稱
     private String categoryDescription;
 
     // 前端為多選；可為0~N個標籤
@@ -183,6 +183,14 @@ public class ProductRequest {
 
     public void setTagDescription(String tagDescription) {
         this.tagDescription = tagDescription;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
 }

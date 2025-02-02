@@ -2,22 +2,31 @@ package tw.com.ispan.service.shop;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import tw.com.ispan.domain.admin.Member;
+import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.dto.ProductRequest;
 import tw.com.ispan.dto.ProductResponse;
+import tw.com.ispan.repository.shop.CartItemRepository;
+import tw.com.ispan.repository.shop.CategoryRepository;
+import tw.com.ispan.repository.shop.InventoryItemRepository;
+import tw.com.ispan.repository.shop.OrderItemRepository;
+import tw.com.ispan.repository.shop.ProductImageRepository;
 import tw.com.ispan.repository.shop.ProductRepository;
-import tw.com.ispan.specification.ProductSpecifications;
+import tw.com.ispan.repository.shop.WishListRepository;
 
 /*
 * isEmpty() 適用於 String, Collection, Map, Array 的空值判斷
@@ -39,6 +48,24 @@ public class ProductService {
 	private ProductRepository productRepository;
 
 	@Autowired
+	private CategoryRepository categoryRepository;
+
+	@Autowired
+	private CartItemRepository cartItemRepository;
+
+	@Autowired
+	private WishListRepository wishlistRepository;
+
+	@Autowired
+	private InventoryItemRepository inventoryItemRepository;
+
+	@Autowired
+	private ProductImageRepository productImageRepository;
+
+	@Autowired
+	private OrderItemRepository orderItemRepository;
+
+	@Autowired
 	private CategoryService categoryService;
 
 	@Autowired
@@ -46,6 +73,9 @@ public class ProductService {
 
 	@Autowired
 	private ProductImageService productImageService;
+
+	@Autowired
+	private NotificationService notificationService;
 
 	// 單筆新增
 	public ProductResponse createSingle(ProductRequest request, List<MultipartFile> filenames) {
@@ -61,9 +91,6 @@ public class ProductService {
 
 			// 處理標籤(0~N個)
 			productTagService.processProductTags(product, request.getTags());
-
-			// 處理商品圖片(1~5張)
-			productImageService.processProductImage(product, filenames);
 
 			/*
 			 * compareTo 適用於以下型別的空值判斷
@@ -111,6 +138,12 @@ public class ProductService {
 			product.setCreatedAt(LocalDateTime.now());
 			product.setUpdatedAt(LocalDateTime.now());
 
+			// 先存 Product實體，確保有 ID；避免圖片雙向關聯映射對應到 transient 狀態而無法執行
+			product = productRepository.save(product); 
+
+			// 處理商品圖片(1~5張)
+			productImageService.processProductImage(product, filenames);
+
 			Product savedProduct = productRepository.save(product);
 			response.setSuccess(true);
 			response.setProduct(savedProduct);
@@ -123,15 +156,80 @@ public class ProductService {
 		return response;
 	}
 
-	// 單筆刪除
-	public ProductResponse deleteSingle(Integer productId) {
+	// 一次修改多屬性
+	public ProductResponse updateSingle(Integer productId, ProductRequest request, List<MultipartFile> images) {
 		ProductResponse response = new ProductResponse();
 
 		Optional<Product> productOpt = productRepository.findById(productId);
 		if (productOpt.isPresent()) {
-			productRepository.delete(productOpt.get());
+			Product product = productOpt.get();
+
+			// 更新非空欄位，null的判斷，若not-null欄位未修改，可避免跳出錯誤訊息
+			if (request.getProductName() != null) {
+				product.setProductName(request.getProductName());
+			}
+			if (request.getDescription() != null) {
+				product.setDescription(request.getDescription());
+			}
+			if (request.getOriginalPrice() != null) {
+				product.setOriginalPrice(request.getOriginalPrice());
+			}
+			if (request.getSalePrice() != null) {
+				product.setSalePrice(request.getSalePrice());
+			}
+			if (request.getStockQuantity() != null) {
+				product.setStockQuantity(request.getStockQuantity());
+			}
+			if (request.getUnit() != null) {
+				product.setUnit(request.getUnit());
+			}
+			if (request.getExpire() != null) {
+				product.setExpire(request.getExpire());
+			}
+
+			// 更新類別
+			if (request.getCategoryId() != null) {
+				// 直接查詢 category 並設定
+				Optional<Category> categoryOpt = categoryRepository.findById(request.getCategoryId());
+				if (categoryOpt.isPresent()) {
+					product.setCategory(categoryOpt.get());
+
+					// 若類別有 defaultUnit，且商品單位尚未設定，則同步更新
+					if (categoryOpt.get().getDefaultUnit() != null && product.getUnit() == null) {
+						product.setUnit(categoryOpt.get().getDefaultUnit());
+					}
+				} else {
+					throw new IllegalArgumentException("類別 ID 不存在");
+				}
+			} else if (request.getCategoryName() != null) {
+				// 如果提供的是 categoryName，則查找 categoryId
+				Integer resolvedCategoryId = categoryService.findCategoryIdByName(request.getCategoryName());
+				if (resolvedCategoryId != null) {
+					Optional<Category> categoryOpt = categoryRepository.findById(resolvedCategoryId);
+					if (categoryOpt.isPresent()) {
+						product.setCategory(categoryOpt.get());
+					}
+				} else {
+					throw new IllegalArgumentException("無效的商品類別名稱");
+				}
+			}
+
+			// 更新標籤
+			if (request.getTags() != null) {
+				productTagService.processProductTags(product, request.getTags());
+			}
+
+			// 更新圖片
+			if (images != null && !images.isEmpty()) {
+				productImageService.processProductImage(product, images);
+			}
+
+			product.setUpdatedAt(LocalDateTime.now()); // 更新時間
+			Product updatedProduct = productRepository.save(product);
+
 			response.setSuccess(true);
-			response.setMessage("商品刪除成功");
+			response.setProduct(updatedProduct);
+			response.setMessage("商品更新成功");
 		} else {
 			response.setSuccess(false);
 			response.setMessage("商品不存在");
@@ -139,6 +237,65 @@ public class ProductService {
 
 		return response;
 	}
+
+	// 單筆刪除
+	@Transactional
+public ProductResponse deleteSingle(Integer productId) {
+    ProductResponse response = new ProductResponse();
+    Optional<Product> productOpt = productRepository.findById(productId);
+
+    if (productOpt.isPresent()) {
+        Product product = productOpt.get();
+
+        // **(1) 若商品已在訂單內，則禁止刪除並通知管理員**
+        if (orderItemRepository.existsByProduct(product)) {
+            notificationService.notifyAdmin(
+                "刪除商品失敗", 
+                "商品 [" + product.getProductName() + "] 已有會員下單，無法刪除。"
+            );
+            response.setSuccess(false);
+            response.setMessage("商品已被訂購，無法刪除");
+            return response;
+        }
+
+        // **(2) 查詢受影響的會員**
+        List<Member> affectedMembers = new ArrayList<>();
+        
+        // 取得購物車內的會員
+        List<Member> cartMembers = cartItemRepository.findMembersByProduct(product);
+        affectedMembers.addAll(cartMembers);
+        
+        // 取得願望清單內的會員
+        List<Member> wishlistMembers = wishlistRepository.findMembersByProduct(product);
+        affectedMembers.addAll(wishlistMembers);
+
+        // **(3) 發送通知給會員**
+        for (Member member : affectedMembers) {
+            notificationService.notifyMember(
+                member,
+                "商品已下架", 
+                "您購物車或願望清單內的商品 [" + product.getProductName() + "] 已被刪除，請更新您的購物車或願望清單。"
+            );
+        }
+
+        // **(4) 刪除關聯數據**
+        wishlistRepository.deleteByProduct(product);
+        cartItemRepository.deleteByProduct(product);
+        productImageRepository.deleteByProduct(product);
+        product.getTags().clear();
+
+        // **(5) 刪除商品**
+        productRepository.delete(product);
+        productRepository.flush();
+
+        response.setSuccess(true);
+        response.setMessage("商品刪除成功，已通知相關會員");
+    } else {
+        response.setSuccess(false);
+        response.setMessage("商品不存在");
+    }
+    return response;
+}
 
 	// 批量刪除
 	public ProductResponse deleteBatch(List<Integer> productIds) {
@@ -153,65 +310,6 @@ public class ProductService {
 			response.setSuccess(false);
 			response.setMessage("未找到任何匹配的商品");
 		}
-
-		return response;
-	}
-
-	// 單筆修改
-	public ProductResponse updateSingle(Integer productId, ProductRequest request) {
-		ProductResponse response = new ProductResponse();
-
-		Optional<Product> productOpt = productRepository.findById(productId);
-		if (productOpt.isPresent()) {
-			Product product = productOpt.get();
-			product.setProductName(request.getProductName());
-			product.setDescription(request.getDescription());
-			product.setOriginalPrice(request.getOriginalPrice());
-			product.setSalePrice(request.getSalePrice());
-			product.setStockQuantity(request.getStockQuantity());
-			product.setUnit(request.getUnit());
-			product.setExpire(request.getExpire());
-			Product updatedProduct = productRepository.save(product);
-			response.setSuccess(true);
-			response.setProduct(updatedProduct);
-			response.setMessage("商品更新成功");
-		} else {
-			response.setSuccess(false);
-			response.setMessage("商品不存在");
-		}
-
-		return response;
-	}
-
-	// 批量修改
-	public ProductResponse updateBatch(List<ProductRequest> requests) {
-		ProductResponse response = new ProductResponse();
-
-		// 遍歷請求列表並動態更新
-		List<Product> updatedProducts = requests.stream().map(request -> {
-			// 動態查詢條件
-			Specification<Product> spec = Specification
-					.where(ProductSpecifications.hasProductName(request.getProductName()));
-			List<Product> products = productRepository.findAll(spec);
-
-			if (!products.isEmpty()) {
-				Product product = products.get(0); // 更新第一個匹配的商品
-				product.setProductName(request.getProductName());
-				product.setDescription(request.getDescription());
-				product.setOriginalPrice(request.getOriginalPrice());
-				product.setSalePrice(request.getSalePrice());
-				product.setStockQuantity(request.getStockQuantity());
-				product.setUnit(request.getUnit());
-				product.setExpire(request.getExpire());
-				return productRepository.save(product);
-			}
-			return null;
-		}).filter(product -> product != null).collect(Collectors.toList());
-
-		// 設定返回結果
-		response.setSuccess(!updatedProducts.isEmpty());
-		response.setProducts(updatedProducts);
-		response.setMessage(updatedProducts.isEmpty() ? "未找到任何匹配的商品進行更新" : "批量更新成功");
 
 		return response;
 	}
@@ -259,7 +357,9 @@ public class ProductService {
 		return response;
 	}
 
-	
+	// 分頁
+	public Page<Product> getAllPaged(Pageable pageable) {
+        return productRepository.findAll(pageable);
+    }
 
-	
 }

@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.shop.Product;
@@ -20,5 +22,11 @@ public interface WishListRepository
 
     // 查詢收藏
     List<WishList> findByMember(Member member);
+
+    // 刪除商品時，確認受到影響的會員
+    @Query("SELECT DISTINCT w.member FROM Wishlist w WHERE w.product = :product")
+    List<Member> findMembersByProduct(@Param("product") Product product);
+
+    void deleteByProduct(Product product);
 
 }

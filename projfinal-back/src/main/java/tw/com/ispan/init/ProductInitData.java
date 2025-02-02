@@ -49,7 +49,7 @@ public class ProductInitData implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
         // 初始化管理員資料
-        // initializeAdmins();
+        initializeAdmins();
 
         // 初始化類別資料
         initializeCategories();
@@ -61,25 +61,25 @@ public class ProductInitData implements CommandLineRunner {
         initializeData();
     }
 
-    // private void initializeAdmins() {
-    //     String adminName = "admin"; // 你的管理員名稱
+    private void initializeAdmins() {
+        String adminName = "admin"; // 你的管理員名稱
     
-    //     // 檢查 `adminName` 是否已存在，避免違反 UNIQUE KEY
-    //     if (adminRepository.findByAdminName(adminName).isPresent()) {
-    //         System.out.println("管理員 " + adminName + " 已存在，跳過初始化");
-    //         return;
-    //     }
+        // 檢查 `adminName` 是否已存在，避免違反 UNIQUE KEY
+        if (adminRepository.findByAdminName(adminName).isPresent()) {
+            System.out.println("管理員 " + adminName + " 已存在，跳過初始化");
+            return;
+        }
     
-    //     // 🔹 若不存在，則新增
-    //     Admin admin = new Admin();
-    //     admin.setAdminName(adminName);
-    //     admin.setPassword("AAA");
-    //     admin.setCreateDate(LocalDateTime.now());
-    //     admin.setUpdateDate(LocalDateTime.now());
+        // 🔹 若不存在，則新增
+        Admin admin = new Admin();
+        admin.setAdminName(adminName);
+        admin.setPassword("AAA");
+        admin.setCreateDate(LocalDateTime.now());
+        admin.setUpdateDate(LocalDateTime.now());
     
-    //     adminRepository.save(admin);
-    //     System.out.println("初始化管理員成功：" + adminName);
-    // }
+        adminRepository.save(admin);
+        System.out.println("初始化管理員成功：" + adminName);
+    }
 
     private void initializeCategories() {
         Set<CategoryRequest> categories = Set.of(
@@ -133,6 +133,8 @@ public class ProductInitData implements CommandLineRunner {
             Category category4 = categoryService.findCategoryEntity("玩具");
             Category category5 = categoryService.findCategoryEntity("清潔用品");
 
+            // 透過 savedProduct1 先建立實體，存入圖片時才不會因為 Product 處於 transient 無法正確映射
+
             Product product1 = new Product();
             product1.setAdmin(admin);
             product1.setProductName("貓糧");
@@ -146,8 +148,9 @@ public class ProductInitData implements CommandLineRunner {
             product1.setExpire(LocalDate.parse("2025-12-31"));
             product1.setCreatedAt(LocalDateTime.now());
             product1.setUpdatedAt(LocalDateTime.now());
+            Product savedProduct1 = productRepository.save(product1);
             List<String> filenames1 = List.of("image11.jpg", "image12.jpg");
-            productImageService.initializeProductImages(product1, filenames1);
+            productImageService.initializeProductImages(savedProduct1, filenames1);
 
             Product product2 = new Product();
             product2.setAdmin(admin);
@@ -162,8 +165,9 @@ public class ProductInitData implements CommandLineRunner {
             product2.setExpire(LocalDate.parse("2030-12-31"));
             product2.setCreatedAt(LocalDateTime.now());
             product2.setUpdatedAt(LocalDateTime.now());
+            Product savedProduct2 = productRepository.save(product2);
             List<String> filenames2 = List.of("image2.jpg");
-            productImageService.initializeProductImages(product2, filenames2);
+            productImageService.initializeProductImages(savedProduct2, filenames2);
 
             Product product3 = new Product();
             product3.setAdmin(admin);
@@ -178,8 +182,9 @@ public class ProductInitData implements CommandLineRunner {
             product3.setExpire(LocalDate.parse("2025-12-31"));
             product3.setCreatedAt(LocalDateTime.now());
             product3.setUpdatedAt(LocalDateTime.now());
+            Product savedProduct3 = productRepository.save(product3);
             List<String> filenames3 = List.of("image3.jpg");
-            productImageService.initializeProductImages(product3, filenames3);
+            productImageService.initializeProductImages(savedProduct3, filenames3);
 
             Product product4 = new Product();
             product4.setAdmin(admin);
@@ -194,8 +199,9 @@ public class ProductInitData implements CommandLineRunner {
             product4.setExpire(LocalDate.now());
             product4.setCreatedAt(LocalDateTime.now());
             product4.setUpdatedAt(LocalDateTime.now());
+            Product savedProduct4 = productRepository.save(product4);
             List<String> filenames4 = List.of("image41.jpg", "image42.jpg", "image43.jpg");
-            productImageService.initializeProductImages(product4, filenames4);
+            productImageService.initializeProductImages(savedProduct4, filenames4);
 
             Product product5 = new Product();
             product5.setAdmin(admin);
@@ -210,14 +216,15 @@ public class ProductInitData implements CommandLineRunner {
             product5.setExpire(LocalDate.parse("2025-06-30"));
             product5.setCreatedAt(LocalDateTime.now());
             product5.setUpdatedAt(LocalDateTime.now());
+            Product savedProduct5 = productRepository.save(product5);
             List<String> filenames5 = List.of("image5.jpg");
-            productImageService.initializeProductImages(product5, filenames5);
+            productImageService.initializeProductImages(savedProduct5, filenames5);
 
-            productRepository.save(product1);
-            productRepository.save(product2);
-            productRepository.save(product3);
-            productRepository.save(product4);
-            productRepository.save(product5);
+            productRepository.save(savedProduct1);
+            productRepository.save(savedProduct2);
+            productRepository.save(savedProduct3);
+            productRepository.save(savedProduct4);
+            productRepository.save(savedProduct5);
 
             System.out.println("初始化商城資料成功！");
         } catch (Exception e) {

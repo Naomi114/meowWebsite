@@ -207,4 +207,14 @@ public class CategoryService {
         categoryRequest.setDefaultUnit(request.getUnit());
         return categoryRequest;
     }
+
+    // 已上架商品，修改類別
+    public Integer findCategoryIdByName(String categoryName) {
+        Optional<Category> categoryOpt = categoryRepository.findByCategoryName(categoryName);
+        if (categoryOpt.isPresent()) {
+            return categoryOpt.get().getCategoryId();
+        } else {
+            throw new IllegalArgumentException("類別不存在: " + categoryName);
+        }
+    }
 }

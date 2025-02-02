@@ -11,6 +11,22 @@ public class ProductResponse {
     private Product product; // 單商品數據
     private List<Product> products; // 多商品列表
     private Long count;
+    
+    public ProductResponse() {
+    }
+
+    public ProductResponse(Boolean success, String message) {
+        this.success = success;
+        this.message = message;
+    }
+
+    public ProductResponse(Boolean success, String message, Product product, List<Product> products, Long count) {
+        this.success = success;
+        this.message = message;
+        this.product = product;
+        this.products = products;
+        this.count = count;
+    }
 
     public Boolean getSuccess() {
         return success;

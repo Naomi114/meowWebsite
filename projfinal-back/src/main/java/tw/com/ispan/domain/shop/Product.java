@@ -24,6 +24,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Admin;
 
@@ -84,8 +85,7 @@ public class Product {
 
     // 雙向一對多，可反向查找
     // cascade = CascadeType.remove 當刪除商品時，會刪除商品圖片；已包含在 ALL 內
-    // orphanRemoval = true，確保當某圖片從商品圖片集合中移除時，該圖片會從資料庫中刪除。
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonBackReference("product")
     private List<ProductImage> productImages = new LinkedList<>(); // 有序可重複 (首圖為選取的第一張)
 
@@ -100,12 +100,12 @@ public class Product {
     // cascade = CascadeType.remove 當刪除商品時，會刪除庫存異動；須排除在外
     @OneToMany(mappedBy = "product", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
             CascadeType.REFRESH }, fetch = FetchType.EAGER)
-    private List<InventoryItem> inventoryItems = new LinkedList<>(); // 無序可重複，適合頻繁插入和刪除
+    private List<InventoryItem> inventoryItems = new LinkedList<>();
 
     // 雙向一對多，可反向查找 (刪除願望清單，會員商品列表也會同步? 合理??)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonBackReference("products")
-    private Set<WishList> wishlists = new LinkedHashSet<>(); // 有序不重複
+    private Set<WishList> wishlists = new LinkedHashSet<>();
 
     public Product() {
     }
@@ -288,4 +288,17 @@ public class Product {
         this.wishlists = wishlists;
     }
 
+    // 確保時間自動填入
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = LocalDateTime.now();
+        }
+        if (this.expire == null) {
+            this.expire = LocalDate.now().plusMonths(3); // 設定預設值為三個月後
+        }
+    }
 }

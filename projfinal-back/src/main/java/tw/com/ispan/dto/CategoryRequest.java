@@ -23,6 +23,10 @@ public class CategoryRequest {
         this.defaultUnit = defaultUnit;
     }
 
+    // 已上架的商品，修改類別
+    public CategoryRequest(Integer resolvedCategoryId) {
+    }
+
     public String getCategoryName() {
         return categoryName;
     }

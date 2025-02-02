@@ -6,6 +6,9 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,6 +43,17 @@ public class ProductController {
     @Autowired
     private ObjectMapper objectMapper;
 
+    // 分頁
+    @GetMapping("/paged")
+        public ResponseEntity<Page<Product>> getProductsPaged(
+            @RequestParam(defaultValue = "0") int page,  // 預設第 0 頁
+            @RequestParam(defaultValue = "10") int size // 預設每頁 10 筆
+        ) {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Product> products = productService.getAllPaged(pageable);
+            return ResponseEntity.ok(products);
+        }
+        
     // 新增商品
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createProduct(
@@ -60,12 +74,20 @@ public class ProductController {
     }
 
     // 修改商品
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Integer id,
-            @Valid @RequestBody ProductRequest request) {
-        ProductResponse response = productService.updateSingle(id, request);
-        return response.getSuccess() ? ResponseEntity.ok(response)
-                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductResponse> updateProduct(
+            @PathVariable Integer id,
+            @RequestPart("productRequest") String productRequestJson,
+            @RequestPart(value = "productImages", required = false) List<MultipartFile> productImages) {
+        
+        try {
+            ProductRequest productRequest = objectMapper.readValue(productRequestJson, ProductRequest.class);
+            ProductResponse response = productService.updateSingle(id, productRequest, productImages);
+            return response.getSuccess() ? ResponseEntity.ok(response)
+                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ProductResponse(false, "更新失敗: " + e.getMessage()));
+        }
     }
 
     // 刪除商品
