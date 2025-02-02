@@ -83,7 +83,8 @@ public class ProductInitData implements CommandLineRunner {
 
     private void initializeCategories() {
         Set<CategoryRequest> categories = Set.of(
-                new CategoryRequest("寵物用品", "所有寵物相關商品","個"),
+                new CategoryRequest("狗用品", "狗相關商品","個"),
+                new CategoryRequest("貓用品", "貓相關商品","個"),
                 new CategoryRequest("玩具", "各類寵物玩具", "個"),
                 new CategoryRequest("飼料", "各種寵物飼料", "包"),
                 new CategoryRequest("保健品", "寵物專用保健產品", "罐"),
