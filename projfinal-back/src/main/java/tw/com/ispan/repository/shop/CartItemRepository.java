@@ -39,6 +39,6 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     void deleteByProduct(Product product);
 
     // 刪除商品時，確認受到影響的會員(by Naomi)
-    @Query("SELECT DISTINCT c.member FROM CartItem c WHERE c.product = :product")
+    @Query("SELECT c.cart.member FROM CartItem c WHERE c.product = :product")
     List<Member> findMembersByProduct(@Param("product") Product product);
 }

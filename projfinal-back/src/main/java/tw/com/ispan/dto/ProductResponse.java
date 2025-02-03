@@ -1,6 +1,7 @@
 package tw.com.ispan.dto;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import tw.com.ispan.domain.shop.Product;
 
@@ -8,24 +9,26 @@ import tw.com.ispan.domain.shop.Product;
 public class ProductResponse {
     private Boolean success;
     private String message;
-    private Product product; // 單商品數據
-    private List<Product> products; // 多商品列表
+    private ProductDTO product; // ✅ 確保單一商品返回時包含 `imageUrls`
+    private List<ProductDTO> products; // ✅ 修改為 `List<ProductDTO>`
     private Long count;
-    
-    public ProductResponse() {
-    }
+
+    public ProductResponse() {}
 
     public ProductResponse(Boolean success, String message) {
         this.success = success;
         this.message = message;
     }
 
-    public ProductResponse(Boolean success, String message, Product product, List<Product> products, Long count) {
+    public ProductResponse(Boolean success, String message, List<Product> products, Long count) {
         this.success = success;
         this.message = message;
-        this.product = product;
-        this.products = products;
         this.count = count;
+
+        // ✅ 轉換 `Product` 為 `ProductDTO`
+        this.products = products.stream()
+                .map(ProductDTO::new)
+                .collect(Collectors.toList());
     }
 
     public Boolean getSuccess() {
@@ -44,19 +47,19 @@ public class ProductResponse {
         this.message = message;
     }
 
-    public Product getProduct() {
+    public ProductDTO getProduct() {
         return product;
     }
 
-    public void setProduct(Product product) {
+    public void setProduct(ProductDTO product) {
         this.product = product;
     }
 
-    public List<Product> getProducts() {
+    public List<ProductDTO> getProducts() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
+    public void setProducts(List<ProductDTO> products) {
         this.products = products;
     }
 
@@ -67,5 +70,4 @@ public class ProductResponse {
     public void setCount(Long count) {
         this.count = count;
     }
-
 }

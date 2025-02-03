@@ -128,11 +128,11 @@ public class ProductInitData implements CommandLineRunner {
                     .orElseThrow(() -> new IllegalArgumentException("管理員不存在"));
 
             // 查找類別
-            Category category1 = categoryService.findCategoryEntity("飼料");
-            Category category2 = categoryService.findCategoryEntity("寵物用品");
-            Category category3 = categoryService.findCategoryEntity("玩具");
+            Category category1 = categoryService.findCategoryEntity("貓用品");
+            Category category2 = categoryService.findCategoryEntity("狗用品");
+            Category category3 = categoryService.findCategoryEntity("貓用品");
             Category category4 = categoryService.findCategoryEntity("玩具");
-            Category category5 = categoryService.findCategoryEntity("清潔用品");
+            Category category5 = categoryService.findCategoryEntity("貓用品");
 
             // 透過 savedProduct1 先建立實體，存入圖片時才不會因為 Product 處於 transient 無法正確映射
 

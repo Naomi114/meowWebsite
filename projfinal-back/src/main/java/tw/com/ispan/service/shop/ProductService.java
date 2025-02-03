@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
+import tw.com.ispan.dto.ProductDTO;
 import tw.com.ispan.dto.ProductRequest;
 import tw.com.ispan.dto.ProductResponse;
 import tw.com.ispan.repository.shop.CartItemRepository;
@@ -146,7 +147,7 @@ public class ProductService {
 
 			Product savedProduct = productRepository.save(product);
 			response.setSuccess(true);
-			response.setProduct(savedProduct);
+			response.setProduct(new ProductDTO(savedProduct));
 			response.setMessage("商品新增成功");
 		} catch (Exception e) {
 			response.setSuccess(false);
@@ -228,7 +229,7 @@ public class ProductService {
 			Product updatedProduct = productRepository.save(product);
 
 			response.setSuccess(true);
-			response.setProduct(updatedProduct);
+			response.setProduct(new ProductDTO(updatedProduct));
 			response.setMessage("商品更新成功");
 		} else {
 			response.setSuccess(false);
@@ -321,7 +322,7 @@ public ProductResponse deleteSingle(Integer productId) {
 		Optional<Product> productOpt = productRepository.findById(productId);
 		if (productOpt.isPresent()) {
 			response.setSuccess(true);
-			response.setProduct(productOpt.get());
+			response.setProduct(new ProductDTO(productOpt.get()));
 			response.setMessage("查詢成功");
 		} else {
 			response.setSuccess(false);
@@ -336,10 +337,14 @@ public ProductResponse deleteSingle(Integer productId) {
 
 		// 使用 Specification 執行查詢
 		List<Product> products = productRepository.findAll(spec);
+		List<ProductDTO> productDTOs = new ArrayList<>();
+		for (Product product : products) {
+			productDTOs.add(new ProductDTO(product));
+		}
 
 		// 設定返回結果
 		response.setSuccess(!products.isEmpty());
-		response.setProducts(products);
+		response.setProducts(productDTOs);
 		response.setMessage(products.isEmpty() ? "未找到匹配的商品" : "批量查詢成功");
 
 		return response;
@@ -349,9 +354,13 @@ public ProductResponse deleteSingle(Integer productId) {
 	public ProductResponse findAll() {
 		ProductResponse response = new ProductResponse();
 		List<Product> products = productRepository.findAll();
+		List<ProductDTO> productDTOs = new ArrayList<>();
+		for (Product product : products) {
+			productDTOs.add(new ProductDTO(product));
+		}
 
 		response.setSuccess(!products.isEmpty());
-		response.setProducts(products);
+		response.setProducts(productDTOs);
 		response.setMessage(products.isEmpty() ? "未找到任何商品" : "商品查詢成功");
 
 		return response;

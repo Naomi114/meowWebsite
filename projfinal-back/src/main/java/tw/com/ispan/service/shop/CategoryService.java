@@ -217,4 +217,20 @@ public class CategoryService {
             throw new IllegalArgumentException("類別不存在: " + categoryName);
         }
     }
+
+    // 獲取所有類別
+    public List<Category> getAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        if (categories == null || categories.isEmpty()) {
+            throw new IllegalArgumentException("沒有可用的類別");
+        }
+        return categories;
+    }
+
+    // 根據類別ID獲取商品
+    public List<Product> getProductsByCategory(Integer categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("類別不存在: ID = " + categoryId));
+        return productRepository.findByCategory(category);
+    }
 }

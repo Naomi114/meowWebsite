@@ -1,5 +1,7 @@
 package tw.com.ispan.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import tw.com.ispan.domain.shop.Category;
+import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.dto.CategoryRequest;
 import tw.com.ispan.dto.CategoryResponse;
 import tw.com.ispan.service.shop.CategoryService;
@@ -71,6 +75,20 @@ public class CategoryController {
         return response.getSuccess()
                 ? ResponseEntity.ok(response)
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    // 獲取所有分類
+    @GetMapping
+    public ResponseEntity<List<Category>> getAllCategories() {
+        List<Category> categories = categoryService.getAllCategories();
+        return ResponseEntity.ok(categories);
+    }
+
+    // 根據分類 ID 獲取對應商品
+    @GetMapping("/{categoryId}/products")
+    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable Integer categoryId) {
+        List<Product> products = categoryService.getProductsByCategory(categoryId);
+        return ResponseEntity.ok(products);
     }
 
 }

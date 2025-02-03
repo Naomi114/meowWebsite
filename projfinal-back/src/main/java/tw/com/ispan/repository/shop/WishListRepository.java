@@ -24,7 +24,7 @@ public interface WishListRepository
     List<WishList> findByMember(Member member);
 
     // 刪除商品時，確認受到影響的會員
-    @Query("SELECT DISTINCT w.member FROM Wishlist w WHERE w.product = :product")
+    @Query("SELECT DISTINCT w.member FROM WishList w WHERE w.product = :product")
     List<Member> findMembersByProduct(@Param("product") Product product);
 
     void deleteByProduct(Product product);
