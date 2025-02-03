@@ -6,92 +6,161 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import tw.com.ispan.service.shop.OrderService;
 import tw.com.ispan.util.EcpayFunctions;
-import tw.com.ispan.domain.shop.Orders;
 import tw.com.ispan.dto.PaymentRequest;
+import tw.com.ispan.domain.shop.Orders;
+import tw.com.ispan.dto.OrderItemDTO;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/pages/ecpay") // 定义 ECPay 路径
-@CrossOrigin // 支持跨域访问
+@RequestMapping("/pages/ecpay") // Define ECPay path
 public class EcpayController {
 
     @Autowired
     private EcpayFunctions ecpayFunctions;
 
     @Autowired
-    private OrderService orderService; // 用于更新订单和购物车
+    private OrderService orderService; // Service to update orders and cart
 
-    // 接收 ECPay 的回传数据
+    /**
+     * Receive payment result from ECPay
+     */
     @PostMapping("/return")
-    public ResponseEntity<String> ecpayReturn(@RequestBody String body) {
+    public ResponseEntity<String> ecpayReturn(@RequestParam Map<String, String> params) {
         System.out.println("ECPay return received at " + System.currentTimeMillis());
-        System.out.println("Body: " + body);
+        // Print all received parameters for debugging
+        params.forEach((key, value) -> System.out.println(key + ": " + value));
 
         try {
-            // 解析回传的 JSON 数据
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> responseMap = objectMapper.readValue(body, Map.class);
-
-            // 从回传数据中获取订单ID和支付状态
-            String orderIdString = (String) responseMap.get("OrderId");
-            String paymentStatus = (String) responseMap.get("PaymentStatus");
-
-            // Convert orderId from String to Integer
-            Integer orderId = Integer.parseInt(orderIdString);
-
-            // 根据支付状态处理订单
-            if ("Success".equals(paymentStatus)) {
-                // 更新订单状态为已支付
-                orderService.updateOrderStatus(orderId, "PAID");
-
-                // 清空购物车中的已购买商品
-                orderService.clearCartForOrder(orderId);
-
-                // 返回成功消息
-                return ResponseEntity.ok("Payment processed successfully");
-            } else {
-                // 如果支付失败，返回失败消息
-                return ResponseEntity.status(400).body("Payment failed");
+            // Get MerchantTradeNo as ECPay transaction ID
+            String ecpayTradeNo = params.get("MerchantTradeNo");
+            if (ecpayTradeNo == null || ecpayTradeNo.isEmpty()) {
+                return ResponseEntity.status(400).body("Error: Missing MerchantTradeNo");
             }
 
+            // Get Order ID (Your system's Order ID)
+            String orderIdString = params.get("OrderId");
+            if (orderIdString == null || orderIdString.isEmpty()) {
+                return ResponseEntity.status(400).body("Error: Missing OrderId");
+            }
+
+            Integer orderId = Integer.parseInt(orderIdString);
+            String paymentStatus = params.get("RtnCode");
+
+            // RtnCode '1' means payment successful
+            if ("1".equals(paymentStatus)) {
+                // Update order status
+                orderService.updateOrderStatus(orderId, "已付款");
+
+                // Save ECPay transaction ID
+                orderService.updateEcpayTransactionId(orderId, ecpayTradeNo);
+
+                // Get the order items and mark them as checked out
+                List<OrderItemDTO> orderItemsDTO = orderService.getOrderItemsByOrderId(orderId);
+                for (OrderItemDTO itemDTO : orderItemsDTO) {
+                    orderService.updateOrderItemStatus(orderId, itemDTO.getProductId(), "已结账");
+                }
+
+                // Clear the cart for this order
+                orderService.clearCartForOrder(orderId);
+
+                return ResponseEntity.ok("Payment processed successfully");
+            } else {
+                return ResponseEntity.status(400).body("Payment failed");
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Error processing payment return"); // 出现异常时返回错误信息
+            return ResponseEntity.status(500).body("Error processing payment return");
         }
     }
 
-    // 提交支付请求，传递商品资料
+    /**
+     * Send payment request and pass product information
+     */
     @PostMapping("/send")
-    public String send(@RequestBody Map<String, Object> body) {
+    public String send(@RequestParam Map<String, String> body) {
         try {
-            // 将请求体中的商品数据转换为 JSON 字符串
+            // Ensure the body contains orderId
+            String orderIdString = body.get("orderId");
+            if (orderIdString == null || orderIdString.isEmpty()) {
+                return "Error: Missing orderId";
+            }
+
+            Integer orderId;
+            try {
+                orderId = Integer.parseInt(orderIdString);
+            } catch (NumberFormatException e) {
+                return "Error: Invalid orderId format";
+            }
+
+            // Convert the body map to JSON string
             ObjectMapper objectMapper = new ObjectMapper();
             String bodyJson = objectMapper.writeValueAsString(body);
 
-            // 调用 EcpayFunctions 生成支付表单
-            String form = ecpayFunctions.buildEcpayForm(bodyJson);
-
-            // 返回生成的表单
-            return form;
+            // Now call the buildEcpayForm method with a JSON string and the orderId
+            String ecpayForm = ecpayFunctions.buildEcpayForm(bodyJson, orderId.toString());
+            return ecpayForm;
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "Error: Unable to convert data to JSON"; // 转换数据时发生错误
+            return "Error: Unable to process request";
         }
     }
 
-    // 确认订单支付
+    /**
+     * Confirm order payment
+     */
     @PostMapping("/{orderId}/payment")
-    public ResponseEntity<Orders> processPayment(@PathVariable int orderId,
-            @RequestBody PaymentRequest paymentRequest) {
+    public ResponseEntity<Map<String, Object>> processPayment(@PathVariable String orderId,
+                                                 @RequestBody PaymentRequest paymentRequest) {
         try {
-            // 使用 orderService 来处理支付逻辑
-            Orders updatedOrder = orderService.processPayment(orderId, paymentRequest);
-            return ResponseEntity.ok(updatedOrder);
+            Integer orderIdInt = Integer.parseInt(orderId);
+            Orders updatedOrder = orderService.processPayment(orderIdInt, paymentRequest);
+
+            // Construct response with only the necessary fields
+            Map<String, Object> response = Map.of(
+                "orderId", updatedOrder.getOrderId(),
+                "finalPrice", updatedOrder.getFinalPrice(),
+                "orderStatus", updatedOrder.getOrderStatus()
+            );
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(null); // 处理支付过程中出错
+            return ResponseEntity.status(500).body(null);
         }
+    }
+
+    /**
+     * Generate the ECPay payment form and redirect to ECPay for payment
+     */
+    @PostMapping("/{orderId}/ecpay")
+    public String initiatePayment(@PathVariable Long orderId) {
+        // 从数据库中获取订单信息
+        Orders order = orderService.getOrderDTOById(orderId);
+
+        // 生成ECPay需要的参数
+        String merchantID = "xxx"; // 替换为实际商户ID
+        String orderID = order.getOrderId().toString();
+        String amount = order.getFinalPrice().toString();
+        String productName = order.getOrderItems().stream()
+            .map(item -> item.getProductName())
+            .collect(Collectors.joining(", "));
+
+        // 生成ECPay表单HTML
+        String formHtml = "<form action=\"https://payment.ecpay.com.tw/xxx\" method=\"POST\">" +
+                          "<input type=\"hidden\" name=\"MerchantID\" value=\"" + merchantID + "\">" +
+                          "<input type=\"hidden\" name=\"OrderID\" value=\"" + orderID + "\">" +
+                          "<input type=\"hidden\" name=\"Amount\" value=\"" + amount + "\">" +
+                          "<input type=\"hidden\" name=\"ProductName\" value=\"" + productName + "\">" +
+                          // 添加其他必要字段
+                          "<button type=\"submit\">Proceed to ECPay</button>" +
+                          "</form>" +
+                          "<script>document.forms[0].submit();</script>";
+
+        // 返回HTML响应
+        return formHtml;
     }
 }

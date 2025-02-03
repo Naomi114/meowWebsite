@@ -49,13 +49,20 @@ public class Orders {
     @Column(nullable = false)
     private Double finalPrice;  // Final Price after applying discount
 
+    @Column(nullable = true)  // Allow null for transactionId
+    private String transactionId;  // Transaction ID (for looking up orders)
+
+    @Column(nullable = true)  // Allow null for merchantTradeNo
+    private String merchantTradeNo;  // Merchant Trade No (for looking up orders)
+
     // Default Constructor
     public Orders() {}
 
     // Constructor with all fields
     public Orders(Integer orderId, Member member, List<OrderItem> orderItems, Discount discount,
                   String shippingAddress, LocalDateTime orderDate, String creditCard,
-                  String orderStatus, String feedback, Double subtotalPrice, Double finalPrice) {
+                  String orderStatus, String feedback, Double subtotalPrice, Double finalPrice,
+                  String transactionId, String merchantTradeNo) {
         this.orderId = orderId;
         this.member = member;
         this.orderItems = orderItems;
@@ -67,6 +74,8 @@ public class Orders {
         this.feedback = feedback;
         this.subtotalPrice = subtotalPrice;
         this.finalPrice = finalPrice;
+        this.transactionId = transactionId;
+        this.merchantTradeNo = merchantTradeNo;
     }
 
     // Getters and Setters
@@ -103,5 +112,14 @@ public class Orders {
     public Double getFinalPrice() { return finalPrice; }
     public void setFinalPrice(Double finalPrice) { this.finalPrice = finalPrice; }
 
-    // Removed the setMember method that was unimplemented, leaving it as is.
+    public String getTransactionId() { return transactionId; }
+    public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
+
+    public String getMerchantTradeNo() { return merchantTradeNo; }
+    public void setMerchantTradeNo(String merchantTradeNo) { this.merchantTradeNo = merchantTradeNo; }
+
+    public Orders orElseThrow(Object object) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
+    }
 }

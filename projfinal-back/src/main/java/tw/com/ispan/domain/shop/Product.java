@@ -10,10 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -33,7 +29,6 @@ import tw.com.ispan.domain.admin.Admin;
 
 @Entity
 @Table(name = "Product")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "productId") // 避免循環引用
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,6 +40,7 @@ public class Product {
     @Column(nullable = true)
     private String description;
 
+    // 總共 10 位數，整數 8 位，小數 2 位
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal originalPrice;
 
@@ -60,40 +56,56 @@ public class Product {
     @Column(nullable = true)
     private String status;
 
+    // LocalDate 存年月日
     @Column(nullable = false)
     private LocalDate expire;
 
+    // LocalDateTime 存年月日時分秒
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    // 雙向多對一，可反向查找
+    // cascade = CascadeType.remove 會導致刪除商品時刪除商品類別；只有新增、修改、更新同步
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "FK_categoryId", foreignKey = @ForeignKey(name = "fkc_category_id"))
-    @JsonManagedReference("products")
+    @JsonBackReference("products")
     private Category category;
 
+    // 雙向多對一，可反向查找
+    // 尚待確認 Admin 表格有fetch = FetchType.EAGER (預設為 LAZY)
+    // cascade = CascadeType.remove 會導致刪除商品時刪除管理員；須排除在外
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "FK_adminId", foreignKey = @ForeignKey(name = "fkc_admin_id"))
-    @JsonManagedReference("products")
+    @JsonBackReference("products")
     private Admin admin;
 
+    // 雙向一對多，可反向查找
+    // cascade = CascadeType.remove 當刪除商品時，會刪除商品圖片；已包含在 ALL 內
+    // orphanRemoval = true，確保當某圖片從商品圖片集合中移除時，該圖片會從資料庫中刪除。
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @JsonManagedReference("product")
-    private List<ProductImage> productImages = new LinkedList<>();
+    @JsonBackReference("product")
+    private List<ProductImage> productImages = new LinkedList<>(); // 有序可重複 (首圖為選取的第一張)
 
+    // 雙向多對多，可反向查找；可選0~N個標籤
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
     @JoinTable(name = "Product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id", nullable = true))
-    @JsonIgnore // 避免影響 JSON 轉換
-    private Set<ProductTag> tags = new HashSet<>();
+    @JsonBackReference("products")
+    private Set<ProductTag> tags = new HashSet<>(); // 無序不重複
 
-    @OneToMany(mappedBy = "product", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH }, fetch = FetchType.EAGER)
-    private List<InventoryItem> inventoryItems = new LinkedList<>();
+    // 單向一對多，可由商品查找庫存異動
+    // 商品刪除時，保留相關的庫存異動記錄
+    // cascade = CascadeType.remove 當刪除商品時，會刪除庫存異動；須排除在外
+    @OneToMany(mappedBy = "product", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
+            CascadeType.REFRESH }, fetch = FetchType.EAGER)
+    private List<InventoryItem> inventoryItems = new LinkedList<>(); // 無序可重複，適合頻繁插入和刪除
 
+    // 雙向一對多，可反向查找 (刪除願望清單，會員商品列表也會同步? 合理??)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @JsonManagedReference("products")
-    private Set<WishList> wishlists = new LinkedHashSet<>();
+    @JsonBackReference("products")
+    private Set<WishList> wishlists = new LinkedHashSet<>(); // 有序不重複
 
     public Product() {
     }
@@ -124,7 +136,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return "Product [productId=" + productId + ", productName=" + productName + ", description=" + description
+        return "ProductBean [productId=" + productId + ", productName=" + productName + ", description=" + description
                 + ", originalPrice=" + originalPrice + ", salePrice=" + salePrice + ", stockQuantity=" + stockQuantity
                 + ", unit=" + unit + ", status=" + status + ", expire=" + expire + ", createdAt=" + createdAt
                 + ", updatedAt=" + updatedAt + ", category=" + category + ", adminId=" + admin + ", productImages="
@@ -275,4 +287,5 @@ public class Product {
     public void setWishlists(Set<WishList> wishlists) {
         this.wishlists = wishlists;
     }
+
 }

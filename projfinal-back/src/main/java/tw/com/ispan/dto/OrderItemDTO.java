@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public class OrderItemDTO {
     private Integer productId;  // 產品 ID
     private Integer orderQuantity;  // 訂單數量
-    private Double purchasedPrice;  // 購買價格
+    private BigDecimal purchasedPrice;  // 購買價格
 
     // Getters and Setters
     public Integer getProductId() {
@@ -24,18 +24,11 @@ public class OrderItemDTO {
         this.orderQuantity = orderQuantity;
     }
 
-    public Double getPurchasedPrice() {
+    public BigDecimal getPurchasedPrice() {
         return purchasedPrice;
     }
 
-
-    public void setPurchasedPrice(Double purchasedPrice2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setPurchasedPrice'");
-    }
-
-    public void setPurchasedPrice(BigDecimal purchasedPrice2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setPurchasedPrice'");
+    public void setPurchasedPrice(BigDecimal purchasedPrice) {
+        this.purchasedPrice = purchasedPrice;
     }
 }
