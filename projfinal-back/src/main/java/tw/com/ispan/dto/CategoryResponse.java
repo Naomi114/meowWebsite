@@ -3,16 +3,29 @@ package tw.com.ispan.dto;
 import java.util.List;
 
 import tw.com.ispan.domain.shop.Category;
-import tw.com.ispan.domain.shop.Product;
 
 public class CategoryResponse {
     private Boolean success;
     private String message;
+    private Integer categoryId;
     private String categoryName;
-    private String categoryDescription;
     private String defaultUnit;
-    private List<Product> products;
+    private List<ProductDTO> products;
     private List<Category> categories;
+
+    public CategoryResponse() {
+    }
+
+    public CategoryResponse(Boolean success, String message, Integer categoryId, String categoryName,
+            String defaultUnit, List<ProductDTO> products, List<Category> categories) {
+        this.success = success;
+        this.message = message;
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.defaultUnit = defaultUnit;
+        this.products = products;
+        this.categories = categories;
+    }
 
     public Boolean getSuccess() {
         return success;
@@ -28,6 +41,14 @@ public class CategoryResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getCategoryName() {
@@ -46,19 +67,11 @@ public class CategoryResponse {
         this.defaultUnit = defaultUnit;
     }
 
-    public String getCategoryDescription() {
-        return categoryDescription;
-    }
-
-    public void setCategoryDescription(String categoryDescription) {
-        this.categoryDescription = categoryDescription;
-    }
-
-    public List<Product> getProducts() {
+    public List<ProductDTO> getProducts() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
+    public void setProducts(List<ProductDTO> products) {
         this.products = products;
     }
 

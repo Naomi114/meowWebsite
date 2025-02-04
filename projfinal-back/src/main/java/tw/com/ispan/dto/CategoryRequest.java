@@ -16,8 +16,9 @@ public class CategoryRequest {
     public CategoryRequest() {
     }
 
-    public CategoryRequest(@NotBlank(message = "類別名稱不能為空") String categoryName, String categoryDescription,
-            @NotBlank(message = "新建類別單位不能為空") String defaultUnit) {
+    public CategoryRequest(Integer categoryId, @NotBlank(message = "類別名稱不能為空") String categoryName,
+            String categoryDescription, @NotBlank(message = "新建類別單位不能為空") String defaultUnit) {
+        this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.categoryDescription = categoryDescription;
         this.defaultUnit = defaultUnit;

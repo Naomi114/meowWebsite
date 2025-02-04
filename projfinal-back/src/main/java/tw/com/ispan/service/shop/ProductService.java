@@ -28,6 +28,7 @@ import tw.com.ispan.repository.shop.OrderItemRepository;
 import tw.com.ispan.repository.shop.ProductImageRepository;
 import tw.com.ispan.repository.shop.ProductRepository;
 import tw.com.ispan.repository.shop.WishListRepository;
+import tw.com.ispan.specification.ProductSpecifications;
 
 /*
 * isEmpty() 適用於 String, Collection, Map, Array 的空值判斷
@@ -140,7 +141,7 @@ public class ProductService {
 			product.setUpdatedAt(LocalDateTime.now());
 
 			// 先存 Product實體，確保有 ID；避免圖片雙向關聯映射對應到 transient 狀態而無法執行
-			product = productRepository.save(product); 
+			product = productRepository.save(product);
 
 			// 處理商品圖片(1~5張)
 			productImageService.processProductImage(product, filenames);
@@ -241,62 +242,60 @@ public class ProductService {
 
 	// 單筆刪除
 	@Transactional
-public ProductResponse deleteSingle(Integer productId) {
-    ProductResponse response = new ProductResponse();
-    Optional<Product> productOpt = productRepository.findById(productId);
+	public ProductResponse deleteSingle(Integer productId) {
+		ProductResponse response = new ProductResponse();
+		Optional<Product> productOpt = productRepository.findById(productId);
 
-    if (productOpt.isPresent()) {
-        Product product = productOpt.get();
+		if (productOpt.isPresent()) {
+			Product product = productOpt.get();
 
-        // **(1) 若商品已在訂單內，則禁止刪除並通知管理員**
-        if (orderItemRepository.existsByProduct(product)) {
-            notificationService.notifyAdmin(
-                "刪除商品失敗", 
-                "商品 [" + product.getProductName() + "] 已有會員下單，無法刪除。"
-            );
-            response.setSuccess(false);
-            response.setMessage("商品已被訂購，無法刪除");
-            return response;
-        }
+			// **(1) 若商品已在訂單內，則禁止刪除並通知管理員**
+			if (orderItemRepository.existsByProduct(product)) {
+				notificationService.notifyAdmin(
+						"刪除商品失敗",
+						"商品 [" + product.getProductName() + "] 已有會員下單，無法刪除。");
+				response.setSuccess(false);
+				response.setMessage("商品已被訂購，無法刪除");
+				return response;
+			}
 
-        // **(2) 查詢受影響的會員**
-        List<Member> affectedMembers = new ArrayList<>();
-        
-        // 取得購物車內的會員
-        List<Member> cartMembers = cartItemRepository.findMembersByProduct(product);
-        affectedMembers.addAll(cartMembers);
-        
-        // 取得願望清單內的會員
-        List<Member> wishlistMembers = wishlistRepository.findMembersByProduct(product);
-        affectedMembers.addAll(wishlistMembers);
+			// **(2) 查詢受影響的會員**
+			List<Member> affectedMembers = new ArrayList<>();
 
-        // **(3) 發送通知給會員**
-        for (Member member : affectedMembers) {
-            notificationService.notifyMember(
-                member,
-                "商品已下架", 
-                "您購物車或願望清單內的商品 [" + product.getProductName() + "] 已被刪除，請更新您的購物車或願望清單。"
-            );
-        }
+			// 取得購物車內的會員
+			List<Member> cartMembers = cartItemRepository.findMembersByProduct(product);
+			affectedMembers.addAll(cartMembers);
 
-        // **(4) 刪除關聯數據**
-        wishlistRepository.deleteByProduct(product);
-        cartItemRepository.deleteByProduct(product);
-        productImageRepository.deleteByProduct(product);
-        product.getTags().clear();
+			// 取得願望清單內的會員
+			List<Member> wishlistMembers = wishlistRepository.findMembersByProduct(product);
+			affectedMembers.addAll(wishlistMembers);
 
-        // **(5) 刪除商品**
-        productRepository.delete(product);
-        productRepository.flush();
+			// **(3) 發送通知給會員**
+			for (Member member : affectedMembers) {
+				notificationService.notifyMember(
+						member,
+						"商品已下架",
+						"您購物車或願望清單內的商品 [" + product.getProductName() + "] 已被刪除，請更新您的購物車或願望清單。");
+			}
 
-        response.setSuccess(true);
-        response.setMessage("商品刪除成功，已通知相關會員");
-    } else {
-        response.setSuccess(false);
-        response.setMessage("商品不存在");
-    }
-    return response;
-}
+			// **(4) 刪除關聯數據**
+			wishlistRepository.deleteByProduct(product);
+			cartItemRepository.deleteByProduct(product);
+			productImageRepository.deleteByProduct(product);
+			product.getTags().clear();
+
+			// **(5) 刪除商品**
+			productRepository.delete(product);
+			productRepository.flush();
+
+			response.setSuccess(true);
+			response.setMessage("商品刪除成功，已通知相關會員");
+		} else {
+			response.setSuccess(false);
+			response.setMessage("商品不存在");
+		}
+		return response;
+	}
 
 	// 批量刪除
 	public ProductResponse deleteBatch(List<Integer> productIds) {
@@ -332,21 +331,40 @@ public ProductResponse deleteSingle(Integer productId) {
 	}
 
 	// 動態多條件查詢: Specification類的應用
-	public ProductResponse findBatch(Specification<Product> spec) {
+	public ProductResponse findBatch(String query, Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice) {
 		ProductResponse response = new ProductResponse();
 
-		// 使用 Specification 執行查詢
-		List<Product> products = productRepository.findAll(spec);
-		List<ProductDTO> productDTOs = new ArrayList<>();
-		for (Product product : products) {
-			productDTOs.add(new ProductDTO(product));
+		try {
+			Specification<Product> spec = Specification.where(null);
+
+			if (query != null && !query.trim().isEmpty()) {
+				spec = spec.and(ProductSpecifications.hasProductName(query));
+			}
+			if (minPrice != null && maxPrice != null) {
+				spec = spec.and(ProductSpecifications.priceBetween(minPrice, maxPrice));
+			}
+			if (categoryId != null) {
+				Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
+				if (categoryOpt.isPresent()) {
+					spec = spec.and(ProductSpecifications.hasCategory(categoryOpt.get()));
+				} else {
+					response.setSuccess(false);
+					response.setMessage("無效的類別 ID");
+					return response;
+				}
+			}
+
+			List<Product> products = productRepository.findAll(spec);
+			List<ProductDTO> productDTOs = products.stream().map(ProductDTO::new).toList();
+
+			response.setSuccess(!productDTOs.isEmpty());
+			response.setProducts(productDTOs);
+			response.setMessage(productDTOs.isEmpty() ? "未找到符合條件的商品" : "搜尋成功");
+		} catch (Exception e) {
+			response.setSuccess(false);
+			response.setMessage("搜尋失敗: " + e.getMessage());
+			e.printStackTrace();
 		}
-
-		// 設定返回結果
-		response.setSuccess(!products.isEmpty());
-		response.setProducts(productDTOs);
-		response.setMessage(products.isEmpty() ? "未找到匹配的商品" : "批量查詢成功");
-
 		return response;
 	}
 
@@ -368,7 +386,7 @@ public ProductResponse deleteSingle(Integer productId) {
 
 	// 分頁
 	public Page<Product> getAllPaged(Pageable pageable) {
-        return productRepository.findAll(pageable);
-    }
+		return productRepository.findAll(pageable);
+	}
 
 }

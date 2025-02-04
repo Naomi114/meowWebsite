@@ -22,6 +22,7 @@ import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.dto.CategoryRequest;
 import tw.com.ispan.dto.CategoryResponse;
+import tw.com.ispan.dto.ProductResponse;
 import tw.com.ispan.service.shop.CategoryService;
 
 @RestController
@@ -62,7 +63,7 @@ public class CategoryController {
     // 單筆查詢，返回商品清單
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> findCategoryWithProducts(@PathVariable Integer id) {
-        CategoryResponse response = categoryService.findCategoryWithProducts(id);
+        CategoryResponse response = categoryService.getProductsByCategory(id);
         return response.getSuccess()
                 ? ResponseEntity.ok(response)
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
@@ -82,13 +83,6 @@ public class CategoryController {
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
-    }
-
-    // 根據分類 ID 獲取對應商品
-    @GetMapping("/{categoryId}/products")
-    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable Integer categoryId) {
-        List<Product> products = categoryService.getProductsByCategory(categoryId);
-        return ResponseEntity.ok(products);
     }
 
 }

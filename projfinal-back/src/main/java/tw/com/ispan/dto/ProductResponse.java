@@ -9,11 +9,12 @@ import tw.com.ispan.domain.shop.Product;
 public class ProductResponse {
     private Boolean success;
     private String message;
-    private ProductDTO product; // ✅ 確保單一商品返回時包含 `imageUrls`
-    private List<ProductDTO> products; // ✅ 修改為 `List<ProductDTO>`
+    private ProductDTO product;
+    private List<ProductDTO> products;
     private Long count;
 
-    public ProductResponse() {}
+    public ProductResponse() {
+    }
 
     public ProductResponse(Boolean success, String message) {
         this.success = success;

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +28,6 @@ import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.dto.ProductRequest;
 import tw.com.ispan.dto.ProductResponse;
 import tw.com.ispan.service.shop.ProductService;
-import tw.com.ispan.specification.ProductSpecifications;
 
 @RestController
 @RequestMapping("/products")
@@ -44,19 +42,19 @@ public class ProductController {
 
     // 分頁
     @GetMapping("/paged")
-        public ResponseEntity<Page<Product>> getProductsPaged(
-            @RequestParam(defaultValue = "0") int page,  // 預設第 0 頁
+    public ResponseEntity<Page<Product>> getProductsPaged(
+            @RequestParam(defaultValue = "0") int page, // 預設第 0 頁
             @RequestParam(defaultValue = "10") int size // 預設每頁 10 筆
-        ) {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<Product> products = productService.getAllPaged(pageable);
-            return ResponseEntity.ok(products);
-        }
-        
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> products = productService.getAllPaged(pageable);
+        return ResponseEntity.ok(products);
+    }
+
     // 新增商品
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createProduct(
-            @RequestPart("productRequest") String productRequestJson,  // 先以 String 接收 JSON
+            @RequestPart("productRequest") String productRequestJson, // 先以 String 接收 JSON
             @RequestPart(value = "productImages", required = false) List<MultipartFile> productImages) {
 
         try {
@@ -78,7 +76,7 @@ public class ProductController {
             @PathVariable Integer id,
             @RequestPart("productRequest") String productRequestJson,
             @RequestPart(value = "productImages", required = false) List<MultipartFile> productImages) {
-        
+
         try {
             ProductRequest productRequest = objectMapper.readValue(productRequestJson, ProductRequest.class);
             ProductResponse response = productService.updateSingle(id, productRequest, productImages);
@@ -105,28 +103,15 @@ public class ProductController {
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
-    // 搜尋商品:商品關鍵字+價格區間
-    @PostMapping("/search")
+    // 搜尋商品:商品關鍵字+價格區間+類別
+    @GetMapping("/search")
     public ResponseEntity<ProductResponse> searchProducts(
-            @RequestParam(required = false) String productName,
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) Integer minStock,
-            @RequestParam(required = false) Integer maxStock) {
+            @RequestParam(required = false) BigDecimal maxPrice) {
 
-        // 動態構建 Specification 條件
-        Specification<Product> spec = Specification.where(
-                productName != null ? ProductSpecifications.hasProductName(productName) : null)
-                .and(minPrice != null && maxPrice != null
-                        ? ProductSpecifications.priceBetween(minPrice, maxPrice)
-                        : null)
-                .and(minStock != null && maxStock != null
-                        ? ProductSpecifications.stockBetween(minStock, maxStock)
-                        : null);
-
-        // 調用 Service 層查詢方法
-        ProductResponse response = productService.findBatch(spec);
-
+        ProductResponse response = productService.findBatch(query, categoryId, minPrice, maxPrice);
         return ResponseEntity.ok(response);
     }
 

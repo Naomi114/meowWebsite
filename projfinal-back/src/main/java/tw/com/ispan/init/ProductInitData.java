@@ -3,6 +3,7 @@ package tw.com.ispan.init;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -63,40 +64,47 @@ public class ProductInitData implements CommandLineRunner {
 
     private void initializeAdmins() {
         String adminName = "admin"; // 你的管理員名稱
-    
+
         // 檢查 `adminName` 是否已存在，避免違反 UNIQUE KEY
         if (adminRepository.findByAdminName(adminName).isPresent()) {
             System.out.println("管理員 " + adminName + " 已存在，跳過初始化");
             return;
         }
-    
+
         // 🔹 若不存在，則新增
         Admin admin = new Admin();
         admin.setAdminName(adminName);
         admin.setPassword("AAA");
         admin.setCreateDate(LocalDateTime.now());
         admin.setUpdateDate(LocalDateTime.now());
-    
+
         adminRepository.save(admin);
         System.out.println("初始化管理員成功：" + adminName);
     }
 
     private void initializeCategories() {
-        Set<CategoryRequest> categories = Set.of(
-                new CategoryRequest("狗用品", "狗相關商品","個"),
-                new CategoryRequest("貓用品", "貓相關商品","個"),
-                new CategoryRequest("玩具", "各類寵物玩具", "個"),
-                new CategoryRequest("飼料", "各種寵物飼料", "包"),
-                new CategoryRequest("保健品", "寵物專用保健產品", "罐"),
-                new CategoryRequest("清潔用品", "清潔與衛生用品", "包"));
+        // LinkedHashSet 會按照插入順序來儲存元素
+        Set<CategoryRequest> categories = new LinkedHashSet<>(List.of(
+                new CategoryRequest(1, "狗用品", "狗相關商品", "個"),
+                new CategoryRequest(2, "貓用品", "貓相關商品", "個"),
+                new CategoryRequest(3, "保健品", "寵物專用保健產品", "罐"),
+                new CategoryRequest(4, "玩具", "各類寵物玩具", "個"),
+                new CategoryRequest(5, "飼料", "各種寵物飼料", "包"),
+                new CategoryRequest(6, "清潔用品", "清潔與衛生用品", "包")));
 
         categories.forEach(categoryRequest -> {
             try {
-                CategoryResponse response = categoryService.createOrUpdateCategory(categoryRequest);
-                if (response.getSuccess()) {
-                    System.out.println("成功初始化類別: " + categoryRequest.getCategoryName());
+                // 先檢查 categoryId 是否存在
+                boolean exists = categoryService.categoryExistsById(categoryRequest.getCategoryId());
+                if (exists) {
+                    System.out.println("類別已存在，跳過初始化: " + categoryRequest.getCategoryName());
                 } else {
-                    System.err.println("初始化類別失敗: " + response.getMessage());
+                    CategoryResponse response = categoryService.createOrUpdateCategory(categoryRequest);
+                    if (response.getSuccess()) {
+                        System.out.println("成功初始化類別: " + categoryRequest.getCategoryName());
+                    } else {
+                        System.err.println("初始化類別失敗: " + response.getMessage());
+                    }
                 }
             } catch (Exception e) {
                 System.err.println("初始化類別失敗: " + e.getMessage());
@@ -128,11 +136,11 @@ public class ProductInitData implements CommandLineRunner {
                     .orElseThrow(() -> new IllegalArgumentException("管理員不存在"));
 
             // 查找類別
-            Category category1 = categoryService.findCategoryEntity("貓用品");
-            Category category2 = categoryService.findCategoryEntity("狗用品");
-            Category category3 = categoryService.findCategoryEntity("貓用品");
-            Category category4 = categoryService.findCategoryEntity("玩具");
-            Category category5 = categoryService.findCategoryEntity("貓用品");
+            Category category1 = categoryService.findCategoryEntity(2);
+            Category category2 = categoryService.findCategoryEntity(1);
+            Category category3 = categoryService.findCategoryEntity(2);
+            Category category4 = categoryService.findCategoryEntity(3);
+            Category category5 = categoryService.findCategoryEntity(2);
 
             // 透過 savedProduct1 先建立實體，存入圖片時才不會因為 Product 處於 transient 無法正確映射
 
@@ -160,7 +168,7 @@ public class ProductInitData implements CommandLineRunner {
             product2.setCategory(category2);
             product2.setUnit(category2.getDefaultUnit());
             product2.setOriginalPrice(BigDecimal.valueOf(15.00));
-            product2.setSalePrice(BigDecimal.valueOf(12.50));
+            product2.setSalePrice(BigDecimal.valueOf(12.00));
             product2.setStockQuantity(200);
             product2.setStatus("上架中");
             product2.setExpire(LocalDate.parse("2030-12-31"));
