@@ -2,14 +2,13 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
-import org.hibernate.engine.internal.ForeignKeys;
-
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,7 +33,7 @@ public class DistrictArea {
 	private String districtAreaName;
 
 	@ManyToOne
-	@JoinColumn(name = "cityId", nullable = false)
+	@JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_DistrictArea_City"))
 	private City city;
 
 	// 和RescueCase表雙向一對多
