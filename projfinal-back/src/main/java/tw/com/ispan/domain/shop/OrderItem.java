@@ -1,57 +1,59 @@
 package tw.com.ispan.domain.shop;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "OrderItem")
+@Table(name = "order_item")
 public class OrderItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer orderItemId;
+    private Integer orderItemId;  // 訂單項目 ID
 
-    @ManyToOne
-    @JoinColumn(name = "orderId", nullable = false)
-    private Orders order;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    @JsonBackReference  // 防止序列化時的循環引用
+    private Orders order;  // 關聯到 Orders
 
-    @ManyToOne
-    @JoinColumn(name = "productId", nullable = false)
-    private Product product;
-
-    @Column(nullable = false)
-    private Integer orderQuantity;
-
-    @Column(nullable = false)
-    private Double purchasedPrice;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})  // 避免 Hibernate 懶加載問題
+    private Product product;  // 關聯到商品
 
     @Column(nullable = false)
-    private String status; // 20250114 Naomi 新增 (ref. InventoryService)
+    private Integer orderQuantity;  // 訂購數量
 
-    public OrderItem() {
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal purchasedPrice;  // 當前購買時的價格
+
+    @Column(nullable = false)
+    private String status;  // 訂單狀態（如："備貨中"、"已發貨"）
+
+    // **新增方法**：提供商品名稱，確保前端可以獲取
+    @JsonProperty("productName")
+    public String getProductName() {
+        return (product != null) ? product.getProductName() : "未知商品";
     }
 
+    // 預設建構子
+    public OrderItem() {}
+
+    // 全部欄位建構子
     public OrderItem(Integer orderItemId, Orders order, Product product, Integer orderQuantity,
-            Double purchasedPrice) {
+                     BigDecimal purchasedPrice, String status) {
         this.orderItemId = orderItemId;
         this.order = order;
         this.product = product;
         this.orderQuantity = orderQuantity;
         this.purchasedPrice = purchasedPrice;
+        this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return "OrderItem [orderItemId=" + orderItemId + ", order=" + order + ", product=" + product
-                + ", orderQuantity=" + orderQuantity + ", purchasedPrice=" + purchasedPrice + "]";
-    }
-
+    // Getters and Setters
     public Integer getOrderItemId() {
         return orderItemId;
     }
@@ -84,11 +86,11 @@ public class OrderItem {
         this.orderQuantity = orderQuantity;
     }
 
-    public Double getPurchasedPrice() {
+    public BigDecimal getPurchasedPrice() {
         return purchasedPrice;
     }
 
-    public void setPurchasedPrice(Double purchasedPrice) {
+    public void setPurchasedPrice(BigDecimal purchasedPrice) {
         this.purchasedPrice = purchasedPrice;
     }
 
@@ -98,5 +100,32 @@ public class OrderItem {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    // 設定 orderId（輔助方法）
+    public void setOrderId(Integer orderId) {
+        if (this.order == null) {
+            this.order = new Orders();
+        }
+        this.order.setOrderId(orderId);
+    }
+
+    // 設定 productId（輔助方法）
+    public void setProductId(Integer productId) {
+        if (this.product == null) {
+            this.product = new Product();
+        }
+        this.product.setProductId(productId);
+    }
+
+    @Override
+    public String toString() {
+        return "OrderItem [orderItemId=" + orderItemId + 
+               ", order=" + (order != null ? order.getOrderId() : "null") +
+               ", product=" + (product != null ? product.getProductId() : "null") +
+               ", productName=" + getProductName() +
+               ", orderQuantity=" + orderQuantity + 
+               ", purchasedPrice=" + purchasedPrice + 
+               ", status=" + status + "]";
     }
 }

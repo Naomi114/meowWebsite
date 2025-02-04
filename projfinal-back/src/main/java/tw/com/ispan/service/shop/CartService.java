@@ -3,6 +3,7 @@ package tw.com.ispan.service.shop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.shop.Cart;
 import tw.com.ispan.domain.shop.CartItem;
@@ -33,40 +34,39 @@ public class CartService {
     @Autowired
     private CartItemRepository cartItemRepository;
 
+    // Get cart items by member ID
     public List<CartItem> getCartItemsByMemberId(Integer memberId) {
         return cartItemRepository.findByCart_Member_Id(memberId);
     }
 
+    // Get the cart by member ID
     public Cart getCartByMemberId(Integer memberId) {
         return cartRepository.findByMember_Id(memberId);
     }
 
+    // Find a cart item by its ID
     public CartItem findCartItemById(Integer cartItemId) {
         return cartItemRepository.findById(cartItemId).orElse(null);
     }
 
     @Transactional
     public CartResponse addCartItem(CartRequest request) {
-        // Check if the member exists
         Optional<Member> optionalMember = memberRepository.findById(request.getMemberId());
         if (optionalMember.isEmpty()) {
             return new CartResponse(false, "Member not found.");
         }
         Member member = optionalMember.get();
 
-        // Check if the product exists
         Product product = productRepository.findById(request.getProductId()).orElse(null);
         if (product == null) {
             return new CartResponse(false, "Product not found.");
         }
 
-        // Retrieve or create a cart for the member
         Cart cart = cartRepository.findByMember_Id(member.getId());
         if (cart == null) {
             cart = createCart(member.getId());
         }
 
-        // Check if the product is already in the cart
         CartItem existingItem = cartItemRepository.findByCart_Member_IdAndProduct_ProductId(member.getId(),
                 request.getProductId());
         if (existingItem != null) {
@@ -76,7 +76,6 @@ public class CartService {
             return new CartResponse(true, "Item quantity updated in cart.");
         }
 
-        // Add new product to the cart
         CartItem cartItem = new CartItem();
         cartItem.setCart(cart);
         cartItem.setProduct(product);
@@ -89,6 +88,8 @@ public class CartService {
         return new CartResponse(true, "Item added to cart successfully.");
     }
 
+    // Update the quantity of a cart item
+    @Transactional
     public boolean updateCartItemQuantity(Integer cartItemId, int quantity) {
         return cartItemRepository.findById(cartItemId).map(cartItem -> {
             cartItem.setQuantity(quantity);
@@ -98,6 +99,13 @@ public class CartService {
         }).orElse(false);
     }
 
+    // Add a new updateCartItem method to match controller expectations
+    public boolean updateCartItem(Integer cartItemId, Integer quantity) {
+        return updateCartItemQuantity(cartItemId, quantity);
+    }
+
+    // Remove a cart item
+    @Transactional
     public boolean removeCartItem(Integer cartItemId) {
         if (cartItemRepository.existsById(cartItemId)) {
             cartItemRepository.deleteById(cartItemId);
@@ -106,6 +114,8 @@ public class CartService {
         return false;
     }
 
+    // Clear all cart items for a member
+    @Transactional
     public void clearCartByMemberId(Integer memberId) {
         List<CartItem> cartItems = cartItemRepository.findByCart_Member_Id(memberId);
         if (!cartItems.isEmpty()) {
@@ -113,6 +123,8 @@ public class CartService {
         }
     }
 
+    // Update the cart with a CartRequest
+    @Transactional
     public CartResponse updateCart(CartRequest request) {
         return memberRepository.findById(request.getMemberId()).map(member -> {
             CartItem cartItem = cartItemRepository.findByCart_Member_IdAndProduct_ProductId(member.getId(),
@@ -127,12 +139,16 @@ public class CartService {
         }).orElse(new CartResponse(false, "Member not found."));
     }
 
+    // Checkout and remove items from the cart
+    @Transactional
     public void checkout(List<Integer> cartItemIds) {
-        if (cartItemIds != null && !cartItemIds.isEmpty()) {
+        if (!CollectionUtils.isEmpty(cartItemIds)) {
             cartItemRepository.deleteAllByCartItemIdIn(cartItemIds);
         }
     }
 
+    // Create a cart for a member
+    @Transactional
     public Cart createCart(Integer memberId) {
         return memberRepository.findById(memberId).map(member -> {
             Cart cart = new Cart();
@@ -140,5 +156,10 @@ public class CartService {
             cart.setLastUpdatedDate(LocalDateTime.now());
             return cartRepository.save(cart);
         }).orElse(null);
+    }
+
+    public CartItem getCartItemById(Integer cartItemId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCartItemById'");
     }
 }

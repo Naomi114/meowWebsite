@@ -6,7 +6,7 @@ import tw.com.ispan.domain.shop.Category;
 
 public class CategorySpecifications {
 
-    // 標籤模糊查詢
+    // 類別模糊查詢
     public static Specification<Category> hasCategoryName(String categoryName) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("categoryName"),
                 "%" + categoryName + "%");

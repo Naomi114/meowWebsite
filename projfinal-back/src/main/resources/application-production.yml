@@ -5,3 +5,10 @@ spring:
     url: jdbc:sqlserver://localhost:9433;database=meowdb;trustServerCertificate=true
     username: admin
     password: a123
+
+    datasource:
+  url: jdbc:sqlserver://192.168.23.113:1433;database=java;trustServerCertificate=true
+
+  web:
+    resources:
+      static-locations: classpath:/static/

@@ -2,65 +2,67 @@ package tw.com.ispan.domain.shop;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
-@Table(name = "Orders") // order 為Hibernate保留字，所以改為orders (by Naomi 20250115)
+@Table(name = "orders")  // Ensure using table name "orders"
 public class Orders {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer orderId;
+    private Integer orderId;  // Order ID
 
-    @ManyToOne
-    @JoinColumn(name = "memberId", nullable = false)
-    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "member_id", nullable = false)  // Link to Member
+    @JsonBackReference  // Prevents infinite recursion when serializing
+    private Member member;  // Member
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> orderItems;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference  // Prevents infinite recursion when serializing
+    private List<OrderItem> orderItems;  // List of Order Items
 
-    @ManyToOne
-    @JoinColumn(name = "discountId", nullable = false)
-    private Discount discount;
-
-    @Column(nullable = false)
-    private String shippingAddress;
-
-    @Column(nullable = false)
-    private LocalDateTime orderDate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "discount_id")
+    private Discount discount;  // Discount applied to the order
 
     @Column(nullable = false)
-    private String creditCard;
+    private String shippingAddress;  // Shipping Address
 
     @Column(nullable = false)
-    private String orderStatus;
+    private LocalDateTime orderDate;  // Order Date
+
+    @Column(nullable = false)
+    private String creditCard;  // Credit Card Information
+
+    @Column(nullable = false)
+    private String orderStatus;  // Order Status (e.g., 'Pending', 'Shipped')
 
     @Column
-    private String feedback;
+    private String feedback;  // Customer Feedback
 
     @Column(nullable = false)
-    private Double subtotalPrice;
+    private Double subtotalPrice;  // Subtotal Price before discount
 
     @Column(nullable = false)
-    private Double finalPrice;
+    private Double finalPrice;  // Final Price after applying discount
 
-    public Orders() {
-    }
+    @Column(nullable = true)  // Allow null for transactionId
+    private String transactionId;  // Transaction ID (for looking up orders)
 
-    public Orders(Integer orderId, Member member, List<OrderItem> orderItems, Discount discount, String shippingAddress,
-            LocalDateTime orderDate, String creditCard, String orderStatus, String feedback, Double subtotalPrice,
-            Double finalPrice) {
+    @Column(nullable = true)  // Allow null for merchantTradeNo
+    private String merchantTradeNo;  // Merchant Trade No (for looking up orders)
+
+    // Default Constructor
+    public Orders() {}
+
+    // Constructor with all fields
+    public Orders(Integer orderId, Member member, List<OrderItem> orderItems, Discount discount,
+                  String shippingAddress, LocalDateTime orderDate, String creditCard,
+                  String orderStatus, String feedback, Double subtotalPrice, Double finalPrice,
+                  String transactionId, String merchantTradeNo) {
         this.orderId = orderId;
         this.member = member;
         this.orderItems = orderItems;
@@ -72,102 +74,52 @@ public class Orders {
         this.feedback = feedback;
         this.subtotalPrice = subtotalPrice;
         this.finalPrice = finalPrice;
+        this.transactionId = transactionId;
+        this.merchantTradeNo = merchantTradeNo;
     }
 
-    @Override
-    public String toString() {
-        return "Order [orderId=" + orderId + ", member=" + member + ", orderItems=" + orderItems + ", discount="
-                + discount + ", shippingAddress=" + shippingAddress + ", orderDate=" + orderDate + ", creditCard="
-                + creditCard + ", orderStatus=" + orderStatus + ", feedback=" + feedback + ", subtotalPrice="
-                + subtotalPrice + ", finalPrice=" + finalPrice + "]";
-    }
+    // Getters and Setters
+    public Integer getOrderId() { return orderId; }
+    public void setOrderId(Integer orderId) { this.orderId = orderId; }
 
-    public Integer getOrderId() {
-        return orderId;
-    }
+    public Member getMember() { return member; }
+    public void setMember(Member member) { this.member = member; }
 
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
-    }
+    public List<OrderItem> getOrderItems() { return orderItems; }
+    public void setOrderItems(List<OrderItem> orderItems) { this.orderItems = orderItems; }
 
-    public Member getMember() {
-        return member;
-    }
+    public Discount getDiscount() { return discount; }
+    public void setDiscount(Discount discount) { this.discount = discount; }
 
-    public void setMember(Member member) {
-        this.member = member;
-    }
+    public String getShippingAddress() { return shippingAddress; }
+    public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
 
-    public List<OrderItem> getOrderItems() {
-        return orderItems;
-    }
+    public LocalDateTime getOrderDate() { return orderDate; }
+    public void setOrderDate(LocalDateTime orderDate) { this.orderDate = orderDate; }
 
-    public void setOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
-    }
+    public String getCreditCard() { return creditCard; }
+    public void setCreditCard(String creditCard) { this.creditCard = creditCard; }
 
-    public Discount getDiscount() {
-        return discount;
-    }
+    public String getOrderStatus() { return orderStatus; }
+    public void setOrderStatus(String orderStatus) { this.orderStatus = orderStatus; }
 
-    public void setDiscount(Discount discount) {
-        this.discount = discount;
-    }
+    public String getFeedback() { return feedback; }
+    public void setFeedback(String feedback) { this.feedback = feedback; }
 
-    public String getShippingAddress() {
-        return shippingAddress;
-    }
+    public Double getSubtotalPrice() { return subtotalPrice; }
+    public void setSubtotalPrice(Double subtotalPrice) { this.subtotalPrice = subtotalPrice; }
 
-    public void setShippingAddress(String shippingAddress) {
-        this.shippingAddress = shippingAddress;
-    }
+    public Double getFinalPrice() { return finalPrice; }
+    public void setFinalPrice(Double finalPrice) { this.finalPrice = finalPrice; }
 
-    public LocalDateTime getOrderDate() {
-        return orderDate;
-    }
+    public String getTransactionId() { return transactionId; }
+    public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
 
-    public void setOrderDate(LocalDateTime orderDate) {
-        this.orderDate = orderDate;
-    }
+    public String getMerchantTradeNo() { return merchantTradeNo; }
+    public void setMerchantTradeNo(String merchantTradeNo) { this.merchantTradeNo = merchantTradeNo; }
 
-    public String getCreditCard() {
-        return creditCard;
+    public Orders orElseThrow(Object object) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
     }
-
-    public void setCreditCard(String creditCard) {
-        this.creditCard = creditCard;
-    }
-
-    public String getOrderStatus() {
-        return orderStatus;
-    }
-
-    public void setOrderStatus(String orderStatus) {
-        this.orderStatus = orderStatus;
-    }
-
-    public String getFeedback() {
-        return feedback;
-    }
-
-    public void setFeedback(String feedback) {
-        this.feedback = feedback;
-    }
-
-    public Double getSubtotalPrice() {
-        return subtotalPrice;
-    }
-
-    public void setSubtotalPrice(Double subtotalPrice) {
-        this.subtotalPrice = subtotalPrice;
-    }
-
-    public Double getFinalPrice() {
-        return finalPrice;
-    }
-
-    public void setFinalPrice(Double finalPrice) {
-        this.finalPrice = finalPrice;
-    }
-
 }

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tw.com.ispan.domain.shop.CartItem;
+import tw.com.ispan.dto.CartItemResponse;
 import tw.com.ispan.dto.CartRequest;
 import tw.com.ispan.dto.CartResponse;
 import tw.com.ispan.service.shop.CartService;
@@ -27,18 +28,32 @@ public class CartController {
 
     // Show all items in the cart for the specified member
     @GetMapping("/list/{memberId}")
-    public List<CartItem> getCartByMemberId(@PathVariable Integer memberId) {
-        return cartService.getCartItemsByMemberId(memberId);
+    public ResponseEntity<List<CartItem>> getCartByMemberId(@PathVariable Integer memberId) {
+        try {
+            List<CartItem> cartItems = cartService.getCartItemsByMemberId(memberId);
+            if (cartItems.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(cartItems);
+            }
+            return ResponseEntity.ok(cartItems);
+        } catch (Exception e) {
+            log.error("Error fetching cart items for memberId: " + memberId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     // Get the cart ID for the specified member
     @GetMapping("/{memberId}")
     public ResponseEntity<Integer> getCartIdByMemberId(@PathVariable Integer memberId) {
-        Integer cartId = cartService.getCartByMemberId(memberId).getCartId();
-        if (cartId != null) {
-            return ResponseEntity.ok(cartId);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        try {
+            Integer cartId = cartService.getCartByMemberId(memberId).getCartId();
+            if (cartId != null) {
+                return ResponseEntity.ok(cartId);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (Exception e) {
+            log.error("Error fetching cart ID for memberId: " + memberId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
@@ -49,7 +64,7 @@ public class CartController {
             Integer cartId = cartService.createCart(memberId).getCartId();
             return ResponseEntity.status(HttpStatus.CREATED).body(cartId);
         } catch (Exception e) {
-            log.error("Error creating cart", e);
+            log.error("Error creating cart for memberId: " + memberId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -62,40 +77,58 @@ public class CartController {
             return response.isSuccess() ? ResponseEntity.status(HttpStatus.CREATED).body(response)
                     : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (Exception e) {
-            log.error("Error adding cart item", e);
+            log.error("Error adding item to cart", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new CartResponse(false, "Failed to add item to cart"));
         }
     }
 
     // Update the quantity of an item in the cart
-    @PutMapping("/update")
-    public ResponseEntity<String> updateCart(@RequestBody CartItem cartItem) {
-        boolean updated = cartService.updateCartItemQuantity(cartItem.getCartItemId(), cartItem.getQuantity());
-        return updated ? ResponseEntity.ok("Cart item updated successfully.")
-                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Unable to update cart item.");
-    }
-
     // Delete a specified item from the cart
     @DeleteMapping("/delete/{cartItemId}")
     public ResponseEntity<String> deleteCartItem(@PathVariable Integer cartItemId) {
-        boolean removed = cartService.removeCartItem(cartItemId);
-        return removed ? ResponseEntity.ok("Item removed from cart.")
-                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Unable to remove item.");
+        try {
+            boolean removed = cartService.removeCartItem(cartItemId);
+            return removed ? ResponseEntity.ok("Item removed from cart.")
+                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Unable to remove item.");
+        } catch (Exception e) {
+            log.error("Error removing item from cart", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: Unable to remove item.");
+        }
     }
 
     // Clear the entire cart for the specified member
     @DeleteMapping("/clear/{memberId}")
     public ResponseEntity<String> clearCart(@PathVariable Integer memberId) {
-        cartService.clearCartByMemberId(memberId);
-        return ResponseEntity.ok("Cart cleared successfully.");
+        try {
+            cartService.clearCartByMemberId(memberId);
+            return ResponseEntity.ok("Cart cleared successfully.");
+        } catch (Exception e) {
+            log.error("Error clearing cart for memberId: " + memberId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: Unable to clear cart.");
+        }
     }
 
     // Update the cart using a CartRequest
-    @PostMapping("/updateCartRequest")
-    public ResponseEntity<CartResponse> updateCart(@RequestBody @Valid CartRequest request) {
-        CartResponse response = cartService.updateCart(request);
-        return response.isSuccess() ? ResponseEntity.ok(response)
-                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    @PutMapping("/update")
+    public ResponseEntity<String> updateCart(@RequestBody CartItem cartItem) {
+        try {
+            // Update the cart item quantity
+            boolean updated = cartService.updateCartItemQuantity(cartItem.getCartItemId(), cartItem.getQuantity());
+
+            // Return success or failure message
+            if (updated) {
+                // Return updated CartItemResponse
+                CartItem updatedCartItem = cartService.getCartItemById(cartItem.getCartItemId());
+                CartItemResponse response = new CartItemResponse(updatedCartItem); // Convert CartItem to
+                                                                                   // CartItemResponse
+                return ResponseEntity.ok("Cart item updated successfully: " + response);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Unable to update cart item.");
+            }
+        } catch (Exception e) {
+            log.error("Error updating cart item", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: Unable to update cart item.");
+        }
     }
 }
