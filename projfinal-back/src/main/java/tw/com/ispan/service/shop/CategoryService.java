@@ -1,6 +1,5 @@
 package tw.com.ispan.service.shop;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -106,7 +105,7 @@ public class CategoryService {
                 Category updatedCategory = categoryRepository.save(category);
 
                 // 設置返回
-                response.setCategories(Collections.singletonList(category));
+                response.setCategories(Collections.singletonList(updatedCategory));
                 response.setSuccess(true);
                 response.setMessage("類別描述更新成功");
             } else {
@@ -170,16 +169,43 @@ public class CategoryService {
                     .map(ProductDTO::new) // 轉換為 DTO，確保包含 images
                     .collect(Collectors.toList());
 
-            response.setCategories(categories);
-            response.setProducts(productDTOs);
             response.setSuccess(true);
             response.setMessage("模糊查詢成功");
+            response.setCategories(categories);
+            response.setProducts(productDTOs);
         } catch (Exception e) {
             response.setSuccess(false);
             response.setMessage("模糊查詢失敗: " + e.getMessage());
         }
         return response;
     }
+
+    // 獲取所有類別
+    public CategoryResponse getAllCategories() {
+        CategoryResponse response = new CategoryResponse();
+        try {
+            List<Category> categories = categoryRepository.findAll();
+    
+            if (categories.isEmpty()) {
+                response.setSuccess(false);
+                response.setMessage("沒有可用的類別");
+                return response;
+            }
+            List<ProductDTO> productDTOs = categories.stream()
+                    .flatMap(category -> category.getProducts().stream()) // 取得所有產品
+                    .map(ProductDTO::new) // 轉換為 DTO，確保包含 images
+                    .collect(Collectors.toList());
+    
+            response.setSuccess(true);
+            response.setMessage("成功獲取類別清單");
+            response.setCategories(categories);
+            response.setProducts(productDTOs);
+        } catch (Exception e) {
+            response.setSuccess(false);
+            response.setMessage("獲取類別失敗: " + e.getMessage());
+        }
+        return response;
+    }    
 
     // 商品上架，處理類別
     public void processCategory(Product product, Set<CategoryRequest> categoryRequests) {
@@ -235,15 +261,6 @@ public class CategoryService {
         } else {
             throw new IllegalArgumentException("類別不存在: " + categoryName);
         }
-    }
-
-    // 獲取所有類別
-    public List<Category> getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        if (categories == null || categories.isEmpty()) {
-            throw new IllegalArgumentException("沒有可用的類別");
-        }
-        return categories;
     }
 
     public boolean categoryExistsById(Integer categoryId) {
