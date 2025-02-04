@@ -23,7 +23,7 @@ import tw.com.ispan.repository.pet.BannerRepository;
 import tw.com.ispan.repository.pet.BreedRepository;
 import tw.com.ispan.repository.pet.CaseStateRepository;
 import tw.com.ispan.repository.pet.CityRepository;
-import tw.com.ispan.repository.pet.DistinctAreaRepository;
+import tw.com.ispan.repository.pet.DistrictAreaRepository;
 import tw.com.ispan.repository.pet.FurColorRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.SpeciesRepository;
@@ -51,7 +51,7 @@ public class LostCaseService {
     private CityRepository cityRepository;
 
     @Autowired
-    private DistinctAreaRepository distinctAreaRepository;
+    private DistrictAreaRepository districtAreaRepository;
 
     @Autowired
     private CaseStateRepository caseStateRepository;
@@ -61,6 +61,10 @@ public class LostCaseService {
 
     @Autowired
     private BannerRepository bannerRepository;
+
+    public void saveLostCase(LostCase lostCase) {
+        lostCaseRepository.save(lostCase);
+    }
 
     /**
      * 查詢所有 LostCase，支援模糊查詢、分頁與排序
@@ -107,10 +111,10 @@ public class LostCaseService {
                 predicates.add(criteriaBuilder.equal(root.get("city").get("cityId"), param.getInt("cityId")));
             }
 
-            // 根據 distinctAreaId 查詢
-            if (param.has("distinctAreaId")) {
-                predicates.add(criteriaBuilder.equal(root.get("distinctArea").get("distinctAreaId"),
-                        param.getInt("distinctAreaId")));
+            // 根據 districtAreaId 查詢
+            if (param.has("districtAreaId")) {
+                predicates.add(criteriaBuilder.equal(root.get("districtArea").get("districtAreaId"),
+                        param.getInt("districtAreaId")));
             }
 
             // 根據案件狀態 caseStateId 查詢
@@ -142,8 +146,8 @@ public class LostCaseService {
                 .orElseThrow(() -> new IllegalArgumentException("無效的 furColorId")));
         lostCase.setCity(cityRepository.findById(param.getInt("cityId"))
                 .orElseThrow(() -> new IllegalArgumentException("無效的 cityId")));
-        lostCase.setDistinctArea(distinctAreaRepository.findById(param.getInt("distinctAreaId"))
-                .orElseThrow(() -> new IllegalArgumentException("無效的 distinctAreaId")));
+        lostCase.setDistinctArea(districtAreaRepository.findById(param.getInt("districtAreaId"))
+                .orElseThrow(() -> new IllegalArgumentException("無效的 districtAreaId")));
         lostCase.setStreet(param.getString("street"));
         lostCase.setGender(param.optString("gender", null));
         lostCase.setSterilization(param.getString("sterilization"));

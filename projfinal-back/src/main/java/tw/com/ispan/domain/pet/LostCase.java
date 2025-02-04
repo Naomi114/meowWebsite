@@ -85,8 +85,8 @@ public class LostCase {
 
     // 關聯到 DistinctArea 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
-    @JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_distinctArea"))
-    private DistinctArea distinctArea;
+    @JoinColumn(name = "districtAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_districtArea"))
+    private DistrictArea districtArea;
 
     @Column(columnDefinition = "NVARCHAR(10)", name = "street", nullable = false)
     private String street;
@@ -159,7 +159,7 @@ public class LostCase {
             List<ReportCase> reportCases,
             Species species, Breed breed, FurColor furColor,
             String name, String gender, String sterilization, Integer age, Integer microChipNumber, boolean suspLost,
-            City city, DistinctArea distinctArea, String street, BigDecimal latitude, BigDecimal longitude,
+            City city, DistrictArea districtArea, String street, BigDecimal latitude, BigDecimal longitude,
             Integer donationAmount, Integer viewCount, List<Follow> follows, LocalDateTime publicationTime,
             LocalDateTime lastUpdateTime, String lostExperience, String contactInformation, String featureDescription,
             List<CasePicture> casePictures, CaseState caseState, String caseUrl, Banner banner,
@@ -177,7 +177,7 @@ public class LostCase {
         this.microChipNumber = microChipNumber;
         this.suspLost = suspLost;
         this.city = city;
-        this.distinctArea = distinctArea;
+        this.districtArea = districtArea;
         this.street = street;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -302,12 +302,12 @@ public class LostCase {
         this.city = city;
     }
 
-    public DistinctArea getDistinctArea() {
-        return distinctArea;
+    public DistrictArea getDistinctArea() {
+        return districtArea;
     }
 
-    public void setDistinctArea(DistinctArea distinctArea) {
-        this.distinctArea = distinctArea;
+    public void setDistinctArea(DistrictArea districtArea) {
+        this.districtArea = districtArea;
     }
 
     public String getStreet() {
@@ -461,7 +461,7 @@ public class LostCase {
                 ", microChipNumber=" + microChipNumber +
                 ", suspLost=" + suspLost +
                 ", city=" + city +
-                ", distinctArea=" + distinctArea +
+                ", districtArea=" + districtArea +
                 ", street=" + street +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +

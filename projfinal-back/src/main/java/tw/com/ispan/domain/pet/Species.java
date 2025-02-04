@@ -89,8 +89,7 @@ public class Species {
 
     @Override
     public String toString() {
-        return "Species [speciesId=" + speciesId + ", species=" + species + ", lostCases=" + lostCases
-                + ", rescueCases=" + rescueCases + ", adoptionCase=" + adoptionCase + "]";
+        return "Species [speciesId=" + speciesId + ", species=" + species + "]";
     }
 
 }

@@ -74,9 +74,6 @@ public class Breed {
     public String toString() {
         return "Breed [breedId=" + breedId +
                 ", breed=" + breed +
-                ", lostCases=" + lostCases +
-                ", rescueCases=" + rescueCases +
-                ", adoptionCases=" + adoptionCases +
                 "]";
     }
 

@@ -91,8 +91,7 @@ public class FurColor {
 
     @Override
     public String toString() {
-        return "FurColor [furColorId=" + furColorId + ", furColor=" + furColor + ", lostCases=" + lostCases
-                + ", rescueCases=" + rescueCases + ", adoptionCase=" + adoptionCase + "]";
+        return "FurColor [furColorId=" + furColorId + ", furColor=" + furColor + "]";
     }
 
 }

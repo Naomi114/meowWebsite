@@ -29,11 +29,11 @@ public class City {
 	@Column(name = "city", columnDefinition = "NVARCHAR(5)", nullable = false)
 	private String city;
 
-	// 和DistinctArea表單向一對多
+	// 和DistrictArea表單向一對多
 	@OneToMany(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "city_id")
 	@JsonBackReference
-	private List<DistinctArea> distinctAreas;
+	private List<DistrictArea> districtAreas;
 
 	// 和RescueCase表雙向一對多
 	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
@@ -80,12 +80,12 @@ public class City {
 		this.rescueCases = rescueCases;
 	}
 
-	public List<DistinctArea> getDistinctAreas() {
-		return distinctAreas;
+	public List<DistrictArea> getDistinctAreas() {
+		return districtAreas;
 	}
 
-	public void setDistinctAreas(List<DistinctArea> distinctAreas) {
-		this.distinctAreas = distinctAreas;
+	public void setDistinctAreas(List<DistrictArea> districtAreas) {
+		this.districtAreas = districtAreas;
 	}
 
 	public List<LostCase> getLostCases() {
@@ -106,7 +106,6 @@ public class City {
 
 	@Override
 	public String toString() {
-		return "City [cityId=" + cityId + ", city=" + city + ", distinctAreas=" + distinctAreas + ", rescueCases="
-				+ rescueCases + ", lostCases=" + lostCases + ", adoptionCases=" + adoptionCases + "]";
+		return "City [cityId=" + cityId + ", city=" + city + "]";
 	}
 }

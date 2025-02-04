@@ -2,6 +2,8 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
+import org.hibernate.engine.internal.ForeignKeys;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -11,60 +13,74 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "DistinctArea")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "distinctAreaId" // 使用
-																										// distinctAreaId
+@Table(name = "DistrictArea")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "districtAreaId" // 使用
+																										// districtAreaId
 																										// 作為唯一標識符
 )
-public class DistinctArea {
+public class DistrictArea {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer distinctAreaId;
+	private Integer districtAreaId;
 
-	@Column(columnDefinition = "NVARCHAR(5)", name = "distinctAreaName", nullable = false)
-	private String distinctAreaName;
+	@Column(columnDefinition = "NVARCHAR(5)", name = "districtAreaName", nullable = false)
+	private String districtAreaName;
+
+	@ManyToOne
+	@JoinColumn(name = "cityId", nullable = false)
+	private City city;
 
 	// 和RescueCase表雙向一對多
-	@OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
+	@OneToMany(mappedBy = "districtArea", cascade = CascadeType.PERSIST)
 	private List<RescueCase> rescueCases;
 
 	// 和LostCase表雙向一對多
-	@OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
+	@OneToMany(mappedBy = "districtArea", cascade = CascadeType.PERSIST)
 	private List<LostCase> lostCases;
 
 	// 和adoptionCase表雙向一對多
-	@OneToMany(mappedBy = "distinctArea", cascade = CascadeType.PERSIST)
+	@OneToMany(mappedBy = "districtArea", cascade = CascadeType.PERSIST)
 	private List<AdoptionCase> adoptionCase;
 
-	public DistinctArea() {
+	public DistrictArea() {
 		super();
 	}
 
-	public DistinctArea(Integer distinctAreaId, String distinctAreaName) {
+	public DistrictArea(Integer districtAreaId, String districtAreaName) {
 		super();
-		this.distinctAreaId = distinctAreaId;
-		this.distinctAreaName = distinctAreaName;
+		this.districtAreaId = districtAreaId;
+		this.districtAreaName = districtAreaName;
 	}
 
 	public Integer getDistinctAreaId() {
-		return distinctAreaId;
+		return districtAreaId;
 	}
 
-	public void setDistinctAreaId(Integer distinctAreaId) {
-		this.distinctAreaId = distinctAreaId;
+	public void setDistinctAreaId(Integer districtAreaId) {
+		this.districtAreaId = districtAreaId;
 	}
 
 	public String getDistinctAreaName() {
-		return distinctAreaName;
+		return districtAreaName;
 	}
 
-	public void setDistinctAreaName(String distinctAreaName) {
-		this.distinctAreaName = distinctAreaName;
+	public void setDistinctAreaName(String districtAreaName) {
+		this.districtAreaName = districtAreaName;
+	}
+
+	public City getCity() {
+		return city;
+	}
+
+	public void setCity(City city) {
+		this.city = city;
 	}
 
 	public List<RescueCase> getRescueCases() {
@@ -93,8 +109,7 @@ public class DistinctArea {
 
 	@Override
 	public String toString() {
-		return "DistinctArea [distinctAreaId=" + distinctAreaId + ", distinctAreaName=" + distinctAreaName
-				+ ", rescueCases=" + rescueCases + ", lostCases=" + lostCases + ", adoptionCase=" + adoptionCase + "]";
+		return "DistrictArea [districtAreaId=" + districtAreaId + ", districtAreaName=" + districtAreaName + "]";
 	}
 
 }

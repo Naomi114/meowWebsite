@@ -80,10 +80,10 @@ public class RescueCase {
     private City city;
 
     // 必填
-    // 關聯到distinctArea表，雙向多對一
+    // 關聯到districtArea表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    @JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_DistinctArea"))
-    private DistinctArea distinctArea;
+    @JoinColumn(name = "districtAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_DistinctArea"))
+    private DistrictArea districtArea;
 
     @Column(columnDefinition = "NVARCHAR(10)", name = "street")
     private String street;
@@ -283,12 +283,12 @@ public class RescueCase {
         this.city = city;
     }
 
-    public DistinctArea getDistinctArea() {
-        return distinctArea;
+    public DistrictArea getDistinctArea() {
+        return districtArea;
     }
 
-    public void setDistinctArea(DistinctArea distinctArea) {
-        this.distinctArea = distinctArea;
+    public void setDistinctArea(DistrictArea districtArea) {
+        this.districtArea = districtArea;
     }
 
     public String getStreet() {
@@ -449,7 +449,7 @@ public class RescueCase {
                 ", microChipNumber=" + microChipNumber +
                 ", suspLost=" + suspLost +
                 ", city=" + city +
-                ", distinctArea=" + distinctArea +
+                ", districtArea=" + districtArea +
                 ", street=" + street +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
