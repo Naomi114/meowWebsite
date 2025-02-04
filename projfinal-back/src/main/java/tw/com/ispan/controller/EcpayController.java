@@ -15,32 +15,32 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/pages/ecpay") // Define ECPay path
+@RequestMapping("/pages/ecpay") // ECPay 路徑
 public class EcpayController {
 
     @Autowired
     private EcpayFunctions ecpayFunctions;
 
     @Autowired
-    private OrderService orderService; // Service to update orders and cart
+    private OrderService orderService; // 用於訂單和購物車處理
 
     /**
-     * Receive payment result from ECPay
+     * 處理 ECPay 付款結果
      */
     @PostMapping("/return")
     public ResponseEntity<String> ecpayReturn(@RequestParam Map<String, String> params) {
         System.out.println("ECPay return received at " + System.currentTimeMillis());
-        // Print all received parameters for debugging
+        // 打印所有接收到的參數，用於調試
         params.forEach((key, value) -> System.out.println(key + ": " + value));
 
         try {
-            // Get MerchantTradeNo as ECPay transaction ID
+            // 取得 MerchantTradeNo 當作 ECPay 交易編號
             String ecpayTradeNo = params.get("MerchantTradeNo");
             if (ecpayTradeNo == null || ecpayTradeNo.isEmpty()) {
                 return ResponseEntity.status(400).body("Error: Missing MerchantTradeNo");
             }
 
-            // Get Order ID (Your system's Order ID)
+            // 取得訂單 ID（系統中的訂單 ID）
             String orderIdString = params.get("OrderId");
             if (orderIdString == null || orderIdString.isEmpty()) {
                 return ResponseEntity.status(400).body("Error: Missing OrderId");
@@ -49,21 +49,21 @@ public class EcpayController {
             Integer orderId = Integer.parseInt(orderIdString);
             String paymentStatus = params.get("RtnCode");
 
-            // RtnCode '1' means payment successful
+            // RtnCode '1' 代表支付成功
             if ("1".equals(paymentStatus)) {
-                // Update order status
+                // 更新訂單狀態
                 orderService.updateOrderStatus(orderId, "已付款");
 
-                // Save ECPay transaction ID
+                // 儲存 ECPay 交易編號
                 orderService.updateEcpayTransactionId(orderId, ecpayTradeNo);
 
-                // Get the order items and mark them as checked out
+                // 取得訂單商品並標記為已結帳
                 List<OrderItemDTO> orderItemsDTO = orderService.getOrderItemsByOrderId(orderId);
                 for (OrderItemDTO itemDTO : orderItemsDTO) {
                     orderService.updateOrderItemStatus(orderId, itemDTO.getProductId(), "已结账");
                 }
 
-                // Clear the cart for this order
+                // 清除該訂單的購物車
                 orderService.clearCartForOrder(orderId);
 
                 return ResponseEntity.ok("Payment processed successfully");
@@ -77,12 +77,12 @@ public class EcpayController {
     }
 
     /**
-     * Send payment request and pass product information
+     * 發送支付請求並傳送商品資訊
      */
     @PostMapping("/send")
-    public String send(@RequestParam Map<String, String> body) {
+    public String send(@RequestParam Map<String, String> body) { // 使用 @RequestParam 處理 x-www-form-urlencoded
         try {
-            // Ensure the body contains orderId
+            // 確保 body 包含 orderId
             String orderIdString = body.get("orderId");
             if (orderIdString == null || orderIdString.isEmpty()) {
                 return "Error: Missing orderId";
@@ -95,11 +95,11 @@ public class EcpayController {
                 return "Error: Invalid orderId format";
             }
 
-            // Convert the body map to JSON string
+            // 將 body map 轉換為 JSON 字串
             ObjectMapper objectMapper = new ObjectMapper();
             String bodyJson = objectMapper.writeValueAsString(body);
 
-            // Now call the buildEcpayForm method with a JSON string and the orderId
+            // 呼叫 buildEcpayForm 方法生成 ECPay 表單
             String ecpayForm = ecpayFunctions.buildEcpayForm(bodyJson, orderId.toString());
             return ecpayForm;
 
@@ -110,21 +110,20 @@ public class EcpayController {
     }
 
     /**
-     * Confirm order payment
+     * 確認訂單支付
      */
     @PostMapping("/{orderId}/payment")
     public ResponseEntity<Map<String, Object>> processPayment(@PathVariable String orderId,
-                                                 @RequestBody PaymentRequest paymentRequest) {
+            @RequestBody PaymentRequest paymentRequest) {
         try {
             Integer orderIdInt = Integer.parseInt(orderId);
             Orders updatedOrder = orderService.processPayment(orderIdInt, paymentRequest);
 
-            // Construct response with only the necessary fields
+            // 建構回應資料，僅包含必要的欄位
             Map<String, Object> response = Map.of(
-                "orderId", updatedOrder.getOrderId(),
-                "finalPrice", updatedOrder.getFinalPrice(),
-                "orderStatus", updatedOrder.getOrderStatus()
-            );
+                    "orderId", updatedOrder.getOrderId(),
+                    "finalPrice", updatedOrder.getFinalPrice(),
+                    "orderStatus", updatedOrder.getOrderStatus());
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -134,33 +133,33 @@ public class EcpayController {
     }
 
     /**
-     * Generate the ECPay payment form and redirect to ECPay for payment
+     * 生成 ECPay 付款表單並跳轉至 ECPay 進行付款
      */
     @PostMapping("/{orderId}/ecpay")
     public String initiatePayment(@PathVariable Long orderId) {
-        // 从数据库中获取订单信息
+        // 從資料庫中獲取訂單資訊
         Orders order = orderService.getOrderDTOById(orderId);
 
-        // 生成ECPay需要的参数
-        String merchantID = "xxx"; // 替换为实际商户ID
+        // 生成 ECPay 需要的參數
+        String merchantID = "xxx"; // 替換為實際商戶ID
         String orderID = order.getOrderId().toString();
         String amount = order.getFinalPrice().toString();
         String productName = order.getOrderItems().stream()
-            .map(item -> item.getProductName())
-            .collect(Collectors.joining(", "));
+                .map(item -> item.getProductName())
+                .collect(Collectors.joining(", "));
 
-        // 生成ECPay表单HTML
+        // 生成 ECPay 表單 HTML
         String formHtml = "<form action=\"https://payment.ecpay.com.tw/xxx\" method=\"POST\">" +
-                          "<input type=\"hidden\" name=\"MerchantID\" value=\"" + merchantID + "\">" +
-                          "<input type=\"hidden\" name=\"OrderID\" value=\"" + orderID + "\">" +
-                          "<input type=\"hidden\" name=\"Amount\" value=\"" + amount + "\">" +
-                          "<input type=\"hidden\" name=\"ProductName\" value=\"" + productName + "\">" +
-                          // 添加其他必要字段
-                          "<button type=\"submit\">Proceed to ECPay</button>" +
-                          "</form>" +
-                          "<script>document.forms[0].submit();</script>";
+                "<input type=\"hidden\" name=\"MerchantID\" value=\"" + merchantID + "\">" +
+                "<input type=\"hidden\" name=\"OrderID\" value=\"" + orderID + "\">" +
+                "<input type=\"hidden\" name=\"Amount\" value=\"" + amount + "\">" +
+                "<input type=\"hidden\" name=\"ProductName\" value=\"" + productName + "\">" +
+                // 添加其他必要字段
+                "<button type=\"submit\">Proceed to ECPay</button>" +
+                "</form>" +
+                "<script>document.forms[0].submit();</script>";
 
-        // 返回HTML响应
+        // 返回 HTML 回應
         return formHtml;
     }
 }

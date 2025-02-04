@@ -261,6 +261,7 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    // 原始方法：为 Long 类型的 orderId 提供获取订单信息的支持
     public Orders getOrderDTOById(Long orderId) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getOrderDTOById'");
