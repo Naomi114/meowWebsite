@@ -1,14 +1,12 @@
 package tw.com.ispan.domain.admin;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -20,20 +18,18 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.pet.Activity;
 import tw.com.ispan.domain.pet.ActivityParticipantList;
-// import tw.com.ispan.domain.pet.AdoptionCase;
+import tw.com.ispan.domain.pet.AdoptionCase;
 import tw.com.ispan.domain.pet.Follow;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.ReportCase;
 import tw.com.ispan.domain.pet.RescueCase;
-// import tw.com.ispan.domain.pet.forAdopt.AdoptionCaseApply;
+import tw.com.ispan.domain.pet.forAdopt.AdoptionCaseApply;
 // import tw.com.ispan.domain.shop.Cart;
 // import tw.com.ispan.domain.shop.Order;
 // import tw.com.ispan.domain.shop.WishListBean;
 
 @Entity
 @Table(name = "Member")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "memberId" // 使用 memberId 作為唯一標識符
-)
 public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -70,12 +66,10 @@ public class Member {
 	@Column(nullable = false)
 	private LocalDateTime updateDate;
 
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
-			CascadeType.REMOVE })
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	private Set<Activity> activity;
 
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
-			CascadeType.REMOVE })
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	private Set<ActivityParticipantList> acitvityParticipantList;
 
 	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
@@ -90,8 +84,7 @@ public class Member {
 	// true)
 	// private List<Order> order;
 
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
-			CascadeType.REMOVE })
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	private List<RescueCase> rescueCases;
 
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
@@ -100,24 +93,23 @@ public class Member {
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private List<LostCase> lostCase = new ArrayList<>();
 
-	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	// private List<AdoptionCase> adoptionCase = new ArrayList<>();
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private List<AdoptionCase> adoptionCase = new ArrayList<>();
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private List<ReportCase> reportCase = new ArrayList<>();
 
 	// 雙向一對多，最後meeting加的
-	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	// private Set<AdoptionCaseApply> adoptionCaseApply = new HashSet<>();
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private Set<AdoptionCaseApply> adoptionCaseApply = new HashSet<>();
 
 	public Member(Integer memberId, String nickName, String password, String name, String email, String phone,
 			String address, LocalDate birthday, LocalDateTime createDate, LocalDateTime updateDate,
-			Set<Activity> activity, Set<ActivityParticipantList> acitvityParticipantList,
-			// Set<AdoptionCaseApply> adoptionCaseApply,
-			// List<WishListBean> wishList, Set<Cart> cart,List<Order>
-			// order,List<AdoptionCase> adoptionCase,
+			Set<Activity> activity,
+			Set<ActivityParticipantList> acitvityParticipantList,
+			// List<WishListBean> wishList, Set<Cart> cart,List<Order> order,
 			List<RescueCase> rescueCases, Set<Follow> follow, List<LostCase> lostCase,
-			List<ReportCase> reportCase) {
+			List<AdoptionCase> adoptionCase, List<ReportCase> reportCase, Set<AdoptionCaseApply> adoptionCaseApply) {
 		this.memberId = memberId;
 		this.nickName = nickName;
 		this.password = password;
@@ -136,46 +128,10 @@ public class Member {
 		this.rescueCases = rescueCases;
 		this.follow = follow;
 		this.lostCase = lostCase;
-		// this.adoptionCase = adoptionCase;
+		this.adoptionCase = adoptionCase;
 		this.reportCase = reportCase;
-		// this.adoptionCaseApply = adoptionCaseApply;
+		this.adoptionCaseApply = adoptionCaseApply;
 	}
-
-	// // // 雙向一對多，最後meeting加的
-	// // @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	// // private Set<AdoptionCaseApply> adoptionCaseApply = new HashSet<>();
-
-	// public Member(Integer memberId, String nickName, String password, String
-	// name, String email, String phone,
-	// String address, Date birthday, LocalDateTime createDate, LocalDateTime
-	// updateDate, Set<Activity> activity,
-	// Set<ActivityParticipantList> acitvityParticipantList,
-	// // List<WishListBean> wishList, Set<Cart> cart,List<Order> order,
-	// List<RescueCase> rescueCases, Set<Follow> follow, List<LostCase> lostCase,
-	// // List<AdoptionCase> adoptionCase, Set<AdoptionCaseApply> adoptionCaseApply
-	// List<ReportCase> reportCase) {
-	// this.memberId = memberId;
-	// this.nickName = nickName;
-	// this.password = password;
-	// this.name = name;
-	// this.email = email;
-	// this.phone = phone;
-	// this.address = address;
-	// this.birthday = birthday;
-	// this.createDate = createDate;
-	// this.updateDate = updateDate;
-	// this.activity = activity;
-	// this.acitvityParticipantList = acitvityParticipantList;
-	// // this.wishList = wishList;
-	// // this.cart = cart;
-	// // this.order = order;
-	// this.rescueCases = rescueCases;
-	// this.follow = follow;
-	// this.lostCase = lostCase;
-	// // this.adoptionCase = adoptionCase;
-	// this.reportCase = reportCase;
-	// // this.adoptionCaseApply = adoptionCaseApply;
-	// }
 
 	public Integer getMemberId() {
 		return memberId;
@@ -225,6 +181,14 @@ public class Member {
 		this.phone = phone;
 	}
 
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
 	public LocalDate getBirthday() {
 		return birthday;
 	}
@@ -232,14 +196,6 @@ public class Member {
 	public void setBirthday(LocalDate birthday) {
 		this.birthday = birthday;
 	}
-
-	// public Date getBirthday() {
-	// return birthday;
-	// }
-
-	// public void setBirthday(Date birthday) {
-	// this.birthday = birthday;
-	// }
 
 	public LocalDateTime getCreateDate() {
 		return createDate;
@@ -249,69 +205,51 @@ public class Member {
 		this.createDate = createDate;
 	}
 
-	@Override
-	public String toString() {
-		return "Member [memberId=" + memberId +
-				", nickName=" + nickName +
-				", password=" + password +
-				", email=" + email +
-				", phone=" + phone +
-				", address=" + address +
-				", birthday=" + birthday +
-				", createDate=" + createDate +
-				", updateDate=" + updateDate +
-				", acitvityParticipantList=" + acitvityParticipantList +
-				", activity=" + activity +
-				// ", wishList=" + wishList +
-				// ", cart=" + cart+
-				// ", order=" + order +
-				", rescueCases=" + rescueCases +
-				", follow=" + follow +
-				", lostCase=" + lostCase +
-				// ", adoptionCase=" + adoptionCase +
-				// ", adoptionCaseApply="+adoptionCaseApply +
-				", reportCase=" + reportCase +
-				", getClass()=" + getClass() +
-				", hashCode()=" + hashCode() +
-				", getMemberId()=" + getMemberId() +
-				", getNickName()=" + getNickName() +
-				", getPassword()=" + getPassword() +
-				", getName()=" + getName() +
-				", getEmail()=" + getEmail() +
-				", getPhone()=" + getPhone() +
-				// ", getAddress()=" + getAddress() +
-				", getBirthday()=" + getBirthday() +
-				",getCreateDate()=" + getCreateDate() +
-				// ", getUpdateDate()=" + getUpdateDate() +
-				", toString()=" + super.toString() +
-				"]";
+	public LocalDateTime getUpdateDate() {
+		return updateDate;
 	}
 
-	// @Override
-	// public String toString() {
-	// return "Member [memberId=" + memberId + ", nickName=" + nickName + ",
-	// password=" + password + ", name=" + name
-	// + ", email=" + email + ", phone=" + phone + ", address=" + address + ",
-	// birthday=" + birthday
-	// + ", createDate=" + createDate + ", updateDate=" + updateDate + ", activity="
-	// + activity
-	// + ", acitvityParticipantList=" + acitvityParticipantList +
-	// // ", wishList=" + wishList + ", cart=" + cart+ ", order=" + order +
-	// // ", rescueCases=" + rescueCases + ", follow=" + follow + ", lostCase=" +
-	// // lostCase+
-	// // ", adoptionCase=" + adoptionCase +
-	// ", reportCase=" + reportCase +
-	// // ", adoptionCaseApply="+ adoptionCaseApply +
-	// ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ",
-	// getMemberId()="
-	// + getMemberId() + ", getNickName()=" + getNickName() + ", getPassword()=" +
-	// getPassword()
-	// + ", getName()=" + getName() + ", getEmail()=" + getEmail() + ", getPhone()="
-	// + getPhone()
-	// + ", getAddress()=" + getAddress() + ", getBirthday()=" + getBirthday() + ",
-	// getCreateDate()="
-	// + getCreateDate() + ", getUpdateDate()=" + getUpdateDate() + ", toString()="
-	// + super.toString() + "]";
-	// }
+	public void setUpdateDate(LocalDateTime updateDate) {
+		this.updateDate = updateDate;
+	}
+
+	@Override
+	public String toString() {
+		return "Member [memberId=" + memberId + 
+				", nickName=" + nickName + 
+				", password=" + password + 
+				", name=" + name +
+				", email=" + email + 
+				", phone=" + phone + 
+				", address=" + address + 
+				", birthday=" + birthday+ 
+				", createDate=" + createDate + 
+				", updateDate=" + updateDate + 
+				", activity=" + activity+ 
+				", acitvityParticipantList=" + acitvityParticipantList +
+				// ", wishList=" + wishList + 
+				// ", cart=" + cart + 
+				// ", order=" + order +
+				", rescueCases=" + rescueCases + 
+				", follow=" + follow + 
+				", lostCase=" + lostCase+
+				", adoptionCase=" + adoptionCase + 
+				", reportCase=" + reportCase + 
+				", adoptionCaseApply="+ adoptionCaseApply + 
+				", getClass()=" + getClass() + 
+				", hashCode()=" + hashCode() + 
+				", getMemberId()="+ getMemberId() + 
+				", getNickName()=" + getNickName() + 
+				", getPassword()=" + getPassword()+ 
+				", getName()=" + getName() +
+				", getEmail()=" + getEmail() + 
+				", getPhone()=" + getPhone()+ 
+				", getAddress()=" + getAddress() + 
+				", getBirthday()=" + getBirthday() + 
+				", getCreateDate()="+ getCreateDate() + 
+				", getUpdateDate()=" + getUpdateDate() + 
+				", toString()=" + super.toString() + 
+				"]";
+	}
 
 }
