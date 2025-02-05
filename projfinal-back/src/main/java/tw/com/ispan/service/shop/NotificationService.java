@@ -17,13 +17,13 @@ import tw.com.ispan.repository.shop.NotificationRepository;
 public class NotificationService {
 
     @Autowired
-	private NotificationRepository notificationRepository;
+    private NotificationRepository notificationRepository;
 
     @Autowired
-	private AdminRepository adminRepository;
-    
-     // 發送通知給會員
-     public void notifyMember(Member member, String title, String message) {
+    private AdminRepository adminRepository;
+
+    // 發送通知給會員
+    public void notifyMember(Member member, String title, String message) {
         Notification notification = new Notification();
         notification.setMember(member);
         notification.setTitle(title);

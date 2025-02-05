@@ -185,7 +185,7 @@ public class CategoryService {
         CategoryResponse response = new CategoryResponse();
         try {
             List<Category> categories = categoryRepository.findAll();
-    
+
             if (categories.isEmpty()) {
                 response.setSuccess(false);
                 response.setMessage("沒有可用的類別");
@@ -195,7 +195,7 @@ public class CategoryService {
                     .flatMap(category -> category.getProducts().stream()) // 取得所有產品
                     .map(ProductDTO::new) // 轉換為 DTO，確保包含 images
                     .collect(Collectors.toList());
-    
+
             response.setSuccess(true);
             response.setMessage("成功獲取類別清單");
             response.setCategories(categories);
@@ -205,7 +205,7 @@ public class CategoryService {
             response.setMessage("獲取類別失敗: " + e.getMessage());
         }
         return response;
-    }    
+    }
 
     // 商品上架，處理類別
     public void processCategory(Product product, Set<CategoryRequest> categoryRequests) {
@@ -229,7 +229,7 @@ public class CategoryService {
             // 設定商品單位
             String unit = categoryRequest.getDefaultUnit();
             if (unit == null || unit.isEmpty()) {
-                unit = categoryResponse.getDefaultUnit();
+                unit = category.getDefaultUnit(); // 直接從資料庫讀取
                 if (unit == null || unit.isEmpty()) {
                     throw new IllegalArgumentException("類別的預設單位未設置或提供");
                 }
