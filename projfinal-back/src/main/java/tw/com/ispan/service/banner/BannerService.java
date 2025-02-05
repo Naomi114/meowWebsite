@@ -30,6 +30,10 @@ public class BannerService {
     // @Autowired
     // private AdoptionCaseRepository adoptionCaseRepository;
 
+    public List<Banner> getAllBanners() {
+        return bannerRepository.findAll(); // 從資料庫獲取所有 Banner
+    }
+
     /**
      * 根據 Case ID 創建 Banner
      */

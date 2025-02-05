@@ -17,6 +17,8 @@ public interface BannerRepository extends JpaRepository<Banner, Integer> {
 
     Optional<Banner> findByAdoptionCase_AdoptionCaseIdAndBannerType(Integer adoptionCaseId, BannerType bannerType);
 
+    List<Banner> findAll(); // 取得所有 Banner
+
     List<Banner> findByDueDateBefore(LocalDateTime now);
 
     void deleteByLostCase_LostCaseIdAndBannerType(Integer caseId, BannerType bannerType);

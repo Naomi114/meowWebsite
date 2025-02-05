@@ -70,13 +70,13 @@ public class ReportCase {
 
     // 全參數建構子
     public ReportCase(Integer reportId, RescueCase rescueCase, LostCase lostCase,
-            // AdoptionCase adoptionCase,
+            AdoptionCase adoptionCase,
             Member member, Admin admin, LocalDateTime reportDate, String reportTitle, String reportNotes,
             boolean reportState, LocalDateTime updateDate) {
         this.reportId = reportId;
         this.rescueCase = rescueCase;
         this.lostCase = lostCase;
-        // this.adoptionCase=adoptionCase;
+        this.adoptionCase = adoptionCase;
         this.member = member;
         this.admin = admin;
         this.reportDate = reportDate;
@@ -90,7 +90,7 @@ public class ReportCase {
     public String toString() {
         return "ReportCase [reportId=" + reportId +
                 ", lostCaseId=" + lostCase + ", rescueCaseId=" + rescueCase +
-                // ", adoptionCaseId=" + adoptionCase +
+                ", adoptionCaseId=" + adoptionCase +
                 ",memberId=" + member + ",adminId=" + admin +
                 ", reportDate=" + reportDate + ", reportTitle=" + reportTitle + ", reportNotes=" + reportNotes
                 + ", reportState=" + reportState + ", updateDate=" + updateDate + "]";
@@ -121,13 +121,13 @@ public class ReportCase {
         this.lostCase = lostCase;
     }
 
-    // public AdoptionCase getAdoptionCase() {
-    // return adoptionCase;
-    // }
+    public AdoptionCase getAdoptionCase() {
+        return adoptionCase;
+    }
 
-    // public void setAdoptionCase(AdoptionCase adoptionCase) {
-    // this.adoptionCase = adoptionCase;
-    // }
+    public void setAdoptionCase(AdoptionCase adoptionCase) {
+        this.adoptionCase = adoptionCase;
+    }
 
     public Member getMember() {
         return member;
