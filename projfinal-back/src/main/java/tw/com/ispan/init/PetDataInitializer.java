@@ -265,13 +265,13 @@ public class PetDataInitializer implements CommandLineRunner {
 
 				List<DistrictArea> areas = cityDto.getAreaList().stream().map(areaDto -> {
 					DistrictArea area = new DistrictArea();
-					area.setDistinctAreaName(areaDto.getAreaName());
+					area.setDistrictAreaName(areaDto.getAreaName());
 					return area;
 				}).toList();
 
-				city.setDistinctAreas(areas);
+				city.setDistrictAreas(areas);
 
-				// 儲存 City（會同時儲存其相關的 DistinctArea）
+				// 儲存 City（會同時儲存其相關的 DistrictArea）
 				cityRepository.save(city);
 			}
 		}
