@@ -1,13 +1,16 @@
 package tw.com.ispan.service.shop;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import tw.com.ispan.domain.shop.Cart;
 import tw.com.ispan.domain.shop.CartItem;
@@ -19,6 +22,7 @@ import tw.com.ispan.dto.OrderItemDTO;
 import tw.com.ispan.dto.PaymentRequest;
 import tw.com.ispan.repository.shop.CartItemRepository;
 import tw.com.ispan.repository.shop.CartRepository;
+import tw.com.ispan.repository.shop.IOrderService;
 import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.shop.OrderItemRepository;
 import tw.com.ispan.repository.shop.OrderRepository;
@@ -26,7 +30,7 @@ import tw.com.ispan.repository.shop.OrderRequest;
 import tw.com.ispan.repository.shop.ProductRepository;
 
 @Service
-public class OrderService {
+public class OrderService implements IOrderService {
 
     @Autowired
     private OrderRepository orderRepository;
@@ -45,6 +49,22 @@ public class OrderService {
 
     @Autowired
     private OrderItemRepository orderItemRepository;
+
+    private final Map<Integer, String> orderTradeMap = new HashMap<>();
+
+    // 更新 ECPay 交易 ID 和 MerchantTradeNo
+    @Transactional
+    public Orders updateEcpayTransactionIds(Integer orderId, String merchantTradeNo, String transactionId) {
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+        // 更新 merchantTradeNo 和 transactionId 字段
+        order.setMerchantTradeNo(merchantTradeNo);
+        order.setTransactionId(transactionId);
+
+        // 保存订单并返回
+        return orderRepository.save(order);
+    }
 
     // 创建订单
     @Transactional
@@ -87,7 +107,6 @@ public class OrderService {
     // 处理支付
     @Transactional
     public Orders processPayment(Integer orderId, PaymentRequest paymentRequest) {
-        // Retrieve the order by ID with proper exception handling
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
 
@@ -149,7 +168,6 @@ public class OrderService {
     // 更新订单状态
     @Transactional
     public Orders updateOrderStatus(Integer orderId, String status) {
-        // Add better error handling for invalid orderId
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("订单未找到: " + orderId));
         order.setOrderStatus(status);
@@ -206,7 +224,7 @@ public class OrderService {
     }
 
     private OrderDTO convertToDTO(Orders order) {
-        OrderDTO orderDTO = new OrderDTO();
+        OrderDTO orderDTO = new OrderDTO(order);
         orderDTO.setId(order.getOrderId());
         orderDTO.setOrderStatus(order.getOrderStatus());
         orderDTO.setFinalPrice(order.getFinalPrice());
@@ -248,22 +266,57 @@ public class OrderService {
         }
     }
 
-    // 新方法：更新ECPay的transactionId
-    @Transactional
-    public Orders updateEcpayTransactionId(Integer orderId, String transactionId) {
-        Orders order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
-
-        // 更新transactionId字段
-        order.setTransactionId(transactionId);
-
-        // 保存订单并返回
-        return orderRepository.save(order);
+    // 获取所有订单 DTO
+    public List<OrderDTO> getAllOrderDTOs() {
+        List<Orders> orders = getAllOrders();
+        List<OrderDTO> orderDTOs = new ArrayList<>();
+        for (Orders order : orders) {
+            orderDTOs.add(convertToDTO(order));
+        }
+        return orderDTOs;
     }
 
-    // 原始方法：为 Long 类型的 orderId 提供获取订单信息的支持
+    // 根据 ECPay 交易 ID 获取订单 ID
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Optional getOrderIdByEcpayTransactionId(String ecpayTransactionId) {
+        // 获取与 ECPay 交易ID 相关的订单 ID
+        Orders orders = orderRepository.findByTransactionId(ecpayTransactionId);
+        return Optional.empty();
+    }
+
+    @Override
+    public void updateEcpayTransactionId(Integer orderId, String merchantTradeNo) {
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+        order.setMerchantTradeNo(merchantTradeNo);
+        orderRepository.save(order); // 保存订单
+    }
+
+    @Override
     public Orders getOrderDTOById(Long orderId) {
+        Orders order = orderRepository.findById(orderId.intValue())
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+        return order;
+    }
+
+    @Override
+    public Optional<Orders> getOrderByEcpayTransactionId(String transactionId) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getOrderDTOById'");
+        throw new UnsupportedOperationException("Unimplemented method 'getOrderByEcpayTransactionId'");
+    }
+
+    @Override
+    public Optional<Orders> getOrderByMerchantTradeNo(String merchantTradeNo) {
+        Orders order = orderRepository.findByMerchantTradeNo(merchantTradeNo);
+        return Optional.ofNullable(order);
+    }
+
+    @Transactional
+    public void updateMerchantTradeNo(Integer orderId, String merchantTradeNo) {
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+        order.setMerchantTradeNo(merchantTradeNo);
+        orderRepository.save(order); // Save the updated order
     }
 }
