@@ -28,10 +28,6 @@ public class Admin {
 	@Column(length = 20, nullable = false)
 	private String password;
 
-	public Admin() {
-		// 這是默認構造函數，Hibernate 需要
-	}
-
 	@Column(nullable = false)
 	private LocalDateTime createDate;
 
@@ -53,16 +49,19 @@ public class Admin {
 	@JsonManagedReference("admin") // Unique reference for Products
 	private Set<Product> products = new HashSet<>();
 
-	public Admin(Integer adminId, String adminName, String password, LocalDateTime createDate, LocalDateTime updateDate
-	// ,List<Discount> discounts, Set<InventoryBean> inventory
-	) {
+	public Admin() {
+	}
+
+	public Admin(Integer adminId, String adminName, String password, LocalDateTime createDate, LocalDateTime updateDate,
+			List<Discount> discounts, Set<Inventory> inventory, Set<Product> products) {
 		this.adminId = adminId;
 		this.adminName = adminName;
 		this.password = password;
 		this.createDate = createDate;
 		this.updateDate = updateDate;
-		// this.discounts = discounts;
-		// this.inventory = inventory;
+		this.discounts = discounts;
+		this.inventory = inventory;
+		this.products = products;
 	}
 
 	public Integer getAdminId() {
@@ -140,8 +139,4 @@ public class Admin {
 		this.products = products;
 	}
 
-	@Override
-	public String toString() {
-		return "Admin [adminId=" + adminId + ", adminName=" + adminName + "]";
-	}
 }
