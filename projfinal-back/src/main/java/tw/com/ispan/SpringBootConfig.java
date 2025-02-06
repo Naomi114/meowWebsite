@@ -6,12 +6,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class SpringBootConfig implements WebMvcConfigurer {
-        @Override
-        public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                                .allowedOrigins("http://localhost:5173")
-                                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                                .allowedHeaders("*")
-                                .allowCredentials(true);
-        }
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        // 允許的來源網址
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:5173") // 允許前端的 Vue 地址
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedHeaders("*")
+                .allowCredentials(true); // 允許攜帶憑證（cookies）
+    }
 }

@@ -78,3 +78,12 @@ google:
 jackson:
   serialization:
     fail-on-empty-beans: false
+
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: a0912829673+test@gmail.com
+  password: frww ocfi lxda dscs
+
+
+  
