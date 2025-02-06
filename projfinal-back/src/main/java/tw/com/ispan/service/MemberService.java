@@ -152,4 +152,8 @@ public class MemberService {
         );
     }
 
+    // 購物車操作紀錄會用到 (by Naomi)
+    public Member findById(Long memberId) {
+        return memberRepository.findById(memberId).orElse(null);
+    }
 }
