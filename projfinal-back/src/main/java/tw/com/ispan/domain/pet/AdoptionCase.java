@@ -75,7 +75,7 @@ public class AdoptionCase {
     // 雙向多對一,外鍵,對應distinctArea表
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     @JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_Distinct"))
-    private DistinctArea distinctArea;
+    private DistrictArea distinctArea;
 
     @Column(name = "street", columnDefinition = "NVARCHAR(10)")
     private String street;
@@ -142,7 +142,7 @@ public class AdoptionCase {
 
     public AdoptionCase(Integer adoptionCaseId, String caseTitle, Member member, Species species, Breed breed,
             FurColor furColor, String gender, String sterilization, Integer age, Integer microChipNumber,
-            Boolean susLost, City city, DistinctArea distinctArea, String street, BigDecimal latitude,
+            Boolean susLost, City city, DistrictArea distinctArea, String street, BigDecimal latitude,
             BigDecimal longitude,
             Integer viewCount, Integer follow, LocalDateTime publicationTime, LocalDateTime lastUpdateTime,
             String title, String story, String healthCondition, String adoptedCondition, Integer status, Integer note,
@@ -308,11 +308,11 @@ public class AdoptionCase {
         this.city = city;
     }
 
-    public DistinctArea getDistintId() {
+    public DistrictArea getDistintId() {
         return distinctArea;
     }
 
-    public void setDistintId(DistinctArea distinctArea) {
+    public void setDistintId(DistrictArea distinctArea) {
         this.distinctArea = distinctArea;
     }
 

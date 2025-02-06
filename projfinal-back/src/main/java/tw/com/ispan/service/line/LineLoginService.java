@@ -32,11 +32,8 @@ public class LineLoginService {
 	@Value("${line.login.channel-secret}")
 	private String channelSecret;
 
-	@Value("${line.login.redirect-uri}")
+	@Value("${line.login.redirect-uri}") // line callback
 	private String redirectUri;
-
-	@Autowired
-	private StateRedisService stateRedisService;
 
 	@Autowired
 	private MemberRepository memberRepository;
@@ -96,14 +93,12 @@ public class LineLoginService {
 
 		return response.getBody();
 	}
-	
-	
-	// 檢查 LINE 用戶是否已存在
-    public boolean isLineUserExists(String lineId) {
-        return memberRepository.existsByLineId(lineId);
-    }
 
-	
+	// 檢查 LINE 用戶是否已存在
+	public boolean isLineUserExists(String lineId) {
+		return memberRepository.existsByLineId(lineId);
+	}
+
 	// line login時進行lineid和memberid的綁定
 	// 已註冊會員：綁定 LINE 信息
 	public void bindLineInfoToMember(Integer memberId, LineUserProfile profile) {
@@ -119,22 +114,22 @@ public class LineLoginService {
 	// 非會員：新增 LINE 用戶
 	public void createLineOnlyUser(LineUserProfile profile) {
 		Member member = new Member();
-	    member.setUserType(false);  // false等於標記為LINE用戶
-	    member.setLineId(profile.getUserId());
-	    member.setLineName(profile.getDisplayName());
-	    member.setLinePicture(profile.getPictureUrl());
+		member.setUserType(false); // false等於標記為LINE用戶
+		member.setLineId(profile.getUserId());
+		member.setLineName(profile.getDisplayName());
+		member.setLinePicture(profile.getPictureUrl());
 
-	    // 自動填充默認值以滿足非空約束
-	    member.setNickName("LINE_USER_" + profile.getUserId().substring(0, 8)); // 使用 LINE ID 生成默認名稱
-	    member.setPassword("@Fakepswrd"); // 默認密碼
-	    member.setName(profile.getDisplayName());
-	    member.setEmail("unknown@line.com"); // 假設值
-	    member.setPhone("0000000000"); // 假設值
-	    member.setAddress("無"); // 假設值
-	    member.setBirthday(LocalDate.now()); // 默認填充當前日期
-	    member.setCreateDate(LocalDateTime.now());
-	    member.setUpdateDate(LocalDateTime.now());
+		// 自動填充默認值以滿足非空約束
+		member.setNickName("LINE_USER_" + profile.getUserId().substring(0, 8)); // 使用 LINE ID 生成默認名稱
+		member.setPassword("@Fakepswrd"); // 默認密碼
+		member.setName(profile.getDisplayName());
+		member.setEmail("unknown@line.com"); // 假設值
+		member.setPhone("0000000000"); // 假設值
+		member.setAddress("無"); // 假設值
+		member.setBirthday(LocalDate.now()); // 默認填充當前日期
+		member.setCreateDate(LocalDateTime.now());
+		member.setUpdateDate(LocalDateTime.now());
 
-	    memberRepository.save(member);
+		memberRepository.save(member);
 	}
 }

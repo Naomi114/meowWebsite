@@ -2,7 +2,6 @@ package tw.com.ispan.service.banner;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +28,10 @@ public class BannerService {
     private RescueCaseRepository rescueCaseRepository;
     // @Autowired
     // private AdoptionCaseRepository adoptionCaseRepository;
+
+    public List<Banner> getAllBanners() {
+        return bannerRepository.findAll(); // 從資料庫獲取所有 Banner
+    }
 
     /**
      * 根據 Case ID 創建 Banner
@@ -119,34 +122,21 @@ public class BannerService {
     }
 
     /**
-     * 根據案件 ID 和 Banner 類型查詢對應的 Banner
+     * 根據 Banner 類型查詢對應的 Banners
      *
-     * @param caseId     案件 ID
      * @param bannerType Banner 類型（LOST, ADOPTION, RESCUE）
-     * @return 對應的 Banner（如果存在）
+     * @return 符合條件的 Banner 列表
      */
-    public Optional<Banner> getBannerByCaseId(Integer caseId, BannerType bannerType) {
-        switch (bannerType) {
-            case LOST:
-                return bannerRepository.findByLostCase_LostCaseIdAndBannerType(caseId, BannerType.LOST);
-            case ADOPTION:
-                // return
-                // bannerRepository.findByAdoptionCase_AdoptionCaseIdAndBannerType(caseId,
-                // BannerType.ADOPTION);
-            case RESCUE:
-                // return bannerRepository.findByRescueCase_RescueCaseIdAndBannerType(caseId,
-                // BannerType.RESCUE);
-            default:
-                throw new IllegalArgumentException("無效的 Banner 類型：" + bannerType);
-        }
+    public List<Banner> findByBannerType(BannerType bannerType) {
+        return bannerRepository.findByBannerType(bannerType);
     }
 
     public void deleteBannerByCaseId(Integer caseId, BannerType bannerType) {
         bannerRepository.deleteByLostCase_LostCaseIdAndBannerType(caseId, bannerType);
-        // bannerRepository.deleteByRescueCase_RescueCaseIdAndBannerType(caseId,
-        // bannerType);
-        // bannerRepository.deleteByAdoptionCase_AdoptionCaseIdAndBannerType(caseId,
-        // bannerType);
+        bannerRepository.deleteByRescueCase_RescueCaseIdAndBannerType(caseId,
+                bannerType);
+        bannerRepository.deleteByAdoptionCase_AdoptionCaseIdAndBannerType(caseId,
+                bannerType);
     }
 
 }

@@ -1,12 +1,9 @@
 package tw.com.ispan.domain.pet;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
@@ -16,23 +13,32 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.banner.Banner;
 
 @Entity
-@Table(name = "LostCase")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "lostCaseId") // 使用 lostCaseId作為唯一標識符                                                                                               
+@Table(name = "LostCase", indexes = {
+        @Index(name = "idx_species", columnList = "speciesId"),
+        @Index(name = "idx_breed", columnList = "breedId"),
+        @Index(name = "idx_furColor", columnList = "furColorId"),
+        @Index(name = "idx_city", columnList = "cityId"),
+        @Index(name = "idx_districtArea", columnList = "districtAreaId")
+})
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "lostCaseId")
+// 使用lostCaseId作為唯一標識符
 public class LostCase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "lostCaseId")
     private Integer lostCaseId;
 
     @Column(columnDefinition = "NVARCHAR(30)", name = "caseTitle", nullable = false)
@@ -46,22 +52,19 @@ public class LostCase {
     // 關聯到 Species 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Species"))
-//    @JsonManagedReference ("lostCase-species")
     private Species species;
 
     // 關聯到 Breed 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "breedId", foreignKey = @ForeignKey(name = "FK_LostCase_Breed"))
-//    @JsonManagedReference("lostCase-breed")
     private Breed breed;
 
     // 關聯到 FurColor 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "furColorId", foreignKey = @ForeignKey(name = "FK_LostCase_FurColor"))
-//    @JsonManagedReference("lostCase-furColor")
     private FurColor furColor;
 
-    @Column(columnDefinition = "NVARCHAR(5)", name = "name")
+    @Column(columnDefinition = "NVARCHAR(5)", name = "petName")
     private String name;
 
     @Column(columnDefinition = "NVARCHAR(5)", name = "gender")
@@ -76,9 +79,6 @@ public class LostCase {
     @Column(name = "microChipNumber")
     private Integer microChipNumber;
 
-    @Column(name = "suspLost")
-    private boolean suspLost;
-
     // 關聯到 City 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_City"))
@@ -86,32 +86,41 @@ public class LostCase {
 
     // 關聯到 DistinctArea 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
-    @JoinColumn(name = "distinctAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_distinctArea"))
-    private DistinctArea distinctArea;
+    @JoinColumn(name = "districtAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_districtArea"))
+    private DistrictArea districtArea;
 
-    @Column(columnDefinition = "NVARCHAR(10)", name = "street", nullable = false)
+    @Column(columnDefinition = "NVARCHAR(10)", name = "street")
     private String street;
 
-    @Column(name = "latitude", precision = 10, scale = 8, nullable = false)
-    private BigDecimal latitude;
+    // 必填(請求成功後記得改回來)
+    // 10位數，8位小數
+    @Column(name = "latitude", precision = 10, nullable = true)
+    private Double latitude;
 
-    @Column(name = "longitude", precision = 11, scale = 8, nullable = false)
-    private BigDecimal longitude;
+    // 必填
+    // 11位數，8位小數
+    @Column(name = "longitude", precision = 11, nullable = true)
+    private Double longitude;
 
     @Column(name = "donationAmount")
-    private Integer donationAmount;
+    private Integer donationAmount = 0;
 
     @Column(name = "viewCount")
-    private Integer viewCount;
+    private Integer viewCount = 0;
 
-    @Column(name = "publicationTime", nullable = true)
+    @Column(name = "follow") // 被追蹤數
+    private Integer follow = 0;
+
+    // 必填(非使用者手動填寫)
+    @Column(name = "publicationTime", nullable = false)
     private LocalDateTime publicationTime;
 
-    @Column(name = "lastUpdateTime", nullable = true)
+    // 必填
+    @Column(name = "lastUpdateTime", nullable = false)
     private LocalDateTime lastUpdateTime;
 
     @Lob
-    @Column(name = "lostExperience")
+    @Column(name = "lostExperience", nullable = false)
     private String lostExperience;
 
     @Lob
@@ -119,15 +128,18 @@ public class LostCase {
     private String contactInformation;
 
     @Lob
-    @Column(name = "featureDescription")
+    @Column(name = "featureDescription", nullable = false)
     private String featureDescription;
 
-    // 關聯到 CasePicture 表，單向一對多
-    @OneToMany
+    // 必填
+    // 關聯到CasePicture表，單向一對多，註釋在這但rescueCaseId外鍵會在CasePicture表中
+    // 當初設計一個case需放多張圖，由於想要減少表格數??? 把不同case的圖都放在同一張表，因此雖然設立3個case外鍵，但都須設為null
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "lostCase", foreignKey = @ForeignKey(name = "FK_CasePicture_LostCase"))
     private List<CasePicture> casePictures;
 
-    @OneToMany(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
+    // 關聯到follow表(為會員和案件的追蹤中介表) 雙向一對多
+    @OneToMany(mappedBy = "lostCase", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Follow> follows;
 
     // 關聯到 ReportCase 表，單向一對多
@@ -153,49 +165,17 @@ public class LostCase {
         super();
     }
 
-    // 全參數建構子
-    public LostCase(
-            Integer lostCaseId, String caseTitle,
-            Member member,
-            List<ReportCase> reportCases,
-            Species species, Breed breed, FurColor furColor,
-            String name, String gender, String sterilization, Integer age, Integer microChipNumber, boolean suspLost,
-            City city, DistinctArea distinctArea, String street, BigDecimal latitude, BigDecimal longitude,
-            Integer donationAmount, Integer viewCount, List<Follow> follows, LocalDateTime publicationTime,
-            LocalDateTime lastUpdateTime, String lostExperience, String contactInformation, String featureDescription,
-            List<CasePicture> casePictures, CaseState caseState, String caseUrl, Banner banner,
-            Boolean isHidden) {
-        this.lostCaseId = lostCaseId;
-        this.caseTitle = caseTitle;
-        this.member = member;
-        this.species = species;
-        this.breed = breed;
-        this.furColor = furColor;
-        this.name = name;
-        this.gender = gender;
-        this.sterilization = sterilization;
-        this.age = age;
-        this.microChipNumber = microChipNumber;
-        this.suspLost = suspLost;
-        this.city = city;
-        this.distinctArea = distinctArea;
-        this.street = street;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.donationAmount = donationAmount;
-        this.viewCount = viewCount;
-        this.follows = follows;
-        this.publicationTime = publicationTime;
-        this.lastUpdateTime = lastUpdateTime;
-        this.lostExperience = lostExperience;
-        this.contactInformation = contactInformation;
-        this.featureDescription = featureDescription;
-        this.casePictures = casePictures;
-        this.reportCases = reportCases;
-        this.caseState = caseState;
-        this.caseUrl = caseUrl;
-        this.banner = banner;
-        this.isHidden = isHidden;
+    // 設定初始值(publicationTime、lastUpdateTime、caseState為待救援id=5)，在物件永續化存入之前會觸發
+    @PrePersist
+    public void prePersist() {
+        this.publicationTime = LocalDateTime.now();
+        this.lastUpdateTime = LocalDateTime.now();
+    }
+
+    // 實體更新操作(save,merge)前會觸發，更改更新時間
+    @PreUpdate
+    public void preUpdate() {
+        this.lastUpdateTime = LocalDateTime.now();
     }
 
     // Getter & Setter
@@ -287,14 +267,6 @@ public class LostCase {
         this.microChipNumber = microChipNumber;
     }
 
-    public boolean isSuspLost() {
-        return suspLost;
-    }
-
-    public void setSuspLost(boolean suspLost) {
-        this.suspLost = suspLost;
-    }
-
     public City getCity() {
         return city;
     }
@@ -303,12 +275,12 @@ public class LostCase {
         this.city = city;
     }
 
-    public DistinctArea getDistinctArea() {
-        return distinctArea;
+    public DistrictArea getDistrictArea() {
+        return districtArea;
     }
 
-    public void setDistinctArea(DistinctArea distinctArea) {
-        this.distinctArea = distinctArea;
+    public void setDistrictArea(DistrictArea districtArea) {
+        this.districtArea = districtArea;
     }
 
     public String getStreet() {
@@ -319,19 +291,19 @@ public class LostCase {
         this.street = street;
     }
 
-    public BigDecimal getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(BigDecimal latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public BigDecimal getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(BigDecimal longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
@@ -351,11 +323,11 @@ public class LostCase {
         this.viewCount = viewCount;
     }
 
-    public List<Follow> getFollow() {
+    public List<Follow> getFollows() {
         return follows;
     }
 
-    public void setFollow(List<Follow> follows) {
+    public void setFollows(List<Follow> follows) {
         this.follows = follows;
     }
 
@@ -460,9 +432,8 @@ public class LostCase {
                 ", sterilization=" + sterilization +
                 ", age=" + age +
                 ", microChipNumber=" + microChipNumber +
-                ", suspLost=" + suspLost +
                 ", city=" + city +
-                ", distinctArea=" + distinctArea +
+                ", districtArea=" + districtArea +
                 ", street=" + street +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +

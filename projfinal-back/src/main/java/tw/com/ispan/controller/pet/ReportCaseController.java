@@ -1,4 +1,4 @@
-package tw.com.ispan.controller;
+package tw.com.ispan.controller.pet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,6 +21,7 @@ import tw.com.ispan.dto.ReportCaseResponse;
 import tw.com.ispan.service.pet.ReportCaseService;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/reports")
 public class ReportCaseController {
 
