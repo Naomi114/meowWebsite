@@ -2,9 +2,13 @@ package tw.com.ispan.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,25 +27,27 @@ import tw.com.ispan.service.pet.AdoptionCaseService;
 public class AdoptionCaseController {
 
     @Autowired
-    private final AdoptionCaseService adoptionCaseService;
+    private AdoptionCaseService adoptionCaseService;
 
-    public AdoptionCaseController(AdoptionCaseService adoptionCaseService) {
-        this.adoptionCaseService = adoptionCaseService;
-    }
+    //     System.out.println() 和 e.printStackTrace() 可能被日誌框架攔截
+    // 🔹 問題
+
+    // Spring Boot 默認使用 SLF4J + Logback 來處理日誌。
+    // System.out.println() 和 e.printStackTrace() 可能被 Logback 覆蓋，導致 Console 沒有輸出
+    private static final Logger logger = LoggerFactory.getLogger(AdoptionCaseController.class);
 
     // 創建新的 AdoptionCase
-    @PostMapping
-    public ResponseEntity<?> createAdoptionCase(@RequestBody AdoptionCase adoptionCase) {
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> createAdoptionCase(@RequestBody AdoptioncaseDTO dto) {
         try {
-            // 調用服務層的方法來創建 AdoptionCase
-            AdoptionCase createdAdoptionCase = adoptionCaseService.createAdoptionCase(adoptionCase);
-            // 返回創建的 AdoptionCase 並返回 201 (Created) 狀態碼
+            System.out.println("收到的 JSON: " + dto);
+            AdoptionCase createdAdoptionCase = adoptionCaseService.createAdoptionCase(dto);
             return new ResponseEntity<>(createdAdoptionCase, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
-            // 如果有錯誤，返回 400 (Bad Request) 狀態碼和錯誤訊息
+            e.printStackTrace(); 
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            // 捕獲其他可能的錯誤，返回 500 (Internal Server Error) 狀態碼
+            e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -62,5 +68,13 @@ public class AdoptionCaseController {
             @RequestParam(value = "speciesId", required = false) Long speciesId,
             @RequestParam(value = "gender", required = false) String gender) {
         return adoptionCaseService.searchAdoptionCases(cityId, distinctAreaId, caseStateId, speciesId, gender);
+    }
+
+   
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        logger.error("請求格式錯誤: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body("請求格式錯誤: " + ex.getMessage());
     }
 }

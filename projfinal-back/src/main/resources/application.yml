@@ -1,5 +1,9 @@
 server:
-  port: 8080   
+  port: 8080
+  error:
+    include-message: always  # 確保錯誤訊息包含在回應中
+    include-binding-errors: always  # 顯示參數驗證錯誤
+    include-stacktrace: always  # 顯示完整錯誤堆疊
 
 spring:
   application:
@@ -139,8 +143,6 @@ line:
     redirect-uri: ${back.domainName.url}/line/callback
     channel-id: 2006807062
     channel-secret: 1f781b9cf730b0c4decdeba7eead6778
-
-
 
 mail:
   host: smtp.gmail.com

@@ -10,12 +10,12 @@ import tw.com.ispan.domain.pet.AdoptionCase;
 
 public interface AdoptionCaseRepository extends JpaRepository<AdoptionCase, Integer> {
 
-    @Query("SELECT ac FROM AdoptionCase ac WHERE " +
-            "(:cityId IS NULL OR ac.city.id = :cityId) AND " +
-            "(:districtAreaId IS NULL OR ac.districtArea.id = :districtAreaId) AND " +
-            "(:caseStateId IS NULL OR ac.caseState.id = :caseStateId) AND " +
-            "(:speciesId IS NULL OR ac.species.id = :speciesId) AND " +
-            "(:gender IS NULL OR ac.gender LIKE %:gender%)")
+@Query("SELECT ac FROM AdoptionCase ac WHERE " +
+"(:cityId IS NULL OR ac.city.cityId = :cityId) AND " +
+"(:districtAreaId IS NULL OR ac.districtArea.districtAreaId = :districtAreaId) AND " +
+"(:caseStateId IS NULL OR ac.caseState.caseStateId = :caseStateId) AND " +
+"(:speciesId IS NULL OR ac.species.speciesId = :speciesId) AND " +
+"(:gender IS NULL OR ac.gender LIKE %:gender%)")
     List<AdoptionCase> searchAdoptionCases(
             @Param("cityId") Long cityId,
             @Param("districtAreaId") Long districtAreaId,
