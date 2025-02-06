@@ -28,18 +28,26 @@ public class AdoptionCaseApply {
     @Column(nullable = false)
     private boolean applicationStatus;
 
-    public AdoptionCaseApply() {
-        // 无参构造函数
-    }
-
     // 雙向多對一,對應member表
     @ManyToOne
     @JoinColumn(name = "memberId")
     private Member member;
 
+    public Member getMember() {
+        return member;
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
+    }
+
     // 雙向多對多,外鍵在多方，對應adoptioncase表
     @ManyToMany(mappedBy = "adoptionCaseApply")
     private Set<AdoptionCase> adoptionCase;
+
+    public AdoptionCaseApply() {
+        // 无参构造函数
+    }
 
     public AdoptionCaseApply(Integer adoptionCaseApplyId, String introduction, boolean applicationStatus,
             Set<AdoptionCase> adoptionCase) {

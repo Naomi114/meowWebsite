@@ -9,13 +9,17 @@ spring:
   profiles:
     active: "dev"
 
+  #thyleaf
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
   #資料庫連線設定
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     url: jdbc:sqlserver://localhost:1433;database=meowdb;trustServerCertificate=true
     username: admin
     password: a123
-
+ 
   #Hibernate/JPA的相關設定
   jpa:
     show-sql: true
@@ -59,3 +63,7 @@ jwt:
 google:
   api:
     key: AIzaSyATLMpyW2m1qnNAAQf0rZSpcl6TadBobBg
+
+citycountydata:
+  json:
+    path: CityCountyData.json

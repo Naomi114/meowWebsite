@@ -10,6 +10,8 @@ import tw.com.ispan.domain.pet.City;
 
 public interface CityRepository extends JpaRepository<City, Integer> {
 
+	List<City> findAll(); // 自動生成的查詢方法，返回所有城市資料
+
 	// 由於僅提供內部資料初始化使用，因此不怕SQL injection
 	@Query("SELECT c.id FROM City c WHERE c.id BETWEEN :start AND :end")
 	List<Integer> findCityIdsInRange(@Param("start") int start, @Param("end") int end);

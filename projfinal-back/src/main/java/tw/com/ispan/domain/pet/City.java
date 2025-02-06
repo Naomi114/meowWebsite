@@ -15,8 +15,7 @@ public class City {
 	private String city;
 
 	// 和DistinctArea表單向一對多
-	@OneToMany(cascade = CascadeType.PERSIST)
-	@JoinColumn(name = "city_id")
+	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
 	private List<DistinctArea> distinctAreas;
 
 	// 和RescueCase表雙向一對多
@@ -87,7 +86,5 @@ public class City {
 	public void setAdoptionCases(List<AdoptionCase> adoptionCases) {
 		this.adoptionCases = adoptionCases;
 	}
-	
-	
 
 }

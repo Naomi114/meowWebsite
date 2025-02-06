@@ -37,6 +37,59 @@ public class MemberService {
         return null; // 若無效的用戶或密碼錯誤，返回 null
     }
 
+    // 註冊
+    public void addMember2(MemberDto memberDto) {
+        // 先進行會員資料新增
+        Member member = mapToEntity(memberDto);
+
+        // 直接使用明文密碼，不加密
+        member.setPassword(memberDto.getPassword());
+
+        // 設置 createDate 和 updateDate
+        if (member.getCreateDate() == null) {
+            member.setCreateDate(LocalDateTime.now());
+        }
+        member.setUpdateDate(LocalDateTime.now());
+        // 保存會員資料
+        memberRepository.save(member);
+        System.out.println("會員註冊成功，開始自動登入...");
+
+        // 加入延遲，確保資料庫有時間寫入資料
+        try {
+            Thread.sleep(1000); // 延遲 1秒，確保資料庫寫入完成
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        // 檢查資料庫中的資料是否存在
+        Optional<Member> savedMember = memberRepository.findByEmail(member.getEmail());
+        if (savedMember.isPresent()) {
+            System.out.println("資料庫中找到該用戶，開始登入...");
+        } else {
+            System.out.println("資料庫中未找到該用戶，註冊資料保存失敗！");
+            return; // 如果資料庫中沒有這個會員，退出
+        }
+        // 註冊後自動登入
+        Member loggedInMember = login(member.getEmail(), memberDto.getPassword());
+
+        if (loggedInMember != null) {
+            System.out.println("自動登入成功！");
+        } else {
+            System.out.println("自動登入失敗！");
+        }
+    }
+
+    // 新增
+    public void addMember(MemberDto memberDto) {
+        Member member = mapToEntity(memberDto);
+
+        // 設置 createDate 和 updateDate
+        if (member.getCreateDate() == null) {
+            member.setCreateDate(LocalDateTime.now());
+        }
+        member.setUpdateDate(LocalDateTime.now());
+        memberRepository.save(member);
+    }
+
     // 修改密碼
     public boolean changePassword(PasswordDto passwordDto) {
         // 1. 檢查用戶是否存在
@@ -80,18 +133,6 @@ public class MemberService {
         } else {
             return false; // 未找到會員
         }
-    }
-
-    // 新增
-    public void addMember(MemberDto memberDto) {
-        Member member = mapToEntity(memberDto);
-
-        // 設置 createDate 和 updateDate
-        if (member.getCreateDate() == null) {
-            member.setCreateDate(LocalDateTime.now());
-        }
-        member.setUpdateDate(LocalDateTime.now());
-        memberRepository.save(member);
     }
 
     // 修改會員資料

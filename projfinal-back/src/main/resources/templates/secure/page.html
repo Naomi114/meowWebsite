@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遺失協尋</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: #ffffff;
+            padding: 10px 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .menu {
+            display: flex;
+            gap: 10px;
+            width: 727.11px;
+            height: 83.45px;
+            align-items: center;
+        }
+
+        .menu a,
+        .menu select {
+            font-size: 16px;
+            text-decoration: none;
+            color: #333;
+            padding: 10px;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
+
+        .menu a:hover,
+        .menu select:hover {
+            color: #099879;
+        }
+
+        form {
+            margin-left: 160px;
+
+        }
+
+        .container {
+            width: 730px;
+            margin-top: 20px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+
+
+        .search-section input {
+
+            width: 700px;
+            height: 40px;
+            font-size: 16px;
+            color: #888888;
+            opacity: 100%;
+            border-radius: 5px;
+            border: none;
+            justify-content: center;
+        }
+
+        .search-conditions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .search-conditions input {
+            width: 167.5px;
+            height: 40px;
+            font-size: 16px;
+            color: #888888;
+            border-radius: 5px;
+            opacity: 100%;
+            border: none;
+
+        }
+
+        .search-conditions select {
+            width: 167.5px;
+            height: 40px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            color: #212121;
+            border: none;
+        }
+
+        .search-section button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+
+        }
+
+        .search-section button:hover {
+            background-color: #45a049;
+        }
+
+        .note {
+            color: red;
+            font-size: 14px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .result {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .result img {
+            width: 221.33px;
+            height: 221.33px;
+            border-radius: 8px;
+        }
+
+        .result-details {
+            margin-top: 10px;
+            text-align: left;
+            display: inline-block;
+        }
+
+        label {
+            display: inline-block;
+            margin-right: 20px;
+            /* 设置间距 */
+        }
+
+        .ww {
+            margin-left: 14px;
+        }
+
+        .custom-checkbox {
+            display: none;
+        }
+
+        /* 自定義 checkbox 的樣式 */
+        .custom-checkbox+label {
+            position: relative;
+            padding-left: 30px;
+            /* 調整 checkbox 與文字之間的距離 */
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .custom-checkbox+label::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #333;
+            border-radius: 4px;
+            background-color: #fff;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        /* 當 checkbox 被選中時，改變 checkbox 外觀 */
+        .custom-checkbox:checked+label::before {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .custom-checkbox:checked+label::after {
+            content: '✔';
+            position: absolute;
+            top: 0;
+            left: 3px;
+            font-size: 18px;
+            color: white;
+        }
+
+        /* 控制 checkbox 和其他 checkbox 之間的間距 */
+        .checkbox-container {
+            display: flex;
+            gap: 20px;
+            /* 控制 checkbox 之間的距離 */
+            align-items: center;
+            margin: 10px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="menu">
+            <a href="#">首頁</a>
+            <select>
+                <option>通報案件</option>
+                <option>選項 1</option>
+                <option>選項 2</option>
+            </select>
+            <select>
+                <option>最新消息</option>
+                <option>選項 1</option>
+                <option>選項 2</option>
+            </select>
+            <select>
+                <option>近期活動</option>
+                <option>選項 1</option>
+                <option>選項 2</option>
+            </select>
+            <a href="#">違規查詢</a>
+            <a href="#">精選商店</a>
+            <a href="#">會員中心</a>
+        </div>
+    </div>
+
+    <form>
+        <div class="container">
+            <div class="search-section">
+                <h2>動物認養</h2>
+                <input class="ww" type="text" placeholder="輸入關鍵字">
+                <div class="search-conditions">
+                    <input type="text" placeholder="案件編號">
+                    <select>
+                        <option>結案狀態</option>
+                        <option>開放領養中</option>
+                        <option>暫停領養中</option>
+                        <option>已送養結案</option>
+                        <option>送養失敗</option>
+                    </select>
+                    <select>
+                        <option>縣市</option>
+                        <option>台北市</option>
+                        <option>新北市</option>
+                        <option>桃園市</option>
+                        <option>台中市</option>
+                        <option>台南市</option>
+                        <option>高雄市</option>
+                        <option>基隆市</option>
+                        <option>新竹市</option>
+                        <option>新竹縣</option>
+                        <option>苗栗縣</option>
+                        <option>彰化縣</option>
+                        <option>南投縣</option>
+                        <option>雲林縣</option>
+                        <option>嘉義市</option>
+                        <option>嘉義縣</option>
+                        <option>屏東縣</option>
+                        <option>宜蘭縣</option>
+                        <option>花蓮縣</option>
+                        <option>台東縣</option>
+                        <option>澎湖縣</option>
+                        <option>金門縣</option>
+                        <option>連江縣</option>
+                    </select>
+                    <select>
+                        <option>鄉鎮區</option>
+                        <option>選項 1</option>
+                        <option>選項 2</option>
+                    </select>
+                </div>
+
+                <div class="checkbox-container">
+                    <input type="checkbox" class="custom-checkbox" id="checkbox1">
+                    <label for="checkbox1">貓</label>
+
+                    <input type="checkbox" class="custom-checkbox" id="checkbox2">
+                    <label for="checkbox2">狗
+                    </label>
+
+                    <input type="checkbox" class="custom-checkbox" id="checkbox3">
+                    <label for="checkbox3">男</label>
+
+                    <input type="checkbox" class="custom-checkbox" id="checkbox4">
+                    <label for="checkbox4">女</label>
+
+                    <input type="checkbox" class="custom-checkbox" id="checkbox5">
+                    <label for="checkbox5">已結紮</label>
+                </div>
+
+                <button onclick="searchCases()">搜尋</button>
+            </div>
+
+            <div class="note">
+                小提醒：如果找不到想要的案件，可以外加不填寫「縣市鄉鎮區」，這樣可以擴大搜尋範圍！
+            </div>
+        </div>
+
+        <div class="result">
+            <img src="cat-example.jpg" alt="失物照片">
+            <div class="result-details">
+                <p><strong>案件編號：</strong>S17352765407</p>
+                <p><strong>動物種類：</strong>貓</p>
+                <p><strong>動物名稱：</strong>澎澎</p>
+                <p><strong>動物性別：</strong>男</p>
+                <p><strong>有剪耳：</strong>是</p>
+                <p><strong>遺失地點：</strong>新北市樹林區</p>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        function searchCases() {
+            alert("搜尋功能尚未實現！");
+        }
+    </script>
+</body>
+
+</html>
