@@ -16,4 +16,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer>, 
 
     List<OrderItem> findByOrder_OrderIdAndProduct_ProductId(Integer orderId, Integer productId);
 
+    // 刪除商品時，確認是否有會員下單 (by Naomi)
+    boolean existsByProduct(Product product);
+
 }
