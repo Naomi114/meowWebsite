@@ -1,16 +1,28 @@
 package tw.com.ispan.domain.shop;
 
-import jakarta.persistence.*;
-import tw.com.ispan.domain.admin.Member;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import tw.com.ispan.domain.admin.Member;
 
 @Entity
 @Table(name = "cart")
-@JsonIgnoreProperties({ "cart", "member" })
+// @JsonIgnoreProperties({ "cart", "member" })
+
 public class Cart implements Serializable {
 
     @Id
@@ -26,6 +38,7 @@ public class Cart implements Serializable {
     private LocalDateTime lastUpdatedDate; // Timestamp of the last update
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("cart") // by Naomi
     private List<CartItem> cartItems; // List of cart items related to this cart
 
     // Getters and Setters

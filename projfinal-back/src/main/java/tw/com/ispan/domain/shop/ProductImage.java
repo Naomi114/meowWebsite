@@ -30,7 +30,7 @@ public class ProductImage {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @ManyToOne
+    @ManyToOne(optional = false) // 確保不能為 NULL
     @JoinColumn(name = "FK_productId", foreignKey = @ForeignKey(name = "fkc_product_id"))
     @JsonManagedReference("productImages")
     private Product product;

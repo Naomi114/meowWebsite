@@ -25,13 +25,13 @@ public class CartItem implements Serializable {
     // dependencies)
     @ManyToOne
     @JoinColumn(name = "cartId", nullable = false)
-    @JsonBackReference("cart-items-cart") // Unique back reference name for Cart
+    @JsonBackReference("cartItems") // Unique back reference name for Cart
     private Cart cart;
 
     // One-to-One relationship with Product
     @OneToOne
     @JoinColumn(name = "product_Id", nullable = false)
-    @JsonManagedReference("cart-items-product") // Managed side for serialization
+    @JsonManagedReference("cartItem") // Managed side for serialization
     private Product product;
 
     // Many-to-One relationship with Orders (Avoid circular reference with

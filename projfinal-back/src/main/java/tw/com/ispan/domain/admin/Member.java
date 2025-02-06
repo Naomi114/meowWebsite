@@ -9,13 +9,13 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import tw.com.ispan.domain.shop.Cart;
+import tw.com.ispan.domain.shop.CartActionLog;
 import tw.com.ispan.domain.shop.Orders;
 import tw.com.ispan.domain.shop.WishList;
 
 @Entity
-@Table(name = "Member")  // Ensure using table name "Member"
+@Table(name = "Member") // Ensure using table name "Member"
 public class Member {
 
     @Id
@@ -54,14 +54,19 @@ public class Member {
     private List<WishList> wishList;
 
     @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
-    private Set<Cart> cart;  // Set<Cart> for cart field
+    private Set<Cart> cart;
+
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @JsonBackReference("member")
+    private Set<CartActionLog> cartActionLog;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference  // Prevent infinite recursion by referencing the back end of the relationship
-    private List<Orders> orders;  // Orders placed by the member
+    @JsonBackReference
+    private List<Orders> orders;
 
     // Constructors
-    public Member() {}
+    public Member() {
+    }
 
     public Member(Integer memberId, String nickName, String password, String name, String email, String phone,
             String address,
