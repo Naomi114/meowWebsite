@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.criteria.Predicate;
+import tw.com.ispan.domain.pet.City;
+import tw.com.ispan.domain.pet.DistrictArea;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.Banner.Banner;
 import tw.com.ispan.domain.pet.Banner.BannerType;
@@ -136,6 +138,7 @@ public class LostCaseService {
     public LostCase create(JSONObject param) {
         LostCase lostCase = new LostCase();
         lostCase.setCaseTitle(param.getString("caseTitle"));
+
         lostCase.setMember(memberRepository.findById(param.getInt("memberId"))
                 .orElseThrow(() -> new IllegalArgumentException("無效的 memberId")));
         lostCase.setSpecies(speciesRepository.findById(param.getInt("speciesId"))
@@ -144,10 +147,16 @@ public class LostCaseService {
                 .orElseThrow(() -> new IllegalArgumentException("無效的 breedId")));
         lostCase.setFurColor(furColorRepository.findById(param.getInt("furColorId"))
                 .orElseThrow(() -> new IllegalArgumentException("無效的 furColorId")));
-        lostCase.setCity(cityRepository.findById(param.getInt("cityId"))
-                .orElseThrow(() -> new IllegalArgumentException("無效的 cityId")));
-        lostCase.getDistrictArea(districtAreaRepository.findById(param.getInt("districtAreaId"))
-                .orElseThrow(() -> new IllegalArgumentException("無效的 districtAreaId")));
+
+        // 設置 City 和 DistrictArea
+        City city = cityRepository.findById(param.getInt("cityId"))
+                .orElseThrow(() -> new IllegalArgumentException("無效的 cityId"));
+        lostCase.setCity(city);
+
+        DistrictArea districtArea = districtAreaRepository.findById(param.getInt("districtAreaId"))
+                .orElseThrow(() -> new IllegalArgumentException("無效的 districtAreaId"));
+        lostCase.setDistrictArea(districtArea);
+
         lostCase.setStreet(param.getString("street"));
         lostCase.setGender(param.optString("gender", null));
         lostCase.setSterilization(param.getString("sterilization"));
@@ -156,8 +165,11 @@ public class LostCaseService {
         lostCase.setLatitude(param.getDouble("latitude"));
         lostCase.setLongitude(param.getDouble("longitude"));
         lostCase.setDonationAmount(param.optInt("donationAmount", 0));
-        lostCase.setCaseState(caseStateRepository.findById(param.getInt("caseStateId"))
-                .orElseThrow(() -> new IllegalArgumentException("無效的 caseStateId")));
+
+        // **固定案件狀態為「待協尋」（caseStateId = 5）**
+        lostCase.setCaseState(caseStateRepository.findById(5)
+                .orElseThrow(() -> new IllegalArgumentException("案件狀態不存在")));
+
         lostCase.setLostExperience(param.optString("lostExperience", null));
         lostCase.setContactInformation(param.optString("contactInformation", null));
         lostCase.setFeatureDescription(param.optString("featureDescription", null));
@@ -165,10 +177,10 @@ public class LostCaseService {
         lostCase.setPublicationTime(LocalDateTime.now());
         lostCase.setLastUpdateTime(LocalDateTime.now());
 
-        // 先存儲 LostCase
+        // **先存儲 LostCase**
         LostCase savedLostCase = lostCaseRepository.save(lostCase);
 
-        // 檢查這段是否存在：確保 LostCase 建立後自動產生 Banner
+        // **確保 LostCase 建立後自動產生 Banner**
         Banner banner = new Banner();
         banner.setLostCase(savedLostCase);
         banner.setBannerType(BannerType.LOST);

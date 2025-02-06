@@ -26,7 +26,7 @@ import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.Banner.Banner;
 
 @Entity
-@Table(name = "RescueCase", indexes = {
+@Table(name = "LostCase", indexes = {
         @Index(name = "idx_species", columnList = "speciesId"),
         @Index(name = "idx_breed", columnList = "breedId"),
         @Index(name = "idx_furColor", columnList = "furColorId"),
@@ -40,7 +40,6 @@ public class LostCase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "lostCaseId")
     private Integer lostCaseId;
 
     @Column(columnDefinition = "NVARCHAR(30)", name = "caseTitle", nullable = false)
@@ -167,7 +166,7 @@ public class LostCase {
         super();
     }
 
-    // 設定初始值(publicationTime、lastUpdateTime、caseState為待救援id=3)，在物件永續化存入之前會觸發
+    // 設定初始值(publicationTime、lastUpdateTime、caseState為待救援id=5)，在物件永續化存入之前會觸發
     @PrePersist
     public void prePersist() {
         this.publicationTime = LocalDateTime.now();
@@ -281,7 +280,7 @@ public class LostCase {
         return districtArea;
     }
 
-    public void getDistrictArea(DistrictArea districtArea) {
+    public void setDistrictArea(DistrictArea districtArea) {
         this.districtArea = districtArea;
     }
 

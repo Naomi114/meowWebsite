@@ -2,6 +2,7 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -33,6 +34,7 @@ public class DistrictArea {
 	// 和City表雙向多對一
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "cityId", nullable = true, foreignKey = @ForeignKey(name = "FK_DistrictAreas_City"))
+	@JsonBackReference
 	private City city;
 
 	// 和RescueCase表雙向一對多
@@ -75,8 +77,7 @@ public class DistrictArea {
 	public void setDistrictAreaName(String districtAreaName) {
 		this.districtAreaName = districtAreaName;
 	}
-	
-	
+
 	public City getCity() {
 		return city;
 	}
