@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import tw.com.ispan.domain.pet.Banner.Banner;
 import tw.com.ispan.domain.pet.Banner.BannerType;
 
+@Repository
 public interface BannerRepository extends JpaRepository<Banner, Integer> {
 
     Optional<Banner> findByLostCase_LostCaseIdAndBannerType(Integer lostCaseId, BannerType bannerType);
