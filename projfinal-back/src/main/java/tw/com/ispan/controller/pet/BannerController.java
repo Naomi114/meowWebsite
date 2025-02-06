@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +29,7 @@ public class BannerController {
      * @param bannerType Banner 類型（LOST, ADOPTION, RESCUE）
      * @return 符合條件的 Banner 列表
      */
-    @GetMapping("/{bannerType}")
+    @PostMapping("/{bannerType}")
     public ResponseEntity<List<Banner>> getBannersByType(@PathVariable String bannerType) {
         try {
             BannerType type = BannerType.valueOf(bannerType.toUpperCase()); // 確保 ENUM 值正確
