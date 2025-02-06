@@ -146,15 +146,15 @@ public class LostCaseService {
                 .orElseThrow(() -> new IllegalArgumentException("無效的 furColorId")));
         lostCase.setCity(cityRepository.findById(param.getInt("cityId"))
                 .orElseThrow(() -> new IllegalArgumentException("無效的 cityId")));
-        lostCase.setDistinctArea(districtAreaRepository.findById(param.getInt("districtAreaId"))
+        lostCase.getDistrictArea(districtAreaRepository.findById(param.getInt("districtAreaId"))
                 .orElseThrow(() -> new IllegalArgumentException("無效的 districtAreaId")));
         lostCase.setStreet(param.getString("street"));
         lostCase.setGender(param.optString("gender", null));
         lostCase.setSterilization(param.getString("sterilization"));
         lostCase.setAge(param.optInt("age", -1));
         lostCase.setMicroChipNumber(param.optInt("microChipNumber", -1));
-        lostCase.setLatitude(param.getBigDecimal("latitude"));
-        lostCase.setLongitude(param.getBigDecimal("longitude"));
+        lostCase.setLatitude(param.getDouble("latitude"));
+        lostCase.setLongitude(param.getDouble("longitude"));
         lostCase.setDonationAmount(param.optInt("donationAmount", 0));
         lostCase.setCaseState(caseStateRepository.findById(param.getInt("caseStateId"))
                 .orElseThrow(() -> new IllegalArgumentException("無效的 caseStateId")));
@@ -215,8 +215,8 @@ public class LostCaseService {
         lostCase.setAge(param.has("age") ? param.getInt("age") : lostCase.getAge());
         lostCase.setMicroChipNumber(
                 param.has("microChipNumber") ? param.getInt("microChipNumber") : lostCase.getMicroChipNumber());
-        lostCase.setLatitude(param.has("latitude") ? param.getBigDecimal("latitude") : lostCase.getLatitude());
-        lostCase.setLongitude(param.has("longitude") ? param.getBigDecimal("longitude") : lostCase.getLongitude());
+        lostCase.setLatitude(param.has("latitude") ? param.getDouble("latitude") : lostCase.getLatitude());
+        lostCase.setLongitude(param.has("longitude") ? param.getDouble("longitude") : lostCase.getLongitude());
         lostCase.setDonationAmount(
                 param.has("donationAmount") ? param.getInt("donationAmount") : lostCase.getDonationAmount());
         lostCase.setLostExperience(param.optString("lostExperience", lostCase.getLostExperience()));
