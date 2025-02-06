@@ -17,8 +17,7 @@ public class loginData implements CommandLineRunner {
     private final Random random = new Random();
 
     // 預定的名字
-    private final String[] names = { "Bob", "John", "Alice", "Charlie", "David"
-    };
+    private final String[] names = { "Bob", "John", "Alice", "Charlie", "David" };
 
     public loginData(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
@@ -26,33 +25,37 @@ public class loginData implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // 創建五筆資料
-        for (int i = 0; i < 5; i++) {
-            Member member = new Member();
+        // 檢查 Member 資料表是否為空
+        if (memberRepository.count() == 0) {
+            // 如果資料表為空，則插入資料
+            for (int i = 0; i < 5; i++) {
+                Member member = new Member();
 
-            // 隨機選擇名字
-            String name = names[i];
-            String password = generatePassword(); // 生成隨機的大寫字母作為密碼
-            String email = generateEmail(name); // 根據名字生成電子郵件
+                // 隨機選擇名字
+                String name = names[i];
+                String password = generatePassword(); // 生成隨機的大寫字母作為密碼
+                String email = generateEmail(name); // 根據名字生成電子郵件
 
-            // nickname 直接設置為 name
-            String nickname = name;
+                // nickname 直接設置為 name
+                String nickname = name;
 
-            member.setNickName(nickname); // 設置 Nickname
-            member.setPassword(password); // 設置密碼
-            member.setName(name); // 設置名字
-            member.setEmail(email); // 設置電子郵件
-            member.setPhone(generateRandomPhone()); // 隨機生成電話號碼
-            member.setAddress("123 Lab St " + (i + 1)); // 隨機生成地址
-            member.setBirthday(LocalDate.of(2001, 7, 20)); // 固定生日
-            member.setCreateDate(LocalDateTime.now()); // 使用當前時間
-            member.setUpdateDate(LocalDateTime.now()); // 使用當前時間
+                member.setNickName(nickname); // 設置 Nickname
+                member.setPassword(password); // 設置密碼
+                member.setName(name); // 設置名字
+                member.setEmail(email); // 設置電子郵件
+                member.setPhone(generateRandomPhone()); // 隨機生成電話號碼
+                member.setAddress("123 Lab St " + (i + 1)); // 隨機生成地址
+                member.setBirthday(LocalDate.of(2001, 7, 20)); // 固定生日
+                member.setCreateDate(LocalDateTime.now()); // 使用當前時間
+                member.setUpdateDate(LocalDateTime.now()); // 使用當前時間
 
-            // 保存資料到資料庫
-            memberRepository.save(member);
+                // 保存資料到資料庫
+                memberRepository.save(member);
+            }
+
+        } else {
+
         }
-
-        System.out.println("五筆個性化資料已經插入到 Member 表格");
     }
 
     // 生成密碼：密碼為一個隨機的大寫字母
