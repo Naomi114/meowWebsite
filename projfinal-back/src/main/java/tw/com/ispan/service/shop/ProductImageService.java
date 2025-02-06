@@ -113,7 +113,6 @@ public class ProductImageService {
                 // 創建 ProductImage 實體
                 ProductImage productImage = new ProductImage();
                 productImage.setImageUrl(imageUrl);
-                // Assuming the first image in the list is the primary image
                 productImage.setIsPrimary(product.getProductImages().isEmpty());
                 productImage.setCreatedAt(LocalDateTime.now());
                 productImage.setProduct(product);

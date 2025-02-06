@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import tw.com.ispan.service.shop.CategoryService;
 
 @RestController
 @RequestMapping("/categories")
+@CrossOrigin
 public class CategoryController {
 
     @Autowired
@@ -56,7 +58,7 @@ public class CategoryController {
     // 單筆查詢，返回商品清單
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> findCategoryWithProducts(@PathVariable Integer id) {
-        CategoryResponse response = categoryService.findCategoryWithProducts(id);
+        CategoryResponse response = categoryService.getProductsByCategory(id);
         return response.getSuccess()
                 ? ResponseEntity.ok(response)
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
@@ -66,6 +68,15 @@ public class CategoryController {
     @GetMapping("/search")
     public ResponseEntity<CategoryResponse> findCategoriesWithProducts(@RequestParam String keyword) {
         CategoryResponse response = categoryService.findCategoriesWithProducts(keyword);
+        return response.getSuccess()
+                ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    // 獲取所有分類
+    @GetMapping
+    public ResponseEntity<CategoryResponse> getAllCategories() {
+        CategoryResponse response = categoryService.getAllCategories();
         return response.getSuccess()
                 ? ResponseEntity.ok(response)
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);

@@ -2,6 +2,8 @@ package tw.com.ispan.repository.shop;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -17,4 +19,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, JpaS
 
     // 查詢多個類別下的所有商品
     List<Product> findByCategoryIn(List<Category> categories);
+
+    // 分頁
+    Page<Product> findAll(Pageable pageable);
 }
