@@ -1,19 +1,20 @@
 package tw.com.ispan.domain.admin;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-// import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-// import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.pet.Activity;
 import tw.com.ispan.domain.pet.ActivityParticipantList;
@@ -22,7 +23,10 @@ import tw.com.ispan.domain.pet.Follow;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.ReportCase;
 import tw.com.ispan.domain.pet.RescueCase;
+import tw.com.ispan.domain.pet.forAdopt.AdoptionCaseApply;
+// import tw.com.ispan.domain.shop.Cart;
 // import tw.com.ispan.domain.shop.Order;
+// import tw.com.ispan.domain.shop.WishListBean;
 
 @Entity
 @Table(name = "Member")
@@ -37,6 +41,10 @@ public class Member {
 	@Column(length = 20, nullable = false)
 	private String password;
 
+	public Member() {
+		// 這是默認構造函數，Hibernate 需要
+	}
+
 	@Column(length = 70, nullable = false)
 	private String name;
 
@@ -50,7 +58,7 @@ public class Member {
 	private String address;
 
 	@Column(nullable = false)
-	private Date birthday;
+	private LocalDate birthday;
 
 	@Column(nullable = false)
 	private LocalDateTime createDate;
@@ -64,9 +72,23 @@ public class Member {
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	private Set<ActivityParticipantList> acitvityParticipantList;
 
+
+	// 以下為給line login使用
+	private String lineId;
+
+	private String lineName;
+
+	private String linePicture;
+
+	// 以下為給追蹤line商家帳號使用
+	private boolean followed = false;
+
+	@Column(nullable = false)
+	private boolean userType; // 1表示註冊會員，0表示line登入會員
+
 	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
 	// CascadeType.REMOVE })
-	// private List<WishList> wishList;
+	// private List<WishListBean> wishList;
 
 	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
 	// CascadeType.REMOVE })
@@ -80,16 +102,50 @@ public class Member {
 	private List<RescueCase> rescueCases;
 
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
-	private Set<Follow> follow;
+	private Set<Follow> follow = new HashSet<>();
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	private List<LostCase> lostCase;
+	private List<LostCase> lostCase = new ArrayList<>();
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	private List<AdoptionCase> adoptionCase;
+	private List<AdoptionCase> adoptionCase = new ArrayList<>();
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	private List<ReportCase> reportCase;
+	private List<ReportCase> reportCase = new ArrayList<>();
+
+	// 雙向一對多，最後meeting加的
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private Set<AdoptionCaseApply> adoptionCaseApply = new HashSet<>();
+
+	public Member(Integer memberId, String nickName, String password, String name, String email, String phone,
+			String address, LocalDate birthday, LocalDateTime createDate, LocalDateTime updateDate,
+			Set<Activity> activity,
+			Set<ActivityParticipantList> acitvityParticipantList,
+			// List<WishListBean> wishList, Set<Cart> cart,List<Order> order,
+			List<RescueCase> rescueCases, Set<Follow> follow, List<LostCase> lostCase,
+			List<AdoptionCase> adoptionCase, List<ReportCase> reportCase, Set<AdoptionCaseApply> adoptionCaseApply) {
+		this.memberId = memberId;
+		this.nickName = nickName;
+		this.password = password;
+		this.name = name;
+		this.email = email;
+		this.phone = phone;
+		this.address = address;
+		this.birthday = birthday;
+		this.createDate = createDate;
+		this.updateDate = updateDate;
+		this.activity = activity;
+		this.acitvityParticipantList = acitvityParticipantList;
+		// this.wishList = wishList;
+		// this.cart = cart;
+		// this.order = order;
+		this.rescueCases = rescueCases;
+		this.follow = follow;
+		this.lostCase = lostCase;
+		this.adoptionCase = adoptionCase;
+		this.reportCase = reportCase;
+		this.adoptionCaseApply = adoptionCaseApply;
+	}
 
 	public Integer getMemberId() {
 		return memberId;
@@ -147,11 +203,11 @@ public class Member {
 		this.address = address;
 	}
 
-	public Date getBirthday() {
+	public LocalDate getBirthday() {
 		return birthday;
 	}
 
-	public void setBirthday(Date birthday) {
+	public void setBirthday(LocalDate birthday) {
 		this.birthday = birthday;
 	}
 
@@ -171,12 +227,63 @@ public class Member {
 		this.updateDate = updateDate;
 	}
 
-	// public String getStatus() {
-	// return status;
-	// }
+	
 
-	// public void setStatus(String status) {
-	// this.status = status;
-	// }
+	public String getLineId() {
+		return lineId;
+	}
+
+	public void setLineId(String lineId) {
+		this.lineId = lineId;
+	}
+
+	public String getLineName() {
+		return lineName;
+	}
+
+	public void setLineName(String lineName) {
+		this.lineName = lineName;
+	}
+
+	public String getLinePicture() {
+		return linePicture;
+	}
+
+	public void setLinePicture(String linePicture) {
+		this.linePicture = linePicture;
+	}
+
+	public boolean isFollowed() {
+		return followed;
+	}
+
+	public void setFollowed(boolean followed) {
+		this.followed = followed;
+	}
+
+	public boolean isUserType() {
+		return userType;
+	}
+
+	public void setUserType(boolean userType) {
+		this.userType = userType;
+	}
+
+	@Override
+	public String toString() {
+		return "Member [memberId=" + memberId + ", nickName=" + nickName + ", password=" + password + ", name=" + name
+				+ ", email=" + email + ", phone=" + phone + ", address=" + address + ", birthday=" + birthday
+				+ ", createDate=" + createDate + ", updateDate=" + updateDate + ", activity=" + activity
+				+ ", acitvityParticipantList=" + acitvityParticipantList +
+				// ", wishList=" + wishList + ", cart=" + cart+ ", order=" + order +
+				// ", rescueCases=" + rescueCases + ", follow=" + follow + ", lostCase=" +
+				// lostCase+
+				", adoptionCase=" + adoptionCase + ", reportCase=" + reportCase + ", adoptionCaseApply="
+				+ adoptionCaseApply + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", getMemberId()="
+				+ getMemberId() + ", getNickName()=" + getNickName() + ", getPassword()=" + getPassword()
+				+ ", getName()=" + getName() + ", getEmail()=" + getEmail() + ", getPhone()=" + getPhone()
+				+ ", getAddress()=" + getAddress() + ", getBirthday()=" + getBirthday() + ", getCreateDate()="
+				+ getCreateDate() + ", getUpdateDate()=" + getUpdateDate() + ", toString()=" + super.toString() + "]";
+	}
 
 }

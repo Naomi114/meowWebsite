@@ -1,10 +1,24 @@
 package tw.com.ispan.domain.pet;
 
-import jakarta.persistence.*;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Breed")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "breedId")
 public class Breed {
 
     @Id
@@ -14,16 +28,18 @@ public class Breed {
 
     @Column(name = "breed", nullable = false, columnDefinition = "NVARCHAR(50)")
     private String breed;
-
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
     private List<LostCase> lostCases;
-
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
     private List<RescueCase> rescueCases;
     
+    @JsonIgnore
     @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
     private List<AdoptionCase> adoptionCases;
-
 
     // Getters and Setters
     public Integer getBreedId() {
@@ -58,13 +74,22 @@ public class Breed {
         this.lostCases = lostCases;
     }
 
-	@Override
-	public String toString() {
-		return "Breed [breedId=" + breedId + ", breed=" + breed + ", lostCases=" + lostCases + ", rescueCases="
-				+ rescueCases + ", adoptionCases=" + adoptionCases + "]";
-	}
-    
-    
-    
-}
+    @Override
+    public String toString() {
+        return "Breed [breedId=" + breedId +
+                ", breed=" + breed +
+                ", lostCases=" + lostCases +
+                ", rescueCases=" + rescueCases +
+                ", adoptionCases=" + adoptionCases +
+                "]";
+    }
 
+    public List<AdoptionCase> getAdoptionCases() {
+        return adoptionCases;
+    }
+
+    public void setAdoptionCases(List<AdoptionCase> adoptionCases) {
+        this.adoptionCases = adoptionCases;
+    }
+
+}

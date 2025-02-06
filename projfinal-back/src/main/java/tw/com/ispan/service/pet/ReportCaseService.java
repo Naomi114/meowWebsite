@@ -1,162 +1,248 @@
 package tw.com.ispan.service.pet;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import tw.com.ispan.domain.admin.Admin;
+import tw.com.ispan.domain.admin.Member;
+import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.ReportCase;
+import tw.com.ispan.repository.admin.AdminRepository;
+import tw.com.ispan.repository.admin.MemberRepository;
+import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.ReportCaseRepository;
+import tw.com.ispan.repository.pet.RescueCaseRepository;
 
 @Service
 public class ReportCaseService {
 
     @Autowired
     private ReportCaseRepository reportCaseRepository;
+    @Autowired
+    private RescueCaseRepository rescueCaseRepository;
+    @Autowired
+    private LostCaseRepository lostCaseRepository;
+    // @Autowired
+    // private AdoptionCaseRepository adoptionCaseRepository;
+    @Autowired
+    private AdminRepository adminRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
-    /**
-     * 新增或更新 ReportCase
-     *
-     * @param reportCase ReportCase 物件
-     * @return 儲存後的 ReportCase 物件
-     */
-    public ReportCase save(ReportCase reportCase) {
-        if (reportCase == null) {
-            throw new IllegalArgumentException("ReportCase 物件不能為 null");
-        }
+    public ReportCase review(Integer reportCaseId, Integer adminId, boolean isApproved, boolean hideCase) {
+        // 確認舉報案件是否存在
+        ReportCase reportCase = reportCaseRepository.findById(reportCaseId)
+                .orElseThrow(() -> new IllegalArgumentException("舉報案件不存在！"));
 
-        // 新增操作（ID 為 null 時）
-        if (reportCase.getReportId() == null) {
-            System.out.println("執行新增操作...");
+        // 更新審核狀態
+        reportCase.setReportState(isApproved); // true 表示審核完成
+        reportCase.setUpdateDate(LocalDateTime.now());
+
+        // 設置修改者 (Admin)
+        if (adminId != null) {
+            Admin admin = adminRepository.findById(adminId)
+                    .orElseThrow(() -> new IllegalArgumentException("管理員不存在！"));
+            reportCase.setAdmin(admin);
         } else {
-            // 更新操作（ID 存在時）
-            Optional<ReportCase> existing = reportCaseRepository.findById(reportCase.getReportId());
-            if (existing.isPresent()) {
-                System.out.println("執行更新操作...");
-                ReportCase existingReportCase = existing.get();
-
-                // 更新非空欄位值
-                existingReportCase.setRescueCase(reportCase.getRescueCase());
-                existingReportCase.setLostCase(reportCase.getLostCase());
-                existingReportCase.setAdoptionCase(reportCase.getAdoptionCase());
-                existingReportCase.setMember(reportCase.getMember());
-                existingReportCase.setReportDate(reportCase.getReportDate());
-                existingReportCase.setReportType(reportCase.getReportType());
-                existingReportCase.setReportNotes(reportCase.getReportNotes());
-
-                // 儲存更新後的 ReportCase
-                return reportCaseRepository.save(existingReportCase);
-            } else {
-                throw new IllegalArgumentException("要更新的 ReportCase 不存在，ID: " + reportCase.getReportId());
-            }
+            throw new IllegalArgumentException("審核時必須指定管理員！");
         }
 
-        // 儲存新增的 ReportCase
+        // 隱藏案件邏輯
+        if (hideCase) {
+            if (reportCase.getLostCase() != null) {
+                LostCase lostCase = reportCase.getLostCase();
+                lostCaseRepository.save(lostCase);
+            }
+            // else if (reportCase.getRescueCase() != null) {
+            // RescueCase rescueCase = reportCase.getRescueCase();
+            // rescueCase.setIsHidden(true); // 隱藏救援案件
+            // rescueCaseRepository.save(rescueCase);
+            // }
+            // else if (reportCase.getAdoptionCase() != null) {
+            // AdoptionCase adoptionCase = reportCase.getAdoptionCase();
+            // adoptionCase.setIsHidden(true); // 隱藏領養案件
+            // adoptionCaseRepository.save(adoptionCase);
+            // }
+        }
+
+        // 保存舉報案件的審核結果
         return reportCaseRepository.save(reportCase);
     }
 
-    /**
-     * 查詢所有 ReportCase
-     *
-     * @return 所有 ReportCase 的列表
-     */
-    public List<ReportCase> findAll() {
-        return reportCaseRepository.findAll();
+    public ReportCase modify(String json) {
+        try {
+            // 解析 JSON 请求
+            JSONObject obj = new JSONObject(json);
+            Integer reportId = obj.optInt("reportId", -1); // 获取报告 ID
+            boolean reportState = obj.optBoolean("reportState", false); // 获取报告状态
+            boolean hideCase = obj.optBoolean("hideCase", false); // 是否隐藏案件
+            Integer adminId = obj.optInt("adminId", -1); // 获取管理员 ID
+
+            // 验证报告 ID
+            if (reportId == -1) {
+                throw new IllegalArgumentException("報告 ID 無效！");
+            }
+
+            // 查找报告记录
+            ReportCase reportCase = reportCaseRepository.findById(reportId)
+                    .orElseThrow(() -> new IllegalArgumentException("找不到指定的報告！"));
+
+            // 验证管理员 ID
+            if (adminId == -1) {
+                throw new IllegalArgumentException("管理員 ID 無效！");
+            }
+
+            Admin admin = adminRepository.findById(adminId)
+                    .orElseThrow(() -> new IllegalArgumentException("無效的管理員 ID！"));
+
+            // 更新报告状态
+            reportCase.setReportState(reportState); // 标记为已审核
+            reportCase.setAdmin(admin); // 设置审核管理员
+            reportCase.setUpdateDate(LocalDateTime.now()); // 设置最后更新时间
+
+            // 隱藏案件邏輯
+            if (hideCase) {
+                if (reportCase.getLostCase() != null) {
+                    LostCase lostCase = reportCase.getLostCase();
+                    lostCaseRepository.save(lostCase);
+                }
+                // else if (reportCase.getRescueCase() != null) {
+                // RescueCase rescueCase = reportCase.getRescueCase();
+                // rescueCase.setIsHidden(true); // 隱藏救援案件
+                // rescueCaseRepository.save(rescueCase);
+                // }
+                // else if (reportCase.getAdoptionCase() != null) {
+                // AdoptionCase adoptionCase = reportCase.getAdoptionCase();
+                // adoptionCase.setIsHidden(true); // 隱藏領養案件
+                // adoptionCaseRepository.save(adoptionCase);
+                // }
+            }
+
+            // 保存并返回修改后的报告
+            return reportCaseRepository.save(reportCase);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("修改報告失敗：" + e.getMessage());
+        }
     }
 
-    /**
-     * 根據 ID 查詢 ReportCase
-     *
-     * @param id ReportCase 的 ID
-     * @return Optional 包裝的 ReportCase
-     */
-    public Optional<ReportCase> findById(Integer id) {
-        return reportCaseRepository.findById(id);
+    public ReportCase create(String json) {
+        try {
+            JSONObject obj = new JSONObject(json);
+
+            // 獲取報告參數
+            Integer memberId = obj.optInt("memberId", 0);
+            Integer rescueCaseId = obj.optInt("rescueCaseId", -1);
+            Integer lostCaseId = obj.optInt("lostCaseId", -1);
+            Integer adoptionCaseId = obj.optInt("adoptionCaseId", -1);
+            String reportTitle = obj.optString("reportTitle");
+            String reportNotes = obj.optString("reportNotes");
+
+            // 驗證必填字段
+            if (memberId == 0) {
+                throw new IllegalArgumentException("必須指定舉報者 ID！");
+            }
+
+            if ((rescueCaseId == -1 && lostCaseId == -1 && adoptionCaseId == -1) || reportTitle == null
+                    || reportNotes == null) {
+                throw new IllegalArgumentException("必須指定一種類型的案件進行舉報，且標題和內容為必填項！");
+            }
+
+            // 確保只有一種類型的案件被舉報
+            if ((rescueCaseId != -1 ? 1 : 0) + (lostCaseId != -1 ? 1 : 0) + (adoptionCaseId != -1 ? 1 : 0) > 1) {
+                throw new IllegalArgumentException("只能舉報一種類型的案件！");
+            }
+
+            // 確認 memberId 是否存在
+            Member member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new IllegalArgumentException("舉報者不存在！"));
+
+            // 檢查唯一性
+            if (reportCaseRepository
+                    .existsByRescueCase_RescueCaseIdAndLostCase_LostCaseIdAndAdoptionCase_AdoptionCaseIdAndReportTitle(
+                            rescueCaseId, lostCaseId, adoptionCaseId, reportTitle)) {
+                throw new IllegalArgumentException("該舉報案件已經存在！");
+            }
+
+            // 創建報告
+            ReportCase reportCase = new ReportCase();
+            reportCase.setRescueCase(
+                    rescueCaseId != -1 ? rescueCaseRepository.findById(rescueCaseId).orElse(null) : null);
+            reportCase.setLostCase(
+                    lostCaseId != -1 ? lostCaseRepository.findById(lostCaseId).orElse(null) : null);
+            // reportCase.setAdoptionCase(
+            // adoptionCaseId != -1 ?
+            // adoptionCaseRepository.findById(adoptionCaseId).orElse(null) : null);
+            reportCase.setMember(member); // 設置舉報者
+            reportCase.setReportDate(LocalDateTime.now());
+            reportCase.setReportTitle(reportTitle);
+            reportCase.setReportNotes(reportNotes);
+            reportCase.setReportState(false); // 初始狀態為未審核
+            reportCase.setAdmin(null); // 創建時沒有管理員
+
+            return reportCaseRepository.save(reportCase);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("創建報告失敗：" + e.getMessage());
+        }
     }
 
-    /**
-     * 根據 ID 刪除 ReportCase
-     *
-     * @param id 要刪除的 ReportCase 的 ID
-     */
-    public void deleteById(Integer id) {
-        reportCaseRepository.deleteById(id);
+    public ReportCase findById(Integer id) {
+        if (id != null) {
+            Optional<ReportCase> optional = reportCaseRepository.findById(id);
+            if (optional.isPresent()) {
+                return optional.get();
+            }
+        }
+        return null;
     }
 
-    /**
-     * 確認 ReportCase 是否存在
-     *
-     * @param id 要檢查的 ReportCase ID
-     * @return 是否存在
-     */
-    public boolean existsById(Integer id) {
-        return reportCaseRepository.existsById(id);
+    public boolean exists(Integer reportCaseId) {
+        if (reportCaseId == null) {
+            return false;
+        }
+        return reportCaseRepository.existsById(reportCaseId);
     }
 
-    // /**
-    // * 根據 ReportType 查詢 ReportCase
-    // *
-    // * @param reportType 報告類型
-    // * @return 符合條件的 ReportCase 列表
-    // */
-    // public List<ReportCase> findByReportType(String reportType) {
-    // return reportCaseRepository.findByReportType(reportType);
-    // }
-
-    /**
-     * 根據 Member ID 查詢相關的 ReportCase
-     *
-     * @param memberId 會員 ID
-     * @return 符合條件的 ReportCase 列表
-     */
-    public List<ReportCase> findByMemberId(Integer memberId) {
-        return reportCaseRepository.findByMemberId(memberId);
+    public boolean remove(Integer reportCaseId) {
+        if (reportCaseId == null || !reportCaseRepository.existsById(reportCaseId)) {
+            return false; // 如果 ID 为 null 或不存在，返回 false
+        }
+        reportCaseRepository.deleteById(reportCaseId); // 执行删除操作
+        return true;
     }
 
-    /**
-     * 根據 LostCase ID 查詢相關的 ReportCase
-     *
-     * @param lostCaseId 遺失案件 ID
-     * @return 符合條件的 ReportCase 列表
-     */
-    public List<ReportCase> findByLostCaseId(Integer lostCaseId) {
-        return reportCaseRepository.findByLostCaseId(lostCaseId);
+    public ReportCase insert(ReportCase bean) {
+        if (bean != null && bean.getReportId() != null) {
+            if (!reportCaseRepository.existsById(bean.getReportId())) {
+                return reportCaseRepository.save(bean);
+            }
+        }
+        return null;
     }
 
-    /**
-     * 根據 RescueCase ID 查詢相關的 ReportCase
-     *
-     * @param rescueCaseId 遺失案件 ID
-     * @return 符合條件的 ReportCase 列表
-     */
-    public List<ReportCase> findByRescueCaseId(Integer rescueCaseId) {
-        return reportCaseRepository.findByRescueCaseId(rescueCaseId);
+    public long count(String json) {
+        try {
+            JSONObject obj = new JSONObject(json);
+            return reportCaseRepository.count(obj);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
-    /**
-     * 根據 AdoptionCase ID 查詢相關的 ReportCase
-     *
-     * @param adoptionCaseId 遺失案件 ID
-     * @return 符合條件的 ReportCase 列表
-     */
-    public List<ReportCase> findByAdoptionCaseId(Integer adoptionCaseId) {
-        return reportCaseRepository.findByAdoptionCaseId(adoptionCaseId);
-    }
-
-    /**
-     * 查詢報告數量
-     *
-     * @return ReportCase 的總數量
-     */
-    public long count() {
-        return reportCaseRepository.count();
-    }
-
-    /**
-     * 刪除所有 ReportCase
-     */
-    public void deleteAll() {
-        reportCaseRepository.deleteAll();
+    public List<ReportCase> find(String json) {
+        try {
+            JSONObject obj = new JSONObject(json);
+            return reportCaseRepository.find(obj);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

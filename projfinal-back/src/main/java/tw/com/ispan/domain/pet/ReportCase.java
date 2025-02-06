@@ -12,11 +12,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import tw.com.ispan.domain.admin.Admin;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
 @Table(name = "ReportCase", uniqueConstraints = @UniqueConstraint(name = "UK_Member_Report", columnNames = { "memberId",
-        "rescueCaseId", "lostCaseId", "adoptionCaseId", "reportType" }))
+        "adminId", "rescueCaseId", "lostCaseId", "adoptionCaseId", "reportTitle" }))
 public class ReportCase {
 
     @Id
@@ -42,20 +43,57 @@ public class ReportCase {
     @JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(name = "FK_ReportCase_Member"))
     private Member member;
 
+    // 關聯到 Admin 表，單向多對一
+    @ManyToOne
+    @JoinColumn(name = "adminId", nullable = true, foreignKey = @ForeignKey(name = "FK_ReportCase_Admin"))
+    private Admin admin;
+
     @Column(name = "reportDate", nullable = false)
     private LocalDateTime reportDate;
 
-    @Column(name = "reportType", length = 30, nullable = false)
-    private String reportType;
+    @Column(name = "updateDate", nullable = true)
+    private LocalDateTime updateDate;
+
+    @Column(name = "reportTitle", length = 30, nullable = false)
+    private String reportTitle;
 
     @Column(name = "reportNotes", columnDefinition = "TEXT")
     private String reportNotes;
 
+    @Column(name = "reportState")
+    private boolean reportState;
+
+    // 空參數建構子 (Hibernate 要求)
+    public ReportCase() {
+        super();
+    }
+
+    // 全參數建構子
+    public ReportCase(Integer reportId, RescueCase rescueCase, LostCase lostCase,
+            // AdoptionCase adoptionCase,
+            Member member, Admin admin, LocalDateTime reportDate, String reportTitle, String reportNotes,
+            boolean reportState, LocalDateTime updateDate) {
+        this.reportId = reportId;
+        this.rescueCase = rescueCase;
+        this.lostCase = lostCase;
+        // this.adoptionCase=adoptionCase;
+        this.member = member;
+        this.admin = admin;
+        this.reportDate = reportDate;
+        this.reportTitle = reportTitle;
+        this.reportNotes = reportNotes;
+        this.reportState = reportState;
+        this.updateDate = updateDate;
+    }
+
     @Override
     public String toString() {
-        return "ReportCase [reportId=" + reportId + ", rescueCaseId=" + rescueCase + ", lostCaseId=" + lostCase
-                + ", adoptionCaseId=" + adoptionCase + ", memberId=" + member + ", reportDate=" + reportDate
-                + ", reportType=" + reportType + ", reportNotes=" + reportNotes + "]";
+        return "ReportCase [reportId=" + reportId +
+                ", lostCaseId=" + lostCase + ", rescueCaseId=" + rescueCase +
+                // ", adoptionCaseId=" + adoptionCase +
+                ",memberId=" + member + ",adminId=" + admin +
+                ", reportDate=" + reportDate + ", reportTitle=" + reportTitle + ", reportNotes=" + reportNotes
+                + ", reportState=" + reportState + ", updateDate=" + updateDate + "]";
     }
 
     // Getters and Setters
@@ -83,13 +121,13 @@ public class ReportCase {
         this.lostCase = lostCase;
     }
 
-    public AdoptionCase getAdoptionCase() {
-        return adoptionCase;
-    }
+    // public AdoptionCase getAdoptionCase() {
+    // return adoptionCase;
+    // }
 
-    public void setAdoptionCase(AdoptionCase adoptionCase) {
-        this.adoptionCase = adoptionCase;
-    }
+    // public void setAdoptionCase(AdoptionCase adoptionCase) {
+    // this.adoptionCase = adoptionCase;
+    // }
 
     public Member getMember() {
         return member;
@@ -97,6 +135,14 @@ public class ReportCase {
 
     public void setMember(Member member) {
         this.member = member;
+    }
+
+    public Admin getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Admin admin) {
+        this.admin = admin;
     }
 
     public LocalDateTime getReportDate() {
@@ -107,12 +153,12 @@ public class ReportCase {
         this.reportDate = reportDate;
     }
 
-    public String getReportType() {
-        return reportType;
+    public String getReportTitle() {
+        return reportTitle;
     }
 
-    public void setReportType(String reportType) {
-        this.reportType = reportType;
+    public void setReportTitle(String reportTitle) {
+        this.reportTitle = reportTitle;
     }
 
     public String getReportNotes() {
@@ -122,4 +168,21 @@ public class ReportCase {
     public void setReportNotes(String reportNotes) {
         this.reportNotes = reportNotes;
     }
+
+    public LocalDateTime getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(LocalDateTime updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public boolean isReportState() {
+        return reportState;
+    }
+
+    public void setReportState(boolean reportState) {
+        this.reportState = reportState;
+    }
+
 }

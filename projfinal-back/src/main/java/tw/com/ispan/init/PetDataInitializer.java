@@ -2,33 +2,47 @@ package tw.com.ispan.init;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import tw.com.ispan.domain.pet.Breed;
+import tw.com.ispan.domain.pet.CasePicture;
 import tw.com.ispan.domain.pet.CaseState;
 import tw.com.ispan.domain.pet.City;
-import tw.com.ispan.domain.pet.DistinctArea;
+import tw.com.ispan.domain.pet.DistrictArea;
 import tw.com.ispan.domain.pet.FurColor;
+import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.domain.pet.Species;
 import tw.com.ispan.domain.pet.forRescue.CanAfford;
 import tw.com.ispan.domain.pet.forRescue.RescueDemand;
+import tw.com.ispan.init.pet.CityDto;
+import tw.com.ispan.init.pet.fakeRescueCaseDto;
+import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.pet.BreedRepository;
 import tw.com.ispan.repository.pet.CaseStateRepository;
 import tw.com.ispan.repository.pet.CityRepository;
+import tw.com.ispan.repository.pet.DistrictAreaRepository;
+// import tw.com.ispan.repository.pet.DistrictAreaRepository;
 import tw.com.ispan.repository.pet.FurColorRepository;
+import tw.com.ispan.repository.pet.RescueCaseRepository;
 import tw.com.ispan.repository.pet.SpeciesRepository;
 import tw.com.ispan.repository.pet.forRescue.CanAffordRepository;
 import tw.com.ispan.repository.pet.forRescue.RescueDemandRepository;
+// import tw.com.ispan.service.pet.ImageService;
 
+@Transactional
 @Component
 public class PetDataInitializer implements CommandLineRunner {
 
@@ -41,28 +55,57 @@ public class PetDataInitializer implements CommandLineRunner {
 	@Autowired
 	private BreedRepository breedRepository;
 	@Autowired
-	CaseStateRepository caseStateRepository;
+	private CaseStateRepository caseStateRepository;
 	@Autowired
-	RescueDemandRepository rescueDemandRepository;
+	private RescueDemandRepository rescueDemandRepository;
 	@Autowired
-	CanAffordRepository canAffordRepository;
+	private CanAffordRepository canAffordRepository;
+	@Autowired
+	private RescueCaseRepository rescueCaseRepository;
+	@Autowired
+	private DistrictAreaRepository districtAreaRepository;
+	@Autowired
+	private MemberRepository memberRepository;
+	// @Autowired
+	// private ImageService imageService;
+	
+	@Transactional
+	public void saveSpeciesData() {
+	    if (!speciesRepository.existsById(1)) {
+	        speciesRepository.save(new Species("狗"));
+	    }
+	    if (!speciesRepository.existsById(2)) {
+	        speciesRepository.save(new Species("貓"));
+	    }
+	}
+	
+
+	@Value("${file.final-upload-dir}") // 後端圖片最終路徑
+	private String imageBaseUrl;
 
 	// 此方法會在專案啟動同時執行一次，進行資料初始化
 	@Override
 	public void run(String... args) throws Exception {
 
 		// 存入物種資料
-		if (!speciesRepository.existsById(1)) {
-			speciesRepository.save(new Species("狗"));
+		saveSpeciesData();
+		// 手動檢查是否成功存入
+		if (!speciesRepository.existsById(1) || !speciesRepository.existsById(2)) {
+		    throw new RuntimeException("Species 資料未成功儲存，請檢查交易提交狀態！");
 		}
-		if (!speciesRepository.existsById(2)) {
-			speciesRepository.save(new Species("貓"));
-		}
+//		if (!speciesRepository.existsById(1)) {
+//			speciesRepository.save(new Species("狗"));
+//		}
+//		if (!speciesRepository.existsById(2)) {
+//			speciesRepository.save(new Species("貓"));
+//		}
+//		speciesRepository.flush();  // 強制同步
 
 		// 存入品種資料(狗貓放在同一表格，貓breedId為1~53 狗breedId 54~186)
-		//檢查邏輯為breed資料表內是否有id 1-53的資料，返回的list如果不是共53筆就做新增 (其實邏輯不太對，但基本上有執行過資料注入就應該一次是53筆，就先這樣吧)
-		List<Integer> catList = breedRepository.findBreedIdsInRange(1,53);
-		if(catList.size() != 53) {
+		// 檢查邏輯為breed資料表內是否有id 1-53的資料，返回的list如果不是共53筆就做新增
+		// (其實邏輯不太對，但基本上有執行過資料注入就應該一次是53筆，就先這樣吧)
+		List<Integer> catList = breedRepository.findBreedIdsInRange(1, 53);
+		if (catList.size() != 53) {
 			Resource catResource = new ClassPathResource("data/catBreeds.json");
 			ObjectMapper objectMapper1 = new ObjectMapper();
 
@@ -76,9 +119,9 @@ public class PetDataInitializer implements CommandLineRunner {
 				e.printStackTrace();
 			}
 		}
-		
-		List<Integer> dogList = breedRepository.findBreedIdsInRange(54,186);
-		if(dogList.size() != 133) {
+
+		List<Integer> dogList = breedRepository.findBreedIdsInRange(54, 186);
+		if (dogList.size() != 133) {
 			Resource dogResource = new ClassPathResource("data/dogBreeds.json");
 			ObjectMapper objectMapper2 = new ObjectMapper();
 
@@ -93,10 +136,10 @@ public class PetDataInitializer implements CommandLineRunner {
 			}
 		}
 
-		
-
 		// 存入毛色資料(主要給米克斯用)
-		if (!furColorRepository.existsById(1)) {
+		if (!furColorRepository.existsById(1))
+
+		{
 			furColorRepository.save(new FurColor("土黃"));
 		}
 		if (!furColorRepository.existsById(2)) {
@@ -112,10 +155,10 @@ public class PetDataInitializer implements CommandLineRunner {
 			furColorRepository.save(new FurColor("三花貓"));
 		}
 		if (!furColorRepository.existsById(6)) {
-			furColorRepository.save(new FurColor("虎斑"));
+			furColorRepository.save(new FurColor("虎斑貓"));
 		}
 		if (!furColorRepository.existsById(7)) {
-			furColorRepository.save(new FurColor("賓士"));
+			furColorRepository.save(new FurColor("賓士貓"));
 		}
 
 		// 存入casestate (狀態描述 ( 認養: 待認養/已認養; 救援: 待救援/已救援; 協尋: 待協尋/已尋回 三種共用: 變成小天使、案件失敗))
@@ -171,89 +214,19 @@ public class PetDataInitializer implements CommandLineRunner {
 		if (!canAffordRepository.existsById(4)) {
 			canAffordRepository.save(new CanAfford("願意負擔救援物資"));
 		}
-		if (!canAffordRepository.existsById(1)) {
+		if (!canAffordRepository.existsById(5)) {
 			canAffordRepository.save(new CanAfford("願意負擔救援費用"));
 		}
 
-		// 存入city資料(舊版!!!!)
-		// 臺北市、新北市、基隆市、新竹市、桃園市、新竹縣及宜蘭縣。 中部區域：包括臺中市、苗栗縣、彰化縣、南投縣及雲林縣。
-		// 南部區域：包括高雄市、臺南市、嘉義市、嘉義縣、屏東縣及澎湖縣。 東部區域：包括花蓮縣及臺東縣
-//		if (!cityRepository.existsById(1)) {
-//			cityRepository.save(new City("臺北市"));
-//		}
-//		if (!cityRepository.existsById(2)) {
-//			cityRepository.save(new City("新北市"));
-//		}
-//		if (!cityRepository.existsById(3)) {
-//			cityRepository.save(new City("基隆市"));
-//		}
-//		if (!cityRepository.existsById(4)) {
-//			cityRepository.save(new City("新竹市"));
-//		}
-//		if (!cityRepository.existsById(5)) {
-//			cityRepository.save(new City("桃園市"));
-//		}
-//		if (!cityRepository.existsById(6)) {
-//			cityRepository.save(new City("新竹縣"));
-//		}
-//		if (!cityRepository.existsById(7)) {
-//			cityRepository.save(new City("宜蘭縣"));
-//		}
-//		if (!cityRepository.existsById(8)) {
-//			cityRepository.save(new City("臺中市"));
-//		}
-//		if (!cityRepository.existsById(9)) {
-//			cityRepository.save(new City("苗栗縣"));
-//		}
-//		if (!cityRepository.existsById(10)) {
-//			cityRepository.save(new City("彰化縣"));
-//		}
-//		if (!cityRepository.existsById(11)) {
-//			cityRepository.save(new City("南投縣"));
-//		}
-//		if (!cityRepository.existsById(12)) {
-//			cityRepository.save(new City("雲林縣"));
-//		}
-//		if (!cityRepository.existsById(13)) {
-//			cityRepository.save(new City("高雄市"));
-//		}
-//		if (!cityRepository.existsById(14)) {
-//			cityRepository.save(new City("臺南市"));
-//		}
-//		if (!cityRepository.existsById(15)) {
-//			cityRepository.save(new City("嘉義市"));
-//		}
-//		if (!cityRepository.existsById(16)) {
-//			cityRepository.save(new City("嘉義縣"));
-//		}
-//		if (!cityRepository.existsById(17)) {
-//			cityRepository.save(new City("屏東縣"));
-//		}
-//		if (!cityRepository.existsById(18)) {
-//			cityRepository.save(new City("澎湖縣"));
-//		}
-//		if (!cityRepository.existsById(19)) {
-//			cityRepository.save(new City("花蓮縣"));
-//		}
-//		if (!cityRepository.existsById(20)) {
-//			cityRepository.save(new City("臺東縣"));
-//		}
-//		if (!cityRepository.existsById(21)) {
-//			cityRepository.save(new City("金門縣"));
-//		}
-//		if (!cityRepository.existsById(22)) {
-//			cityRepository.save(new City("連江縣"));
-//		}
-
-		// 存入distinct資料
+		// 存入district資料
 		// Jackson 或 Gson 在將 JSON 轉換為
 		// Java物件時，只會映射與dto類別中字段名稱匹配的JSON屬性(大小寫敏感)，額外的屬性會被自動忽略，而不會影響轉換過程
 		// 檔案位於 resources 資料夾內，建議使用 ClassLoader 來讀取檔案，這樣可以避免路徑解析問題
 		// 這段在跑測試程式時，因為測試程式和專案啟動執行環境不同，僅測試不會去打包resource底下靜態資源，因此data/CityCountyData.json會找不到，導致需要先註解!!
 
-		//city和distinct資料會同時儲存，因此檢查city是否存在即可(邏輯不太完善但先這樣吧)
-		List<Integer> cityList = cityRepository.findCityIdsInRange(1,24);
-		if(cityList.size() != 24) {
+		// city和district資料會同時儲存，因此檢查city是否存在即可(邏輯不太完善但先這樣吧)
+		List<Integer> cityList = cityRepository.findCityIdsInRange(1, 24);
+		if (cityList.size() != 24) {
 			String filePath = getClass().getClassLoader().getResource("data/CityCountyData.json").getPath();
 			ObjectMapper objectMapper3 = new ObjectMapper();
 
@@ -264,19 +237,108 @@ public class PetDataInitializer implements CommandLineRunner {
 				City city = new City();
 				city.setCity(cityDto.getCityName());
 
-				List<DistinctArea> areas = cityDto.getAreaList().stream().map(areaDto -> {
-					DistinctArea area = new DistinctArea();
-					area.setDistinctAreaName(areaDto.getAreaName());
+				List<DistrictArea> areas = cityDto.getAreaList().stream().map(areaDto -> {
+					DistrictArea area = new DistrictArea();
+					area.setDistrictAreaName(areaDto.getAreaName());
+					area.setCity(city); // 關聯 City
 					return area;
 				}).toList();
 
-				city.setDistinctAreas(areas);
+				city.setDistrictAreas(areas);
 
-				// 儲存 City（會同時儲存其相關的 DistinctArea）
+				// 儲存 City（會同時儲存其相關的 DistrictArea）
 				cityRepository.save(city);
 			}
 		}
-		
+
+		// 塞入5筆救援案件假資料以及更新圖片表
+
+		// if (rescueCaseRepository.count() < 5) {
+
+		// 	// 讀取 JSON 假資料
+		// 	ObjectMapper objectMapper = new ObjectMapper();
+		// 	String filePath = "data/rescueCase.json"; // JSON 檔案的路徑
+		// 	String jsonContent = new String(Files.readAllBytes(new ClassPathResource(filePath).getFile().toPath()));
+
+		// 	// 替換 ${final-upload-dir} 為環境變數的值，為圖片儲存於後端的外部資料夾路徑
+		// 	jsonContent = jsonContent.replace("${final-upload-dir}", imageBaseUrl);
+
+		// 	List<fakeRescueCaseDto> rescueCaseDtos = objectMapper.readValue(
+		// 			jsonContent,
+		// 			new TypeReference<List<fakeRescueCaseDto>>() {
+		// 			});
+
+		// 	// 將 DTO 轉換為實體並存入資料庫
+		// 	for (fakeRescueCaseDto dto : rescueCaseDtos) {
+		// 		RescueCase rescueCase = new RescueCase();
+
+		// 		// 儲存圖片路徑於圖片表中
+		// 		List<CasePicture> casePictures = imageService.saveImage(dto.getCasePictureUrls());
+
+		// 		// 設定 RescueCase 基本屬性
+		// 		rescueCase.setCaseTitle(dto.getCaseTitle());
+		// 		rescueCase.setGender(dto.getGender());
+		// 		rescueCase.setSterilization(dto.getSterilization());
+		// 		rescueCase.setAge(dto.getAge());
+		// 		rescueCase.setMicroChipNumber(dto.getMicroChipNumber());
+		// 		rescueCase.setSuspLost(dto.getSuspLost());
+		// 		rescueCase.setStreet(dto.getStreet());
+		// 		rescueCase.setLatitude(dto.getLatitude());
+		// 		rescueCase.setLongitude(dto.getLongitude());
+		// 		rescueCase.setDonationAmount(dto.getDonationAmount());
+		// 		rescueCase.setViewCount(dto.getViewCount());
+		// 		rescueCase.setFollow(dto.getFollow());
+		// 		rescueCase.setPublicationTime(LocalDateTime.now()); // 自動設置發佈時間
+		// 		rescueCase.setLastUpdateTime(LocalDateTime.now()); // 自動設置更新時間
+		// 		rescueCase.setTag(dto.getTag());
+		// 		rescueCase.setRescueReason(dto.getRescueReason());
+		// 		rescueCase.setCaseUrl(dto.getCaseUrl());
+		// 		rescueCase.setIsHidden(dto.getIsHidden());
+
+		// 		// 手動關聯實體
+		// 		rescueCase.setMember(memberRepository.findById(dto.getMemberId())
+		// 				.orElseThrow(() -> new RuntimeException("member not found")));
+				
+		// 		System.out.println("物種ID"+dto.getSpeciesId());
+		// 		System.out.println("找到物種為"+speciesRepository.findById(dto.getSpeciesId()));
+				
+				
+		// 		rescueCase.setSpecies(speciesRepository.findById(dto.getSpeciesId())
+		// 				.orElseThrow(() -> new RuntimeException("Species not found")));
+		// 		rescueCase.setFurColor(furColorRepository.findById(dto.getFurColorId())
+		// 				.orElseThrow(() -> new RuntimeException("FurColor not found")));
+		// 		rescueCase.setBreed(breedRepository.findById(dto.getBreedId())
+		// 				.orElseThrow(() -> new RuntimeException("Breed not found")));
+		// 		rescueCase.setCity(cityRepository.findById(dto.getCityId())
+		// 				.orElseThrow(() -> new RuntimeException("City not found")));
+		// 		rescueCase.setDistrictArea(districtAreaRepository.findById(dto.getDistrictAreaId())
+		// 				.orElseThrow(() -> new RuntimeException("DistrictArea not found")));
+		// 		rescueCase.setCaseState(caseStateRepository.findById(dto.getCaseStateId())
+		// 				.orElseThrow(() -> new RuntimeException("CaseState not found")));
+
+		// 		// 新增 canAffords 的處理
+		// 		List<CanAfford> canAffordEntities = dto.getCanAffords().stream()
+		// 				.map(canAffordDto -> canAffordRepository.findById(canAffordDto.getCanAffordId())
+		// 						.orElseThrow(() -> new RuntimeException(
+		// 								"CanAfford not found for ID: " + canAffordDto.getCanAffordId())))
+		// 				.toList();
+		// 		rescueCase.setCanAffords(canAffordEntities);
+
+		// 		// 新增 rescueDemands 的處理
+		// 		List<RescueDemand> rescueDemandEntities = dto.getRescueDemands().stream()
+		// 				.map(rescueDemandDto -> rescueDemandRepository.findById(rescueDemandDto.getRescueDemandId())
+		// 						.orElseThrow(() -> new RuntimeException(
+		// 								"RescueDemand not found for ID: " + rescueDemandDto.getRescueDemandId())))
+		// 				.toList();
+		// 		rescueCase.setRescueDemands(rescueDemandEntities);
+
+		// 		// 設定圖片關聯
+		// 		rescueCase.setCasePictures(casePictures);
+
+		// 		// 保存 RescueCase 到資料庫
+		// 		rescueCaseRepository.save(rescueCase);
+		// 	}
+		// }
 	}
 
 }

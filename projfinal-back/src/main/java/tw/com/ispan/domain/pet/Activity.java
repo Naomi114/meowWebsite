@@ -28,6 +28,7 @@ public class Activity {
 	// 和member表為雙向多對一
 	@ManyToOne
 	@JoinColumn(name = "memberId", nullable = false)
+	
 	private Member member;
 
 	@Column(name = "title", columnDefinition = "nvarchar(30)", nullable = false)

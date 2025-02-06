@@ -12,7 +12,10 @@ public class ReportCaseResponse {
 
     @Override
     public String toString() {
-        return "LostCaseResponse [success=" + success + ", message=" + message + ", list=" + list + ", count=" + count
+        return "LostCaseResponse [success=" + success +
+                ", message=" + message +
+                ",list=" + list +
+                ", count=" + count
                 + "]";
     }
 
