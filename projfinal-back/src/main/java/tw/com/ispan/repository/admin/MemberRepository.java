@@ -9,14 +9,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import tw.com.ispan.domain.admin.Member;
+import tw.com.ispan.dto.MemberDto;
 
 public interface MemberRepository extends JpaRepository<Member, Integer> {
- 	
-	
-	Optional<Member> findByEmail(String email);
+    Optional<Member> findByEmail(String email);
 
     List<Member> findByEmailContaining(String email);
 
+
+	//以下為冠儒增加的
 	Optional<Member> findByNickName(String nickName);
 
 	// 默認情況下Spring Data JPA 的 @Query 方法僅用於查詢SELECT，當執行非查詢操作（如
@@ -36,4 +37,5 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 	@Modifying
 	@Query("UPDATE Member m SET m.followed = true WHERE m.lineId = :lineId")
 	void updateFollowed(@Param("lineId") String lineId);
+
 }

@@ -1,9 +1,13 @@
 package tw.com.ispan.controller;
 
+import java.util.List;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tw.com.ispan.domain.admin.Admin;
@@ -11,7 +15,7 @@ import tw.com.ispan.jwt.JsonWebTokenUtility;
 import tw.com.ispan.service.AdminService;
 
 @RestController
-public class AdminController {
+public class LoginAdminController {
     @Autowired
     private AdminService adminService;
 
@@ -54,4 +58,5 @@ public class AdminController {
         }
         return responseJson.toString();
     }
+
 }

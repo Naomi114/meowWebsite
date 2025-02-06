@@ -53,7 +53,6 @@ public class Admin {
 	// @JsonManagedReference("admin")
 	// private Set<ProductBean> products = new HashSet<>();
 
-	
 	public Admin(Integer adminId, String adminName, String password, LocalDateTime createDate, LocalDateTime updateDate
 	// ,List<Discount> discounts, Set<InventoryBean> inventory
 	) {
@@ -66,7 +65,6 @@ public class Admin {
 		// this.inventory = inventory;
 	}
 
-	
 	public Integer getAdminId() {
 		return adminId;
 	}

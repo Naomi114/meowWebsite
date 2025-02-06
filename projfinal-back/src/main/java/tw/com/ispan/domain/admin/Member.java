@@ -1,13 +1,12 @@
 package tw.com.ispan.domain.admin;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,7 +16,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.ToString;
 import tw.com.ispan.domain.pet.Activity;
 import tw.com.ispan.domain.pet.ActivityParticipantList;
 import tw.com.ispan.domain.pet.AdoptionCase;
@@ -25,8 +23,10 @@ import tw.com.ispan.domain.pet.Follow;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.ReportCase;
 import tw.com.ispan.domain.pet.RescueCase;
-//import tw.com.ispan.domain.shop.Order;
 import tw.com.ispan.domain.pet.forAdopt.AdoptionCaseApply;
+// import tw.com.ispan.domain.shop.Cart;
+// import tw.com.ispan.domain.shop.Order;
+// import tw.com.ispan.domain.shop.WishListBean;
 
 @Entity
 @Table(name = "Member")
@@ -40,6 +40,10 @@ public class Member {
 
 	@Column(length = 20, nullable = false)
 	private String password;
+
+	public Member() {
+		// 這是默認構造函數，Hibernate 需要
+	}
 
 	@Column(length = 70, nullable = false)
 	private String name;
@@ -62,33 +66,43 @@ public class Member {
 	@Column(nullable = false)
 	private LocalDateTime updateDate;
 
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	private Set<Activity> activity;
+
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	private Set<ActivityParticipantList> acitvityParticipantList;
+
+
 	// 以下為給line login使用
 	private String lineId;
 
 	private String lineName;
 
 	private String linePicture;
-	
+
+	// 以下為給追蹤line商家帳號使用
+	private boolean followed = false;
+
 	@Column(nullable = false)
-	private boolean userType;    // 1表示註冊會員，0表示line登入會員
-	
-	//以下為關聯產生的屬性
-	// 雙向一對多
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST })
-	@ToString.Exclude
+	private boolean userType; // 1表示註冊會員，0表示line登入會員
+
+	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
+	// CascadeType.REMOVE })
+	// private List<WishListBean> wishList;
+
+	// @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST,
+	// CascadeType.REMOVE })
+	// private Set<Cart> cart;
+
+	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval =
+	// true)
+	// private List<Order> order;
+
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	private List<RescueCase> rescueCases;
 
-	// 雙向一對多
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST })
-	private List<Activity> activity;
-
-	// 會員和活動的中介表 雙向一對多
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST }, orphanRemoval = true)
-	private List<ActivityParticipantList> acitvityParticipantLists;
-
-	// 單向一對多
 	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
-	private List<Follow> follows;
+	private Set<Follow> follow = new HashSet<>();
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private List<LostCase> lostCase = new ArrayList<>();
@@ -103,27 +117,13 @@ public class Member {
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private Set<AdoptionCaseApply> adoptionCaseApply = new HashSet<>();
 
-	// 綁定流程:當需要綁定時，為會員生成和 bindingToken和bindingTokenExpiry，存入Member表。
-	// 用戶掃描 QR Code 或點擊綁定鏈接時，通過 binding_token 查找對應的會員。
-	// 驗證 Token 是否有效（未過期）。
-	// 綁定完成後，將 line_user_id 更新到該會員記錄中，並清空 bindingToken。
-	private String userLineId;
-
-	private String bindingToken;
-
-	private LocalDateTime bindingTokenExpiry;
-
-	// Constructors, getters, setters, toString()
-	public Member() {
-		// 這是默認構造函數，Hibernate 需要
-	}
-
 	public Member(Integer memberId, String nickName, String password, String name, String email, String phone,
 			String address, LocalDate birthday, LocalDateTime createDate, LocalDateTime updateDate,
-			List<Activity> activity, List<ActivityParticipantList> acitvityParticipantLists,
+			Set<Activity> activity,
+			Set<ActivityParticipantList> acitvityParticipantList,
 			// List<WishListBean> wishList, Set<Cart> cart,List<Order> order,
-			List<RescueCase> rescueCases, List<Follow> follow, List<LostCase> lostCase, List<AdoptionCase> adoptionCase,
-			List<ReportCase> reportCase, Set<AdoptionCaseApply> adoptionCaseApply) {
+			List<RescueCase> rescueCases, Set<Follow> follow, List<LostCase> lostCase,
+			List<AdoptionCase> adoptionCase, List<ReportCase> reportCase, Set<AdoptionCaseApply> adoptionCaseApply) {
 		this.memberId = memberId;
 		this.nickName = nickName;
 		this.password = password;
@@ -135,12 +135,12 @@ public class Member {
 		this.createDate = createDate;
 		this.updateDate = updateDate;
 		this.activity = activity;
-		this.acitvityParticipantLists = acitvityParticipantLists;
+		this.acitvityParticipantList = acitvityParticipantList;
 		// this.wishList = wishList;
 		// this.cart = cart;
 		// this.order = order;
 		this.rescueCases = rescueCases;
-		this.follows = follow;
+		this.follow = follow;
 		this.lostCase = lostCase;
 		this.adoptionCase = adoptionCase;
 		this.reportCase = reportCase;
@@ -227,29 +227,7 @@ public class Member {
 		this.updateDate = updateDate;
 	}
 
-	public String getUserLineId() {
-		return userLineId;
-	}
-
-	public void setUserLineId(String userLineId) {
-		this.userLineId = userLineId;
-	}
-
-	public String getBindingToken() {
-		return bindingToken;
-	}
-
-	public void setBindingToken(String bindingToken) {
-		this.bindingToken = bindingToken;
-	}
-
-	public LocalDateTime getBindingTokenExpiry() {
-		return bindingTokenExpiry;
-	}
-
-	public void setBindingTokenExpiry(LocalDateTime bindingTokenExpiry) {
-		this.bindingTokenExpiry = bindingTokenExpiry;
-	}
+	
 
 	public String getLineId() {
 		return lineId;
@@ -274,7 +252,14 @@ public class Member {
 	public void setLinePicture(String linePicture) {
 		this.linePicture = linePicture;
 	}
-	
+
+	public boolean isFollowed() {
+		return followed;
+	}
+
+	public void setFollowed(boolean followed) {
+		this.followed = followed;
+	}
 
 	public boolean isUserType() {
 		return userType;
@@ -288,10 +273,17 @@ public class Member {
 	public String toString() {
 		return "Member [memberId=" + memberId + ", nickName=" + nickName + ", password=" + password + ", name=" + name
 				+ ", email=" + email + ", phone=" + phone + ", address=" + address + ", birthday=" + birthday
-				+ ", createDate=" + createDate + ", updateDate=" + updateDate + ", rescueCases=" + rescueCases
-				+ ", activity=" + activity + ", acitvityParticipantLists=" + acitvityParticipantLists + ", follows="
-				+ follows + ", lostCase=" + lostCase + ", adoptionCase=" + adoptionCase + ", reportCase=" + reportCase
-				+ ", adoptionCaseApply=" + adoptionCaseApply + "]";
+				+ ", createDate=" + createDate + ", updateDate=" + updateDate + ", activity=" + activity
+				+ ", acitvityParticipantList=" + acitvityParticipantList +
+				// ", wishList=" + wishList + ", cart=" + cart+ ", order=" + order +
+				// ", rescueCases=" + rescueCases + ", follow=" + follow + ", lostCase=" +
+				// lostCase+
+				", adoptionCase=" + adoptionCase + ", reportCase=" + reportCase + ", adoptionCaseApply="
+				+ adoptionCaseApply + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", getMemberId()="
+				+ getMemberId() + ", getNickName()=" + getNickName() + ", getPassword()=" + getPassword()
+				+ ", getName()=" + getName() + ", getEmail()=" + getEmail() + ", getPhone()=" + getPhone()
+				+ ", getAddress()=" + getAddress() + ", getBirthday()=" + getBirthday() + ", getCreateDate()="
+				+ getCreateDate() + ", getUpdateDate()=" + getUpdateDate() + ", toString()=" + super.toString() + "]";
 	}
 
 }

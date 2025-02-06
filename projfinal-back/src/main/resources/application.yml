@@ -50,10 +50,10 @@ spring:
 
   #寵物圖片暫存路徑(冠)
 file:
-  tmp-upload-dir: /src/main/resources/upload/tmp/pet/images
+  tmp-upload-dir: C:/upload/tmp/pet/images/
 
   #寵物圖片上傳路徑(冠)
-  final-upload-dir: /src/main/resources/upload/final/pet/images
+  final-upload-dir: C:/upload/final/pet/images/
 
   #conosle顏色
   output:
@@ -66,7 +66,7 @@ file:
 
 jwt:
   token:
-    expire: 10
+    expire: 60
 
 #google座標api(冠)
 google:
@@ -90,12 +90,25 @@ logging:
       apache:
         http: DEBUG
 #Domain Name(冠)
-DomainName:
-  url: http://localhost:8080
+front:
+  domainName:
+    url: http://localhost:5173
 
-#開發用公開網域url(冠)
+back:
+  domainName:
+    url: http://localhost:8080
+
+#前端讀取後端圖片的路徑，用在init的案件資料controller中
+image:
+  base:
+    url: http://localhost:8080/upload/final/pet/images/
+
+#用在後端圖片路徑轉前端路徑的rescueService檔案中
+serverAddress-serverPort: localhost:8080
+
+#開發用公開網域url(冠)   //記得到時候也要去改LINE平台上webhook的url
 ngrok:
-  url: https://586f-1-160-6-252.ngrok-free.app
+  url: https://f632-36-225-194-22.ngrok-free.app
 
 #linebot跳轉(冠)
 lineBot: https://line.me/R/ti/p/@310pndih
@@ -103,6 +116,6 @@ lineBot: https://line.me/R/ti/p/@310pndih
 #line login相關設定(冠)
 line:
   login:
-    redirect-uri: ${DomainName.url}/line/callback
+    redirect-uri: ${back.domainName.url}/line/callback
     channel-id: 2006807062
     channel-secret: 1f781b9cf730b0c4decdeba7eead6778

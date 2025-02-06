@@ -12,7 +12,7 @@ import tw.com.ispan.domain.pet.Follow;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.repository.admin.MemberRepository;
-import tw.com.ispan.repository.pet.AdoptionCaseRepository;
+import tw.com.ispan.repository.pet.forAdopt.AdoptionCaseRepository;
 import tw.com.ispan.repository.pet.FollowRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.RescueCaseRepository;
