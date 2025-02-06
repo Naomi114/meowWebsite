@@ -1,6 +1,5 @@
 package tw.com.ispan.domain.admin;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -215,40 +214,40 @@ public class Member {
 
 	@Override
 	public String toString() {
-		return "Member [memberId=" + memberId + 
-				", nickName=" + nickName + 
-				", password=" + password + 
+		return "Member [memberId=" + memberId +
+				", nickName=" + nickName +
+				", password=" + password +
 				", name=" + name +
-				", email=" + email + 
-				", phone=" + phone + 
-				", address=" + address + 
-				", birthday=" + birthday+ 
-				", createDate=" + createDate + 
-				", updateDate=" + updateDate + 
-				", activity=" + activity+ 
+				", email=" + email +
+				", phone=" + phone +
+				", address=" + address +
+				", birthday=" + birthday +
+				", createDate=" + createDate +
+				", updateDate=" + updateDate +
+				", activity=" + activity +
 				", acitvityParticipantList=" + acitvityParticipantList +
-				// ", wishList=" + wishList + 
-				// ", cart=" + cart + 
+				// ", wishList=" + wishList +
+				// ", cart=" + cart +
 				// ", order=" + order +
-				", rescueCases=" + rescueCases + 
-				", follow=" + follow + 
-				", lostCase=" + lostCase+
-				", adoptionCase=" + adoptionCase + 
-				", reportCase=" + reportCase + 
-				", adoptionCaseApply="+ adoptionCaseApply + 
-				", getClass()=" + getClass() + 
-				", hashCode()=" + hashCode() + 
-				", getMemberId()="+ getMemberId() + 
-				", getNickName()=" + getNickName() + 
-				", getPassword()=" + getPassword()+ 
+				", rescueCases=" + rescueCases +
+				", follow=" + follow +
+				", lostCase=" + lostCase +
+				", adoptionCase=" + adoptionCase +
+				", reportCase=" + reportCase +
+				", adoptionCaseApply=" + adoptionCaseApply +
+				", getClass()=" + getClass() +
+				", hashCode()=" + hashCode() +
+				", getMemberId()=" + getMemberId() +
+				", getNickName()=" + getNickName() +
+				", getPassword()=" + getPassword() +
 				", getName()=" + getName() +
-				", getEmail()=" + getEmail() + 
-				", getPhone()=" + getPhone()+ 
-				", getAddress()=" + getAddress() + 
-				", getBirthday()=" + getBirthday() + 
-				", getCreateDate()="+ getCreateDate() + 
-				", getUpdateDate()=" + getUpdateDate() + 
-				", toString()=" + super.toString() + 
+				", getEmail()=" + getEmail() +
+				", getPhone()=" + getPhone() +
+				", getAddress()=" + getAddress() +
+				", getBirthday()=" + getBirthday() +
+				", getCreateDate()=" + getCreateDate() +
+				", getUpdateDate()=" + getUpdateDate() +
+				", toString()=" + super.toString() +
 				"]";
 	}
 

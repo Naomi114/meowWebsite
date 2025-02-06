@@ -138,8 +138,8 @@ public class BannerService {
                 // bannerRepository.findByAdoptionCase_AdoptionCaseIdAndBannerType(caseId,
                 // BannerType.ADOPTION);
             case RESCUE:
-                // return bannerRepository.findByRescueCase_RescueCaseIdAndBannerType(caseId,
-                // BannerType.RESCUE);
+                return bannerRepository.findByRescueCase_RescueCaseIdAndBannerType(caseId,
+                        BannerType.RESCUE);
             default:
                 throw new IllegalArgumentException("無效的 Banner 類型：" + bannerType);
         }

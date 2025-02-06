@@ -57,12 +57,17 @@ public class VForService {
 
     // 尋找全部city
     public List<City> allCity() {
-        return cityRepository.findAll();
+        List<City> cities = cityRepository.findAll();
+        System.out.println("🔍 查詢到的城市數量：" + cities.size());
+        return cities;
     }
 
     // 依據cityId尋找對應districtArea
     public List<DistrictArea> getDistrictsByCity(Integer cityId) {
-        return districtAreaRepository.findByCity_CityId(cityId);
+        System.out.println("🔍 查詢 CityId：" + cityId);
+        List<DistrictArea> areas = districtAreaRepository.findByCity_CityId(cityId);
+        System.out.println("🔍 查詢到的區域數量：" + areas.size());
+        return areas;
     }
 
     // 尋找全部breed

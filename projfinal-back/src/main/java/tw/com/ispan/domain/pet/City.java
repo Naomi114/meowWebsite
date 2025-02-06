@@ -3,7 +3,7 @@ package tw.com.ispan.domain.pet;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
@@ -12,13 +12,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "City")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "cityId" // 使用 cityId 作為唯一標識符
-)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "cityId")
 public class City {
 
 	@Id
@@ -27,22 +27,25 @@ public class City {
 
 	@Column(name = "city", columnDefinition = "NVARCHAR(5)", nullable = false)
 	private String city;
-
-	// 和 DistrictArea 表的一對多關聯
-	@OneToMany(mappedBy = "city", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonManagedReference // 避免 JSON 循環問題
+	
+	// 和DistrictArea表雙向一對多
+	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
+	@JsonIgnore
 	private List<DistrictArea> districtAreas;
 
 	// 和RescueCase表雙向一對多
 	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
+	@JsonIgnore
 	private List<RescueCase> rescueCases;
 
 	// 和LostCase表雙向一對多
 	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
+	@JsonIgnore
 	private List<LostCase> lostCases;
 
 	// 和adoptionCase表雙向一對多
 	@OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
+	@JsonIgnore
 	private List<AdoptionCase> adoptionCases;
 
 	public City() {
@@ -100,11 +103,6 @@ public class City {
 
 	public void setAdoptionCases(List<AdoptionCase> adoptionCases) {
 		this.adoptionCases = adoptionCases;
-	}
-
-	@Override
-	public String toString() {
-		return "City [cityId=" + cityId + ", city=" + city + "]";
 	}
 
 }

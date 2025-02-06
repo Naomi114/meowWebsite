@@ -2,14 +2,13 @@ package tw.com.ispan.domain.pet;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,7 +20,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "DistrictArea")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "districtAreaId") // 使用districtAreaId作為唯一標識符
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "districtAreaId")
 public class DistrictArea {
 
 	@Id
@@ -31,22 +30,24 @@ public class DistrictArea {
 	@Column(columnDefinition = "NVARCHAR(5)", name = "districtAreaName", nullable = false)
 	private String districtAreaName;
 
-	// 多對一關聯至 City
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "cityId", nullable = true, foreignKey = @ForeignKey(name = "FK_DistrictArea_City"))
-	@JsonBackReference // 避免 JSON 循環問題
+	// 和City表雙向多對一
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "cityId", nullable = true, foreignKey = @ForeignKey(name = "FK_DistrictAreas_City"))
 	private City city;
 
 	// 和RescueCase表雙向一對多
 	@OneToMany(mappedBy = "districtArea", cascade = CascadeType.PERSIST)
+	@JsonIgnore
 	private List<RescueCase> rescueCases;
 
 	// 和LostCase表雙向一對多
 	@OneToMany(mappedBy = "districtArea", cascade = CascadeType.PERSIST)
+	@JsonIgnore
 	private List<LostCase> lostCases;
 
 	// 和adoptionCase表雙向一對多
 	@OneToMany(mappedBy = "districtArea", cascade = CascadeType.PERSIST)
+	@JsonIgnore
 	private List<AdoptionCase> adoptionCase;
 
 	public DistrictArea() {
@@ -63,7 +64,7 @@ public class DistrictArea {
 		return districtAreaId;
 	}
 
-	public void setDistrictAreaId(Integer districtAreaId) {
+	public void setDistrictAreaId(int districtAreaId) {
 		this.districtAreaId = districtAreaId;
 	}
 
@@ -74,7 +75,8 @@ public class DistrictArea {
 	public void setDistrictAreaName(String districtAreaName) {
 		this.districtAreaName = districtAreaName;
 	}
-
+	
+	
 	public City getCity() {
 		return city;
 	}
@@ -89,27 +91,6 @@ public class DistrictArea {
 
 	public void setRescueCases(List<RescueCase> rescueCases) {
 		this.rescueCases = rescueCases;
-	}
-
-	public List<LostCase> getLostCases() {
-		return lostCases;
-	}
-
-	public void setLostCases(List<LostCase> lostCases) {
-		this.lostCases = lostCases;
-	}
-
-	public List<AdoptionCase> getAdoptionCase() {
-		return adoptionCase;
-	}
-
-	public void setAdoptionCase(List<AdoptionCase> adoptionCase) {
-		this.adoptionCase = adoptionCase;
-	}
-
-	@Override
-	public String toString() {
-		return "DistrictArea [districtAreaId=" + districtAreaId + ", districtAreaName=" + districtAreaName + "]";
 	}
 
 }

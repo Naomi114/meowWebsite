@@ -21,10 +21,12 @@ public class ActivityParticipantList {
     @Column(name = "participantId")
     private Integer participantId;
 
+    //雙向多對一
     @ManyToOne
     @JoinColumn(name = "activityId", nullable = false)
     private Activity activity;
 
+    //雙向多對一
     @ManyToOne
     @JoinColumn(name = "memberId", nullable = false)
     private Member member;
