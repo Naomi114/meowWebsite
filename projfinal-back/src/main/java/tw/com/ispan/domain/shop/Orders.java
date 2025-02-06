@@ -192,4 +192,8 @@ public class Orders {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
     }
+
+    public String getCustomerEmail() {
+        return this.member.getEmail(); // Assuming 'member' has a method 'getEmail()'
+    }
 }

@@ -1,8 +1,11 @@
 package tw.com.ispan.service.shop;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.mail.MessagingException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -50,11 +53,18 @@ public class OrderService implements IOrderService {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
+    @Autowired
+    private JavaMailSender javaMailSender; // 用于发送邮件
+
+    @Autowired
+    private EmailService emailService; // 用于发送邮件的 EmailService
+
     private final Map<Integer, String> orderTradeMap = new HashMap<>();
 
     // 更新 ECPay 交易 ID 和 MerchantTradeNo
     @Transactional
     public Orders updateEcpayTransactionIds(Integer orderId, String merchantTradeNo, String transactionId) {
+
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
 
@@ -106,7 +116,7 @@ public class OrderService implements IOrderService {
 
     // 处理支付
     @Transactional
-    public Orders processPayment(Integer orderId, PaymentRequest paymentRequest) {
+    public Orders processPayment(Integer orderId, PaymentRequest paymentRequest) throws MessagingException {
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
 
@@ -116,7 +126,40 @@ public class OrderService implements IOrderService {
             order.setOrderStatus("付款失敗");
         }
 
-        return orderRepository.save(order);
+        // 更新訂單狀態
+        orderRepository.save(order);
+
+        // 準備郵件內容
+        String emailContent = generateEmailContent(order);
+
+        emailService.sendEmail(order.getMember().getEmail(), "交易明細", emailContent);
+
+        return order;
+    }
+
+    // 根據訂單生成郵件內容
+    private String generateEmailContent(Orders order) {
+        StringBuilder emailContent = new StringBuilder();
+        emailContent.append("<h3>您的訂單已處理</h3>");
+        emailContent.append("<p>訂單編號: " + order.getOrderId() + "</p>");
+        emailContent.append("<p>訂單狀態: " + order.getOrderStatus() + "</p>");
+        emailContent.append("<p>訂單總金額: NT$" + order.getFinalPrice() + "</p>");
+        emailContent.append("<p>訂單詳情：</p>");
+        emailContent.append("<table border='1'><tr><th>商品名稱</th><th>數量</th><th>單價</th><th>金額</th></tr>");
+
+        // 生成訂單項目
+        for (OrderItem item : order.getOrderItems()) {
+            emailContent.append("<tr>")
+                    .append("<td>").append(item.getProduct().getProductName()).append("</td>")
+                    .append("<td>").append(item.getOrderQuantity()).append("</td>")
+                    .append("<td>").append(item.getPurchasedPrice()).append("</td>")
+                    .append("<td>").append(item.getPurchasedPrice().multiply(new BigDecimal(item.getOrderQuantity())))
+                    .append("</td>")
+                    .append("</tr>");
+        }
+
+        emailContent.append("</table>");
+        return emailContent.toString();
     }
 
     // 提交订单
@@ -298,6 +341,7 @@ public class OrderService implements IOrderService {
         Orders order = orderRepository.findById(orderId.intValue())
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
         return order;
+
     }
 
     @Override

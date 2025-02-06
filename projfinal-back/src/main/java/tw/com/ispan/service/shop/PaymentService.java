@@ -21,13 +21,13 @@ public class PaymentService {
             // 根据支付结果更新订单状态
             if (success) {
                 // 更新 merchantTradeNo 和 transactionId
-                order.setMerchantTradeNo(merchantTradeNo);  // 通过绿界返回的 merchantTradeNo 更新
-                order.setTransactionId(transactionId);  // 通过绿界返回的 transactionId 更新
-                order.setOrderStatus("已支付");  // 设置订单状态为已支付
+                order.setMerchantTradeNo(merchantTradeNo); // 通过绿界返回的 merchantTradeNo 更新
+                order.setTransactionId(transactionId); // 通过绿界返回的 transactionId 更新
+                order.setOrderStatus("已支付"); // 设置订单状态为已支付
             } else {
-                order.setOrderStatus("支付失败");  // 设置订单状态为支付失败
+                order.setOrderStatus("支付失败"); // 设置订单状态为支付失败
             }
-            orderRepository.save(order);  // 保存更新后的订单
+            orderRepository.save(order); // 保存更新后的订单
         }
     }
 
