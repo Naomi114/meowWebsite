@@ -132,9 +132,6 @@ public class AdoptionCase {
     @OneToMany(mappedBy = "adoptionCase", cascade = CascadeType.ALL)
     private List<ReportCase> reportCase;
 
-
-
-
     // 與AdoptionCaseApply 多對多
     @ManyToMany
     @JoinTable(name = "Case_CaseApply", joinColumns = @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_Case")), inverseJoinColumns = @JoinColumn(name = "adoptionCaseApplyId", foreignKey = @ForeignKey(name = "FK_CaseApply")))

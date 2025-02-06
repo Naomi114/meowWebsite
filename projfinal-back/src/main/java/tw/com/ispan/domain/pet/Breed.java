@@ -28,15 +28,15 @@ public class Breed {
 
     @Column(name = "breed", nullable = false, columnDefinition = "NVARCHAR(50)")
     private String breed;
-    
+
     @JsonIgnore
     @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
     private List<LostCase> lostCases;
-    
+
     @JsonIgnore
     @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
     private List<RescueCase> rescueCases;
-    
+
     @JsonIgnore
     @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
     private List<AdoptionCase> adoptionCases;

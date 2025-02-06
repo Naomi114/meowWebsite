@@ -18,7 +18,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "FurColor")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "furColorId")                                                                                           // 作為唯一標識符
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "furColorId") // 作為唯一標識符
 
 public class FurColor {
 
@@ -29,15 +29,15 @@ public class FurColor {
 
     @Column(name = "furColor", nullable = false, length = 20)
     private String furColor;
-    
+
     @JsonIgnore
     @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
     private List<LostCase> lostCases;
-    
+
     @JsonIgnore
     @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
     private List<RescueCase> rescueCases;
-    
+
     @JsonIgnore
     @OneToMany(mappedBy = "furColor", cascade = CascadeType.ALL)
     private List<AdoptionCase> adoptionCase;

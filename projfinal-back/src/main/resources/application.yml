@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: projfinal-meow
@@ -5,12 +8,15 @@ spring:
   profiles:
     active: "@xxxx@"
 
+    web:
+    resources:
+      static-locations: classpath:/static/
   #資料庫連線設定
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://localhost:1433;database=meowdb;trustServerCertificate=true;
-    username: admin
-    password: a123
+    url: jdbc:sqlserver://localhost:1433;database=meowdb;trustServerCertificate=true
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:a123}
 
   #Hibernate/JPA的相關設定
   jpa:
@@ -18,6 +24,8 @@ spring:
       hibernate:
         format_sql: true
     show-sql: true
+    properties:
+      hibernate.format_sql: true
     database-platform: org.hibernate.dialect.SQLServerDialect
     hibernate:
       ddl-auto: create
@@ -35,18 +43,30 @@ spring:
       repositories:
         enabled: false #禁止Redis 的自動儲存庫掃描，改手動啟用所需的 Redis 儲存庫
 
+
+  #靜態資源目錄添加到外部目錄，讓前端能夠直接存取商城上傳的圖片；
+  web:
+    resources:
+      static-locations: file:C:/meowWebsite/images/
+
   #圖片大小限制
   servlet:
     multipart:
+      enabled: true
       max-file-size: 5MB
-      max-request-size: 5MB
+      max-request-size: 20MB
+#商城圖片下載路徑 (動態路徑)
+file:
+  storage:
+    uploadDir: C:/meowWebsite/images #指向實際的存儲目錄
+    baseUrl: ${BASE_URL:http://localhost:8080/images} #對應圖片的訪問 URL
       enabled: true
 
-    #spring手動設定 HTTP 請求和回應的字符編碼(冠)
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
+  #spring手動設定 HTTP 請求和回應的字符編碼(冠)
+  encoding:
+    charset: UTF-8
+    enabled: true
+    force: true
 
   #寵物圖片暫存路徑(冠)
 file:
@@ -119,3 +139,17 @@ line:
     redirect-uri: ${back.domainName.url}/line/callback
     channel-id: 2006807062
     channel-secret: 1f781b9cf730b0c4decdeba7eead6778
+
+
+jackson:
+  serialization:
+    fail-on-empty-beans: false
+
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: a0912829673+test@gmail.com
+  password: frww ocfi lxda dscs
+
+
+  

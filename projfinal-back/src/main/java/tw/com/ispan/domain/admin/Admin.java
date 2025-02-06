@@ -1,20 +1,23 @@
 package tw.com.ispan.domain.admin;
 
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import tw.com.ispan.domain.shop.Discount;
+import tw.com.ispan.domain.shop.Inventory;
+import tw.com.ispan.domain.shop.Product;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 // import tw.com.ispan.domain.shop.Discount;
 // import tw.com.ispan.domain.shop.Inventory;
 // import tw.com.ispan.domain.shop.ProductBean;
 
 @Entity
-@Table(name = "admin")
+@Table(name = "Admin") // Ensure the table name matches convention
 public class Admin {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer adminId;
@@ -35,23 +38,20 @@ public class Admin {
 	@Column(nullable = false)
 	private LocalDateTime updateDate;
 
-	// 雙向一對多，對應Discount
-	// @OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval =
-	// true)
-	// @JsonManagedReference("admin") // by Naomi
-	// private List<Discount> discounts = new ArrayList<>();
+	// One-to-many relationship with Discount (no back reference in Admin)
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval = true)
+	@JsonManagedReference("admin-discounts") // Using a unique reference name for serialization
+	private List<Discount> discounts;
 
-	// 雙向一對多，對應Inventory
-	// @OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval =
-	// true)
-	// @JsonManagedReference("admin") // by Naomi
-	// private Set<Inventory> inventory = new HashSet<>();
+	// One-to-many relationship with Inventory
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval = true)
+	private Set<Inventory> inventory = new HashSet<>();
 
-	// 雙向一對多，對應ProductBean (by Naomi)
-	// @OneToMany(cascade = CascadeType.ALL, mappedBy = "admin", orphanRemoval =
-	// true)
-	// @JsonManagedReference("admin")
-	// private Set<ProductBean> products = new HashSet<>();
+	// One-to-many relationship with Product
+	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
+			CascadeType.REFRESH }, mappedBy = "admin", orphanRemoval = true)
+	@JsonManagedReference("admin") // Unique reference for Products
+	private Set<Product> products = new HashSet<>();
 
 	public Admin(Integer adminId, String adminName, String password, LocalDateTime createDate, LocalDateTime updateDate
 	// ,List<Discount> discounts, Set<InventoryBean> inventory
@@ -116,4 +116,32 @@ public class Admin {
 				+ "]";
 	}
 
+	public List<Discount> getDiscounts() {
+		return discounts;
+	}
+
+	public void setDiscounts(List<Discount> discounts) {
+		this.discounts = discounts;
+	}
+
+	public Set<Inventory> getInventory() {
+		return inventory;
+	}
+
+	public void setInventory(Set<Inventory> inventory) {
+		this.inventory = inventory;
+	}
+
+	public Set<Product> getProducts() {
+		return products;
+	}
+
+	public void setProducts(Set<Product> products) {
+		this.products = products;
+	}
+
+	@Override
+	public String toString() {
+		return "Admin [adminId=" + adminId + ", adminName=" + adminName + "]";
+	}
 }

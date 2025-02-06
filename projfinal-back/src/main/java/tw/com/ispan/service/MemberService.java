@@ -1,9 +1,16 @@
 package tw.com.ispan.service;
+package tw.com.ispan.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +19,16 @@ import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.dto.MemberDto;
 import tw.com.ispan.dto.PasswordDto;
 import tw.com.ispan.repository.admin.MemberRepository;
+import tw.com.ispan.domain.admin.Member;
+import tw.com.ispan.dto.MemberDto;
+import tw.com.ispan.dto.PasswordDto;
+import tw.com.ispan.repository.admin.MemberRepository;
+
+@Service
+@Transactional
+public class MemberService {
+    @Autowired
+    private MemberRepository memberRepository;
 
 @Service
 @Transactional

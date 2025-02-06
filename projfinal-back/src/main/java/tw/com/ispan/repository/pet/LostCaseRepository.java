@@ -8,5 +8,5 @@ import tw.com.ispan.domain.pet.LostCase;
 
 @Repository
 public interface LostCaseRepository
-                extends JpaRepository<LostCase, Integer>, JpaSpecificationExecutor<LostCase> {
+        extends JpaRepository<LostCase, Integer>, JpaSpecificationExecutor<LostCase> {
 }

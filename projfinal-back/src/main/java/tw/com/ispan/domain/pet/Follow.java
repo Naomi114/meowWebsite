@@ -45,9 +45,7 @@ public class Follow {
 	@Column(name = "notifications_enabled")
 	private Boolean notificationsEnabled;
 
-	
-	
-	//getter & setter
+	// getter & setter
 	public Integer getFollowId() {
 		return followId;
 	}
@@ -103,7 +101,5 @@ public class Follow {
 	public void setNotificationsEnabled(Boolean notificationsEnabled) {
 		this.notificationsEnabled = notificationsEnabled;
 	}
-	
-	
-	
+
 }

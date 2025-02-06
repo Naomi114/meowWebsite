@@ -8,5 +8,4 @@ import tw.com.ispan.domain.pet.CasePicture;
 
 public interface CasePictureRepository extends JpaRepository<CasePicture, Integer> {
 
-   
 }

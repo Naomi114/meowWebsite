@@ -12,12 +12,11 @@ import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.dto.MemberDto;
 
 public interface MemberRepository extends JpaRepository<Member, Integer> {
-    Optional<Member> findByEmail(String email);
+	Optional<Member> findByEmail(String email);
 
-    List<Member> findByEmailContaining(String email);
+	List<Member> findByEmailContaining(String email);
 
-
-	//以下為冠儒增加的
+	// 以下為冠儒增加的
 	Optional<Member> findByNickName(String nickName);
 
 	// 默認情況下Spring Data JPA 的 @Query 方法僅用於查詢SELECT，當執行非查詢操作（如
@@ -38,4 +37,18 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 	@Query("UPDATE Member m SET m.followed = true WHERE m.lineId = :lineId")
 	void updateFollowed(@Param("lineId") String lineId);
 
+	Optional<Member> findByNickName(String nickName);
+
+	Optional<Member> findByEmail(String email);
+
+	List<Member> findByEmailContaining(String email);
+
+	// NotificationService 查詢會員 (by Naomi)
+	Optional<Member> findById(Long memberId);
+
+	// by Naomi
+	boolean existsByEmail(String email);
+
+	// by Naomi
+	boolean existsByNickName(String nickname);
 }

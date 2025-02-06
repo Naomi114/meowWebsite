@@ -8,8 +8,8 @@ import org.springframework.data.repository.query.Param;
 
 import tw.com.ispan.domain.pet.forRescue.RescueProgress;
 
-public interface RescueProgressRepository extends JpaRepository<RescueProgress, Integer>{
-	
-	//根據案件id查詢救援進度
+public interface RescueProgressRepository extends JpaRepository<RescueProgress, Integer> {
+
+	// 根據案件id查詢救援進度
 	List<RescueProgress> findByRescueCase_RescueCaseId(Integer rescueCaseId);
 }

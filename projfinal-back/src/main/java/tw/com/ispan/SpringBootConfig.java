@@ -8,10 +8,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SpringBootConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        /* 將前後端頁面註冊後，CORS可以跨過SOP限制 */
-        // registry.addMapping("/ajax/pages/products/**")
-        // .allowedMethods("GET", "POST", "PUT", "DELETE");
-
-        // registry.addMapping("/ajax/secure/login");
+        // 允許的來源網址
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:5173") // 允許前端的 Vue 地址
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedHeaders("*")
+                .allowCredentials(true); // 允許攜帶憑證（cookies）
     }
 }

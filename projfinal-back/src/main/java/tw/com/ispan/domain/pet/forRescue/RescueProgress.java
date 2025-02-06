@@ -22,10 +22,10 @@ public class RescueProgress {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "rescueProgressId")
 	private Integer rescueProgressId;
-	
+
 	@JsonIgnore // 忽略序列化此字段
 	@ManyToOne
-	@JoinColumn(name="rescueCaseId", nullable = false)
+	@JoinColumn(name = "rescueCaseId", nullable = false)
 	private RescueCase rescueCase;
 
 	@Column(name = "progressDetail", columnDefinition = "nvarchar(max)")
@@ -36,62 +36,50 @@ public class RescueProgress {
 
 	@Column(name = "imageUrl", length = 255)
 	private String imageUrl;
-	
-	
+
 	public RescueProgress() {
 		super();
 	}
-
 
 	public Integer getRescueProgressId() {
 		return rescueProgressId;
 	}
 
-
 	public void setRescueProgressId(Integer rescueProgressId) {
 		this.rescueProgressId = rescueProgressId;
 	}
-	
-	
+
 	public RescueCase getRescueCase() {
 		return rescueCase;
 	}
-
 
 	public void setRescueCase(RescueCase rescueCase) {
 		this.rescueCase = rescueCase;
 	}
 
-
 	public String getProgressDetail() {
 		return progressDetail;
 	}
-
 
 	public void setProgressDetail(String progressDetail) {
 		this.progressDetail = progressDetail;
 	}
 
-
 	public LocalDateTime getCreateTime() {
 		return createTime;
 	}
-
 
 	public void setCreateTime(LocalDateTime createTime) {
 		this.createTime = createTime;
 	}
 
-
 	public String getImageUrl() {
 		return imageUrl;
 	}
 
-
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
-
 
 	@Override
 	public String toString() {
@@ -99,6 +87,4 @@ public class RescueProgress {
 				+ ", createTime=" + createTime + ", imageUrl=" + imageUrl + "]";
 	}
 
-	
-	
 }
