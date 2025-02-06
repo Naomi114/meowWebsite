@@ -1,7 +1,6 @@
 package tw.com.ispan.controller.pet;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,15 +23,20 @@ public class BannerController {
     private BannerService bannerService;
 
     /**
-     * 根據 Case ID 和 Banner 類型查詢 Banner
+     * 根據 Banner 類型查詢對應的 Banners
+     *
+     * @param bannerType Banner 類型（LOST, ADOPTION, RESCUE）
+     * @return 符合條件的 Banner 列表
      */
     @GetMapping("/{bannerType}")
-    public ResponseEntity<Banner> getBannerByCaseId(
-            @PathVariable Integer caseId,
-            @PathVariable BannerType bannerType) {
-
-        Optional<Banner> banner = bannerService.getBannerByCaseId(caseId, bannerType);
-        return banner.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<List<Banner>> getBannersByType(@PathVariable String bannerType) {
+        try {
+            BannerType type = BannerType.valueOf(bannerType.toUpperCase()); // 確保 ENUM 值正確
+            List<Banner> banners = bannerService.findByBannerType(type);
+            return ResponseEntity.ok(banners);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null); // 參數錯誤時回傳 400 Bad Request
+        }
     }
 
     /**

@@ -30,7 +30,6 @@ import tw.com.ispan.domain.pet.Banner.Banner;
         @Index(name = "idx_species", columnList = "speciesId"),
         @Index(name = "idx_breed", columnList = "breedId"),
         @Index(name = "idx_furColor", columnList = "furColorId"),
-        @Index(name = "idx_suspLost", columnList = "suspLost"),
         @Index(name = "idx_city", columnList = "cityId"),
         @Index(name = "idx_districtArea", columnList = "districtAreaId")
 })
@@ -95,12 +94,12 @@ public class LostCase {
 
     // 必填(請求成功後記得改回來)
     // 10位數，8位小數
-    @Column(name = "latitude", precision = 10, nullable = false)
+    @Column(name = "latitude", precision = 10, nullable = true)
     private Double latitude;
 
     // 必填
     // 11位數，8位小數
-    @Column(name = "longitude", precision = 11, nullable = false)
+    @Column(name = "longitude", precision = 11, nullable = true)
     private Double longitude;
 
     @Column(name = "donationAmount")

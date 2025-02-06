@@ -162,8 +162,8 @@ public class LostCaseService {
         lostCase.setSterilization(param.getString("sterilization"));
         lostCase.setAge(param.optInt("age", -1));
         lostCase.setMicroChipNumber(param.optInt("microChipNumber", -1));
-        lostCase.setLatitude(param.getDouble("latitude"));
-        lostCase.setLongitude(param.getDouble("longitude"));
+        // lostCase.setLatitude(param.getDouble("latitude"));
+        // lostCase.setLongitude(param.getDouble("longitude"));
         lostCase.setDonationAmount(param.optInt("donationAmount", 0));
 
         // **固定案件狀態為「待協尋」（caseStateId = 5）**

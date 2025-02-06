@@ -25,10 +25,11 @@ public interface BannerRepository extends JpaRepository<Banner, Integer> {
 
     void deleteByLostCase_LostCaseIdAndBannerType(Integer caseId, BannerType bannerType);
 
-    // void deleteByRescueCase_RescueCaseIdAndBannerType(Integer caseId, BannerType
-    // bannerType);
+    List<Banner> findByBannerType(BannerType bannerType);
 
-    // void deleteByAdoptionCase_AdoptionCaseIdAndBannerType(Integer caseId,
-    // BannerType bannerType);
+    void deleteByRescueCase_RescueCaseIdAndBannerType(Integer caseId, BannerType bannerType);
+
+    void deleteByAdoptionCase_AdoptionCaseIdAndBannerType(Integer caseId,
+            BannerType bannerType);
 
 }
