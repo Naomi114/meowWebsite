@@ -40,6 +40,19 @@ public class Banner {
     @Column(name = "isHidden", nullable = false)
     private Boolean isHidden = false;
 
+    // ✅ 新增 getter 方法，方便 `BannerDTO` 轉換時使用
+    public Integer getLostCaseId() {
+        return lostCase != null ? lostCase.getLostCaseId() : null;
+    }
+
+    public Integer getRescueCaseId() {
+        return rescueCase != null ? rescueCase.getRescueCaseId() : null;
+    }
+
+    public Integer getAdoptionCaseId() {
+        return adoptionCase != null ? adoptionCase.getAdoptionCaseId() : null;
+    }
+
     // Getters and Setters
     public Integer getBannerId() {
         return bannerId;
