@@ -63,11 +63,11 @@ public class AdoptionCaseController {
     @GetMapping("/search")
     public List<AdoptionCase> searchAdoptionCases(
             @RequestParam(value = "cityId", required = false) Long cityId,
-            @RequestParam(value = "distinctAreaId", required = false) Long distinctAreaId,
+            @RequestParam(value = "districtAreaId", required = false) Long districtAreaId,
             @RequestParam(value = "caseStateId", required = false) Long caseStateId,
             @RequestParam(value = "speciesId", required = false) Long speciesId,
             @RequestParam(value = "gender", required = false) String gender) {
-        return adoptionCaseService.searchAdoptionCases(cityId, distinctAreaId, caseStateId, speciesId, gender);
+        return adoptionCaseService.searchAdoptionCases(cityId, districtAreaId, caseStateId, speciesId, gender);
     }
 
    

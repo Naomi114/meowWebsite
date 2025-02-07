@@ -39,7 +39,7 @@ public class AdoptionCaseService {
     @Autowired
     private CityRepository cityRepository; // 新的 City repository
     @Autowired
-    private DistrictAreaRepository districtAreaRepository; // 新的 DistinctArea repository
+    private DistrictAreaRepository districtAreaRepository; // 新的 districtArea repository
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
@@ -103,8 +103,8 @@ public class AdoptionCaseService {
 
     // -----------------------------------------------------------------------------
     // 查詢
-    public List<AdoptionCase> searchAdoptionCases(Long cityId, Long distinctAreaId, Long caseStateId, Long speciesId,
+    public List<AdoptionCase> searchAdoptionCases(Long cityId, Long districtAreaId, Long caseStateId, Long speciesId,
             String gender) {
-        return adoptionCaseRepository.searchAdoptionCases(cityId, distinctAreaId, caseStateId, speciesId, gender);
+        return adoptionCaseRepository.searchAdoptionCases(cityId, districtAreaId, caseStateId, speciesId, gender);
     }
 }

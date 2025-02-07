@@ -45,13 +45,13 @@ public class LostcaseSpecifications {
     }
 
     // 根據鄉鎮區名稱模糊查詢
-    public static Specification<LostCase> hasDistinctAreaNameLike(String distinctAreaName) {
+    public static Specification<LostCase> hasDistrictAreaNameLike(String districtAreaName) {
         return (root, query, criteriaBuilder) -> {
-            if (distinctAreaName == null || distinctAreaName.trim().isEmpty()) {
+            if (districtAreaName == null || districtAreaName.trim().isEmpty()) {
                 return null; // 如果鄉鎮區名稱為空，則不加入條件
             }
-            String likePattern = "%" + distinctAreaName + "%";
-            return criteriaBuilder.like(root.get("distinctArea").get("name"), likePattern);
+            String likePattern = "%" + districtAreaName + "%";
+            return criteriaBuilder.like(root.get("districtArea").get("name"), likePattern);
         };
     }
 }

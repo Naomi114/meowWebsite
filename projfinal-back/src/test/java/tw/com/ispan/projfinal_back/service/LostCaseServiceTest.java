@@ -60,7 +60,7 @@
 //                .put("breedId", 3) // 品种 ID
 //                .put("furColorId", 5) // 毛色 ID
 //                .put("cityId", 2) // 城市 ID，例如：新北市
-//                .put("distinctAreaId", 8) // 区域 ID
+//                .put("districtAreaId", 8) // 区域 ID
 //                .put("street", "New Updated Street Name")
 //                .put("gender", "Male")
 //                .put("sterilization", "Yes")
@@ -93,7 +93,7 @@
 //                .put("breedId", 3) // 品种 ID
 //                .put("furColorId", 5) // 毛色 ID
 //                .put("cityId", 2) // 城市 ID，例如：新北市
-//                .put("distinctAreaId", 8) // 区域 ID
+//                .put("districtAreaId", 8) // 区域 ID
 //                .put("street", "New Street Name")
 //                .put("gender", "Female")
 //                .put("sterilization", "No")
