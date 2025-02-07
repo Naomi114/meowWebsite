@@ -363,4 +363,10 @@ public class OrderService implements IOrderService {
         order.setMerchantTradeNo(merchantTradeNo);
         orderRepository.save(order); // Save the updated order
     }
+
+    public boolean submitOrder(int cartId, int memberId, String creditCard, String shippingAddress,
+            List<Integer> selectedItems) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'submitOrder'");
+    }
 }

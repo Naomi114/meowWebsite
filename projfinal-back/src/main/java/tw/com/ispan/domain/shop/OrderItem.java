@@ -12,26 +12,26 @@ public class OrderItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer orderItemId;  // 訂單項目 ID
+    private Integer orderItemId; // 訂單項目 ID
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
-    @JsonBackReference  // 防止序列化時的循環引用
-    private Orders order;  // 關聯到 Orders
+    @JsonBackReference // 防止序列化時的循環引用
+    private Orders order; // 關聯到 Orders
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})  // 避免 Hibernate 懶加載問題
-    private Product product;  // 關聯到商品
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" }) // 避免 Hibernate 懶加載問題
+    private Product product; // 關聯到商品
 
     @Column(nullable = false)
-    private Integer orderQuantity;  // 訂購數量
+    private Integer orderQuantity; // 訂購數量
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal purchasedPrice;  // 當前購買時的價格
+    private BigDecimal purchasedPrice; // 當前購買時的價格
 
     @Column(nullable = false)
-    private String status;  // 訂單狀態（如："備貨中"、"已發貨"）
+    private String status; // 訂單狀態（如："備貨中"、"已發貨"）
 
     // **新增方法**：提供商品名稱，確保前端可以獲取
     @JsonProperty("productName")
@@ -40,11 +40,12 @@ public class OrderItem {
     }
 
     // 預設建構子
-    public OrderItem() {}
+    public OrderItem() {
+    }
 
     // 全部欄位建構子
     public OrderItem(Integer orderItemId, Orders order, Product product, Integer orderQuantity,
-                     BigDecimal purchasedPrice, String status) {
+            BigDecimal purchasedPrice, String status) {
         this.orderItemId = orderItemId;
         this.order = order;
         this.product = product;
@@ -120,12 +121,17 @@ public class OrderItem {
 
     @Override
     public String toString() {
-        return "OrderItem [orderItemId=" + orderItemId + 
-               ", order=" + (order != null ? order.getOrderId() : "null") +
-               ", product=" + (product != null ? product.getProductId() : "null") +
-               ", productName=" + getProductName() +
-               ", orderQuantity=" + orderQuantity + 
-               ", purchasedPrice=" + purchasedPrice + 
-               ", status=" + status + "]";
+        return "OrderItem [orderItemId=" + orderItemId +
+                ", order=" + (order != null ? order.getOrderId() : "null") +
+                ", product=" + (product != null ? product.getProductId() : "null") +
+                ", productName=" + getProductName() +
+                ", orderQuantity=" + orderQuantity +
+                ", purchasedPrice=" + purchasedPrice +
+                ", status=" + status + "]";
+    }
+
+    public void setCartId(Integer cartId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCartId'");
     }
 }
