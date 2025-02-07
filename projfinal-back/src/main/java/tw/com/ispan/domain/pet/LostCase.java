@@ -84,7 +84,7 @@ public class LostCase {
     @JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_City"))
     private City city;
 
-    // 關聯到 DistinctArea 表，雙向多對一
+    // 關聯到 districtArea 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "districtAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_districtArea"))
     private DistrictArea districtArea;
