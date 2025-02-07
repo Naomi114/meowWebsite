@@ -65,30 +65,34 @@ public class Member {
     @Column(nullable = false)
     private LocalDateTime updateDate;
 
-    // 以下為給line login使用
+    // 以下為給line login使用(冠)
     private String lineId;
 
     private String lineName;
 
     private String linePicture;
 
-    // 以下為給追蹤line商家帳號使用
+    // 以下為給追蹤line商家帳號使用(冠)
     private boolean followed = false;
 
     @Column(nullable = false)
-    private boolean userType; // 1表示註冊會員，0表示line登入會員
+    private boolean userType; // 1表示註冊會員，0表示line登入會員(冠)
 
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    private Set<Activity> activity;
+ 	// 雙向一對多
+     @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST })
+     private List<Activity> activity;
 
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    private Set<ActivityParticipantList> acitvityParticipantList;
+   // 會員和活動的中介表 雙向一對多
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST }, orphanRemoval = true)
+	private List<ActivityParticipantList> acitvityParticipantLists;
 
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    private List<RescueCase> rescueCases;
+   // 雙向一對多
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST })
+	private List<RescueCase> rescueCases;
 
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
-    private Set<Follow> follow = new HashSet<>();
+  	// 單向一對多
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
+	private List<Follow> follows;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<LostCase> lostCase = new ArrayList<>();
@@ -124,9 +128,9 @@ public class Member {
 
     public Member(Integer memberId, String nickName, String password, String name, String email, String phone,
             String address, LocalDate birthday, LocalDateTime createDate, LocalDateTime updateDate,
-            Set<Activity> activity, Set<ActivityParticipantList> acitvityParticipantList, String lineId,
+            List<Activity> activity, List<ActivityParticipantList> acitvityParticipantList, String lineId,
             String lineName, String linePicture, boolean followed, boolean userType, List<WishList> wishList,
-            Set<Cart> cart, Set<CartActionLog> cartActionLog, List<Orders> orders, Set<Follow> follow,
+            Set<Cart> cart, Set<CartActionLog> cartActionLog, List<Orders> orders, List<Follow> follows,
             List<LostCase> lostCase, List<AdoptionCase> adoptionCase, List<ReportCase> reportCase,
             Set<AdoptionCaseApply> adoptionCaseApply) {
         this.memberId = memberId;
@@ -140,7 +144,7 @@ public class Member {
         this.createDate = createDate;
         this.updateDate = updateDate;
         this.activity = activity;
-        this.acitvityParticipantList = acitvityParticipantList;
+        this.acitvityParticipantLists = acitvityParticipantList;
         this.lineId = lineId;
         this.lineName = lineName;
         this.linePicture = linePicture;
@@ -150,28 +154,47 @@ public class Member {
         this.cart = cart;
         this.cartActionLog = cartActionLog;
         this.orders = orders;
-        this.follow = follow;
+        this.follows = follows;
         this.lostCase = lostCase;
         this.adoptionCase = adoptionCase;
         this.reportCase = reportCase;
         this.adoptionCaseApply = adoptionCaseApply;
     }
 
-    public Set<Activity> getActivity() {
+  
+
+    public List<Activity> getActivity() {
         return activity;
     }
 
-    public void setActivity(Set<Activity> activity) {
+    public void setActivity(List<Activity> activity) {
         this.activity = activity;
     }
 
-    public Set<ActivityParticipantList> getAcitvityParticipantList() {
-        return acitvityParticipantList;
+    public List<ActivityParticipantList> getAcitvityParticipantLists() {
+        return acitvityParticipantLists;
     }
 
-    public void setAcitvityParticipantList(Set<ActivityParticipantList> acitvityParticipantList) {
-        this.acitvityParticipantList = acitvityParticipantList;
+    public void setAcitvityParticipantLists(List<ActivityParticipantList> acitvityParticipantLists) {
+        this.acitvityParticipantLists = acitvityParticipantLists;
     }
+
+    public List<RescueCase> getRescueCases() {
+        return rescueCases;
+    }
+
+    public void setRescueCases(List<RescueCase> rescueCases) {
+        this.rescueCases = rescueCases;
+    }
+
+    public List<Follow> getFollows() {
+        return follows;
+    }
+
+    public void setFollows(List<Follow> follows) {
+        this.follows = follows;
+    }
+
 
     public String getLineId() {
         return lineId;
@@ -220,15 +243,6 @@ public class Member {
     public void setCartActionLog(Set<CartActionLog> cartActionLog) {
         this.cartActionLog = cartActionLog;
     }
-
-    public Set<Follow> getFollow() {
-        return follow;
-    }
-
-    public void setFollow(Set<Follow> follow) {
-        this.follow = follow;
-    }
-
     public List<LostCase> getLostCase() {
         return lostCase;
     }
@@ -370,6 +384,8 @@ public class Member {
         return this.memberId;
     }
 
+
+    
     @Override
     public String toString() {
         return "Member{" +

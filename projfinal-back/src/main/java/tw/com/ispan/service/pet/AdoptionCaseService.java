@@ -39,110 +39,52 @@ public class AdoptionCaseService {
     @Autowired
     private CityRepository cityRepository; // 新的 City repository
     @Autowired
-    private DistrictAreaRepository distinctAreaRepository; // 新的 DistinctArea repository
+    private DistrictAreaRepository districtAreaRepository; // 新的 districtArea repository
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
     private SpeciesRepository speciesRepository;
 
     // 新增
-    public AdoptionCase createAdoptionCase(AdoptionCase adoptionCase) {
-
-        // 确保传递了 caseTitle
-        if (adoptionCase.getCaseTitle() == null || adoptionCase.getCaseTitle().isEmpty()) {
-            throw new IllegalArgumentException("CaseTitle must not be null or empty");
-        }
-        adoptionCase.setCaseTitle(adoptionCase.getCaseTitle()); // 确保值传递到实体
-
-        // 确保传递了 story
-        if (adoptionCase.getStory() == null || adoptionCase.getStory().isEmpty()) {
-            throw new IllegalArgumentException("Story must not be null or empty");
-        }
-        adoptionCase.setStory(adoptionCase.getStory()); // 设置 story
-
-        // 确保传递了 healthCondition
-        if (adoptionCase.getHealthCondition() == null || adoptionCase.getHealthCondition().isEmpty()) {
-            throw new IllegalArgumentException("HealthCondition must not be null or empty");
-        }
-        adoptionCase.setHealthCondition(adoptionCase.getHealthCondition()); // 设置 healthCondition
-
-        // 确保传递了 adoptedCondition
-        if (adoptionCase.getAdoptedCondition() == null || adoptionCase.getAdoptedCondition().isEmpty()) {
-            throw new IllegalArgumentException("AdoptedCondition must not be null or empty");
-        }
-        adoptionCase.setAdoptedCondition(adoptionCase.getAdoptedCondition()); // 设置 adoptedCondition
-
-        // 检查并设置 breedId
-        Integer breedId = adoptionCase.getBreed().getBreedId();
-        if (breedId == null) {
-            throw new IllegalArgumentException("Breed ID must not be null");
-        }
-        Breed breed = breedRepository.findById(breedId)
-                .orElseThrow(() -> new IllegalArgumentException("Breed with ID " + breedId + " not found"));
-        adoptionCase.setBreed(breed);
-
-        // 检查并设置 caseStateId
-        Integer caseStateId = adoptionCase.getCaseState().getCaseStateId();
-        if (caseStateId == null) {
-            throw new IllegalArgumentException("CaseState ID must not be null");
-        }
-        CaseState caseState = caseStateRepository.findById(caseStateId)
-                .orElseThrow(() -> new IllegalArgumentException("CaseState with ID " + caseStateId + " not found"));
+    public AdoptionCase createAdoptionCase(AdoptioncaseDTO dto) {
+        AdoptionCase adoptionCase = new AdoptionCase();
+        
+        adoptionCase.setCaseTitle(dto.getCaseTitle());
+        adoptionCase.setStory(dto.getStory());
+        adoptionCase.setHealthCondition(dto.getHealthCondition());
+        adoptionCase.setAdoptedCondition(dto.getAdoptedCondition());
+        adoptionCase.setNote(dto.getNote());
+    
+        // 查找關聯物件並設置
+        Member member = memberRepository.findById(dto.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("Member ID not found: " + dto.getMemberId()));
+        adoptionCase.setMember(member);
+    
+        CaseState caseState = caseStateRepository.findById(dto.getCaseStateId())
+        .orElseThrow(() -> new IllegalArgumentException("CaseState ID not found"));
         adoptionCase.setCaseState(caseState);
 
-        // 查找并设置 City 实体
-        Integer cityId = adoptionCase.getCity().getCityId();
-        if (cityId == null) {
-            throw new IllegalArgumentException("City ID must not be null");
-        }
-        City city = cityRepository.findById(cityId)
-                .orElseThrow(() -> new IllegalArgumentException("City with ID " + cityId + " not found"));
-        adoptionCase.setCity(city);
-
-        // 查找并设置 DistinctArea 实体
-        Integer distinctAreaId = adoptionCase.getDistinctArea().getDistrictAreaId();
-        if (distinctAreaId == null) {
-            throw new IllegalArgumentException("DistinctArea ID must not be null");
-        }
-        DistrictArea distinctArea = distinctAreaRepository.findById(distinctAreaId)
-                .orElseThrow(
-                        () -> new IllegalArgumentException("DistinctArea with ID " + distinctAreaId + " not found"));
-        adoptionCase.setDistinctArea(distinctArea);
-
-        // 查找并设置 FurColor 实体
-        Integer furColorId = adoptionCase.getFurColor().getFurColorId();
-        if (furColorId == null) {
-            throw new IllegalArgumentException("FurColor ID must not be null");
-        }
-        FurColor furColor = furColorRepository.findById(furColorId)
-                .orElseThrow(() -> new IllegalArgumentException("FurColor with ID " + furColorId + " not found"));
-        adoptionCase.setFurColor(furColor);
-
-        // 查找并设置 Member 实体
-        Integer memberId = adoptionCase.getMember().getMemberId();
-        if (memberId == null) {
-            throw new IllegalArgumentException("Member ID must not be null");
-        }
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member with ID " + memberId + " not found"));
-        adoptionCase.setMember(member);
-
-        // 查找并设置 Species 实体
-        Integer speciesId = adoptionCase.getSpecies().getSpeciesId();
-        if (speciesId == null) {
-            throw new IllegalArgumentException("Species ID must not be null");
-        }
-        Species species = speciesRepository.findById(speciesId)
-                .orElseThrow(() -> new IllegalArgumentException("Species with ID " + speciesId + " not found"));
+        Species species = speciesRepository.findById(dto.getSpeciesId())
+                .orElseThrow(() -> new IllegalArgumentException("Species ID not found: " + dto.getSpeciesId()));
         adoptionCase.setSpecies(species);
-
-        // 设置最后更新和发布时间
+    
+        Breed breed = breedRepository.findById(dto.getBreedId())
+                .orElseThrow(() -> new IllegalArgumentException("Breed ID not found: " + dto.getBreedId()));
+        adoptionCase.setBreed(breed);
+    
+        City city = cityRepository.findById(dto.getCityId())
+                .orElseThrow(() -> new IllegalArgumentException("City ID not found: " + dto.getCityId()));
+        adoptionCase.setCity(city);
+    
+        DistrictArea districtArea = districtAreaRepository.findById(dto.getDistrictAreaId())
+                .orElseThrow(() -> new IllegalArgumentException("DistrictArea ID not found: " + dto.getDistrictAreaId()));
+        adoptionCase.setDistrictArea(districtArea);
+    
         adoptionCase.setLastUpdateTime(LocalDateTime.now());
         adoptionCase.setPublicationTime(LocalDateTime.now());
-
-        // 保存并返回创建的 AdoptionCase
+    
         return adoptionCaseRepository.save(adoptionCase);
-    }
+    }    
 
     // -----------------------------------------------------------------------------
     // 貼文者對申請者的註記
@@ -152,7 +94,7 @@ public class AdoptionCaseService {
                 .orElseThrow(() -> new RuntimeException("AdoptionCase not found with id " + adoptionCaseId));
 
         // 更新資料
-        adoptionCase.setTitle(dto.getTitle());
+        adoptionCase.setCaseTitle(dto.getCaseTitle());
         adoptionCase.setNote(dto.getNote());
 
         // 儲存更新後的資料
@@ -161,8 +103,8 @@ public class AdoptionCaseService {
 
     // -----------------------------------------------------------------------------
     // 查詢
-    public List<AdoptionCase> searchAdoptionCases(Long cityId, Long distinctAreaId, Long caseStateId, Long speciesId,
+    public List<AdoptionCase> searchAdoptionCases(Long cityId, Long districtAreaId, Long caseStateId, Long speciesId,
             String gender) {
-        return adoptionCaseRepository.searchAdoptionCases(cityId, distinctAreaId, caseStateId, speciesId, gender);
+        return adoptionCaseRepository.searchAdoptionCases(cityId, districtAreaId, caseStateId, speciesId, gender);
     }
 }

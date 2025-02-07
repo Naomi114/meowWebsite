@@ -34,8 +34,6 @@ public class JsonWebTokenUtility {
 	
 	@PostConstruct
 	public void init() {
-		// 需要長度是512-bit的金鑰以便使用HS512演算法
-		// @PostConstruct讓每次應用程式啟動時，sharedKey 都會不同
 		sharedKey = new byte[64];
 
 		// TODO：可以使用其他方式產生金鑰內容
@@ -43,21 +41,18 @@ public class JsonWebTokenUtility {
 		secureRandom.nextBytes(sharedKey);
 	}
 	
-	
-	//老師生成的jwt只有含簽章(確保來回內容都相同)，沒有加密，因此不能存放機密資訊
-	//接收一個 JSON 字串，生成對應的 JWT Token
 	public String createToken(String data) {
 		Instant now = Instant.now();
 		Instant expire = now.plusSeconds(this.expire * 60);
 		try {
 			// 建立HMAC signer
-			JWSSigner signer = new MACSigner(sharedKey);    //為簽章的金鑰
+			JWSSigner signer = new MACSigner(sharedKey);    
 
 			// 準備JWT主體
 			JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-					.issuer(issuer)                                 //發行時間者
-					.issueTime(Date.from(now))                      //發行時間為現在
-					.expirationTime(Date.from(expire))              //過期時間
+					.issuer(issuer)                                 
+					.issueTime(Date.from(now))                      
+					.expirationTime(Date.from(expire))              
 					.subject(data)                                  //夾帶資訊
 					.build();
 
@@ -85,9 +80,7 @@ public class JsonWebTokenUtility {
 			// 解析JWS
 			SignedJWT signedJWT = SignedJWT.parse(token);
 			JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
-//			System.out.println(claimsSet.getExpirationTime());      //檢查過期時間
-			System.out.println(signedJWT.verify(verifier));         //檢查驗證是否相符
-
+			System.out.println(signedJWT.verify(verifier));         
 	        // 驗證簽名通過以及時間尚未過期
 			if (signedJWT.verify(verifier) && new Date().before(claimsSet.getExpirationTime())) {
 				System.out.println("簽章和效期驗證通過"); 

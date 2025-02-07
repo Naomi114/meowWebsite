@@ -13,10 +13,10 @@ public class CaseState {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "CaseStateId")
+	@Column(name = "caseStateId")
 	private Integer caseStateId;
 
-	@Column(name = "CaseStatement", columnDefinition = "NVARCHAR(5)", nullable = false)
+	@Column(name = "caseStatement", columnDefinition = "NVARCHAR(5)", nullable = false)
 	private String caseStatement;
 
 	public CaseState() {
