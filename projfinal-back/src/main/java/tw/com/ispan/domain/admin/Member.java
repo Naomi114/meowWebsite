@@ -2,14 +2,30 @@ package tw.com.ispan.domain.admin;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import tw.com.ispan.domain.pet.Activity;
+import tw.com.ispan.domain.pet.ActivityParticipantList;
+import tw.com.ispan.domain.pet.AdoptionCase;
+import tw.com.ispan.domain.pet.Follow;
+import tw.com.ispan.domain.pet.LostCase;
+import tw.com.ispan.domain.pet.ReportCase;
+import tw.com.ispan.domain.pet.RescueCase;
+import tw.com.ispan.domain.pet.forAdopt.AdoptionCaseApply;
+import tw.com.ispan.domain.shop.Cart;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import jakarta.persistence.*;
-
-import tw.com.ispan.domain.shop.Cart;
 import tw.com.ispan.domain.shop.CartActionLog;
 import tw.com.ispan.domain.shop.Orders;
 import tw.com.ispan.domain.shop.WishList;
@@ -49,6 +65,44 @@ public class Member {
     @Column(nullable = false)
     private LocalDateTime updateDate;
 
+    // 以下為給line login使用
+    private String lineId;
+
+    private String lineName;
+
+    private String linePicture;
+
+    // 以下為給追蹤line商家帳號使用
+    private boolean followed = false;
+
+    @Column(nullable = false)
+    private boolean userType; // 1表示註冊會員，0表示line登入會員
+
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    private Set<Activity> activity;
+
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    private Set<ActivityParticipantList> acitvityParticipantList;
+
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    private List<RescueCase> rescueCases;
+
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
+    private Set<Follow> follow = new HashSet<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<LostCase> lostCase = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<AdoptionCase> adoptionCase = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<ReportCase> reportCase = new ArrayList<>();
+
+    // 雙向一對多，最後meeting加的
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private Set<AdoptionCaseApply> adoptionCaseApply = new HashSet<>();
+
     @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
     @JsonBackReference("member")
     private List<WishList> wishList;
@@ -69,9 +123,12 @@ public class Member {
     }
 
     public Member(Integer memberId, String nickName, String password, String name, String email, String phone,
-            String address,
-            LocalDate birthday, LocalDateTime createDate, LocalDateTime updateDate, List<WishList> wishList,
-            Set<Cart> cart, List<Orders> orders) {
+            String address, LocalDate birthday, LocalDateTime createDate, LocalDateTime updateDate,
+            Set<Activity> activity, Set<ActivityParticipantList> acitvityParticipantList, String lineId,
+            String lineName, String linePicture, boolean followed, boolean userType, List<WishList> wishList,
+            Set<Cart> cart, Set<CartActionLog> cartActionLog, List<Orders> orders, Set<Follow> follow,
+            List<LostCase> lostCase, List<AdoptionCase> adoptionCase, List<ReportCase> reportCase,
+            Set<AdoptionCaseApply> adoptionCaseApply) {
         this.memberId = memberId;
         this.nickName = nickName;
         this.password = password;
@@ -82,12 +139,128 @@ public class Member {
         this.birthday = birthday;
         this.createDate = createDate;
         this.updateDate = updateDate;
+        this.activity = activity;
+        this.acitvityParticipantList = acitvityParticipantList;
+        this.lineId = lineId;
+        this.lineName = lineName;
+        this.linePicture = linePicture;
+        this.followed = followed;
+        this.userType = userType;
         this.wishList = wishList;
         this.cart = cart;
+        this.cartActionLog = cartActionLog;
         this.orders = orders;
+        this.follow = follow;
+        this.lostCase = lostCase;
+        this.adoptionCase = adoptionCase;
+        this.reportCase = reportCase;
+        this.adoptionCaseApply = adoptionCaseApply;
     }
 
-    // Getters and Setters
+    public Set<Activity> getActivity() {
+        return activity;
+    }
+
+    public void setActivity(Set<Activity> activity) {
+        this.activity = activity;
+    }
+
+    public Set<ActivityParticipantList> getAcitvityParticipantList() {
+        return acitvityParticipantList;
+    }
+
+    public void setAcitvityParticipantList(Set<ActivityParticipantList> acitvityParticipantList) {
+        this.acitvityParticipantList = acitvityParticipantList;
+    }
+
+    public String getLineId() {
+        return lineId;
+    }
+
+    public void setLineId(String lineId) {
+        this.lineId = lineId;
+    }
+
+    public String getLineName() {
+        return lineName;
+    }
+
+    public void setLineName(String lineName) {
+        this.lineName = lineName;
+    }
+
+    public String getLinePicture() {
+        return linePicture;
+    }
+
+    public void setLinePicture(String linePicture) {
+        this.linePicture = linePicture;
+    }
+
+    public boolean isFollowed() {
+        return followed;
+    }
+
+    public void setFollowed(boolean followed) {
+        this.followed = followed;
+    }
+
+    public boolean isUserType() {
+        return userType;
+    }
+
+    public void setUserType(boolean userType) {
+        this.userType = userType;
+    }
+
+    public Set<CartActionLog> getCartActionLog() {
+        return cartActionLog;
+    }
+
+    public void setCartActionLog(Set<CartActionLog> cartActionLog) {
+        this.cartActionLog = cartActionLog;
+    }
+
+    public Set<Follow> getFollow() {
+        return follow;
+    }
+
+    public void setFollow(Set<Follow> follow) {
+        this.follow = follow;
+    }
+
+    public List<LostCase> getLostCase() {
+        return lostCase;
+    }
+
+    public void setLostCase(List<LostCase> lostCase) {
+        this.lostCase = lostCase;
+    }
+
+    public List<AdoptionCase> getAdoptionCase() {
+        return adoptionCase;
+    }
+
+    public void setAdoptionCase(List<AdoptionCase> adoptionCase) {
+        this.adoptionCase = adoptionCase;
+    }
+
+    public List<ReportCase> getReportCase() {
+        return reportCase;
+    }
+
+    public void setReportCase(List<ReportCase> reportCase) {
+        this.reportCase = reportCase;
+    }
+
+    public Set<AdoptionCaseApply> getAdoptionCaseApply() {
+        return adoptionCaseApply;
+    }
+
+    public void setAdoptionCaseApply(Set<AdoptionCaseApply> adoptionCaseApply) {
+        this.adoptionCaseApply = adoptionCaseApply;
+    }
+
     public Integer getMemberId() {
         return memberId;
     }

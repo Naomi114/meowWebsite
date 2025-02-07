@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+// import tw.com.ispan.domain.shop.Discount;
+// import tw.com.ispan.domain.shop.Inventory;
+// import tw.com.ispan.domain.shop.ProductBean;
 
 @Entity
 @Table(name = "Admin") // Ensure the table name matches convention
@@ -24,10 +27,6 @@ public class Admin {
 
 	@Column(length = 20, nullable = false)
 	private String password;
-
-	public Admin() {
-		// 這是默認構造函數，Hibernate 需要
-	}
 
 	@Column(nullable = false)
 	private LocalDateTime createDate;
@@ -50,20 +49,21 @@ public class Admin {
 	@JsonManagedReference("admin") // Unique reference for Products
 	private Set<Product> products = new HashSet<>();
 
-	// Constructors
-	public Admin(Integer adminId, String adminName, String password, LocalDateTime createDate, LocalDateTime updateDate
-	// ,List<Discount> discounts, Set<InventoryBean> inventory
-	) {
+	public Admin() {
+	}
+
+	public Admin(Integer adminId, String adminName, String password, LocalDateTime createDate, LocalDateTime updateDate,
+			List<Discount> discounts, Set<Inventory> inventory, Set<Product> products) {
 		this.adminId = adminId;
 		this.adminName = adminName;
 		this.password = password;
 		this.createDate = createDate;
 		this.updateDate = updateDate;
-		// this.discounts = discounts;
-		// this.inventory = inventory;
+		this.discounts = discounts;
+		this.inventory = inventory;
+		this.products = products;
 	}
 
-	// Getters and setters
 	public Integer getAdminId() {
 		return adminId;
 	}
@@ -104,6 +104,17 @@ public class Admin {
 		this.updateDate = updateDate;
 	}
 
+	@Override
+	public String toString() {
+		return "Admin [adminId=" + adminId + ", adminName=" + adminName + ", password=" + password + ", createDate="
+				+ createDate + ", updateDate=" + updateDate + ", discounts=" +
+				// discounts + ", inventory=" + inventory+
+				", getAdminId()=" + getAdminId() + ", getAdminName()=" + getAdminName() + ", getPassword()="
+				+ getPassword() + ", getCreateDate()=" + getCreateDate() + ", getUpdateDate()=" + getUpdateDate()
+				+ ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString()
+				+ "]";
+	}
+
 	public List<Discount> getDiscounts() {
 		return discounts;
 	}
@@ -128,8 +139,4 @@ public class Admin {
 		this.products = products;
 	}
 
-	@Override
-	public String toString() {
-		return "Admin [adminId=" + adminId + ", adminName=" + adminName + "]";
-	}
 }
