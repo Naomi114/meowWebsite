@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.dto.MemberDto;
 import tw.com.ispan.dto.PasswordDto;
 import tw.com.ispan.service.MemberService;
@@ -29,12 +27,12 @@ public class MemberController {
 
     // 註冊
     @PostMapping
-    public ResponseEntity<String> addMember(@RequestBody MemberDto memberDto) {
+    public ResponseEntity<String> addMember2(@RequestBody MemberDto memberDto) {
 
         if (memberDto.getBirthday() == null) {
             return ResponseEntity.badRequest().body("生日是必填項，不能為空");
         }
-        memberService.addMember(memberDto);
+        memberService.addMember2(memberDto);
         return ResponseEntity.ok("會員新增成功");
     }
 

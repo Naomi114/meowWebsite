@@ -40,9 +40,9 @@ public class ProductDTO {
     private List<String> extractImageUrls(Product product) {
         if (product.getProductImages() != null) {
             return product.getProductImages().stream()
-                .limit(5) // 限制最多 5 張
-                .map(ProductImage::getImageUrl)
-                .collect(Collectors.toList());
+                    .limit(5) // 限制最多 5 張
+                    .map(ProductImage::getImageUrl)
+                    .collect(Collectors.toList());
         }
         return List.of(); // ✅ 若無圖片則回傳空列表
     }
@@ -127,5 +127,4 @@ public class ProductDTO {
         this.imageUrls = imageUrls;
     }
 
-    
 }

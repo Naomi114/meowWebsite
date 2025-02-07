@@ -48,9 +48,10 @@ public class OrderController {
      */
     @PostMapping("/{orderId}/payment")
     public ResponseEntity<Orders> processPayment(@PathVariable int orderId,
-                                                 @RequestBody PaymentRequest paymentRequest) {
+            @RequestBody PaymentRequest paymentRequest) {
         try {
-            Orders updatedOrder = orderService.processPayment(orderId, paymentRequest); // Call the service to process payment
+            Orders updatedOrder = orderService.processPayment(orderId, paymentRequest); // Call the service to process
+                                                                                        // payment
             return ResponseEntity.ok(updatedOrder); // Return the updated order after payment
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

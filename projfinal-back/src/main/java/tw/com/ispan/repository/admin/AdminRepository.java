@@ -7,5 +7,4 @@ import tw.com.ispan.domain.admin.Admin;
 
 public interface AdminRepository extends JpaRepository<Admin, Integer> {
     Optional<Admin> findByAdminName(String adminName);
-
 }
