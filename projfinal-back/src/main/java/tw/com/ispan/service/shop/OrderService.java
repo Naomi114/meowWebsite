@@ -364,9 +364,67 @@ public class OrderService implements IOrderService {
         orderRepository.save(order); // Save the updated order
     }
 
+    @Transactional
     public boolean submitOrder(int cartId, int memberId, String creditCard, String shippingAddress,
             List<Integer> selectedItems) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'submitOrder'");
+        try {
+            // 确保 selectedItems 不是 null
+            if (selectedItems == null || selectedItems.isEmpty()) {
+                throw new RuntimeException("未選擇商品");
+            }
+
+            // 查询购物车
+            Cart cart = cartRepository.findById(cartId)
+                    .orElseThrow(() -> new RuntimeException("找不到購物車"));
+
+            // 查询用户
+            Member member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new RuntimeException("找不到會員"));
+
+            // 过滤出被选中的商品
+            List<CartItem> cartItems = cart.getCartItems().stream()
+                    .filter(item -> selectedItems.contains(item.getProduct().getProductId())) // 只保留被选中的商品
+                    .toList();
+
+            if (cartItems.isEmpty()) {
+                throw new RuntimeException("未選擇有效的商品");
+            }
+
+            // 计算订单总金额
+            double totalPrice = cartItems.stream()
+                    .mapToDouble(item -> item.getProduct().getSalePrice().doubleValue() * item.getQuantity())
+                    .sum();
+
+            // 创建订单
+            Orders newOrder = new Orders();
+            newOrder.setMember(member);
+            newOrder.setShippingAddress(shippingAddress);
+            newOrder.setCreditCard(creditCard);
+            newOrder.setOrderDate(LocalDateTime.now());
+            newOrder.setOrderStatus("待支付");
+            newOrder.setSubtotalPrice(totalPrice);
+            newOrder.setFinalPrice(totalPrice);
+
+            Orders savedOrder = orderRepository.save(newOrder);
+
+            // 添加订单项
+            for (CartItem item : cartItems) {
+                OrderItem orderItem = new OrderItem();
+                orderItem.setOrder(savedOrder);
+                orderItem.setProduct(item.getProduct());
+                orderItem.setOrderQuantity(item.getQuantity());
+                orderItem.setPurchasedPrice(item.getProduct().getSalePrice());
+                orderItem.setStatus("待出貨");
+                orderItemRepository.save(orderItem);
+            }
+
+            // 从购物车中删除已选中的商品
+            cartItemRepository.deleteAll(cartItems);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
