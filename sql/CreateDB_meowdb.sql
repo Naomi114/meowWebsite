@@ -19,4 +19,4 @@ FILEGROWTH = 10MB )
 COLLATE Chinese_Taiwan_Stroke_CI_AS  --定序
 
 /*查詢DB的內容、屬性*/
--- sp_helpdb meowdb
+-- sp_helpdb moewdb

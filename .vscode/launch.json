@@ -2,13 +2,6 @@
     "configurations": [
         {
             "type": "java",
-            "name": "EcpayBootApplication",
-            "request": "launch",
-            "mainClass": "tw.com.ispan.EcpayBootApplication",
-            "projectName": "projfinal-back"
-        },
-        {
-            "type": "java",
             "name": "ProjfinalApplication",
             "request": "launch",
             "mainClass": "tw.com.ispan.ProjfinalApplication",
