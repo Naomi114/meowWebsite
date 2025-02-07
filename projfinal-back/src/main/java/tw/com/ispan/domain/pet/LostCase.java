@@ -323,6 +323,20 @@ public class LostCase {
         this.viewCount = viewCount;
     }
 
+    
+
+    public Integer getFollow() {
+        return follow;
+    }
+
+    public void setFollow(Integer follow) {
+        this.follow = follow;
+    }
+
+    public void setBanner(Banner banner) {
+        this.banner = banner;
+    }
+
     public List<Follow> getFollows() {
         return follows;
     }
