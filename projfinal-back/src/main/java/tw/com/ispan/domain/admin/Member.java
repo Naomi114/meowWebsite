@@ -65,30 +65,34 @@ public class Member {
     @Column(nullable = false)
     private LocalDateTime updateDate;
 
-    // 以下為給line login使用
+    // 以下為給line login使用(冠)
     private String lineId;
 
     private String lineName;
 
     private String linePicture;
 
-    // 以下為給追蹤line商家帳號使用
+    // 以下為給追蹤line商家帳號使用(冠)
     private boolean followed = false;
 
     @Column(nullable = false)
-    private boolean userType; // 1表示註冊會員，0表示line登入會員
+    private boolean userType; // 1表示註冊會員，0表示line登入會員(冠)
 
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    private Set<Activity> activity;
+ 	// 雙向一對多
+     @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST })
+     private List<Activity> activity;
 
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    private Set<ActivityParticipantList> acitvityParticipantList;
+   // 會員和活動的中介表 雙向一對多
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST }, orphanRemoval = true)
+	private List<ActivityParticipantList> acitvityParticipantLists;
 
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-    private List<RescueCase> rescueCases;
+   // 雙向一對多
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST })
+	private List<RescueCase> rescueCases;
 
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
-    private Set<Follow> follow = new HashSet<>();
+  	// 單向一對多
+	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
+	private List<Follow> follows;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<LostCase> lostCase = new ArrayList<>();
