@@ -34,7 +34,6 @@ import tw.com.ispan.repository.pet.BreedRepository;
 import tw.com.ispan.repository.pet.CaseStateRepository;
 import tw.com.ispan.repository.pet.CityRepository;
 import tw.com.ispan.repository.pet.DistrictAreaRepository;
-// import tw.com.ispan.repository.pet.DistrictAreaRepository;
 import tw.com.ispan.repository.pet.FurColorRepository;
 import tw.com.ispan.repository.pet.RescueCaseRepository;
 import tw.com.ispan.repository.pet.SpeciesRepository;
@@ -68,17 +67,16 @@ public class PetDataInitializer implements CommandLineRunner {
 	private MemberRepository memberRepository;
 	// @Autowired
 	// private ImageService imageService;
-	
+
 	@Transactional
 	public void saveSpeciesData() {
-	    if (!speciesRepository.existsById(1)) {
-	        speciesRepository.save(new Species("狗"));
-	    }
-	    if (!speciesRepository.existsById(2)) {
-	        speciesRepository.save(new Species("貓"));
-	    }
+		if (!speciesRepository.existsById(1)) {
+			speciesRepository.save(new Species("狗"));
+		}
+		if (!speciesRepository.existsById(2)) {
+			speciesRepository.save(new Species("貓"));
+		}
 	}
-	
 
 	@Value("${file.final-upload-dir}") // 後端圖片最終路徑
 	private String imageBaseUrl;
@@ -91,15 +89,15 @@ public class PetDataInitializer implements CommandLineRunner {
 		saveSpeciesData();
 		// 手動檢查是否成功存入
 		if (!speciesRepository.existsById(1) || !speciesRepository.existsById(2)) {
-		    throw new RuntimeException("Species 資料未成功儲存，請檢查交易提交狀態！");
+			throw new RuntimeException("Species 資料未成功儲存，請檢查交易提交狀態！");
 		}
-//		if (!speciesRepository.existsById(1)) {
-//			speciesRepository.save(new Species("狗"));
-//		}
-//		if (!speciesRepository.existsById(2)) {
-//			speciesRepository.save(new Species("貓"));
-//		}
-//		speciesRepository.flush();  // 強制同步
+		// if (!speciesRepository.existsById(1)) {
+		// speciesRepository.save(new Species("狗"));
+		// }
+		// if (!speciesRepository.existsById(2)) {
+		// speciesRepository.save(new Species("貓"));
+		// }
+		// speciesRepository.flush(); // 強制同步
 
 		// 存入品種資料(狗貓放在同一表格，貓breedId為1~53 狗breedId 54~186)
 		// 檢查邏輯為breed資料表內是否有id 1-53的資料，返回的list如果不是共53筆就做新增
@@ -255,89 +253,92 @@ public class PetDataInitializer implements CommandLineRunner {
 
 		// if (rescueCaseRepository.count() < 5) {
 
-		// 	// 讀取 JSON 假資料
-		// 	ObjectMapper objectMapper = new ObjectMapper();
-		// 	String filePath = "data/rescueCase.json"; // JSON 檔案的路徑
-		// 	String jsonContent = new String(Files.readAllBytes(new ClassPathResource(filePath).getFile().toPath()));
+		// // 讀取 JSON 假資料
+		// ObjectMapper objectMapper = new ObjectMapper();
+		// String filePath = "data/rescueCase.json"; // JSON 檔案的路徑
+		// String jsonContent = new String(Files.readAllBytes(new
+		// ClassPathResource(filePath).getFile().toPath()));
 
-		// 	// 替換 ${final-upload-dir} 為環境變數的值，為圖片儲存於後端的外部資料夾路徑
-		// 	jsonContent = jsonContent.replace("${final-upload-dir}", imageBaseUrl);
+		// // 替換 ${final-upload-dir} 為環境變數的值，為圖片儲存於後端的外部資料夾路徑
+		// jsonContent = jsonContent.replace("${final-upload-dir}", imageBaseUrl);
 
-		// 	List<fakeRescueCaseDto> rescueCaseDtos = objectMapper.readValue(
-		// 			jsonContent,
-		// 			new TypeReference<List<fakeRescueCaseDto>>() {
-		// 			});
+		// List<fakeRescueCaseDto> rescueCaseDtos = objectMapper.readValue(
+		// jsonContent,
+		// new TypeReference<List<fakeRescueCaseDto>>() {
+		// });
 
-		// 	// 將 DTO 轉換為實體並存入資料庫
-		// 	for (fakeRescueCaseDto dto : rescueCaseDtos) {
-		// 		RescueCase rescueCase = new RescueCase();
+		// // 將 DTO 轉換為實體並存入資料庫
+		// for (fakeRescueCaseDto dto : rescueCaseDtos) {
+		// RescueCase rescueCase = new RescueCase();
 
-		// 		// 儲存圖片路徑於圖片表中
-		// 		List<CasePicture> casePictures = imageService.saveImage(dto.getCasePictureUrls());
+		// // 儲存圖片路徑於圖片表中
+		// List<CasePicture> casePictures =
+		// imageService.saveImage(dto.getCasePictureUrls());
 
-		// 		// 設定 RescueCase 基本屬性
-		// 		rescueCase.setCaseTitle(dto.getCaseTitle());
-		// 		rescueCase.setGender(dto.getGender());
-		// 		rescueCase.setSterilization(dto.getSterilization());
-		// 		rescueCase.setAge(dto.getAge());
-		// 		rescueCase.setMicroChipNumber(dto.getMicroChipNumber());
-		// 		rescueCase.setSuspLost(dto.getSuspLost());
-		// 		rescueCase.setStreet(dto.getStreet());
-		// 		rescueCase.setLatitude(dto.getLatitude());
-		// 		rescueCase.setLongitude(dto.getLongitude());
-		// 		rescueCase.setDonationAmount(dto.getDonationAmount());
-		// 		rescueCase.setViewCount(dto.getViewCount());
-		// 		rescueCase.setFollow(dto.getFollow());
-		// 		rescueCase.setPublicationTime(LocalDateTime.now()); // 自動設置發佈時間
-		// 		rescueCase.setLastUpdateTime(LocalDateTime.now()); // 自動設置更新時間
-		// 		rescueCase.setTag(dto.getTag());
-		// 		rescueCase.setRescueReason(dto.getRescueReason());
-		// 		rescueCase.setCaseUrl(dto.getCaseUrl());
-		// 		rescueCase.setIsHidden(dto.getIsHidden());
+		// // 設定 RescueCase 基本屬性
+		// rescueCase.setCaseTitle(dto.getCaseTitle());
+		// rescueCase.setGender(dto.getGender());
+		// rescueCase.setSterilization(dto.getSterilization());
+		// rescueCase.setAge(dto.getAge());
+		// rescueCase.setMicroChipNumber(dto.getMicroChipNumber());
+		// rescueCase.setSuspLost(dto.getSuspLost());
+		// rescueCase.setStreet(dto.getStreet());
+		// rescueCase.setLatitude(dto.getLatitude());
+		// rescueCase.setLongitude(dto.getLongitude());
+		// rescueCase.setDonationAmount(dto.getDonationAmount());
+		// rescueCase.setViewCount(dto.getViewCount());
+		// rescueCase.setFollow(dto.getFollow());
+		// rescueCase.setPublicationTime(LocalDateTime.now()); // 自動設置發佈時間
+		// rescueCase.setLastUpdateTime(LocalDateTime.now()); // 自動設置更新時間
+		// rescueCase.setTag(dto.getTag());
+		// rescueCase.setRescueReason(dto.getRescueReason());
+		// rescueCase.setCaseUrl(dto.getCaseUrl());
+		// rescueCase.setIsHidden(dto.getIsHidden());
 
-		// 		// 手動關聯實體
-		// 		rescueCase.setMember(memberRepository.findById(dto.getMemberId())
-		// 				.orElseThrow(() -> new RuntimeException("member not found")));
-				
-		// 		System.out.println("物種ID"+dto.getSpeciesId());
-		// 		System.out.println("找到物種為"+speciesRepository.findById(dto.getSpeciesId()));
-				
-				
-		// 		rescueCase.setSpecies(speciesRepository.findById(dto.getSpeciesId())
-		// 				.orElseThrow(() -> new RuntimeException("Species not found")));
-		// 		rescueCase.setFurColor(furColorRepository.findById(dto.getFurColorId())
-		// 				.orElseThrow(() -> new RuntimeException("FurColor not found")));
-		// 		rescueCase.setBreed(breedRepository.findById(dto.getBreedId())
-		// 				.orElseThrow(() -> new RuntimeException("Breed not found")));
-		// 		rescueCase.setCity(cityRepository.findById(dto.getCityId())
-		// 				.orElseThrow(() -> new RuntimeException("City not found")));
-		// 		rescueCase.setDistrictArea(districtAreaRepository.findById(dto.getDistrictAreaId())
-		// 				.orElseThrow(() -> new RuntimeException("DistrictArea not found")));
-		// 		rescueCase.setCaseState(caseStateRepository.findById(dto.getCaseStateId())
-		// 				.orElseThrow(() -> new RuntimeException("CaseState not found")));
+		// // 手動關聯實體
+		// rescueCase.setMember(memberRepository.findById(dto.getMemberId())
+		// .orElseThrow(() -> new RuntimeException("member not found")));
 
-		// 		// 新增 canAffords 的處理
-		// 		List<CanAfford> canAffordEntities = dto.getCanAffords().stream()
-		// 				.map(canAffordDto -> canAffordRepository.findById(canAffordDto.getCanAffordId())
-		// 						.orElseThrow(() -> new RuntimeException(
-		// 								"CanAfford not found for ID: " + canAffordDto.getCanAffordId())))
-		// 				.toList();
-		// 		rescueCase.setCanAffords(canAffordEntities);
+		// System.out.println("物種ID"+dto.getSpeciesId());
+		// System.out.println("找到物種為"+speciesRepository.findById(dto.getSpeciesId()));
 
-		// 		// 新增 rescueDemands 的處理
-		// 		List<RescueDemand> rescueDemandEntities = dto.getRescueDemands().stream()
-		// 				.map(rescueDemandDto -> rescueDemandRepository.findById(rescueDemandDto.getRescueDemandId())
-		// 						.orElseThrow(() -> new RuntimeException(
-		// 								"RescueDemand not found for ID: " + rescueDemandDto.getRescueDemandId())))
-		// 				.toList();
-		// 		rescueCase.setRescueDemands(rescueDemandEntities);
+		// rescueCase.setSpecies(speciesRepository.findById(dto.getSpeciesId())
+		// .orElseThrow(() -> new RuntimeException("Species not found")));
+		// rescueCase.setFurColor(furColorRepository.findById(dto.getFurColorId())
+		// .orElseThrow(() -> new RuntimeException("FurColor not found")));
+		// rescueCase.setBreed(breedRepository.findById(dto.getBreedId())
+		// .orElseThrow(() -> new RuntimeException("Breed not found")));
+		// rescueCase.setCity(cityRepository.findById(dto.getCityId())
+		// .orElseThrow(() -> new RuntimeException("City not found")));
+		// rescueCase.setDistrictArea(districtAreaRepository.findById(dto.getDistrictAreaId())
+		// .orElseThrow(() -> new RuntimeException("DistrictArea not found")));
+		// rescueCase.setCaseState(caseStateRepository.findById(dto.getCaseStateId())
+		// .orElseThrow(() -> new RuntimeException("CaseState not found")));
 
-		// 		// 設定圖片關聯
-		// 		rescueCase.setCasePictures(casePictures);
+		// // 新增 canAffords 的處理
+		// List<CanAfford> canAffordEntities = dto.getCanAffords().stream()
+		// .map(canAffordDto ->
+		// canAffordRepository.findById(canAffordDto.getCanAffordId())
+		// .orElseThrow(() -> new RuntimeException(
+		// "CanAfford not found for ID: " + canAffordDto.getCanAffordId())))
+		// .toList();
+		// rescueCase.setCanAffords(canAffordEntities);
 
-		// 		// 保存 RescueCase 到資料庫
-		// 		rescueCaseRepository.save(rescueCase);
-		// 	}
+		// // 新增 rescueDemands 的處理
+		// List<RescueDemand> rescueDemandEntities = dto.getRescueDemands().stream()
+		// .map(rescueDemandDto ->
+		// rescueDemandRepository.findById(rescueDemandDto.getRescueDemandId())
+		// .orElseThrow(() -> new RuntimeException(
+		// "RescueDemand not found for ID: " + rescueDemandDto.getRescueDemandId())))
+		// .toList();
+		// rescueCase.setRescueDemands(rescueDemandEntities);
+
+		// // 設定圖片關聯
+		// rescueCase.setCasePictures(casePictures);
+
+		// // 保存 RescueCase 到資料庫
+		// rescueCaseRepository.save(rescueCase);
+		// }
 		// }
 	}
 
