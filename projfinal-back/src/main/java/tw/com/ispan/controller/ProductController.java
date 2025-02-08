@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,13 +41,17 @@ public class ProductController {
     @Autowired
     private ObjectMapper objectMapper;
 
-    // 分頁
+    // 分頁及價格排序
     @GetMapping("/paged")
     public ResponseEntity<Page<Product>> getProductsPaged(
             @RequestParam(defaultValue = "0") int page, // 預設第 0 頁
-            @RequestParam(defaultValue = "10") int size // 預設每頁 10 筆
+            @RequestParam(defaultValue = "5") int size, // 預設每頁 10 筆
+            @RequestParam(defaultValue = "productName") String sortBy, // 預設以名稱排序
+            @RequestParam(defaultValue = "asc") String order // 預設升序
     ) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(
+                page, size,
+                order.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending());
         Page<Product> products = productService.getAllPaged(pageable);
         return ResponseEntity.ok(products);
     }

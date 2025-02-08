@@ -3,6 +3,7 @@ package tw.com.ispan.controller;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -66,5 +67,14 @@ public class ProductTagController {
             throw new IllegalArgumentException("標籤查詢失敗，返回值為空");
         }
         return ResponseEntity.ok(response);
+    }
+
+    // 獲取所有分類
+    @GetMapping
+    public ResponseEntity<ProductTagResponse> getAllTags() {
+        ProductTagResponse response = productTagService.getAllTags();
+        return response.getSuccess()
+                ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 }
