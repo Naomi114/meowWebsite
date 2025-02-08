@@ -3,10 +3,15 @@ package tw.com.ispan.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.dto.MemberDto;
@@ -115,24 +120,39 @@ public class MemberService {
         return true; // 密碼更新成功
     }
 
-    // 查詢
-    public List<Member> getAllMembers() {
-        return memberRepository.findAll();
+    // 查詢所有會員，並轉換為 MemberDto
+    public List<MemberDto> getAllMembers() {
+        List<Member> members = memberRepository.findAll();
+        return members.stream()
+                .map(member -> new MemberDto(member.getMemberId(), member.getNickName(), member.getPassword(),
+                        member.getName(), member.getEmail(), member.getPhone(),
+                        member.getAddress(), member.getBirthday(), member.getCreateDate()))
+                .collect(Collectors.toList());
     }
 
-    // 查詢
-    public List<Member> searchMembers(String query) {
-        return memberRepository.findByEmailContaining(query);
+    // 根據搜尋條件查詢會員，並轉換為 MemberDto
+    public List<MemberDto> searchMembers(String query) {
+        List<Member> members = memberRepository.findByEmailContaining(query);
+        return members.stream()
+                .map(member -> new MemberDto(member.getMemberId(), member.getNickName(), member.getPassword(),
+                        member.getName(), member.getEmail(), member.getPhone(),
+                        member.getAddress(), member.getBirthday(), member.getCreateDate()))
+                .collect(Collectors.toList());
     }
 
-    // 刪除
     public boolean deleteMemberById(Integer memberId) {
-        if (memberRepository.existsById(memberId)) { // 確認會員是否存在
-            memberRepository.deleteById(memberId); // 刪除會員
+        if (memberRepository.existsById(memberId)) {
+            memberRepository.deleteById(memberId); // 根據 memberId 刪除會員
             return true; // 刪除成功
         } else {
-            return false; // 未找到會員
+            return false; // 會員未找到
         }
+    }
+
+    // 查詢memberId，進行資料回填
+    public Member getMemberById(Integer memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("會員 ID " + memberId + " 不存在"));
     }
 
     // 修改會員資料
@@ -146,9 +166,13 @@ public class MemberService {
                 });
         // 日誌：會員存在，開始更新
         System.out.println("找到會員 ID " + memberId + "，開始更新");
-        // 更新會員資料
+
+        // 更新會員資料，不更新 password
         member.setNickName(memberDto.getNickName());
-        member.setPassword(memberDto.getPassword());
+        // 只更新其他屬性，保留原有密碼
+        if (memberDto.getPassword() != null && !memberDto.getPassword().isEmpty()) {
+            member.setPassword(memberDto.getPassword()); // 如果提供了新密碼，才更新
+        }
         member.setName(memberDto.getName());
         member.setEmail(memberDto.getEmail());
         member.setPhone(memberDto.getPhone());
