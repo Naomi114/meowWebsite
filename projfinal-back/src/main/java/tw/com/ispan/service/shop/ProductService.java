@@ -79,6 +79,10 @@ public class ProductService {
 	@Autowired
 	private NotificationService notificationService;
 
+	public Page<Product> getAllPaged(Pageable pageable) {
+		return productRepository.findAll(pageable);
+	}
+
 	// 單筆新增
 	public ProductResponse createSingle(ProductRequest request, List<MultipartFile> filenames) {
 		ProductResponse response = new ProductResponse();
@@ -382,11 +386,6 @@ public class ProductService {
 		response.setMessage(products.isEmpty() ? "未找到任何商品" : "商品查詢成功");
 
 		return response;
-	}
-
-	// 分頁
-	public Page<Product> getAllPaged(Pageable pageable) {
-		return productRepository.findAll(pageable);
 	}
 
 }

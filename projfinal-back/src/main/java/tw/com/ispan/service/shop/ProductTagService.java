@@ -9,8 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.domain.shop.ProductTag;
+import tw.com.ispan.dto.CategoryResponse;
+import tw.com.ispan.dto.ProductDTO;
 import tw.com.ispan.dto.ProductRequest;
 import tw.com.ispan.dto.ProductTagRequest;
 import tw.com.ispan.dto.ProductTagResponse;
@@ -98,7 +101,7 @@ public class ProductTagService {
     }
 
     // 商品上架，處理標籤
-	public void processProductTags(Product product, Set<ProductTagRequest> tagRequests) {
+    public void processProductTags(Product product, Set<ProductTagRequest> tagRequests) {
         if (tagRequests == null || tagRequests.isEmpty()) {
             return; // 如果標籤列表為空，直接返回
         }
@@ -121,19 +124,19 @@ public class ProductTagService {
         if (tagName == null || tagName.isEmpty()) {
             throw new IllegalArgumentException("標籤名稱不能為空");
         }
-    
+
         // 查找是否已存在
         Optional<ProductTag> existingTag = productTagRepository.findByTagName(tagName);
         if (existingTag.isPresent()) {
             return existingTag.get();
         }
-    
+
         // 不存在則創建
         ProductTag newTag = new ProductTag();
         newTag.setTagName(tagName);
         productTagRepository.save(newTag);
         return newTag;
-    }    
+    }
 
     // 型別轉換: ProductRequest => ProductTagRequest
     public ProductTagRequest buildTagRequestFromProduct(ProductRequest productRequest) {
@@ -146,4 +149,30 @@ public class ProductTagService {
         return tagRequest;
     }
 
+    // 獲取所有標籤
+    public ProductTagResponse getAllTags() {
+        ProductTagResponse response = new ProductTagResponse();
+        try {
+            List<ProductTag> tags = productTagRepository.findAll();
+
+            if (tags.isEmpty()) {
+                response.setSuccess(false);
+                response.setMessage("沒有可用的類別");
+                return response;
+            }
+            List<ProductDTO> productDTOs = tags.stream()
+                    .flatMap(tag -> tag.getProducts().stream()) // 取得所有產品
+                    .map(ProductDTO::new) // 轉換為 DTO，確保包含 images
+                    .collect(Collectors.toList());
+
+            response.setSuccess(true);
+            response.setMessage("成功獲取標籤清單");
+            response.setTags(tags);
+            response.setProducts(productDTOs);
+        } catch (Exception e) {
+            response.setSuccess(false);
+            response.setMessage("獲取標籤失敗: " + e.getMessage());
+        }
+        return response;
+    }
 }
