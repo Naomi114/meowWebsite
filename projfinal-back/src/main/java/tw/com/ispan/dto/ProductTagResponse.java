@@ -7,6 +7,7 @@ import tw.com.ispan.domain.shop.ProductTag;
 public class ProductTagResponse {
     private Boolean success;
     private String message;
+    private List<ProductDTO> products;
     private List<ProductTag> tags; // 標籤列表
     private Long count;
 
@@ -40,6 +41,14 @@ public class ProductTagResponse {
 
     public void setCount(Long count) {
         this.count = count;
+    }
+
+    public List<ProductDTO> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<ProductDTO> products) {
+        this.products = products;
     }
 
 }

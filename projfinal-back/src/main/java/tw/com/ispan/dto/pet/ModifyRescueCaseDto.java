@@ -65,7 +65,7 @@ public class ModifyRescueCaseDto {
 	@Min(value = 1, message = "區域id不得小於1") 
 	@Max(value = 374, message = "區域id不得大於374") 
 	@NotNull(message = "區域為必填")
-	private Integer distinctAreaId;
+	private Integer districtAreaId;
 	
 	private String street;
 	
@@ -153,11 +153,11 @@ public class ModifyRescueCaseDto {
 	public void setCityId(Integer cityId) {
 		this.cityId = cityId;
 	}
-	public Integer getDistinctAreaId() {
-		return distinctAreaId;
+	public Integer getdistrictAreaId() {
+		return districtAreaId;
 	}
-	public void setDistinctAreaId(Integer distinctAreaId) {
-		this.distinctAreaId = distinctAreaId;
+	public void setdistrictAreaId(Integer districtAreaId) {
+		this.districtAreaId = districtAreaId;
 	}
 	public String getStreet() {
 		return street;
@@ -209,7 +209,7 @@ public class ModifyRescueCaseDto {
 		return "RescueCaseDto [caseTitle=" + caseTitle + ", speciesId=" + speciesId + ", breedId=" + breedId
 				+ ", furColorId=" + furColorId + ", gender=" + gender + ", sterilization=" + sterilization + ", age="
 				+ age + ", microChipNumber=" + microChipNumber + ", suspLost=" + suspLost + ", cityId=" + cityId
-				+ ", distinctAreaId=" + distinctAreaId + ", street=" + street + ", rescueReason=" + rescueReason
+				+ ", districtAreaId=" + districtAreaId + ", street=" + street + ", rescueReason=" + rescueReason
 				+ ", caseStateId=" + caseStateId + ", tag=" + tag + ", rescueDemands=" + rescueDemands + ", canAffords=" + canAffords + ", imageIdandUrl=" + imageIdandUrl
 				+ "]";
 	}

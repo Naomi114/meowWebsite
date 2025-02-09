@@ -2,6 +2,7 @@ package tw.com.ispan.controller;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,6 +11,7 @@ import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.jwt.JsonWebTokenUtility;
 import tw.com.ispan.service.MemberService;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 public class LoginController {
 
@@ -48,7 +50,7 @@ public class LoginController {
             responseJson.put("message", "登入成功");
 
             JSONObject user = new JSONObject()
-                    .put("custid", bean.getMemberId())
+                    .put("memberId", bean.getMemberId())  //把小朱原本custid改成memberId
                     .put("email", bean.getEmail());
 
             // 生成 JWT token
