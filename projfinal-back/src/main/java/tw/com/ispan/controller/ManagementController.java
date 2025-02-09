@@ -26,36 +26,28 @@ public class ManagementController {
     @Autowired
     private MemberService memberService;
 
-    // 獲取所有會員
-    @GetMapping
-    public List<Member> getMembers(@RequestParam(value = "search", required = false) String search) {
-        if (search != null && !search.isEmpty()) {
-            return memberService.searchMembers(search); // 根據搜尋條件過濾會員
-        } else {
-            return memberService.getAllMembers(); // 沒有搜尋條件則返回所有會員
+    // 資料回填查詢
+    @GetMapping("/{memberId}")
+    public ResponseEntity<MemberDto> getMemberById(@PathVariable("memberId") Integer memberId) {
+        try {
+            Member member = memberService.getMemberById(memberId);
+            MemberDto memberDto = new MemberDto();
+            memberDto.setNickName(member.getNickName());
+            memberDto.setName(member.getName());
+            memberDto.setEmail(member.getEmail());
+            memberDto.setPhone(member.getPhone());
+            memberDto.setAddress(member.getAddress());
+            memberDto.setBirthday(member.getBirthday());
+
+            return ResponseEntity.ok(memberDto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    @DeleteMapping("/{memberId}")
-    public ResponseEntity<Void> deleteMember(@PathVariable Integer memberId) {
-        boolean isDeleted = memberService.deleteMemberById(memberId);
-        if (isDeleted) {
-            return ResponseEntity.noContent().build(); // 204 No Content
-        } else {
-            return ResponseEntity.notFound().build(); // 404 Not Found
-        }
-    }
-
-    @PostMapping
-    public ResponseEntity<String> addMember(@RequestBody MemberDto memberDto) {
-
-        if (memberDto.getBirthday() == null) {
-            return ResponseEntity.badRequest().body("生日是必填項，不能為空");
-        }
-        memberService.addMember(memberDto);
-        return ResponseEntity.ok("會員新增成功");
-    }
-
+    // 修改
     @PutMapping("/{memberId}")
     public ResponseEntity<String> updateMember(
             @PathVariable("memberId") Integer memberId,
@@ -73,4 +65,34 @@ public class ManagementController {
                     .body("更新失敗：" + e.getMessage());
         }
     }
+
+    @GetMapping
+    public List<MemberDto> getMembers(@RequestParam(value = "search", required = false) String search) {
+        if (search != null && !search.isEmpty()) {
+            return memberService.searchMembers(search); // 根据搜索条件查询会员
+        } else {
+            return memberService.getAllMembers(); // 没有搜索条件则返回所有会员
+        }
+    }
+
+    @DeleteMapping("/{memberId}")
+    public ResponseEntity<Void> deleteMember(@PathVariable Integer memberId) {
+        boolean isDeleted = memberService.deleteMemberById(memberId); // 根據 memberId 刪除會員
+        if (isDeleted) {
+            return ResponseEntity.noContent().build(); // 204 No Content
+        } else {
+            return ResponseEntity.notFound().build(); // 404 Not Found
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<String> addMember(@RequestBody MemberDto memberDto) {
+
+        if (memberDto.getBirthday() == null) {
+            return ResponseEntity.badRequest().body("生日是必填項，不能為空");
+        }
+        memberService.addMember(memberDto);
+        return ResponseEntity.ok("會員新增成功");
+    }
+
 }

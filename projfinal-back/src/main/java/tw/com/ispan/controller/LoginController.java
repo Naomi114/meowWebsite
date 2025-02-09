@@ -50,13 +50,14 @@ public class LoginController {
             responseJson.put("message", "登入成功");
 
             JSONObject user = new JSONObject()
-                    .put("memberId", bean.getMemberId())  //把小朱原本custid改成memberId
-                    .put("email", bean.getEmail());
+                    .put("memberId", bean.getMemberId()) // memberId //把小朱原本custid改成memberId
+                    .put("email", bean.getEmail()) // email
+                    .put("nickname", bean.getNickName()); // nickname
 
             // 生成 JWT token
             String token = jsonWebTokenUtility.createToken(user.toString());
             responseJson.put("token", token);
-            responseJson.put("user", bean.getEmail());
+            responseJson.put("user", user);
         }
 
         return responseJson.toString();
