@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tw.com.ispan.domain.pet.ReportCase;
-import tw.com.ispan.dto.ReportCaseResponse;
+import tw.com.ispan.dto.shop.ReportCaseResponse;
 import tw.com.ispan.service.pet.ReportCaseService;
 
 @RestController

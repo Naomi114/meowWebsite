@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import tw.com.ispan.domain.admin.Member;
-import tw.com.ispan.dto.MemberDto;
-import tw.com.ispan.dto.PasswordDto;
+import tw.com.ispan.dto.admin.MemberDto;
+import tw.com.ispan.dto.admin.PasswordDto;
 import tw.com.ispan.repository.admin.MemberRepository;
 
 @Service

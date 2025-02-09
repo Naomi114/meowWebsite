@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import tw.com.ispan.domain.pet.banner.Banner;
 import tw.com.ispan.domain.pet.banner.BannerType;
-import tw.com.ispan.dto.BannerDTO;
+import tw.com.ispan.dto.pet.BannerDTO;
 import tw.com.ispan.service.banner.BannerService;
 
 @RestController

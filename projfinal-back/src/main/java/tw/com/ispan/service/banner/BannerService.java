@@ -14,7 +14,7 @@ import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.domain.pet.banner.Banner;
 import tw.com.ispan.domain.pet.banner.BannerType;
-import tw.com.ispan.dto.BannerDTO;
+import tw.com.ispan.dto.pet.BannerDTO;
 import tw.com.ispan.repository.pet.BannerRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.RescueCaseRepository;
