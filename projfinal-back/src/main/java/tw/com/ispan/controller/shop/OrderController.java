@@ -4,12 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import tw.com.ispan.domain.shop.OrderItem;
 import tw.com.ispan.domain.shop.Orders;
+import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.dto.shop.OrderDTO;
 import tw.com.ispan.dto.shop.PaymentRequest;
 import tw.com.ispan.repository.shop.OrderRequest;
+import tw.com.ispan.service.shop.CartService;
 import tw.com.ispan.service.shop.EmailService;
 import tw.com.ispan.service.shop.OrderService;
+import tw.com.ispan.service.shop.ProductService;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +29,10 @@ public class OrderController {
     private OrderService orderService;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private CartService cartService;
+    @Autowired
+    private ProductService productService;
 
     /**
      * 創建訂單
@@ -122,6 +131,39 @@ public class OrderController {
                 } catch (Exception e) {
                     e.printStackTrace();
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("郵件發送失敗: " + e.getMessage());
+                }
+            }
+
+            // 當訂單狀態為「出貨中」時，扣除庫存數量和移除購物車中的商品
+            if ("出貨中".equals(newStatus)) {
+                try {
+                    // 扣除庫存數量
+                    for (OrderItem orderItem : order.getOrderItems()) {
+                        Product product = orderItem.getProduct();
+                        int quantityPurchased = orderItem.getQuantity();
+                        try {
+                            productService.decreaseStock(product.getId(), quantityPurchased); // 假設有 decreaseStock 方法
+                            System.out.println("已扣除商品 " + product.getProductName() + " 的 " + quantityPurchased + " 數量");
+                        } catch (Exception e) {
+                            // 錯誤回報: 庫存扣除失敗
+                            System.err.println("扣除庫存時發生錯誤: " + e.getMessage());
+                            throw new RuntimeException("庫存扣除失敗: " + e.getMessage()); // 可以選擇中斷流程，視需求而定
+                        }
+                    }
+
+                    // 從購物車中移除已購買的商品
+                    try {
+                        cartService.removeItemsByOrderId(orderId); // 假設 cartService 提供此功能
+                        System.out.println("已從購物車中移除已購買的商品");
+                    } catch (Exception e) {
+                        // 錯誤回報: 移除商品失敗
+                        System.err.println("移除商品時發生錯誤: " + e.getMessage());
+                        throw new RuntimeException("移除購物車商品失敗: " + e.getMessage()); // 可以選擇中斷流程，視需求而定
+                    }
+                } catch (Exception e) {
+                    // 錯誤回報: 更新訂單狀態失敗
+                    System.err.println("更新訂單狀態時發生錯誤: " + e.getMessage());
+                    return new ResponseEntity<>("更新訂單狀態失敗: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             }
 
