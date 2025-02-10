@@ -96,6 +96,8 @@ jwt:
 google:
   api:
     key: AIzaSyATLMpyW2m1qnNAAQf0rZSpcl6TadBobBg
+  client:
+    id: 687382637987-mac1n2c8aakto95j4o56keqblhst1j1u.apps.googleusercontent.com
 
 #message API(冠)
 Channel:
