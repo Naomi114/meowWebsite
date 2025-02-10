@@ -35,19 +35,19 @@ public class AdoptionCase {
     private String caseTitle;
 
     // 雙向多對一,外鍵,對應member表
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_Member"))
     private Member member;
     // 雙向多對一,外鍵,對應species表
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_Species"))
     private Species species;
     // 雙向多對一,外鍵,對應breed表
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "breedId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_Breed"))
     private Breed breed;
     // 雙向多對一,外鍵,對應furColor表
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "furColorId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_FurColor"))
     private FurColor furColor;
 
@@ -67,12 +67,12 @@ public class AdoptionCase {
     private Boolean susLost;
 
     // 雙向多對一,外鍵,對應city表
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_City"))
     private City city;
 
     // 雙向多對一,外鍵,對應city表
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "districtAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_DistrictArea"))
     private DistrictArea districtArea;
 
@@ -111,7 +111,7 @@ public class AdoptionCase {
     private String note;
 
     // 單向多對一,外鍵,對應CaseState表
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "caseStateId", nullable = false, foreignKey = @ForeignKey(name = "FK__AdoptionCaseState"))
     private CaseState caseState;
 
@@ -142,7 +142,8 @@ public class AdoptionCase {
             FurColor furColor, String gender, String sterilization, Integer age, Integer microChipNumber,
             Boolean susLost, City city, DistrictArea districtArea, String street, BigDecimal latitude,
             BigDecimal longitude, Integer viewCount, Integer follow, LocalDateTime publicationTime,
-            LocalDateTime lastUpdateTime, String story, String healthCondition, String adoptedCondition, Integer status, String note,
+            LocalDateTime lastUpdateTime, String story, String healthCondition, String adoptedCondition, Integer status,
+            String note,
             List<CasePicture> casePictures, Set<Follow> follows, List<ReportCase> reportCase,
             Set<AdoptionCaseApply> adoptionCaseApply, CaseState caseState) {
         this.adoptionCaseId = adoptionCaseId;
@@ -184,7 +185,8 @@ public class AdoptionCase {
                 + ", sterilization=" + sterilization + ", age=" + age + ", microChipNumber=" + microChipNumber
                 + ", susLost=" + susLost + ", city=" + city + ", districtArea=" + districtArea + ", street=" + street
                 + ", latitude=" + latitude + ", longitude=" + longitude + ", viewCount=" + viewCount + ", follow="
-                + follow + ", publicationTime=" + publicationTime + ", lastUpdateTime=" + lastUpdateTime  + ", story=" + story + ", healthCondition=" + healthCondition + ", adoptedCondition="
+                + follow + ", publicationTime=" + publicationTime + ", lastUpdateTime=" + lastUpdateTime + ", story="
+                + story + ", healthCondition=" + healthCondition + ", adoptedCondition="
                 + adoptedCondition + ", note=" + note + ", caseState=" + caseState + ", casePictures=" + casePictures
                 + ", follows=" + follows + ", reportCase=" + reportCase + ", adoptionCaseApply=" + adoptionCaseApply
                 + "]";
@@ -421,7 +423,5 @@ public class AdoptionCase {
     public void setAdoptionCaseApply(Set<AdoptionCaseApply> adoptionCaseApply) {
         this.adoptionCaseApply = adoptionCaseApply;
     }
-
-    
 
 }

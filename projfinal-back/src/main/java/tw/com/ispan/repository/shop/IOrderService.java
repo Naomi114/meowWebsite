@@ -3,7 +3,7 @@ package tw.com.ispan.repository.shop;
 import java.util.Optional;
 
 import tw.com.ispan.domain.shop.Orders;
-import tw.com.ispan.dto.OrderDTO;
+import tw.com.ispan.dto.shop.OrderDTO;
 
 public interface IOrderService {
 

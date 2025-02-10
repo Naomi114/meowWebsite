@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
-import tw.com.ispan.dto.CategoryRequest;
-import tw.com.ispan.dto.CategoryResponse;
-import tw.com.ispan.dto.ProductDTO;
-import tw.com.ispan.dto.ProductRequest;
+import tw.com.ispan.dto.shop.CategoryRequest;
+import tw.com.ispan.dto.shop.CategoryResponse;
+import tw.com.ispan.dto.shop.ProductDTO;
+import tw.com.ispan.dto.shop.ProductRequest;
 import tw.com.ispan.repository.shop.CategoryRepository;
 import tw.com.ispan.repository.shop.ProductRepository;
 
