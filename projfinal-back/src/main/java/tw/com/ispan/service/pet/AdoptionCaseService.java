@@ -16,7 +16,7 @@ import tw.com.ispan.domain.pet.City;
 import tw.com.ispan.domain.pet.DistrictArea;
 import tw.com.ispan.domain.pet.FurColor;
 import tw.com.ispan.domain.pet.Species;
-import tw.com.ispan.dto.AdoptioncaseDTO;
+import tw.com.ispan.dto.pet.AdoptioncaseDTO;
 import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.pet.BreedRepository;
 import tw.com.ispan.repository.pet.CaseStateRepository;
@@ -39,7 +39,7 @@ public class AdoptionCaseService {
     @Autowired
     private CityRepository cityRepository; // 新的 City repository
     @Autowired
-    private DistrictAreaRepository districtAreaRepository; // 新的 DistinctArea repository
+    private DistrictAreaRepository districtAreaRepository; // 新的 districtArea repository
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
@@ -103,8 +103,8 @@ public class AdoptionCaseService {
 
     // -----------------------------------------------------------------------------
     // 查詢
-    public List<AdoptionCase> searchAdoptionCases(Long cityId, Long distinctAreaId, Long caseStateId, Long speciesId,
+    public List<AdoptionCase> searchAdoptionCases(Long cityId, Long districtAreaId, Long caseStateId, Long speciesId,
             String gender) {
-        return adoptionCaseRepository.searchAdoptionCases(cityId, distinctAreaId, caseStateId, speciesId, gender);
+        return adoptionCaseRepository.searchAdoptionCases(cityId, districtAreaId, caseStateId, speciesId, gender);
     }
 }

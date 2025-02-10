@@ -18,9 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
-import tw.com.ispan.dto.ProductDTO;
-import tw.com.ispan.dto.ProductRequest;
-import tw.com.ispan.dto.ProductResponse;
+import tw.com.ispan.dto.shop.ProductDTO;
+import tw.com.ispan.dto.shop.ProductRequest;
+import tw.com.ispan.dto.shop.ProductResponse;
 import tw.com.ispan.repository.shop.CartItemRepository;
 import tw.com.ispan.repository.shop.CategoryRepository;
 import tw.com.ispan.repository.shop.InventoryItemRepository;
@@ -78,6 +78,10 @@ public class ProductService {
 
 	@Autowired
 	private NotificationService notificationService;
+
+	public Page<Product> getAllPaged(Pageable pageable) {
+		return productRepository.findAll(pageable);
+	}
 
 	// 單筆新增
 	public ProductResponse createSingle(ProductRequest request, List<MultipartFile> filenames) {
@@ -382,11 +386,6 @@ public class ProductService {
 		response.setMessage(products.isEmpty() ? "未找到任何商品" : "商品查詢成功");
 
 		return response;
-	}
-
-	// 分頁
-	public Page<Product> getAllPaged(Pageable pageable) {
-		return productRepository.findAll(pageable);
 	}
 
 }

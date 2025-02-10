@@ -1,7 +1,9 @@
 package tw.com.ispan.service.banner;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,9 +14,11 @@ import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.domain.pet.banner.Banner;
 import tw.com.ispan.domain.pet.banner.BannerType;
+import tw.com.ispan.dto.pet.BannerDTO;
 import tw.com.ispan.repository.pet.BannerRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.RescueCaseRepository;
+import tw.com.ispan.repository.pet.forAdopt.AdoptionCaseRepository;
 
 @Service
 @Transactional
@@ -26,11 +30,57 @@ public class BannerService {
     private LostCaseRepository lostCaseRepository;
     @Autowired
     private RescueCaseRepository rescueCaseRepository;
+    @Autowired
+    private AdoptionCaseRepository adoptionCaseRepository;
     // @Autowired
-    // private AdoptionCaseRepository adoptionCaseRepository;
+    // private CasePictureRepository casePictureRepository;
 
-    public List<Banner> getAllBanners() {
-        return bannerRepository.findAll(); // 從資料庫獲取所有 Banner
+    public List<BannerDTO> getAllBanners() {
+        List<Banner> banners = bannerRepository.findAll();
+
+        return banners.stream()
+                .filter(b -> !b.getIsHidden()) // ✅ 過濾隱藏的 Banner
+                .map(this::mapToBannerDTO) // ✅ 轉換為 DTO
+                .sorted(Comparator.comparing(BannerDTO::getOnlineDate).reversed()) // ✅ 按時間降序排列
+                .collect(Collectors.toList());
+    }
+
+    private BannerDTO mapToBannerDTO(Banner banner) {
+        BannerDTO dto = new BannerDTO();
+        dto.setBannerId(banner.getBannerId());
+        dto.setBannerType(banner.getBannerType().name()); // ✅ Enum 轉 String
+        dto.setOnlineDate(banner.getOnlineDate());
+
+        // ✅ 根據 bannerType 取對應的 caseTitle 和 imageUrl
+        switch (banner.getBannerType().name()) {
+            case "LOST":
+                lostCaseRepository.findById(banner.getLostCaseId()).ifPresent(lostCase -> {
+                    dto.setCaseTitle(lostCase.getCaseTitle());
+                    // casePictureRepository.findByLostCaseId(lostCase.getLostCaseId())
+                    // .ifPresent(casePicture -> dto.setPictureUrl(casePicture.getPictureUrl())); //
+                    // ✅ 取得圖片
+                });
+                break;
+
+            case "RESCUE":
+                rescueCaseRepository.findById(banner.getRescueCaseId()).ifPresent(rescueCase -> {
+                    dto.setCaseTitle(rescueCase.getCaseTitle());
+                    // casePictureRepository.findByRescueCaseId(rescueCase.getRescueCaseId())
+                    // .ifPresent(casePicture -> dto.setPictureUrl(casePicture.getPictureUrl())); //
+                    // ✅ 取得圖片
+                });
+                break;
+
+            case "ADOPT":
+                adoptionCaseRepository.findById(banner.getAdoptionCaseId()).ifPresent(adoptCase -> {
+                    dto.setCaseTitle(adoptCase.getCaseTitle());
+                    // casePictureRepository.findByAdoptionCaseId(adoptCase.getAdoptionCaseId())
+                    // .ifPresent(casePicture -> dto.setPictureUrl(casePicture.getPictureUrl())); //
+                    // ✅ 取得圖片
+                });
+                break;
+        }
+        return dto;
     }
 
     /**
@@ -45,8 +95,8 @@ public class BannerService {
                 return createLostCaseBanner(lostcaseId, bannerType);
             case RESCUE:
                 return createRescueCaseBanner(rescuecaseId, bannerType);
-            // case ADOPTION:
-            // return createAdoptionCaseBanner(adoptioncaseId, bannerType);
+            case ADOPTION:
+                return createAdoptionCaseBanner(adoptioncaseId, bannerType);
             default:
                 throw new IllegalArgumentException("未知的 BannerType: " + bannerType);
         }
@@ -81,17 +131,16 @@ public class BannerService {
     /**
      * 創建領養案件 (AdoptionCase) 的 Banner
      */
-    // private Banner createAdoptionCaseBanner(Integer caseId, BannerType
-    // bannerType) {
-    // if (caseId == null) {
-    // throw new IllegalArgumentException("AdoptionCase ID 不能為 null");
-    // }
-    // AdoptionCase adoptionCase = adoptionCaseRepository.findById(caseId)
-    // .orElseThrow(() -> new IllegalArgumentException("AdoptionCase 不存在，ID: " +
-    // caseId));
+    private Banner createAdoptionCaseBanner(Integer caseId, BannerType bannerType) {
+        if (caseId == null) {
+            throw new IllegalArgumentException("AdoptionCase ID 不能為 null");
+        }
+        AdoptionCase adoptionCase = adoptionCaseRepository.findById(caseId)
+                .orElseThrow(() -> new IllegalArgumentException("AdoptionCase 不存在，ID: " +
+                        caseId));
 
-    // return saveBanner(null, null, adoptionCase, bannerType);
-    // }
+        return saveBanner(null, null, adoptionCase, bannerType);
+    }
 
     /**
      * 儲存 Banner 通用方法
