@@ -24,7 +24,7 @@ import tw.com.ispan.domain.pet.CaseState;
 import tw.com.ispan.domain.pet.City;
 import tw.com.ispan.domain.pet.DistrictArea;
 import tw.com.ispan.domain.pet.Species;
-import tw.com.ispan.dto.AdoptioncaseDTO;
+import tw.com.ispan.dto.pet.AdoptioncaseDTO;
 import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.pet.BreedRepository;
 import tw.com.ispan.repository.pet.CaseStateRepository;

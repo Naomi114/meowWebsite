@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.AdoptionCase;
 import tw.com.ispan.domain.pet.forAdopt.AdoptionCaseApply;
-import tw.com.ispan.dto.AdoptionCaseApplyDTO;
+import tw.com.ispan.dto.pet.AdoptionCaseApplyDTO;
 import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.pet.forAdopt.AdoptionCaseApplyRepository;
 import tw.com.ispan.repository.pet.forAdopt.AdoptionCaseRepository;

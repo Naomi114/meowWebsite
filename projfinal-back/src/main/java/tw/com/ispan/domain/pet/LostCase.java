@@ -323,8 +323,6 @@ public class LostCase {
         this.viewCount = viewCount;
     }
 
-    
-
     public Integer getFollow() {
         return follow;
     }

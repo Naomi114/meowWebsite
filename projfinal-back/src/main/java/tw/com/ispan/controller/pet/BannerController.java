@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import tw.com.ispan.domain.pet.banner.Banner;
 import tw.com.ispan.domain.pet.banner.BannerType;
+import tw.com.ispan.dto.pet.BannerDTO;
 import tw.com.ispan.service.banner.BannerService;
 
 @RestController
@@ -44,15 +45,8 @@ public class BannerController {
      * ✅ 返回所有的 Banner，並按照 `onlineDate` 降冪排序
      */
     @GetMapping
-    public ResponseEntity<List<Banner>> getAllBanners() {
-        List<Banner> banners = bannerService.getAllBanners();
-
-        // 過濾掉 `isHidden: true` 的 Banner
-        banners = banners.stream()
-                .filter(b -> !b.getIsHidden())
-                .sorted((b1, b2) -> b2.getOnlineDate().compareTo(b1.getOnlineDate())) // 按時間排序
-                .toList();
-
+    public ResponseEntity<List<BannerDTO>> getAllBanners() {
+        List<BannerDTO> banners = bannerService.getAllBanners();
         return ResponseEntity.ok(banners);
     }
 }
