@@ -114,51 +114,63 @@ public class OrderService implements IOrderService {
         return savedOrder;
     }
 
-    // 处理支付
+    // 更新订单状态并发送邮件
     @Transactional
-    public Orders processPayment(Integer orderId, PaymentRequest paymentRequest) throws MessagingException {
+    public Orders updateOrderStatus(Integer orderId, String status) throws MessagingException {
         Orders order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
-
-        if ("success".equals(paymentRequest.getPaymentStatus())) {
-            order.setOrderStatus("已付款");
-        } else {
-            order.setOrderStatus("付款失敗");
-        }
+                .orElseThrow(() -> new RuntimeException("订单未找到: " + orderId));
 
         // 更新訂單狀態
-        orderRepository.save(order);
+        order.setOrderStatus(status);
+        Orders updatedOrder = orderRepository.save(order);
 
-        // 準備郵件內容
-        String emailContent = generateEmailContent(order);
+        // 如果狀態變更為「已支付」、「備貨中」或「出貨中」，則發送郵件
+        if (status.equals("已支付") || status.equals("備貨中") || status.equals("出貨中")) {
+            // 準備郵件內容
+            String emailContent = generateEmailContent(updatedOrder, status);
 
-        emailService.sendEmail(order.getMember().getEmail(), "交易明細", emailContent);
-
-        return order;
-    }
-
-    // 根據訂單生成郵件內容
-    private String generateEmailContent(Orders order) {
-        StringBuilder emailContent = new StringBuilder();
-        emailContent.append("<h3>您的訂單已處理</h3>");
-        emailContent.append("<p>訂單編號: " + order.getOrderId() + "</p>");
-        emailContent.append("<p>訂單狀態: " + order.getOrderStatus() + "</p>");
-        emailContent.append("<p>訂單總金額: NT$" + order.getFinalPrice() + "</p>");
-        emailContent.append("<p>訂單詳情：</p>");
-        emailContent.append("<table border='1'><tr><th>商品名稱</th><th>數量</th><th>單價</th><th>金額</th></tr>");
-
-        // 生成訂單項目
-        for (OrderItem item : order.getOrderItems()) {
-            emailContent.append("<tr>")
-                    .append("<td>").append(item.getProduct().getProductName()).append("</td>")
-                    .append("<td>").append(item.getOrderQuantity()).append("</td>")
-                    .append("<td>").append(item.getPurchasedPrice()).append("</td>")
-                    .append("<td>").append(item.getPurchasedPrice().multiply(new BigDecimal(item.getOrderQuantity())))
-                    .append("</td>")
-                    .append("</tr>");
+            // 發送郵件並處理錯誤
+            try {
+                emailService.sendEmail(updatedOrder.getMember().getEmail(), "訂單狀態更新", emailContent);
+            } catch (Exception e) {
+                // 打印出錯信息以便調試
+                e.printStackTrace();
+                throw new MessagingException("郵件發送失敗: " + e.getMessage());
+            }
         }
 
-        emailContent.append("</table>");
+        return updatedOrder;
+    }
+
+    // 根據訂單和狀態生成郵件內容
+    private String generateEmailContent(Orders order, String status) {
+        StringBuilder emailContent = new StringBuilder();
+        emailContent.append("<h3>您的訂單狀態已更新</h3>");
+        emailContent.append("<p>訂單編號: " + order.getOrderId() + "</p>");
+        emailContent.append("<p>訂單狀態: " + status + "</p>");
+
+        if (status.equals("已支付")) {
+            emailContent.append("<p>訂單總金額: NT$" + order.getFinalPrice() + "</p>");
+            emailContent.append("<p>訂單詳情：</p>");
+            emailContent.append("<table border='1'><tr><th>商品名稱</th><th>數量</th><th>單價</th><th>金額</th></tr>");
+
+            // 生成訂單項目
+            for (OrderItem item : order.getOrderItems()) {
+                emailContent.append("<tr>")
+                        .append("<td>").append(item.getProduct().getProductName()).append("</td>")
+                        .append("<td>").append(item.getOrderQuantity()).append("</td>")
+                        .append("<td>").append(item.getPurchasedPrice()).append("</td>")
+                        .append("<td>")
+                        .append(item.getPurchasedPrice().multiply(new BigDecimal(item.getOrderQuantity())))
+                        .append("</td>")
+                        .append("</tr>");
+            }
+
+            emailContent.append("</table>");
+        } else {
+            emailContent.append("<p>您的訂單正在處理中，將很快更新為下一步狀態。</p>");
+        }
+
         return emailContent.toString();
     }
 
@@ -206,15 +218,6 @@ public class OrderService implements IOrderService {
             e.printStackTrace();
             return false;
         }
-    }
-
-    // 更新订单状态
-    @Transactional
-    public Orders updateOrderStatus(Integer orderId, String status) {
-        Orders order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("订单未找到: " + orderId));
-        order.setOrderStatus(status);
-        return orderRepository.save(order);
     }
 
     // 获取订单信息
@@ -425,6 +428,21 @@ public class OrderService implements IOrderService {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public Orders processPayment(int orderId, PaymentRequest paymentRequest) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'processPayment'");
+    }
+
+    public List<Orders> getOrdersByMemberId(int memberId) {
+        try {
+            // Fetch orders by memberId directly, referencing member's memberId
+            return orderRepository.findByMember_MemberId(memberId);
+        } catch (Exception e) {
+            // Handle the exception and throw a RuntimeException with the error message
+            throw new RuntimeException("Error fetching orders: " + e.getMessage(), e);
         }
     }
 }
