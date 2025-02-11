@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
@@ -36,6 +37,7 @@ import tw.com.ispan.domain.pet.banner.Banner;
 })
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "lostCaseId")
 // 使用lostCaseId作為唯一標識符
+@JsonIgnoreProperties({ "member", "casePictures", "follows", "reportCases" })
 public class LostCase {
 
     @Id
@@ -48,25 +50,22 @@ public class LostCase {
     // 關聯到 Member 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "memberId", nullable = true, foreignKey = @ForeignKey(name = "FK_LostCase_Member"))
-    @JsonIgnore
+    // @JsonIgnore
     private Member member;
 
     // 關聯到 Species 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_Species"))
-    @JsonIgnore
     private Species species;
 
     // 關聯到 Breed 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "breedId", foreignKey = @ForeignKey(name = "FK_LostCase_Breed"))
-    @JsonIgnore
     private Breed breed;
 
     // 關聯到 FurColor 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "furColorId", foreignKey = @ForeignKey(name = "FK_LostCase_FurColor"))
-    @JsonIgnore
     private FurColor furColor;
 
     @Column(columnDefinition = "NVARCHAR(5)", name = "petName")
@@ -87,13 +86,11 @@ public class LostCase {
     // 關聯到 City 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "cityId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_City"))
-    @JsonIgnore
     private City city;
 
     // 關聯到 districtArea 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "districtAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_LostCase_districtArea"))
-    @JsonIgnore
     private DistrictArea districtArea;
 
     @Column(columnDefinition = "NVARCHAR(10)", name = "street")
@@ -162,6 +159,7 @@ public class LostCase {
     private String caseUrl;
 
     @OneToOne(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Banner banner;
 
     @Column(name = "isHidden", nullable = false)
