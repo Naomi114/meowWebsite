@@ -52,8 +52,8 @@ public class LoginController {
             JSONObject user = new JSONObject()
                     .put("memberId", bean.getMemberId()) // memberId //把小朱原本custid改成memberId
                     .put("email", bean.getEmail()) // email
-                    .put("nickname", bean.getNickName()); // nickname
-
+                    .put("nickname", bean.getNickName()) // nickname
+                    .put("role", "member");  // 這裡新增角色資訊，給前台做權限驗證
             // 生成 JWT token
             String token = jsonWebTokenUtility.createToken(user.toString());
             responseJson.put("token", token);
