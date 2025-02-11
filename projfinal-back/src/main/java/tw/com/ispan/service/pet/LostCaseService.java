@@ -196,7 +196,17 @@ public class LostCaseService {
      * 根據 ID 查詢 LostCase
      */
     public Optional<LostCase> findById(Integer lostCaseId) {
-        return lostCaseRepository.findById(lostCaseId);
+        return lostCaseRepository.findById(lostCaseId)
+                .map(lostCase -> {
+                    // 確保關聯對象被強制加載
+                    lostCase.getSpecies().getSpeciesId();
+                    lostCase.getBreed().getBreedId();
+                    lostCase.getFurColor().getFurColorId();
+                    lostCase.getCity().getCityId();
+                    lostCase.getDistrictArea().getDistrictAreaId();
+                    lostCase.getCaseState().getCaseStateId();
+                    return lostCase;
+                });
     }
 
     /**

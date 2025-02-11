@@ -65,8 +65,13 @@ public class LostCaseController {
     @GetMapping("/{lostCaseId}")
     public ResponseEntity<LostCase> getLostCaseById(@PathVariable Integer lostCaseId) {
         Optional<LostCase> lostCase = lostCaseService.findById(lostCaseId);
-        return lostCase.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+
+        if (lostCase.isPresent()) {
+            LostCase caseData = lostCase.get();
+            return ResponseEntity.ok(caseData);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     /**
