@@ -1,5 +1,6 @@
 package tw.com.ispan.controller.pet;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -25,6 +26,18 @@ import tw.com.ispan.service.pet.LostCaseService;
 public class LostCaseController {
     @Autowired
     private LostCaseService lostCaseService;
+
+    /**
+     * 根據會員 ID 查詢對應的 LostCases
+     *
+     * @param memberId 會員 ID
+     * @return 符合條件的 LostCase 列表
+     */
+    @GetMapping("/member/{memberId}")
+    public ResponseEntity<List<LostCase>> getLostCasesByMemberId(@PathVariable Integer memberId) {
+        List<LostCase> lostCases = lostCaseService.findByMemberId(memberId);
+        return ResponseEntity.ok(lostCases);
+    }
 
     /**
      * 更新 LostCase 的資訊

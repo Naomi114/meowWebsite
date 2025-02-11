@@ -69,6 +69,16 @@ public class LostCaseService {
     }
 
     /**
+     * 根據會員 ID 查詢對應的 LostCases
+     *
+     * @param memberId 會員 ID
+     * @return 該會員的 LostCase 列表
+     */
+    public List<LostCase> findByMemberId(Integer memberId) {
+        return lostCaseRepository.findByMemberId(memberId);
+    }
+
+    /**
      * 查詢所有 LostCase，支援模糊查詢、分頁與排序
      */
     @Transactional(readOnly = true)
@@ -196,17 +206,7 @@ public class LostCaseService {
      * 根據 ID 查詢 LostCase
      */
     public Optional<LostCase> findById(Integer lostCaseId) {
-        return lostCaseRepository.findById(lostCaseId)
-                .map(lostCase -> {
-                    // 確保關聯對象被強制加載
-                    lostCase.getSpecies().getSpeciesId();
-                    lostCase.getBreed().getBreedId();
-                    lostCase.getFurColor().getFurColorId();
-                    lostCase.getCity().getCityId();
-                    lostCase.getDistrictArea().getDistrictAreaId();
-                    lostCase.getCaseState().getCaseStateId();
-                    return lostCase;
-                });
+        return lostCaseRepository.findById(lostCaseId);
     }
 
     /**
