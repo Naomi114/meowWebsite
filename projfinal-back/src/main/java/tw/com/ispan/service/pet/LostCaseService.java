@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.criteria.Predicate;
+import tw.com.ispan.domain.pet.CasePicture;
 import tw.com.ispan.domain.pet.City;
 import tw.com.ispan.domain.pet.DistrictArea;
 import tw.com.ispan.domain.pet.LostCase;
@@ -29,7 +30,7 @@ import tw.com.ispan.repository.pet.DistrictAreaRepository;
 import tw.com.ispan.repository.pet.FurColorRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.SpeciesRepository;
-import tw.com.ispan.service.banner.BannerService;
+//import tw.com.ispan.service.banner.BannerService;
 
 @Service
 @Transactional
@@ -58,8 +59,8 @@ public class LostCaseService {
     @Autowired
     private CaseStateRepository caseStateRepository;
 
-    @Autowired
-    private BannerService bannerService;
+//    @Autowired
+//    private BannerService bannerService;
 
     @Autowired
     private BannerRepository bannerRepository;
@@ -145,7 +146,7 @@ public class LostCaseService {
     /**
      * 創建 LostCase 並自動創建對應的 Banner
      */
-    public LostCase create(JSONObject param) {
+    public LostCase create(JSONObject param, List<CasePicture> casePictures) {
         LostCase lostCase = new LostCase();
         lostCase.setCaseTitle(param.getString("caseTitle"));
 
@@ -187,6 +188,9 @@ public class LostCaseService {
         lostCase.setPublicationTime(LocalDateTime.now());
         lostCase.setLastUpdateTime(LocalDateTime.now());
 
+     // **關聯圖片**
+        lostCase.setCasePictures(casePictures);
+        
         // **先存儲 LostCase**
         LostCase savedLostCase = lostCaseRepository.save(lostCase);
 
@@ -218,7 +222,7 @@ public class LostCaseService {
         }
 
         // 先刪除 Banner
-        bannerService.deleteBannerByCaseId(lostCaseId, BannerType.LOST);
+//        bannerService.deleteBannerByCaseId(lostCaseId, BannerType.LOST);
 
         // 再刪除 LostCase
         lostCaseRepository.deleteById(lostCaseId);
