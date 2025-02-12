@@ -23,14 +23,14 @@ import tw.com.ispan.service.pet.ImageService;
 import tw.com.ispan.service.pet.LostCaseService;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @RequestMapping("/lostcases")
 public class LostCaseController {
     @Autowired
     private LostCaseService lostCaseService;
-    
+
     @Autowired
-	private ImageService imageService;
+    private ImageService imageService;
 
     /**
      * 根據會員 ID 查詢對應的 LostCases
@@ -40,6 +40,7 @@ public class LostCaseController {
      */
     @GetMapping("/member/{memberId}")
     public ResponseEntity<List<LostCase>> getLostCasesByMemberId(@PathVariable Integer memberId) {
+        System.out.println("🔍 取得的 memberId：" + memberId); // 確認是否正確解析
         List<LostCase> lostCases = lostCaseService.findByMemberId(memberId);
         return ResponseEntity.ok(lostCases);
     }
@@ -101,7 +102,6 @@ public class LostCaseController {
     @PostMapping("/create")
     public ResponseEntity<LostCase> createLostCase(@RequestBody String json) {
         JSONObject param = new JSONObject(json);
-        
 
         List<String> imagePaths = param.getJSONArray("images").toList().stream()
                 .map(Object::toString)
@@ -109,8 +109,7 @@ public class LostCaseController {
         List<String> finalImageUrls = imageService.moveImages(imagePaths);
         System.out.println("圖片移動完成: " + finalImageUrls);
         List<CasePicture> casePictures = imageService.saveImage(finalImageUrls);
-        
-        
+
         LostCase createdLostCase = lostCaseService.create(param, casePictures);
 
         return ResponseEntity.ok(createdLostCase);
