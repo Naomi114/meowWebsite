@@ -1,18 +1,24 @@
 package tw.com.ispan.controller.shop;
 
-import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import tw.com.ispan.domain.shop.OrderItem;
 import tw.com.ispan.domain.shop.Orders;
+import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.dto.shop.OrderDTO;
 import tw.com.ispan.dto.shop.PaymentRequest;
 import tw.com.ispan.repository.shop.OrderRequest;
+import tw.com.ispan.service.shop.CartService;
+import tw.com.ispan.service.shop.EmailService;
 import tw.com.ispan.service.shop.OrderService;
+import tw.com.ispan.service.shop.ProductService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RestController
@@ -21,6 +27,12 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private CartService cartService;
+    @Autowired
+    private ProductService productService;
 
     /**
      * 創建訂單
@@ -34,8 +46,7 @@ public class OrderController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("訂單創建失敗: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("訂單創建時發生錯誤: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("訂單創建時發生錯誤: " + e.getMessage());
         }
     }
 
@@ -47,13 +58,12 @@ public class OrderController {
         try {
             Orders updatedOrder = orderService.processPayment(orderId, paymentRequest);
             return ResponseEntity.ok(updatedOrder);
-        } catch (ObjectNotFoundException e) {
+        } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("付款失敗: 訂單 " + orderId + " 不存在");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("付款失敗: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("處理付款時發生錯誤: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("處理付款時發生錯誤: " + e.getMessage());
         }
     }
 
@@ -65,51 +75,122 @@ public class OrderController {
         try {
             OrderDTO orderDTO = orderService.getOrderDTOById(orderId);
             return ResponseEntity.ok(orderDTO);
-        } catch (ObjectNotFoundException e) {
+        } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("查詢失敗: 訂單 " + orderId + " 不存在");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("獲取訂單詳情時發生錯誤: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("獲取訂單詳情時發生錯誤: " + e.getMessage());
         }
     }
 
     /**
-     * 取得所有訂單
+     * 取得會員的所有訂單
      */
-    @GetMapping
-    public ResponseEntity<?> getAllOrders() {
+    @GetMapping("/member/{memberId}")
+    public ResponseEntity<?> getOrdersByMember(@PathVariable int memberId) {
         try {
-            List<Orders> orders = orderService.getAllOrders();
+            List<Orders> orders = orderService.getOrdersByMemberId(memberId);
             return ResponseEntity.ok(orders);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("獲取訂單列表時發生錯誤: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("獲取訂單時發生錯誤: " + e.getMessage());
         }
     }
 
     /**
-     * 取消訂單
+     * 管理員取得所有訂單
+     * 管理員可以查詢所有會員的訂單
      */
-    @PostMapping("/cancel")
-    public ResponseEntity<?> cancelOrder(@RequestParam int orderId) {
+    @GetMapping("/admin")
+    public ResponseEntity<?> getAllOrders() {
         try {
-            boolean isCancelled = orderService.cancelOrder(orderId);
-            if (isCancelled) {
-                return ResponseEntity.ok("訂單已成功取消");
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("無法取消訂單: 訂單狀態不允許取消");
-            }
-        } catch (ObjectNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("取消失敗: 訂單 " + orderId + " 不存在");
+            List<Orders> allOrders = orderService.getAllOrders();
+            return ResponseEntity.ok(allOrders);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("取消訂單時發生錯誤: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("獲取所有訂單時發生錯誤: " + e.getMessage());
         }
     }
 
     /**
-     * 提交訂單
+     * 更新訂單狀態
      */
+    @PutMapping("/{orderId}")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable int orderId, @RequestBody Map<String, String> request) {
+        try {
+            String newStatus = request.get("orderStatus");
+            Orders order = orderService.updateOrderStatus(orderId, newStatus);
+
+            // 只在「備貨中」或「出貨中」時發送郵件通知會員
+            boolean emailSent = false;
+            if ("備貨中".equals(newStatus) || "出貨中".equals(newStatus)) {
+                String emailContent = generateEmailContent(order, newStatus);
+                try {
+                    // 將發送郵件的過程打印出來以便於調試
+                    String email = "abc61130208@yahoo.com.tw"; // Bind email address here
+                    System.out.println("Sending email to: " + email);
+                    emailService.sendEmail(email, "您的訂單狀態已更新", emailContent);
+                    emailSent = true; // Mark email as sent
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("郵件發送失敗: " + e.getMessage());
+                }
+            }
+
+            // 當訂單狀態為「出貨中」時，扣除庫存數量和移除購物車中的商品
+            if ("出貨中".equals(newStatus)) {
+                try {
+                    // 扣除庫存數量
+                    for (OrderItem orderItem : order.getOrderItems()) {
+                        Product product = orderItem.getProduct();
+                        int quantityPurchased = orderItem.getQuantity();
+                        try {
+                            productService.decreaseStock(product.getId(), quantityPurchased); // 假設有 decreaseStock 方法
+                            System.out.println("已扣除商品 " + product.getProductName() + " 的 " + quantityPurchased + " 數量");
+                        } catch (Exception e) {
+                            // 錯誤回報: 庫存扣除失敗
+                            System.err.println("扣除庫存時發生錯誤: " + e.getMessage());
+                            throw new RuntimeException("庫存扣除失敗: " + e.getMessage()); // 可以選擇中斷流程，視需求而定
+                        }
+                    }
+
+                    // 從購物車中移除已購買的商品
+                    try {
+                        cartService.removeItemsByOrderId(orderId); // 假設 cartService 提供此功能
+                        System.out.println("已從購物車中移除已購買的商品");
+                    } catch (Exception e) {
+                        // 錯誤回報: 移除商品失敗
+                        System.err.println("移除商品時發生錯誤: " + e.getMessage());
+                        throw new RuntimeException("移除購物車商品失敗: " + e.getMessage()); // 可以選擇中斷流程，視需求而定
+                    }
+                } catch (Exception e) {
+                    // 錯誤回報: 更新訂單狀態失敗
+                    System.err.println("更新訂單狀態時發生錯誤: " + e.getMessage());
+                    return new ResponseEntity<>("更新訂單狀態失敗: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
+
+            // Add a confirmation about email sending
+            String responseMessage = "訂單狀態已更新";
+            if (emailSent) {
+                responseMessage += "，並且郵件已成功發送";
+            } else {
+                responseMessage += "，但未發送郵件（狀態未為「備貨中」或「出貨中」）";
+            }
+
+            return ResponseEntity.ok(responseMessage);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("更新失敗: 訂單 " + orderId + " 不存在");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("更新訂單狀態時發生錯誤: " + e.getMessage());
+        }
+    }
+
+    // 簡化的郵件內容
+    private String generateEmailContent(Orders order, String status) {
+        return "<h3>您的訂單狀態已更新</h3>" +
+                "<p>訂單編號: " + order.getOrderId() + "</p>" +
+                "<p>訂單狀態: " + status + "</p>" +
+                "<p>我們將持續為您服務，謝謝您的耐心等待。</p>";
+    }
+
     @PostMapping("/submit")
     public ResponseEntity<?> submitOrder(@RequestBody Map<String, Object> requestBody) {
         try {
@@ -120,44 +201,39 @@ public class OrderController {
                         .body("提交失敗: 缺少必要參數 (cartId, member, creditCard, shippingAddress, selectedItems)");
             }
 
-            try {
-                int cartId = Integer.parseInt(requestBody.get("cartId").toString());
-                int memberId = Integer.parseInt(requestBody.get("member").toString());
-                String creditCard = requestBody.get("creditCard").toString();
-                String shippingAddress = requestBody.get("shippingAddress").toString();
+            int cartId = Integer.parseInt(requestBody.get("cartId").toString());
+            int memberId = Integer.parseInt(requestBody.get("member").toString());
+            String creditCard = requestBody.get("creditCard").toString();
+            String shippingAddress = requestBody.get("shippingAddress").toString();
 
-                // 解析 selectedItems
-                List<Map<String, Object>> selectedItemsRaw = (List<Map<String, Object>>) requestBody
-                        .get("selectedItems");
-                List<Integer> selectedItems = selectedItemsRaw.stream()
-                        .map(item -> Integer.parseInt(item.get("productId").toString()))
-                        .collect(Collectors.toList());
-
-                if (selectedItems.isEmpty()) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("提交失敗: 必須選擇至少一個商品");
-                }
-                if (creditCard.trim().isEmpty() || shippingAddress.trim().isEmpty()) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("提交失敗: 信用卡資訊或送貨地址不能為空");
-                }
-
-                boolean isSubmitted = orderService.submitOrder(cartId, memberId, creditCard, shippingAddress,
-                        selectedItems);
-
-                if (isSubmitted) {
-                    return ResponseEntity.ok("訂單已成功提交");
-                } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("無法提交訂單: 訂單處理失敗");
-                }
-            } catch (NumberFormatException e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("提交失敗: cartId 或 memberId 必須為數字");
-            } catch (ClassCastException e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("提交失敗: selectedItems 格式錯誤，請提供正確的 JSON 格式");
+            Object itemsObj = requestBody.get("selectedItems");
+            if (!(itemsObj instanceof List)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("提交失敗: selectedItems 應為列表");
             }
+
+            List<?> selectedItemsRaw = (List<?>) itemsObj;
+            List<Integer> selectedItems = selectedItemsRaw.stream()
+                    .filter(item -> item instanceof Map)
+                    .map(item -> (Map<?, ?>) item)
+                    .filter(map -> map.containsKey("productId"))
+                    .map(map -> Integer.parseInt(map.get("productId").toString()))
+                    .collect(Collectors.toList());
+
+            if (selectedItems.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("提交失敗: 必須選擇至少一個商品");
+            }
+            if (creditCard.trim().isEmpty() || shippingAddress.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("提交失敗: 信用卡資訊或送貨地址不能為空");
+            }
+
+            boolean isSubmitted = orderService.submitOrder(cartId, memberId, creditCard, shippingAddress,
+                    selectedItems);
+
+            return isSubmitted ? ResponseEntity.ok("訂單已成功提交")
+                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("無法提交訂單: 訂單處理失敗");
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("提交訂單時發生錯誤: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("提交訂單時發生錯誤: " + e.getMessage());
         }
     }
 }

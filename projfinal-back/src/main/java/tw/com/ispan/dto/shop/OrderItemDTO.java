@@ -6,6 +6,7 @@ public class OrderItemDTO {
     private Integer productId; // 產品 ID
     private Integer orderQuantity; // 訂單數量
     private BigDecimal purchasedPrice; // 購買價格
+    private String productName; // 商品名稱
 
     // Getters and Setters
     public Integer getProductId() {
@@ -32,13 +33,12 @@ public class OrderItemDTO {
         this.purchasedPrice = purchasedPrice;
     }
 
-    public Object getStatus() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getStatus'");
+    // 正確返回商品名稱
+    public String getProductName() {
+        return productName; // 返回商品名稱
     }
 
-    public Object getProductName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getProductName'");
+    public void setProductName(String productName) {
+        this.productName = productName; // 設置商品名稱
     }
 }

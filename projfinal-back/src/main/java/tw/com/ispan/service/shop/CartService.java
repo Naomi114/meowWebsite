@@ -162,4 +162,9 @@ public class CartService {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getCartItemById'");
     }
+
+    public void removeItemsByOrderId(int orderId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'removeItemsByOrderId'");
+    }
 }
