@@ -23,7 +23,7 @@ import tw.com.ispan.service.pet.ImageService;
 import tw.com.ispan.service.pet.LostCaseService;
 
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin
 @RequestMapping("/lostcases")
 public class LostCaseController {
     @Autowired
