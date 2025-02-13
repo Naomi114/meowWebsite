@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,10 +16,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
+import tw.com.ispan.domain.shop.ProductTag;
 import tw.com.ispan.dto.shop.ProductDTO;
+import tw.com.ispan.dto.shop.ProductFilter;
 import tw.com.ispan.dto.shop.ProductRequest;
 import tw.com.ispan.dto.shop.ProductResponse;
 import tw.com.ispan.repository.shop.CartItemRepository;
@@ -45,6 +56,9 @@ import tw.com.ispan.specification.ProductSpecifications;
 @Service
 @Transactional
 public class ProductService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
 	@Autowired
 	private ProductRepository productRepository;
@@ -334,19 +348,24 @@ public class ProductService {
 		return response;
 	}
 
-	// 動態多條件查詢: Specification類的應用
-	public ProductResponse findBatch(String query, Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice) {
+	// 動態多條件查詢: Specification類的應用 (沒用到?)
+	public ProductResponse findBatch(String query, Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice, List<String> tags) {
 		ProductResponse response = new ProductResponse();
-
+	
 		try {
 			Specification<Product> spec = Specification.where(null);
-
+	
+			// ✅ 依據商品名稱篩選
 			if (query != null && !query.trim().isEmpty()) {
 				spec = spec.and(ProductSpecifications.hasProductName(query));
 			}
+	
+			// ✅ 依據價格篩選
 			if (minPrice != null && maxPrice != null) {
 				spec = spec.and(ProductSpecifications.priceBetween(minPrice, maxPrice));
 			}
+	
+			// ✅ 依據類別篩選
 			if (categoryId != null) {
 				Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
 				if (categoryOpt.isPresent()) {
@@ -357,10 +376,16 @@ public class ProductService {
 					return response;
 				}
 			}
-
+	
+			// ✅ 依據標籤篩選
+			if (tags != null && !tags.isEmpty()) {
+				spec = spec.and(ProductSpecifications.hasTags(tags));
+			}
+	
+			// 🔍 查詢商品
 			List<Product> products = productRepository.findAll(spec);
 			List<ProductDTO> productDTOs = products.stream().map(ProductDTO::new).toList();
-
+	
 			response.setSuccess(!productDTOs.isEmpty());
 			response.setProducts(productDTOs);
 			response.setMessage(productDTOs.isEmpty() ? "未找到符合條件的商品" : "搜尋成功");
@@ -371,6 +396,60 @@ public class ProductService {
 		}
 		return response;
 	}
+	
+	// 因為前端資料傳輸，多條件查詢改用下面這組方法: Criteria API 
+	// (因為@Qurery mssql無法解析IN、LIKE等關鍵字)
+	public List<ProductDTO> findProductsByFilter(ProductFilter filter) {
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Product> query = cb.createQuery(Product.class);
+    Root<Product> root = query.from(Product.class);
+
+    List<Predicate> predicates = new ArrayList<>();
+
+    // 🔹 1️⃣ 搜索關鍵字
+    if (filter.getQuery() != null && !filter.getQuery().trim().isEmpty()) {
+        predicates.add(cb.like(root.get("productName"), "%" + filter.getQuery() + "%"));
+    }
+
+    // 🔹 2️⃣ 類別過濾
+    if (filter.getCategoryId() != null) {
+        predicates.add(cb.equal(root.get("category").get("id"), filter.getCategoryId()));
+    }
+
+    // 🔹 3️⃣ 價格區間過濾
+    if (filter.getMinPrice() != null) {
+        predicates.add(cb.greaterThanOrEqualTo(
+            root.get("salePrice"), 
+            BigDecimal.valueOf(filter.getMinPrice().doubleValue()) // ✅ 確保 `BigDecimal` 過濾有效
+        ));
+    }
+    if (filter.getMaxPrice() != null) {
+        predicates.add(cb.lessThanOrEqualTo(
+            root.get("salePrice"), 
+            BigDecimal.valueOf(filter.getMaxPrice().doubleValue()) // ✅ 轉換成 `BigDecimal`
+        ));
+    }
+
+    // 🔹 4️⃣ 確保 `salePrice` 不是 `NULL`
+    predicates.add(cb.isNotNull(root.get("salePrice"))); // ✅ 防止 `salePrice` 為 `NULL`
+
+    // 🔹 5️⃣ 過濾 `tags`
+	if (filter.getTagIds() != null && !filter.getTagIds().isEmpty()) {
+		Join<Product, ProductTag> tagJoin = root.join("tags", JoinType.INNER);
+		predicates.add(tagJoin.get("tagId").in(filter.getTagIds())); // ✅ 正確比對 `tagId`
+	}
+
+    // 🔹 6️⃣ 設置 `WHERE` 條件
+    query.where(cb.and(predicates.toArray(new Predicate[0])));
+
+    // 🔹 7️⃣ 執行查詢
+    List<Product> products = entityManager.createQuery(query).getResultList();
+
+	 // 🔹 8️⃣ 轉換 `List<Product>` 為 `List<ProductDTO>`
+	 return products.stream()
+	 .map(product -> new ProductDTO(product))
+	 .collect(Collectors.toList());
+}
 
 	// 查詢所有商品 (by Mark)
 	public ProductResponse findAll() {
