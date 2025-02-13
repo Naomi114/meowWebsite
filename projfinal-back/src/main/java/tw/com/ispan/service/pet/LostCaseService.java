@@ -170,6 +170,7 @@ public class LostCaseService {
         lostCase.setDistrictArea(districtArea);
 
         lostCase.setStreet(param.getString("street"));
+        lostCase.setName(param.getString("petName"));
         lostCase.setGender(param.optString("gender", null));
         lostCase.setSterilization(param.getString("sterilization"));
         lostCase.setAge(param.optInt("age", -1));
