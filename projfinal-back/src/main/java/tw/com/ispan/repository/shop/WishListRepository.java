@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -28,5 +29,9 @@ public interface WishListRepository
     List<Member> findMembersByProduct(@Param("product") Product product);
 
     void deleteByProduct(Product product);
+
+    @Modifying
+    @Query("DELETE FROM Wishlist w WHERE w.product.id = :productId")
+    void deleteByProductId(@Param("productId") Integer productId);
 
 }
