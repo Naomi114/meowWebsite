@@ -23,7 +23,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 允許所有 API 路徑
-                .allowedOriginPatterns("*") // ✅ 改用 allowedOriginPatterns
+                .allowedOriginPatterns("*") // ✅ 改用 allowedOriginPatterns 允許所有路徑
                 .allowedMethods("*") // 允許的 HTTP 方法
                 .allowedHeaders("*") // 允許所有請求標頭
                 .allowCredentials(true); // 允許攜帶 Cookie、Token
