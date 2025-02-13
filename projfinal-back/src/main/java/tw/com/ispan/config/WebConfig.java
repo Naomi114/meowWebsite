@@ -22,11 +22,11 @@ public class WebConfig implements WebMvcConfigurer {
     // 全局 CORS 配置
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // 對所有路徑生效
-                .allowedOrigins("http://localhost:5173") // 允許的前端 URL
-                .allowedMethods("*") // 允許的請求方法
-                .allowedHeaders("*") // 允許的請求頭
-                .allowCredentials(true); // 是否允許攜帶憑證
+        registry.addMapping("/**") // 允許所有 API 路徑
+                .allowedOriginPatterns("*") // ✅ 改用 allowedOriginPatterns 允許所有路徑
+                .allowedMethods("*") // 允許的 HTTP 方法
+                .allowedHeaders("*") // 允許所有請求標頭
+                .allowCredentials(true); // 允許攜帶 Cookie、Token
     }
 
     // 映射靜態資源，讓前端可透過url訪問後端專案中資源(如圖片)
