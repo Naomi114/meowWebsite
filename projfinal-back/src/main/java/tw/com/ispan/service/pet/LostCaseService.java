@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.criteria.Predicate;
 import tw.com.ispan.domain.pet.CasePicture;
+import tw.com.ispan.domain.pet.CaseState;
 import tw.com.ispan.domain.pet.City;
 import tw.com.ispan.domain.pet.DistrictArea;
 import tw.com.ispan.domain.pet.LostCase;
@@ -59,8 +60,8 @@ public class LostCaseService {
     @Autowired
     private CaseStateRepository caseStateRepository;
 
-//    @Autowired
-//    private BannerService bannerService;
+    // @Autowired
+    // private BannerService bannerService;
 
     @Autowired
     private BannerRepository bannerRepository;
@@ -188,9 +189,9 @@ public class LostCaseService {
         lostCase.setPublicationTime(LocalDateTime.now());
         lostCase.setLastUpdateTime(LocalDateTime.now());
 
-     // **關聯圖片**
+        // **關聯圖片**
         lostCase.setCasePictures(casePictures);
-        
+
         // **先存儲 LostCase**
         LostCase savedLostCase = lostCaseRepository.save(lostCase);
 
@@ -222,7 +223,7 @@ public class LostCaseService {
         }
 
         // 先刪除 Banner
-//        bannerService.deleteBannerByCaseId(lostCaseId, BannerType.LOST);
+        // bannerService.deleteBannerByCaseId(lostCaseId, BannerType.LOST);
 
         // 再刪除 LostCase
         lostCaseRepository.deleteById(lostCaseId);
@@ -241,14 +242,31 @@ public class LostCaseService {
         lostCase.setAge(param.has("age") ? param.getInt("age") : lostCase.getAge());
         lostCase.setMicroChipNumber(
                 param.has("microChipNumber") ? param.getInt("microChipNumber") : lostCase.getMicroChipNumber());
-        lostCase.setLatitude(param.has("latitude") ? param.getDouble("latitude") : lostCase.getLatitude());
-        lostCase.setLongitude(param.has("longitude") ? param.getDouble("longitude") : lostCase.getLongitude());
+        // lostCase.setLatitude(param.has("latitude") ? param.getDouble("latitude") :
+        // lostCase.getLatitude());
+        // lostCase.setLongitude(param.has("longitude") ? param.getDouble("longitude") :
+        // lostCase.getLongitude());
         lostCase.setDonationAmount(
                 param.has("donationAmount") ? param.getInt("donationAmount") : lostCase.getDonationAmount());
         lostCase.setLostExperience(param.optString("lostExperience", lostCase.getLostExperience()));
         lostCase.setContactInformation(param.optString("contactInformation", lostCase.getContactInformation()));
         lostCase.setFeatureDescription(param.optString("featureDescription", lostCase.getFeatureDescription()));
         lostCase.setCaseUrl(param.optString("caseUrl", lostCase.getCaseUrl()));
+        // 🔹 更新案件狀態（如果有提供）
+        if (param.has("caseStateId")) {
+            Integer caseStateId = param.getInt("caseStateId");
+
+            // 從資料庫查找對應的 CaseState
+            CaseState caseState = caseStateRepository.findById(caseStateId)
+                    .orElseThrow(() -> new IllegalArgumentException("CaseState 不存在"));
+
+            lostCase.setCaseState(caseState);
+        }
+
+        // 🔹 更新是否隱藏（如果有提供）
+        if (param.has("isHidden")) {
+            lostCase.setIsHidden(param.getBoolean("isHidden"));
+        }
         lostCase.setLastUpdateTime(LocalDateTime.now());
 
         return lostCaseRepository.save(lostCase);
