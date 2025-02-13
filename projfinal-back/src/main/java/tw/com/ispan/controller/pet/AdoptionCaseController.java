@@ -29,7 +29,7 @@ public class AdoptionCaseController {
     @Autowired
     private AdoptionCaseService adoptionCaseService;
 
-    //     System.out.println() 和 e.printStackTrace() 可能被日誌框架攔截
+    // System.out.println() 和 e.printStackTrace() 可能被日誌框架攔截
     // 🔹 問題
 
     // Spring Boot 默認使用 SLF4J + Logback 來處理日誌。
@@ -44,7 +44,7 @@ public class AdoptionCaseController {
             AdoptionCase createdAdoptionCase = adoptionCaseService.createAdoptionCase(dto);
             return new ResponseEntity<>(createdAdoptionCase, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
@@ -69,8 +69,6 @@ public class AdoptionCaseController {
             @RequestParam(value = "gender", required = false) String gender) {
         return adoptionCaseService.searchAdoptionCases(cityId, districtAreaId, caseStateId, speciesId, gender);
     }
-
-   
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {

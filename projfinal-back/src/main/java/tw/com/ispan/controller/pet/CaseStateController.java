@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import tw.com.ispan.domain.pet.CaseState;
 import tw.com.ispan.repository.pet.CaseStateRepository;
 
-@CrossOrigin(origins = "http://localhost:8080") // 允許來自 Vue 前端的請求
+@CrossOrigin // 允許來自 Vue 前端的請求
 @RestController
 public class CaseStateController {
 

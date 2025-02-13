@@ -17,7 +17,7 @@ import tw.com.ispan.dto.pet.BannerDTO;
 import tw.com.ispan.service.banner.BannerService;
 
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin
 @RequestMapping("/banners")
 public class BannerController {
 
