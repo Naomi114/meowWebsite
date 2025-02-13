@@ -1,0 +1,14 @@
+spring:
+  #資料庫連線設定 (localhost 要修改成部屬的主機ip)
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://localhost:9433;database=meowdb;trustServerCertificate=true
+    username: admin
+    password: a123
+
+    datasource:
+  url: jdbc:sqlserver://192.168.23.113:1433;database=java;trustServerCertificate=true
+
+  web:
+    resources:
+      static-locations: classpath:/static/
