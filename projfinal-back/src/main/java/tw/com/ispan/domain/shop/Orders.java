@@ -218,4 +218,9 @@ public class Orders {
     public void setSelectedItems(List<Integer> selectedItems) {
         this.selectedItems = selectedItems;
     }
+
+    public Integer getMemberId() {
+        return this.member != null ? this.member.getId() : null; // 如果 member 为 null，则返回 null
+    }
+
 }
