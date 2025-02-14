@@ -11,4 +11,6 @@ public interface ProductImageRepository
 
     void deleteByProduct(Product product);
 
+    void deleteByProductId(Integer productId);
+
 }
