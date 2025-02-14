@@ -22,19 +22,19 @@ public class DiscountScope {
     private String discountScopeType;
 
     @ManyToOne
-    @JoinColumn(name = "discountId", nullable = false)
+    @JoinColumn(name = "FK_discountId", nullable = false)
     private Discount discount;
 
     @ManyToOne
-    @JoinColumn(name = "categoryId")
+    @JoinColumn(name = "FK_categoryId")
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "productId")
+    @JoinColumn(name = "FK_productId")
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "birthdayMonth")
+    @JoinColumn(name = "FK_memberId")
     private Member member;
 
     public DiscountScope() {

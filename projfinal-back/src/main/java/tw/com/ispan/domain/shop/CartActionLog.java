@@ -25,7 +25,7 @@ public class CartActionLog {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(name = "fkc_member_id"))
+    @JoinColumn(name = "FK_memberId", nullable = false, foreignKey = @ForeignKey(name = "fkc_member_id"))
     @JsonManagedReference("cartActionLog")
     private Member member;
 

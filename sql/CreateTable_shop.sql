@@ -1,175 +1,227 @@
-/*建立資料表*/
+/* 建立商城資料表順序
+1.  Admin
+2.  Member
+3.  Category
+4.  Product
+5.  ProductImage
+6.  ProductTag
+7.  ProductTagMapping
+8.  Discount
+9.  DiscountScope
+10. Inventory
+11. InventoryItem
+12. Orders
+13. OrderItem
+14. Wishlist
+15. Cart
+16. CartActionLog
+17. CartItem
+18. Notification
+*/
+
 USE meowdb
 
-CREATE TABLE category (
-    categoryId INT PRIMARY KEY IDENTITY(1,1),
-    categoryName NVARCHAR(255) UNIQUE NULL,
-    categoryDescription NVARCHAR(MAX) NULL,
-    defaultUnit CHAR(10) NOT NULL
+CREATE TABLE Admin (
+    adminId INT PRIMARY KEY AUTO_INCREMENT,
+    adminName VARCHAR(20) UNIQUE NOT NULL,
+    password VARCHAR(20) NOT NULL,
+    createDate DATETIME NOT NULL,
+    updateDate DATETIME NOT NULL
 );
 
--- 建立 Admin 表 (等Jude表格取代)
-CREATE TABLE admin (
-    adminId INT PRIMARY KEY IDENTITY(1,1),
-    adminName NVARCHAR(255) NOT NULL
+CREATE TABLE Member (
+    memberId INT PRIMARY KEY AUTO_INCREMENT,
+    nickName VARCHAR(20) UNIQUE NOT NULL,
+    password VARCHAR(20) NOT NULL,
+    name VARCHAR(70) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(10) NOT NULL,
+    address VARCHAR(100) NOT NULL,
+    birthday DATE NOT NULL,
+    createDate DATETIME NOT NULL,
+    updateDate DATETIME NOT NULL,
+    lineId VARCHAR(255),
+    lineName VARCHAR(255),
+    linePicture VARCHAR(255),
+    followed BOOLEAN DEFAULT FALSE,
+    userType BOOLEAN NOT NULL
 );
 
--- 建立 member 表(等Jude表格取代)
-CREATE TABLE member (
-    memberId INT PRIMARY KEY IDENTITY(1,1),
-    memberName NVARCHAR(255) NOT NULL
+CREATE TABLE Category (
+    categoryId INT PRIMARY KEY AUTO_INCREMENT,
+    categoryName VARCHAR(255) UNIQUE NOT NULL,
+    categoryDescription TEXT,
+    defaultUnit VARCHAR(10)
 );
 
-CREATE TABLE product (
-    productId INT PRIMARY KEY IDENTITY(1,1) NOT NULL,
-    productName NVARCHAR(255) NOT NULL UNIQUE,
-    productDescription NVARCHAR(MAX) NULL,
-    originalPrice DECIMAL(10, 2) NOT NULL,
-    salePrice DECIMAL(10, 2) NOT NULL,
+CREATE TABLE Product (
+    productId INT PRIMARY KEY AUTO_INCREMENT,
+    productName VARCHAR(255) NOT NULL,
+    description TEXT,
+    originalPrice DECIMAL(10,2) NOT NULL,
+    salePrice DECIMAL(10,2) NOT NULL,
     stockQuantity INT NOT NULL,
     unit VARCHAR(50),
     status VARCHAR(50),
     expire DATE NOT NULL,
-    createdAt DATETIME DEFAULT GETDATE() NOT NULL,
-    updatedAt DATETIME DEFAULT GETDATE() NOT NULL,
-    categoryId INT NOT NULL,
-    adminId INT NOT NULL,
-    FOREIGN KEY (categoryId) REFERENCES category(categoryId),
-    FOREIGN KEY (adminId) REFERENCES Admin(adminId)
+    createdAt DATETIME NOT NULL,
+    updatedAt DATETIME NOT NULL,
+    FK_categoryId INT,
+    FK_adminId INT,
+    FOREIGN KEY (FK_categoryId) REFERENCES Category(categoryId) ON DELETE SET NULL,
+    FOREIGN KEY (FK_adminId) REFERENCES Admin(adminId) ON DELETE SET NULL
 );
 
-CREATE TABLE productImage (
-    imageId INT PRIMARY KEY IDENTITY(1,1),
-    productId INT NOT NULL,
-    imageUrl NVARCHAR(255) NOT NULL,
-    isPrimary BIT NOT NULL,
-    createdAt DATETIME DEFAULT GETDATE() NOT NULL,
-    FOREIGN KEY (productId) REFERENCES product(productId)
+CREATE TABLE ProductImage (
+    imageId INT PRIMARY KEY AUTO_INCREMENT,
+    imageUrl VARCHAR(255) NOT NULL,
+    isPrimary BOOLEAN NOT NULL,
+    createdAt DATETIME NOT NULL,
+    FK_productId INT NOT NULL,
+    FOREIGN KEY (FK_productId) REFERENCES Product(productId) ON DELETE CASCADE
 );
 
-CREATE TABLE tag (
-    tagId INT PRIMARY KEY IDENTITY(1,1),
-    tagName NVARCHAR(255) NOT NULL,
-    tagDescription NVARCHAR(MAX) NULL
+CREATE TABLE ProductTag (
+    tagId INT PRIMARY KEY AUTO_INCREMENT,
+    tagName VARCHAR(255) NOT NULL,
+    tagDescription TEXT
 );
 
-CREATE TABLE inventory (
-    inventoryId INT PRIMARY KEY IDENTITY(1,1),
-    adminId INT NOT NULL,
+CREATE TABLE ProductTagMapping (
+    FK_productId INT NOT NULL,
+    FK_tagId INT NOT NULL,
+    PRIMARY KEY (FK_productId, FK_tagId),
+    FOREIGN KEY (FK_productId) REFERENCES Product(productId) ON DELETE CASCADE,
+    FOREIGN KEY (FK_tagId) REFERENCES ProductTag(tagId) ON DELETE CASCADE
+);
+
+CREATE TABLE Discount (
+    discountId INT PRIMARY KEY AUTO_INCREMENT,
+    FK_adminId INT NOT NULL,
+    discountStartTime DATETIME NOT NULL,
+    discountEndTime DATETIME NOT NULL,
+    minAmount DECIMAL(10,2),
+    minQuantity INT,
+    priority INT,
+    discountStatus VARCHAR(20),
+    discountType VARCHAR(20),
+    discountValue DECIMAL(10,2),
+    FOREIGN KEY (FK_adminId) REFERENCES Admin(adminId) ON DELETE CASCADE
+);
+
+CREATE TABLE DiscountScope (
+    discountScopeId INT PRIMARY KEY AUTO_INCREMENT,
+    discountScopeType VARCHAR(255) NOT NULL UNIQUE,
+    FK_discountId INT NOT NULL,
+    FK_categoryId INT,
+    FK_productId INT,
+    FK_memberId INT,
+    FOREIGN KEY (FK_discountId) REFERENCES Discount(discountId) ON DELETE CASCADE,
+    FOREIGN KEY (FK_categoryId) REFERENCES Category(categoryId) ON DELETE SET NULL,
+    FOREIGN KEY (FK_productId) REFERENCES Product(productId) ON DELETE SET NULL
+    FOREIGN KEY (FK_memberId) REFERENCES Member(memberId) ON DELETE SET NULL
+);
+
+CREATE TABLE Inventory (
+    inventoryId INT PRIMARY KEY AUTO_INCREMENT,
     quantity INT NOT NULL,
-    diffReason NVARCHAR(MAX) NULL,
-    inventoryStatus NVARCHAR(20) NOT NULL,
-    checkAt DATETIME DEFAULT GETDATE(),
-    endAt DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (adminId) REFERENCES Admin(adminId)
+    diffReason VARCHAR(255),
+    inventoryStatus VARCHAR(255) NOT NULL,
+    checkAt DATETIME NOT NULL,
+    endAt DATETIME NOT NULL,
+    FK_adminId INT NOT NULL,
+    FOREIGN KEY (FK_adminId) REFERENCES Admin(adminId) ON DELETE CASCADE
 );
 
-CREATE TABLE stockAudit (
-    auditId INT PRIMARY KEY IDENTITY(1,1),
-    inventoryId INT NOT NULL,
-    productId INT NOT NULL,
-    auditDate DATE NOT NULL,
-    quantityBefore INT NOT NULL,
-    quantityAfter INT NOT NULL,
-    FOREIGN KEY (inventoryId) REFERENCES inventory(inventoryId),
-    FOREIGN KEY (productId) REFERENCES product(productId)
+CREATE TABLE InventoryItem (
+    inventoryItemId INT PRIMARY KEY AUTO_INCREMENT,
+    stockQuantity INT NOT NULL,
+    actualStock INT NOT NULL,
+    FK_productId INT NULL,
+    FK_inventoryId INT NULL,
+    FOREIGN KEY (FK_productId) REFERENCES Product(productId) ON DELETE SET NULL,
+    FOREIGN KEY (FK_inventoryId) REFERENCES Inventory(inventoryId) ON DELETE SET NULL
 );
 
-CREATE TABLE discount (
-        discountId INT PRIMARY KEY,
-        adminId INT NOT NULL,
-        discountStartTime DATETIME2 NOT NULL,  -- Changed to DATETIME2
-        discountEndTime DATETIME2 NOT NULL,    -- Changed to DATETIME2
-        minAmount FLOAT,
-        minQuantity INT,
-        priority INT,
-        discountStatus NVARCHAR(20),
-        discountType NVARCHAR(20),
-        discountValue FLOAT,
-        FOREIGN KEY (adminId) REFERENCES Admin(adminId)
-    );
-
-CREATE TABLE banner (
-    bannerId INT PRIMARY KEY IDENTITY(1,1),
-    bannerTitle NVARCHAR(255) NOT NULL,
-    bannerDescription NVARCHAR(MAX) NULL,
-    bannerImageUrl NVARCHAR(255) NOT NULL,
-    startDate DATE NOT NULL,
-    endDate DATE NOT NULL,
-    createdAt DATETIME DEFAULT GETDATE(),
-    discountId INT NOT NULL,
-    FOREIGN KEY (discountId) REFERENCES discount(discountId)
+CREATE TABLE Orders (
+    orderId INT PRIMARY KEY AUTO_INCREMENT,
+    FK_memberId INT NOT NULL,
+    FK_discountId INT,
+    shippingAddress VARCHAR(255) NOT NULL,
+    orderDate DATETIME NOT NULL,
+    creditCard VARCHAR(255) NOT NULL,
+    orderStatus VARCHAR(255) NOT NULL,
+    feedback TEXT,
+    subtotalPrice DOUBLE NOT NULL,
+    finalPrice DOUBLE NOT NULL,
+    transactionId VARCHAR(255),
+    merchantTradeNo VARCHAR(255),
+    FOREIGN KEY (FK_memberId) REFERENCES Member(memberId) ON DELETE CASCADE,
+    FOREIGN KEY (FK_discountId) REFERENCES Discount(discountId) ON DELETE SET NULL
 );
 
-CREATE TABLE wishlist (
-    wishlistId INT PRIMARY KEY IDENTITY(1,1),
-    memberId INT NOT NULL,
-    productId INT NOT NULL,
-    addedAt DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (memberId) REFERENCES member(memberId),
-    FOREIGN KEY (productId) REFERENCES product(productId)
-);
-
-
--- Create Cart table (One-to-One with Member)
-CREATE TABLE cart (
-    cartId INT PRIMARY KEY,
-    memberId INT NOT NULL,
-    lastUpdatedDate DATETIME2 NOT NULL,  -- Changed from TIMESTAMP to DATETIME2
-    FOREIGN KEY (memberId) REFERENCES Member(memberId)
-);
-
--- Create CartItem table (One-to-Many with Cart and Product)
-CREATE TABLE cartItem (
-    cartItemId INT PRIMARY KEY,
-    cartId INT NOT NULL,
-    productId INT NOT NULL,
-    cartItemStatus NVARCHAR(20),
-    createDate DATETIME2 NOT NULL,  -- Changed from TIMESTAMP to DATETIME2
-    updateDate DATETIME2,  -- Changed from TIMESTAMP to DATETIME2
-    cartItemQuantity INT NOT NULL,
-    FOREIGN KEY (cartId) REFERENCES Cart(cartId),
-    FOREIGN KEY (productId) REFERENCES Product(productId)
-);
-
--- Create Order table (One-to-Many with Member and discount)
-CREATE TABLE [Order] (
-    orderId INT PRIMARY KEY,
-    memberId INT NOT NULL,
-    discountId INT NOT NULL,
-    shippingAddress NVARCHAR(255) NOT NULL,
-    orderDate DATETIME2,
-    creditCard CHAR(16) NOT NULL,
-    orderStatus NVARCHAR(20) NOT NULL,
-    feedback NVARCHAR(MAX),
-    subtotalPrice FLOAT NOT NULL,
-    finalPrice FLOAT NOT NULL,
-    FOREIGN KEY (memberId) REFERENCES Member(memberId),
-    FOREIGN KEY (discountId) REFERENCES discount(discountId)
-);
-
--- Create OrderItem table (One-to-Many with Order and Product)
-CREATE TABLE orderItem (
-    orderItemId INT PRIMARY KEY,
-    orderId INT NOT NULL,
-    productId INT NOT NULL,
+CREATE TABLE OrderItem (
+    orderItemId INT PRIMARY KEY AUTO_INCREMENT,
+    FK_orderId INT NOT NULL,
+    FK_productId INT NOT NULL,
     orderQuantity INT NOT NULL,
-    purchasedPrice FLOAT NOT NULL,
-    FOREIGN KEY (orderId) REFERENCES [Order](orderId),
-    FOREIGN KEY (productId) REFERENCES Product(productId)
+    purchasedPrice DECIMAL(10,2) NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    FOREIGN KEY (FK_orderId) REFERENCES Orders(orderId) ON DELETE CASCADE,
+    FOREIGN KEY (FK_productId) REFERENCES Product(productId) ON DELETE CASCADE
 );
 
--- Create discountScope table (One-to-Many with discount, Category, Product, Member)
-CREATE TABLE discountScope (
-    discountScopeId INT PRIMARY KEY,
-    discountScopeType NVARCHAR(20) NOT NULL,
-    discountId INT NOT NULL,
-    categoryId INT,
-    productId INT,
-    birthdayMonth CHAR(2),
-    FOREIGN KEY (discountId) REFERENCES discount(discountId),
-    FOREIGN KEY (categoryId) REFERENCES category(categoryId),
-    FOREIGN KEY (productId) REFERENCES product(productId)
+CREATE TABLE WishList (
+    wishlistId INT PRIMARY KEY AUTO_INCREMENT,
+    FK_memberId INT NOT NULL,
+    FK_productId INT NOT NULL,
+    addedAt DATETIME NOT NULL,
+    FOREIGN KEY (FK_memberId) REFERENCES Member(memberId) ON DELETE CASCADE,
+    FOREIGN KEY (FK_productId) REFERENCES Product(productId) ON DELETE CASCADE
+);
+
+CREATE TABLE Cart (
+    cartId INT PRIMARY KEY AUTO_INCREMENT,
+    FK_memberId INT NOT NULL,
+    lastUpdatedDate DATETIME NOT NULL,
+    FOREIGN KEY (FK_memberId) REFERENCES Member(memberId) ON DELETE CASCADE
+);
+
+CREATE TABLE CartActionLog (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    FK_memberId INT NOT NULL,
+    action VARCHAR(255) NOT NULL,
+    details TEXT,
+    timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (FK_memberId) REFERENCES Member(memberId) ON DELETE CASCADE
+);
+
+CREATE TABLE CartItem (
+    cartItemId INT PRIMARY KEY AUTO_INCREMENT,
+    FK_cartId INT NOT NULL,
+    FK_productId INT NOT NULL,
+    FK_orderId INT,
+    FK_discountId INT,
+    cartItemStatus VARCHAR(255),
+    createDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updateDate DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    cartItemQuantity INT NOT NULL,
+    FOREIGN KEY (FK_cartId) REFERENCES Cart(cartId) ON DELETE CASCADE,
+    FOREIGN KEY (FK_productId) REFERENCES Product(productId) ON DELETE CASCADE,
+    FOREIGN KEY (FK_orderId) REFERENCES Orders(orderId) ON DELETE SET NULL,
+    FOREIGN KEY (FK_discountId) REFERENCES Discount(discountId) ON DELETE SET NULL
+);
+
+CREATE TABLE Notification (
+    notificationId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    [message] TEXT NOT NULL,
+    createdAt DATETIME NOT NULL,
+    FK_memberId INT,
+    FK_adminId INT,
+    readStatus BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (FK_memberId) REFERENCES Member(memberId) ON DELETE CASCADE,
+    FOREIGN KEY (FK_adminId) REFERENCES Admin(adminId) ON DELETE CASCADE
 );
 
 
