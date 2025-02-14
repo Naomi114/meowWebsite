@@ -325,4 +325,8 @@ public class Product {
             this.expire = LocalDate.now().plusMonths(3); // 設定預設值為三個月後
         }
     }
+
+    public Integer getId() {
+        return productId; // 返回 ID
+    }
 }

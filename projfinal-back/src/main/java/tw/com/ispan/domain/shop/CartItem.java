@@ -25,12 +25,14 @@ public class CartItem implements Serializable {
     // dependencies)
     @ManyToOne
     @JoinColumn(name = "FK_cartId", nullable = false)
+    @JsonProperty("cartId")
     @JsonBackReference("cartItems") // Unique back reference name for Cart
     private Cart cart;
 
     // One-to-One relationship with Product
     @OneToOne
     @JoinColumn(name = "FK_productId", nullable = false)
+    @JsonProperty("product_Id")
     @JsonManagedReference("cartItem") // Managed side for serialization
     private Product product;
 
@@ -38,12 +40,14 @@ public class CartItem implements Serializable {
     // @JsonBackReference)
     @ManyToOne
     @JoinColumn(name = "FK_orderId") // Assuming this is the order ID
+    @JsonProperty("orderId")
     @JsonBackReference("cart-items-order") // Unique back reference name for Orders
     private Orders order;
 
     // Many-to-One relationship with Discount (Ensure this field exists)
     @ManyToOne
     @JoinColumn(name = "FK_discountId") // This should match the FK in your database
+    @JsonProperty("discountI")
     @JsonBackReference("cart-items-discount") // This is the back reference name for Discount
     private Discount discount;
 
