@@ -32,7 +32,7 @@ public class ProductImage {
 
     @ManyToOne(optional = false) // 確保不能為 NULL
     @JoinColumn(name = "FK_productId", foreignKey = @ForeignKey(name = "fkc_product_id"))
-    @JsonManagedReference("productImages")
+    @JsonManagedReference("product_images")
     private Product product;
 
     public ProductImage() {

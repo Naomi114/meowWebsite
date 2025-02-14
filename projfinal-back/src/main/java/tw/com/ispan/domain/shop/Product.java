@@ -73,7 +73,7 @@ public class Product {
     // cascade = CascadeType.remove 會導致刪除商品時刪除商品類別；只有新增、修改、更新同步
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "FK_categoryId", foreignKey = @ForeignKey(name = "fkc_category_id"))
-    @JsonBackReference("products")
+    @JsonBackReference("product_category")
     private Category category;
 
     // 雙向多對一，可反向查找
@@ -81,20 +81,14 @@ public class Product {
     // cascade = CascadeType.remove 會導致刪除商品時刪除管理員；須排除在外
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "FK_adminId", foreignKey = @ForeignKey(name = "fkc_admin_id"))
-    @JsonBackReference("products")
+    @JsonBackReference("admin_products")
     private Admin admin;
 
     // 雙向一對多，可反向查找
     // cascade = CascadeType.remove 當刪除商品時，會刪除商品圖片；已包含在 ALL 內
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonBackReference("product")
+    @JsonBackReference("product_images")
     private List<ProductImage> productImages = new LinkedList<>(); // 有序可重複 (首圖為選取的第一張)
-
-    // 雙向多對多，可反向查找；可選0~N個標籤
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
-    @JoinTable(name = "Product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id", nullable = true))
-    @JsonBackReference("products")
-    private Set<ProductTag> tags = new HashSet<>(); // 無序不重複
 
     // 單向一對多，可由商品查找庫存異動
     // 商品刪除時，保留相關的庫存異動記錄
@@ -105,8 +99,15 @@ public class Product {
 
     // 雙向一對多，可反向查找 (刪除願望清單，會員商品列表也會同步? 合理??)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @JsonBackReference("products")
+    @JsonBackReference("products_wishlists")
     private Set<WishList> wishlists = new LinkedHashSet<>();
+
+    // 雙向多對多，可反向查找；可選0~N個標籤
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
+    // ✅ name = "product_tag"確保表名與 DB 一致
+    @JoinTable(name = "product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @JsonBackReference("product_tags") // ✅ 確保名稱一致
+    private List<ProductTag> tags = new LinkedList<>(); // Criterial API 會用到，必須是 List
 
     @OneToOne(fetch = FetchType.LAZY)
     @JsonBackReference("cartItem")
@@ -205,10 +206,6 @@ public class Product {
         return productImages;
     }
 
-    public Set<ProductTag> getTags() {
-        return tags;
-    }
-
     public Set<WishList> getWishlists() {
         return wishlists;
     }
@@ -267,10 +264,6 @@ public class Product {
 
     public void setProductImages(List<ProductImage> productImages) {
         this.productImages = productImages;
-    }
-
-    public void setTags(Set<ProductTag> tags) {
-        this.tags = tags;
     }
 
     public void addTag(ProductTag tag) {

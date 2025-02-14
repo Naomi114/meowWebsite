@@ -29,7 +29,7 @@ public class Discount {
 
     // Many-to-one relationship with Admin
     @ManyToOne
-    @JoinColumn(name = "adminId", nullable = false)
+    @JoinColumn(name = "FK_adminId", nullable = false)
     @JsonBackReference("discounts") // Back reference for admin
     private Admin admin;
 

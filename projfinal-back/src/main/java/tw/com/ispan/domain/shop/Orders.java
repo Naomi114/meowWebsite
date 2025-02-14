@@ -10,7 +10,7 @@ import jakarta.persistence.*;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
-@Table(name = "orders") // Ensure using table name "orders"
+@Table(name = "Orders") // Ensure using table name "orders"
 public class Orders {
 
     @Id
@@ -18,7 +18,7 @@ public class Orders {
     private Integer orderId; // Order ID
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "member_id", nullable = false) // Link to Member
+    @JoinColumn(name = "FK_memberId", nullable = false) // Link to Member
     @JsonBackReference // Prevents infinite recursion when serializing
     private Member member; // Member
 
@@ -27,7 +27,7 @@ public class Orders {
     private List<OrderItem> orderItems; // List of Order Items
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "discount_id")
+    @JoinColumn(name = "FK_discountId")
     private Discount discount; // Discount applied to the order
 
     @Column(nullable = false)

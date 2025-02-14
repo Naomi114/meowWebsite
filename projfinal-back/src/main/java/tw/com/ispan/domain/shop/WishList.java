@@ -15,20 +15,20 @@ import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
-@Table(name = "Wishlist")
+@Table(name = "WishList")
 public class WishList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer wishlistId;
 
     @ManyToOne
-    @JoinColumn(name = "memberId", nullable = false)
+    @JoinColumn(name = "FK_memberId", nullable = false)
     @JsonManagedReference("wishlists")
     private Member member;
 
     @ManyToOne
-    @JoinColumn(name = "productId", nullable = false)
-    @JsonManagedReference("wishlists")
+    @JoinColumn(name = "FK_productId", nullable = false)
+    @JsonManagedReference("products_wishlists")
     private Product product;
 
     @Column(nullable = false)

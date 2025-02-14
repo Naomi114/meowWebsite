@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.domain.shop.WishList;
