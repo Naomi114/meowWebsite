@@ -174,7 +174,7 @@ public class LostCaseService {
         lostCase.setGender(param.optString("gender", null));
         lostCase.setSterilization(param.getString("sterilization"));
         lostCase.setAge(param.optInt("age"));
-        lostCase.setMicroChipNumber(param.optInt("microChipNumber"));
+        lostCase.setMicroChipNumber(param.optString("microChipNumber"));
         // lostCase.setLatitude(param.getDouble("latitude"));
         // lostCase.setLongitude(param.getDouble("longitude"));
         lostCase.setDonationAmount(param.optInt("donationAmount", 0));
@@ -242,7 +242,7 @@ public class LostCaseService {
         lostCase.setSterilization(param.optString("sterilization", lostCase.getSterilization()));
         lostCase.setAge(param.has("age") ? param.getInt("age") : lostCase.getAge());
         lostCase.setMicroChipNumber(
-                param.has("microChipNumber") ? param.getInt("microChipNumber") : lostCase.getMicroChipNumber());
+                param.has("microChipNumber") ? param.optString("microChipNumber") : lostCase.getMicroChipNumber());
         // lostCase.setLatitude(param.has("latitude") ? param.getDouble("latitude") :
         // lostCase.getLatitude());
         // lostCase.setLongitude(param.has("longitude") ? param.getDouble("longitude") :
