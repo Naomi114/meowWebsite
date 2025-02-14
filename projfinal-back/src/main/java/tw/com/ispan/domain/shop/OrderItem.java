@@ -131,4 +131,14 @@ public class OrderItem {
                 ", purchasedPrice=" + purchasedPrice +
                 ", status=" + status + "]";
     }
+
+    public void setCartId(Integer cartId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCartId'");
+    }
+
+    // 修正的 getQuantity 方法，應該返回 orderQuantity
+    public int getQuantity() {
+        return this.orderQuantity; // 正確引用 orderQuantity 屬性
+    }
 }
