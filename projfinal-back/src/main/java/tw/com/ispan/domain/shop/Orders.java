@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
@@ -19,6 +20,7 @@ public class Orders {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "FK_memberId", nullable = false) // Link to Member
+    @JsonProperty("member_id")
     @JsonBackReference // Prevents infinite recursion when serializing
     private Member member; // Member
 
@@ -28,6 +30,7 @@ public class Orders {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_discountId")
+    @JsonProperty("discount_id")
     private Discount discount; // Discount applied to the order
 
     @Column(nullable = false)
