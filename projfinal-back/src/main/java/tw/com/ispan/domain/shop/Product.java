@@ -71,15 +71,19 @@ public class Product {
 
     // 雙向多對一，可反向查找
     // cascade = CascadeType.remove 會導致刪除商品時刪除商品類別；只有新增、修改、更新同步
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
-    @JoinColumn(name = "FK_categoryId", foreignKey = @ForeignKey(name = "fkc_category_id"))
+    // FetchType.LAZY 效能較好，但可能出現 NullPointerException； 要在 ProductRepository 層加入
+    // @Query 查詢語法
+    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
+            CascadeType.MERGE })
+    @JoinColumn(name = "FK_categoryId", nullable = true, foreignKey = @ForeignKey(name = "fkc_category_id"))
     @JsonBackReference("product_category")
     private Category category;
 
     // 雙向多對一，可反向查找
     // 尚待確認 Admin 表格有fetch = FetchType.EAGER (預設為 LAZY)
     // cascade = CascadeType.remove 會導致刪除商品時刪除管理員；須排除在外
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
+            CascadeType.MERGE })
     @JoinColumn(name = "FK_adminId", foreignKey = @ForeignKey(name = "fkc_admin_id"))
     @JsonBackReference("admin_products")
     private Admin admin;
@@ -93,12 +97,12 @@ public class Product {
     // 單向一對多，可由商品查找庫存異動
     // 商品刪除時，保留相關的庫存異動記錄
     // cascade = CascadeType.remove 當刪除商品時，會刪除庫存異動；須排除在外
-    @OneToMany(mappedBy = "product", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
-            CascadeType.REFRESH }, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "product", cascade = { CascadeType.PERSIST,
+            CascadeType.MERGE })
     private List<InventoryItem> inventoryItems = new LinkedList<>();
 
     // 雙向一對多，可反向查找 (刪除願望清單，會員商品列表也會同步? 合理??)
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference("products_wishlists")
     private Set<WishList> wishlists = new LinkedHashSet<>();
 
@@ -213,6 +217,11 @@ public class Product {
 
     public Category getCategory() {
         return category;
+    }
+
+    // Product.category == null，會導致 getCategoryId() 錯誤，所以加上 null 檢查：
+    public Integer getCategoryId() {
+        return (this.category != null) ? this.category.getCategoryId() : null;
     }
 
     public Admin getAdmin() {

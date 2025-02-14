@@ -22,6 +22,7 @@ import tw.com.ispan.domain.shop.OrderItem;
 import tw.com.ispan.domain.shop.Orders;
 import tw.com.ispan.dto.shop.OrderDTO;
 import tw.com.ispan.dto.shop.OrderItemDTO;
+import tw.com.ispan.dto.shop.OrderRequest;
 import tw.com.ispan.dto.shop.PaymentRequest;
 import tw.com.ispan.repository.shop.CartItemRepository;
 import tw.com.ispan.repository.shop.CartRepository;
@@ -29,7 +30,6 @@ import tw.com.ispan.repository.shop.IOrderService;
 import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.shop.OrderItemRepository;
 import tw.com.ispan.repository.shop.OrderRepository;
-import tw.com.ispan.repository.shop.OrderRequest;
 import tw.com.ispan.repository.shop.ProductRepository;
 
 @Service

@@ -6,13 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
-
 import org.springframework.web.multipart.MultipartFile;
 
 /*  ProductRequest 的責任
@@ -20,17 +13,13 @@ import org.springframework.web.multipart.MultipartFile;
     2. 包含一組 ProductImageRequest，負責描述該商品的所有圖片。
 */
 public class ProductRequest {
-    @NotBlank(message = "管理員帳號不能為空")
     private String adminId;
 
-    // @NotBlank 只能限制String類型，其他類不為null需要在service層判斷
-    @NotBlank(message = "商品名稱不能為空")
     private String productName;
 
     private String description;
 
     // 前端為單選；不能為空值
-    @NotBlank(message = "商品類別不能為空")
     private Integer categoryId; // 用於接收 ID
     private String categoryName; // 用於查詢時顯示名稱
     private String categoryDescription;
@@ -45,37 +34,21 @@ public class ProductRequest {
 
     private String tagDescription;
 
-    // 前端為填入框；不能為空值
-    @Positive(message = "價格必須為正數")
-    @NotNull(message = "商品原價不能為空")
-    @DecimalMax(value = "99999999.99")
     private BigDecimal originalPrice;
 
-    // 前端為填入框；不能為空值
-    @Positive(message = "價格必須為正數")
-    @NotNull(message = "商品售價不能為空")
-    @DecimalMax(value = "99999999.99")
     private BigDecimal salePrice;
 
-    // 前端為填入框；不能為空值
-    @PositiveOrZero(message = "數量必須為正整數")
-    @NotNull(message = "商品數量不能為空")
     private Integer stockQuantity;
 
-    // 若選擇類別已存在，則進入service層後會自動帶入預設單位；所以不能使用 @NotBlank
-    // 或是新建類別、單位
     private String unit;
 
     // 自動生成：上架中、已售完 (20250116 寫入ProductService)
     // 手動調整：隱藏 (未完成)--應該寫入 adminService
-    // @NotBlank
     // private String status;
 
-    @Future
     private LocalDate expire;
 
     // 前端為多選: 1~5張圖片；不能為空值
-    @NotNull(message = "商品圖片不能為空")
     private List<MultipartFile> productImages;
 
     public String getProductName() {
@@ -127,11 +100,11 @@ public class ProductRequest {
     }
 
     // public String getStatus() {
-    //     return status;
+    // return status;
     // }
 
     // public void setStatus(String status) {
-    //     this.status = status;
+    // this.status = status;
     // }
 
     public LocalDate getExpire() {

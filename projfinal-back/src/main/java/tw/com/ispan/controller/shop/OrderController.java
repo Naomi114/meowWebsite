@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tw.com.ispan.domain.shop.Orders;
 import tw.com.ispan.dto.shop.OrderDTO;
+import tw.com.ispan.dto.shop.OrderRequest;
 import tw.com.ispan.dto.shop.PaymentRequest;
-import tw.com.ispan.repository.shop.OrderRequest;
 import tw.com.ispan.service.shop.OrderService;
 
 import java.util.List;

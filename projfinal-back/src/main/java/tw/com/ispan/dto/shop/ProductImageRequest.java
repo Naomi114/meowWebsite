@@ -2,8 +2,6 @@ package tw.com.ispan.dto.shop;
 
 import java.util.List;
 
-import javax.validation.constraints.NotBlank;
-
 import org.springframework.web.multipart.MultipartFile;
 
 /*  ProductImageRequest 的責任
@@ -15,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class ProductImageRequest {
 
-    @NotBlank(message = "檔案名稱不能為空")
     private List<MultipartFile> filename;
 
     // 前端提供主圖勾選

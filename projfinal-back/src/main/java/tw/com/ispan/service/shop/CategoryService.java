@@ -29,7 +29,7 @@ public class CategoryService {
     @Autowired
     private ProductRepository productRepository;
 
-    // 單筆新增或更新
+    // 單筆新增或更新 (為必填欄位)
     public CategoryResponse createOrUpdateCategory(CategoryRequest request) {
         CategoryResponse response = new CategoryResponse();
         try {
@@ -54,7 +54,7 @@ public class CategoryService {
                 category.setCategoryDescription(request.getCategoryDescription());
                 category.setDefaultUnit(request.getDefaultUnit());
 
-                // 驗證必要屬性是否設置
+                // 驗證必填欄位
                 if (category.getCategoryName() == null || category.getDefaultUnit() == null) {
                     throw new IllegalArgumentException("類別名稱或預設單位不能為空");
                 }
@@ -76,8 +76,14 @@ public class CategoryService {
         CategoryResponse response = new CategoryResponse();
         try {
             Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
+
             if (categoryOpt.isPresent()) {
-                categoryRepository.delete(categoryOpt.get());
+                // 刪除 Category 時，不會影響 Product，將 categoryId 設為 NULL，避免 null 錯誤！
+                // 先將所有關聯的產品分類設為 NULL
+                categoryRepository.removeCategoryFromProducts(categoryId);
+
+                // 然後刪除分類
+                categoryRepository.deleteById(categoryId);
                 response.setSuccess(true);
                 response.setMessage("類別刪除成功");
             } else {

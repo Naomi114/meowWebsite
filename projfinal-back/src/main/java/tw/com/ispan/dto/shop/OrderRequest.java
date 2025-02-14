@@ -1,7 +1,5 @@
-package tw.com.ispan.repository.shop;
+package tw.com.ispan.dto.shop;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.List;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.shop.OrderItem;
@@ -10,23 +8,16 @@ public class OrderRequest {
 
     private Integer cartId; // Shopping cart ID to identify the cart
 
-    @NotNull(message = "Member ID cannot be null")
     private Member member; // Member object for linking the member
 
-    @NotNull(message = "Order items cannot be null")
     private List<OrderItem> items; // List of order items
 
-    @NotNull(message = "Credit card information cannot be null")
-    @Size(min = 16, max = 16, message = "Credit card number must be exactly 16 digits")
     private String creditCard; // Credit card information (16 digits)
 
-    @NotNull(message = "Shipping address cannot be null")
     private String shippingAddress; // Shipping address
 
-    @NotNull(message = "Transaction ID cannot be null")
     private String transactionId; // Transaction ID
 
-    @NotNull(message = "Merchant Trade No cannot be null")
     private String merchantTradeNo; // Merchant Trade No
 
     // Default constructor
