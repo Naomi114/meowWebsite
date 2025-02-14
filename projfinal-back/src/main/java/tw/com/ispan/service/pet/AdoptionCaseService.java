@@ -48,11 +48,15 @@ public class AdoptionCaseService {
         private SpeciesRepository speciesRepository;
 
         // 新增
+        // 新增
         public AdoptionCase createAdoptionCase(JSONObject param) {
                 System.out.println("接收到的 AdoptionCase: " + param);
                 AdoptionCase adoptionCase = new AdoptionCase();
+
+                // 其他設置屬性
                 adoptionCase.setCaseTitle(param.getString("caseTitle"));
 
+                // 設置 member、species、breed 等
                 adoptionCase.setMember(memberRepository.findById(param.getInt("memberId"))
                                 .orElseThrow(() -> new IllegalArgumentException("無效的 memberId")));
                 adoptionCase.setSpecies(speciesRepository.findById(param.getInt("speciesId"))
@@ -88,6 +92,9 @@ public class AdoptionCaseService {
 
                 // 設置 story
                 adoptionCase.setStory(param.optString("story", "No story provided"));
+
+                // **設置 name**
+                adoptionCase.setName(param.optString("name", null)); // 加入此行來設置 name
 
                 adoptionCase.setPublicationTime(LocalDateTime.now());
                 adoptionCase.setLastUpdateTime(LocalDateTime.now());
