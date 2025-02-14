@@ -5,8 +5,11 @@ import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
+import tw.com.ispan.domain.shop.ProductTag;
 
 // 在 controller 中使用 Specification 類下的方法，組合查詢條件
 public class ProductSpecifications {
@@ -24,6 +27,14 @@ public class ProductSpecifications {
     // 庫存範圍查詢
     public static Specification<Product> stockBetween(Integer minStock, Integer maxStock) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.between(root.get("stockQuantity"), minStock, maxStock);
+    }
+    
+    // 新增按標籤查詢商品
+    public static Specification<Product> hasTags(List<String> tags) {
+    return (root, query, cb) -> {
+        Join<Product, ProductTag> tagJoin = root.join("tags", JoinType.INNER);
+        return tagJoin.get("tagName").in(tags);
+    };
     }
 
     // 新增按類別查詢商品

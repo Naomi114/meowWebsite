@@ -17,7 +17,7 @@ import tw.com.ispan.dto.pet.LineUserProfile;
 import tw.com.ispan.service.line.LineLoginService;
 import tw.com.ispan.service.line.StateRedisService;
 
-@CrossOrigin(origins = "http://localhost:5173") // 允許前端不同的主機或埠運行下可訪問這個contorller
+@CrossOrigin // 允許前端不同的主機或埠運行下可訪問這個contorller
 @RestController
 @RequestMapping("/line")
 public class LineLoginController {
