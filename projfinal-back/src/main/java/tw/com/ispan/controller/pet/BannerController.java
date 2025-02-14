@@ -1,6 +1,7 @@
 package tw.com.ispan.controller.pet;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,28 @@ public class BannerController {
 
     @Autowired
     private BannerService bannerService;
+
+    // ✅ 透過 bannerId 查詢對應案件
+    @GetMapping("/{bannerId}")
+    public ResponseEntity<?> getCaseByBannerId(@PathVariable Integer bannerId) {
+        Optional<Banner> bannerOpt = bannerService.findCaseByBannerId(bannerId);
+
+        if (bannerOpt.isPresent()) {
+            Banner banner = bannerOpt.get();
+
+            // 🔍 根據不同的案件類型，回傳對應的案件資料
+            if (banner.getLostCase() != null) {
+                return ResponseEntity.ok(banner.getLostCase());
+            } else if (banner.getRescueCase() != null) {
+                return ResponseEntity.ok(banner.getRescueCase());
+            } else if (banner.getAdoptionCase() != null) {
+                return ResponseEntity.ok(banner.getAdoptionCase());
+            } else {
+                return ResponseEntity.badRequest().body("⚠️ 該 Banner 沒有對應的案件");
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
 
     /**
      * 根據 Banner 類型查詢對應的 Banners

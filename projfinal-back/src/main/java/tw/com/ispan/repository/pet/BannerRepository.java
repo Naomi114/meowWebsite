@@ -38,6 +38,10 @@ public interface BannerRepository extends JpaRepository<Banner, Integer> {
         // 🔹 根據 Banner 類型查詢
         List<Banner> findByBannerType(BannerType bannerType);
 
+        // ✅ 透過 bannerId 查詢對應的案件 ID
+        @Query("SELECT b FROM Banner b LEFT JOIN FETCH b.lostCase LEFT JOIN FETCH b.rescueCase LEFT JOIN FETCH b.adoptionCase WHERE b.bannerId = :bannerId")
+        Optional<Banner> findBannerWithCaseById(Integer bannerId);
+
         // 🔹 刪除指定案件的 Banner
         void deleteByLostCase_LostCaseIdAndBannerType(Integer caseId, BannerType bannerType);
 
