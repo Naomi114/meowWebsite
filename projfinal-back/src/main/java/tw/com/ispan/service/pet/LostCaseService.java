@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.criteria.Predicate;
+import tw.com.ispan.domain.pet.CasePicture;
+import tw.com.ispan.domain.pet.CaseState;
 import tw.com.ispan.domain.pet.City;
 import tw.com.ispan.domain.pet.DistrictArea;
 import tw.com.ispan.domain.pet.LostCase;
@@ -29,7 +31,7 @@ import tw.com.ispan.repository.pet.DistrictAreaRepository;
 import tw.com.ispan.repository.pet.FurColorRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.SpeciesRepository;
-import tw.com.ispan.service.banner.BannerService;
+//import tw.com.ispan.service.banner.BannerService;
 
 @Service
 @Transactional
@@ -58,14 +60,24 @@ public class LostCaseService {
     @Autowired
     private CaseStateRepository caseStateRepository;
 
-    @Autowired
-    private BannerService bannerService;
+    // @Autowired
+    // private BannerService bannerService;
 
     @Autowired
     private BannerRepository bannerRepository;
 
     public void saveLostCase(LostCase lostCase) {
         lostCaseRepository.save(lostCase);
+    }
+
+    /**
+     * 根據會員 ID 查詢對應的 LostCases
+     *
+     * @param memberId 會員 ID
+     * @return 該會員的 LostCase 列表
+     */
+    public List<LostCase> findByMemberId(Integer memberId) {
+        return lostCaseRepository.findByMemberId(memberId);
     }
 
     /**
@@ -135,7 +147,7 @@ public class LostCaseService {
     /**
      * 創建 LostCase 並自動創建對應的 Banner
      */
-    public LostCase create(JSONObject param) {
+    public LostCase create(JSONObject param, List<CasePicture> casePictures) {
         LostCase lostCase = new LostCase();
         lostCase.setCaseTitle(param.getString("caseTitle"));
 
@@ -158,6 +170,7 @@ public class LostCaseService {
         lostCase.setDistrictArea(districtArea);
 
         lostCase.setStreet(param.getString("street"));
+        lostCase.setName(param.getString("petName"));
         lostCase.setGender(param.optString("gender", null));
         lostCase.setSterilization(param.getString("sterilization"));
         lostCase.setAge(param.optInt("age", -1));
@@ -176,6 +189,9 @@ public class LostCaseService {
         lostCase.setCaseUrl(param.optString("caseUrl", null));
         lostCase.setPublicationTime(LocalDateTime.now());
         lostCase.setLastUpdateTime(LocalDateTime.now());
+
+        // **關聯圖片**
+        lostCase.setCasePictures(casePictures);
 
         // **先存儲 LostCase**
         LostCase savedLostCase = lostCaseRepository.save(lostCase);
@@ -208,7 +224,7 @@ public class LostCaseService {
         }
 
         // 先刪除 Banner
-        bannerService.deleteBannerByCaseId(lostCaseId, BannerType.LOST);
+        // bannerService.deleteBannerByCaseId(lostCaseId, BannerType.LOST);
 
         // 再刪除 LostCase
         lostCaseRepository.deleteById(lostCaseId);
@@ -227,14 +243,31 @@ public class LostCaseService {
         lostCase.setAge(param.has("age") ? param.getInt("age") : lostCase.getAge());
         lostCase.setMicroChipNumber(
                 param.has("microChipNumber") ? param.getInt("microChipNumber") : lostCase.getMicroChipNumber());
-        lostCase.setLatitude(param.has("latitude") ? param.getDouble("latitude") : lostCase.getLatitude());
-        lostCase.setLongitude(param.has("longitude") ? param.getDouble("longitude") : lostCase.getLongitude());
+        // lostCase.setLatitude(param.has("latitude") ? param.getDouble("latitude") :
+        // lostCase.getLatitude());
+        // lostCase.setLongitude(param.has("longitude") ? param.getDouble("longitude") :
+        // lostCase.getLongitude());
         lostCase.setDonationAmount(
                 param.has("donationAmount") ? param.getInt("donationAmount") : lostCase.getDonationAmount());
         lostCase.setLostExperience(param.optString("lostExperience", lostCase.getLostExperience()));
         lostCase.setContactInformation(param.optString("contactInformation", lostCase.getContactInformation()));
         lostCase.setFeatureDescription(param.optString("featureDescription", lostCase.getFeatureDescription()));
         lostCase.setCaseUrl(param.optString("caseUrl", lostCase.getCaseUrl()));
+        // 🔹 更新案件狀態（如果有提供）
+        if (param.has("caseStateId")) {
+            Integer caseStateId = param.getInt("caseStateId");
+
+            // 從資料庫查找對應的 CaseState
+            CaseState caseState = caseStateRepository.findById(caseStateId)
+                    .orElseThrow(() -> new IllegalArgumentException("CaseState 不存在"));
+
+            lostCase.setCaseState(caseState);
+        }
+
+        // 🔹 更新是否隱藏（如果有提供）
+        if (param.has("isHidden")) {
+            lostCase.setIsHidden(param.getBoolean("isHidden"));
+        }
         lostCase.setLastUpdateTime(LocalDateTime.now());
 
         return lostCaseRepository.save(lostCase);

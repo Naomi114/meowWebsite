@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import tw.com.ispan.domain.shop.OrderItem;
-import tw.com.ispan.domain.shop.Product;
 
 public interface OrderItemRepository extends JpaRepository<OrderItem, Integer>, JpaSpecificationExecutor<OrderItem> {
 
@@ -17,6 +19,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer>, 
     List<OrderItem> findByOrder_OrderIdAndProduct_ProductId(Integer orderId, Integer productId);
 
     // 刪除商品時，確認是否有會員下單 (by Naomi)
-    boolean existsByProduct(Product product);
+    @Query("SELECT COUNT(o) > 0 FROM OrderItem o WHERE o.product.id = :productId")
+    boolean existsByProductId(@Param("productId") Integer productId);
 
 }

@@ -51,7 +51,8 @@ public class LoginAdminController {
             responseJson.put("message", "登入成功");
 
             JSONObject user = new JSONObject()
-                    .put("admin", bean.getAdminId());
+                    .put("admin", bean.getAdminId())
+                    .put("role", "admin");  // 這裡新增角色資訊，給前台做權限驗證
             String token = jsonWebTokenUtility.createToken(user.toString());
             responseJson.put("token", token);
 

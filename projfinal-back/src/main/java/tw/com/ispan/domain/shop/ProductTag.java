@@ -20,6 +20,7 @@ import jakarta.persistence.Table;
 public class ProductTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "tag_id") // ✅ 確保與 `Product_tag` 表的 `tag_id` 一致
     private Integer tagId;
 
     @Column(nullable = false)
@@ -29,8 +30,8 @@ public class ProductTag {
 
     // 雙向關係的多對多端，可反向查找商品
     @ManyToMany(mappedBy = "tags", cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
-    @JsonManagedReference("tags")
-    private Set<Product> products= new HashSet<>(); // 無序不重複
+    @JsonManagedReference("product_tags") // ✅ 確保名稱一致
+    private Set<Product> products = new HashSet<>(); // 無序不重複
 
     public ProductTag() {
     }

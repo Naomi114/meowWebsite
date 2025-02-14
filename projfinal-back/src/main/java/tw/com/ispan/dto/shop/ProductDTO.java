@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.domain.shop.ProductImage;
 
@@ -19,6 +20,9 @@ public class ProductDTO {
     private String status;
     private LocalDate expire;
     private List<String> imageUrls; // ✅ 用於 API 回應圖片 URL
+    private Integer categoryId; // ✅ 確保回傳 categoryId
+    private List<TagDTO> tags;  // ✅ 回傳標籤陣列
+ 
 
     // ✅ 透過 Product Entity 建立 DTO
     public ProductDTO(Product product) {
@@ -34,6 +38,12 @@ public class ProductDTO {
 
         // ✅ 取得最多 5 張圖片 URL
         this.imageUrls = extractImageUrls(product);
+        
+        // ✅ 確保 categoryId 正確
+        this.categoryId = product.getCategory().getCategoryId(); 
+
+        // ✅ 轉換 tags
+        this.tags = product.getTags().stream().map(TagDTO::new).collect(Collectors.toList());
     }
 
     // ✅ 取得 `imageUrls`
@@ -126,5 +136,22 @@ public class ProductDTO {
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
     }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public List<TagDTO> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<TagDTO> tags) {
+        this.tags = tags;
+    }
+
 
 }
