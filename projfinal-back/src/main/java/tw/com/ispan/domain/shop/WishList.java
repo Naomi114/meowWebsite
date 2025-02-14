@@ -15,7 +15,7 @@ import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
-@Table(name = "Wishlist")
+@Table(name = "WishList")
 public class WishList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

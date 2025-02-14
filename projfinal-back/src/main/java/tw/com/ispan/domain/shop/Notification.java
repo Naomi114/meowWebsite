@@ -16,31 +16,32 @@ import tw.com.ispan.domain.admin.Member;
 @Entity
 @Table(name = "Notification")
 public class Notification {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long notificationId;
 
-    private String title;  // 通知標題
-    private String message;  // 通知內容
-    private LocalDateTime createdAt;  // 通知時間
-
-    @ManyToOne
-    @JoinColumn(name = "member_id", foreignKey = @ForeignKey(name = "fk_notification_member"))
-    private Member member;  // 若是發給會員，關聯會員
+    private String title; // 通知標題
+    private String message; // 通知內容
+    private LocalDateTime createdAt; // 通知時間
 
     @ManyToOne
-    @JoinColumn(name = "admin_id", foreignKey = @ForeignKey(name = "fk_notification_admin"))
-    private Admin admin;  // 若是發給管理員，關聯管理員
+    @JoinColumn(name = "FK_memberId", foreignKey = @ForeignKey(name = "fk_notification_member"))
+    private Member member; // 若是發給會員，關聯會員
+
+    @ManyToOne
+    @JoinColumn(name = "FK_adminId", foreignKey = @ForeignKey(name = "fk_notification_admin"))
+    private Admin admin; // 若是發給管理員，關聯管理員
 
     private Boolean readStatus = false; // 通知是否已讀
 
     public Notification() {
     }
 
-    public Notification(Long id, String title, String message, LocalDateTime createdAt, Member member, Admin admin,
+    public Notification(Long notificationId, String title, String message, LocalDateTime createdAt, Member member,
+            Admin admin,
             Boolean readStatus) {
-        this.id = id;
+        this.notificationId = notificationId;
         this.title = title;
         this.message = message;
         this.createdAt = createdAt;
@@ -50,11 +51,11 @@ public class Notification {
     }
 
     public Long getId() {
-        return id;
+        return notificationId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setId(Long notificationId) {
+        this.notificationId = notificationId;
     }
 
     public String getTitle() {
@@ -107,10 +108,9 @@ public class Notification {
 
     @Override
     public String toString() {
-        return "Notification [id=" + id + ", title=" + title + ", message=" + message + ", createdAt=" + createdAt
+        return "Notification [notificationId=" + notificationId + ", title=" + title + ", message=" + message
+                + ", createdAt=" + createdAt
                 + ", member=" + member + ", admin=" + admin + ", readStatus=" + readStatus + "]";
     }
 
-    
 }
-
