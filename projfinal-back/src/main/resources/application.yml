@@ -111,10 +111,10 @@ logging:
     org:
       springframework:
         web:
-          client:
-            RestTemplate: DEBUG
-      apache:
-        http: DEBUG
+          client: DEBUG         # 設置為 debug，捕捉 web 客戶端級別的日誌
+    apache:
+      http: DEBUG            # 設置 Apache HTTP 客戶端日誌級別
+    org.springframework.web.client.RestTemplate: DEBUG   # 針對 RestTemplate 設置日誌級別
 #Domain Name(冠)
 front:
   domainName:

@@ -1,13 +1,19 @@
 package tw.com.ispan.dto;
 
 public class GoogleLoginRequestDTO {
-    private String idToken;
+    private String idtoken;
 
-    public String getIdToken() {
-        return idToken;
+    @Override
+    public String toString() {
+        return "GoogleLoginRequestDTO [idtoken=" + idtoken + "]";
     }
 
-    public void setIdToken(String idToken) {
-        this.idToken = idToken;
+    public String getIdtoken() {
+        return idtoken;
     }
+
+    public void setIdtoken(String idtoken) {
+        this.idtoken = idtoken;
+    }
+
 }

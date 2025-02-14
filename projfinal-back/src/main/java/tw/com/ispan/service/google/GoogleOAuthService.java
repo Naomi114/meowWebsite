@@ -1,40 +1,55 @@
 package tw.com.ispan.service.google;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.Collections;
-
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.GoogleCredentials;
 import org.springframework.stereotype.Service;
-
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.HttpClientErrorException;
+import java.io.IOException;
 
 @Service
 public class GoogleOAuthService {
 
-    private static final String CLIENT_ID = "your-google-client-id"; // 使用您的 Google Client ID
+    private static final String GOOGLE_PEOPLE_API_URL = "https://people.googleapis.com/v1/people/me";
 
-    // 驗證 ID Token 並返回 Payload
-    public GoogleIdToken.Payload verifyIdToken(String idTokenString) throws GeneralSecurityException, IOException {
-        JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-        NetHttpTransport transport = new NetHttpTransport();
+    // 使用 access token 來取得使用者資料
+    public String getUserProfile(String accessToken) throws IOException {
+        // 使用 access token 來建立 GoogleCredentials
+        AccessToken token = new AccessToken(accessToken, null); // null 表示不設置過期時間
+        GoogleCredentials credentials = GoogleCredentials.create(token);
 
-        // GoogleIdTokenVerifier 用來驗證 ID Token 是否有效
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-                .setAudience(Collections.singletonList(CLIENT_ID)) // 設定驗證的 Client ID
-                .build();
+        // 創建 RestTemplate 用於發送 HTTP 請求
+        RestTemplate restTemplate = new RestTemplate();
 
-        // 驗證 ID Token
-        GoogleIdToken idToken = verifier.verify(idTokenString);
+        // 設定 Authorization 標頭
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken); // 使用 access token 作為 Bearer Token
 
-        if (idToken == null) {
-            throw new IllegalArgumentException("Invalid ID token");
+        // 建立 HTTP 請求的實體
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        // 發送 GET 請求，並獲取回應
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    GOOGLE_PEOPLE_API_URL,
+                    HttpMethod.GET,
+                    entity,
+                    String.class);
+
+            // 返回 JSON 字串
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            throw new IOException("Error while calling Google People API: " + e.getMessage(), e);
         }
+    }
 
-        // 返回 ID Token 的 Payload
-        return idToken.getPayload();
+    public Payload verifyIdToken(String idToken) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'verifyIdToken'");
     }
 }
