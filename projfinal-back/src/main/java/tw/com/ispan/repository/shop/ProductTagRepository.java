@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import tw.com.ispan.domain.shop.ProductTag;
 
@@ -19,9 +20,11 @@ public interface ProductTagRepository extends JpaRepository<ProductTag, Integer>
     // 精確查詢
     Optional<ProductTag> findByTagName(String tagName);
 
-    // 刪除商品時，解除表格關聯
+    // @ManyToMany刪除商品時，解除product_tag表格關聯
+    // 取 @JoinTable name的表格名稱
     @Modifying
-    @Query("DELETE FROM ProductTag pt WHERE pt.product.id = :productId")
+    @Transactional
+    @Query(value = "DELETE FROM product_tag WHERE product_id = :productId", nativeQuery = true)
     void deleteTagsByProductId(@Param("productId") Integer productId);
 
 }

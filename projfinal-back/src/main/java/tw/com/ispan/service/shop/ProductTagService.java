@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.domain.shop.ProductTag;

@@ -20,9 +20,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import tw.com.ispan.domain.pet.CasePicture;
 import tw.com.ispan.repository.pet.CasePictureRepository;
+
 //冠
 @Service
 @Transactional
@@ -54,7 +55,8 @@ public class ImageService {
 		// String tmpDir = System.getProperty("java.io.tmpdir");
 		// Path tmpUploadPath = Paths.get(tmpDir, "upload/tmp/pet/images");
 
-		// 生成唯一文件名，防止文件名衝突 (圖片名預計取為memberid_caseid，但須要從token抓會員資料才能抓)------------------------------------------
+		// 生成唯一文件名，防止文件名衝突
+		// (圖片名預計取為memberid_caseid，但須要從token抓會員資料才能抓)------------------------------------------
 		String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 
 		// 如果暫存目錄不存在則先創建目錄
@@ -139,20 +141,20 @@ public class ImageService {
 
 		// 定義來源檔案路徑
 		// 這裡如果傳入 http://localhost:8080/xxx 會導致 InvalidPathException，因此要做區分
-		 // **檢查是否是 URL，而不是本地路徑**
-        if (tmpUrl.startsWith("http://") || tmpUrl.startsWith("https://")) {
-            // 轉換 URL 為本地路徑，取出實際的檔案名稱
-            String fileName;
+		// **檢查是否是 URL，而不是本地路徑**
+		if (tmpUrl.startsWith("http://") || tmpUrl.startsWith("https://")) {
+			// 轉換 URL 為本地路徑，取出實際的檔案名稱
+			String fileName;
 			try {
 				fileName = Paths.get(new URL(tmpUrl).getPath()).getFileName().toString();
-				 tmpUrl = Paths.get(tmpUploadDir, fileName).toString();
+				tmpUrl = Paths.get(tmpUploadDir, fileName).toString();
 			} catch (MalformedURLException e) {
 				System.out.println("moveImage的移動圖片路徑出問題");
 				e.printStackTrace();
 			}
-           
-        }
-        
+
+		}
+
 		Path sourcePath = Paths.get(tmpUrl);
 
 		// 定義目標檔案路徑（包括目標檔案名稱）
@@ -174,7 +176,7 @@ public class ImageService {
 			e.printStackTrace();
 			System.out.println("檔案移動失敗：" + e.getMessage());
 		}
-		 // **確保路徑格式為 `/`，避免 Windows 反斜線**
+		// **確保路徑格式為 `/`，避免 Windows 反斜線**
 		return targetPath.toString().replace("\\", "/"); // 確保返回的路徑使用 `/`
 	}
 
@@ -194,51 +196,48 @@ public class ImageService {
 
 		return casePictures;
 	}
-	
-	
+
 	// 更新圖片資料------------------------------------------------------------------------------------------------------------------------------
 	public List<CasePicture> updateCasePictures(List<CasePicture> oldPictures, List<Map<String, String>> casePictures) {
-	    List<CasePicture> updatedPictures = new ArrayList<>();
-	    List<Integer> receivedPictureIds = new ArrayList<>();
-	    
-	    // 1. 遍歷新的圖片資料
-	    for (Map<String, String> newPic : casePictures) {
-	        Integer casePictureId = newPic.get("casePictureId") != null ? Integer.parseInt(newPic.get("casePictureId")) : null;
-	        String pictureUrl = newPic.get("pictureUrl");
+		List<CasePicture> updatedPictures = new ArrayList<>();
+		List<Integer> receivedPictureIds = new ArrayList<>();
 
-	        if (casePictureId != null) {
-	        	 // 2. 檢查舊的圖片是否仍然存在
-	            Optional<CasePicture> existingPicOpt = casePictureRepository.findById(casePictureId);
-	            if (existingPicOpt.isPresent()) {
-	                CasePicture existingPic = existingPicOpt.get();
-	                // 3. 檢查 URL 是否改變，如果改變則更新
-	                if (!existingPic.getPictureUrl().equals(pictureUrl)) {
-	                    existingPic.setPictureUrl(moveImage(pictureUrl));
-	                }
-	                updatedPictures.add(existingPic);
-	                receivedPictureIds.add(casePictureId);
-	            }
-	            
-	        } else if (!pictureUrl.isEmpty()) {
-	        	// 4. 新增新的圖片
-	            CasePicture newPicObj = new CasePicture();
-	            newPicObj.setPictureUrl(moveImage(pictureUrl));
-	            updatedPictures.add(casePictureRepository.save(newPicObj));
-	        }
-	    }
+		// 1. 遍歷新的圖片資料
+		for (Map<String, String> newPic : casePictures) {
+			Integer casePictureId = newPic.get("casePictureId") != null ? Integer.parseInt(newPic.get("casePictureId"))
+					: null;
+			String pictureUrl = newPic.get("pictureUrl");
 
-	 // 5. **刪除未在請求中的舊圖片**
-	    List<CasePicture> toDelete = oldPictures.stream()
-	            .filter(oldPic -> !receivedPictureIds.contains(oldPic.getCasePictureId()))
-	            .collect(Collectors.toList());
-	    casePictureRepository.deleteAll(toDelete); // 確保 Hibernate 移除
+			if (casePictureId != null) {
+				// 2. 檢查舊的圖片是否仍然存在
+				Optional<CasePicture> existingPicOpt = casePictureRepository.findById(casePictureId);
+				if (existingPicOpt.isPresent()) {
+					CasePicture existingPic = existingPicOpt.get();
+					// 3. 檢查 URL 是否改變，如果改變則更新
+					if (!existingPic.getPictureUrl().equals(pictureUrl)) {
+						existingPic.setPictureUrl(moveImage(pictureUrl));
+					}
+					updatedPictures.add(existingPic);
+					receivedPictureIds.add(casePictureId);
+				}
 
-	    return updatedPictures;
+			} else if (!pictureUrl.isEmpty()) {
+				// 4. 新增新的圖片
+				CasePicture newPicObj = new CasePicture();
+				newPicObj.setPictureUrl(moveImage(pictureUrl));
+				updatedPictures.add(casePictureRepository.save(newPicObj));
+			}
+		}
+
+		// 5. **刪除未在請求中的舊圖片**
+		List<CasePicture> toDelete = oldPictures.stream()
+				.filter(oldPic -> !receivedPictureIds.contains(oldPic.getCasePictureId()))
+				.collect(Collectors.toList());
+		casePictureRepository.deleteAll(toDelete); // 確保 Hibernate 移除
+
+		return updatedPictures;
 	}
-	
-	
-	
-	
+
 	// 為修改案件圖片時，用於確認傳過來的id+url是否已經存在於圖片資料表中，不存在得都則需轉移到永存資料夾，再修改圖片對應表中資料------------------------------------------
 	public List<CasePicture> saveModify(Map<Integer, String> ImageIdandUrl) {
 
