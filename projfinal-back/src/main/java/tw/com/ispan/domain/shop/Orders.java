@@ -199,4 +199,31 @@ public class Orders {
     public String getCustomerEmail() {
         return this.member.getEmail(); // Assuming 'member' has a method 'getEmail()'
     }
+
+    public void setCartId(int cartId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCartId'");
+    }
+
+    public void setMemberId(int memberId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setMemberId'");
+    }
+
+    private List<Integer> selectedItems;
+
+    // 其他屬性和方法
+
+    public List<Integer> getSelectedItems() {
+        return selectedItems;
+    }
+
+    public void setSelectedItems(List<Integer> selectedItems) {
+        this.selectedItems = selectedItems;
+    }
+
+    public Integer getMemberId() {
+        return this.member != null ? this.member.getId() : null; // 如果 member 为 null，则返回 null
+    }
+
 }

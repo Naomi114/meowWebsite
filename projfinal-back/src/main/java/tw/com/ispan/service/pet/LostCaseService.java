@@ -31,7 +31,7 @@ import tw.com.ispan.repository.pet.DistrictAreaRepository;
 import tw.com.ispan.repository.pet.FurColorRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.SpeciesRepository;
-//import tw.com.ispan.service.banner.BannerService;
+import tw.com.ispan.service.banner.BannerService;
 
 @Service
 @Transactional
@@ -68,16 +68,6 @@ public class LostCaseService {
 
     public void saveLostCase(LostCase lostCase) {
         lostCaseRepository.save(lostCase);
-    }
-
-    /**
-     * 根據會員 ID 查詢對應的 LostCases
-     *
-     * @param memberId 會員 ID
-     * @return 該會員的 LostCase 列表
-     */
-    public List<LostCase> findByMemberId(Integer memberId) {
-        return lostCaseRepository.findByMemberId(memberId);
     }
 
     /**
@@ -147,7 +137,7 @@ public class LostCaseService {
     /**
      * 創建 LostCase 並自動創建對應的 Banner
      */
-    public LostCase create(JSONObject param, List<CasePicture> casePictures) {
+    public LostCase create(JSONObject param) {
         LostCase lostCase = new LostCase();
         lostCase.setCaseTitle(param.getString("caseTitle"));
 

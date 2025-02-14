@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,20 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
-import tw.com.ispan.domain.shop.ProductTag;
 import tw.com.ispan.dto.shop.ProductDTO;
-import tw.com.ispan.dto.shop.ProductFilter;
 import tw.com.ispan.dto.shop.ProductRequest;
 import tw.com.ispan.dto.shop.ProductResponse;
 import tw.com.ispan.repository.admin.AdminRepository;
@@ -479,6 +468,23 @@ public class ProductService {
 		response.setMessage(products.isEmpty() ? "未找到任何商品" : "商品查詢成功");
 
 		return response;
+	}
+
+	public void decreaseStock(Integer productId, int quantity) {
+		// 確認商品存在
+		Product product = productRepository.findById(productId)
+				.orElseThrow(() -> new RuntimeException("商品不存在，ID: " + productId));
+
+		// 檢查庫存是否足夠
+		if (product.getStockQuantity() < quantity) {
+			throw new RuntimeException("庫存不足，無法扣除 " + quantity + " 數量");
+		}
+
+		// 扣除庫存
+		product.setStockQuantity(product.getStockQuantity() - quantity);
+		productRepository.save(product); // 儲存變更到資料庫
+
+		System.out.println("成功扣除商品 " + product.getProductName() + " 的 " + quantity + " 數量");
 	}
 
 	public void decreaseStock(Integer productId, int quantity) {

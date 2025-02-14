@@ -10,15 +10,10 @@ public class ProductResponse {
     private Boolean success;
     private String message;
     private ProductDTO product;
-    // private List<Product> productfilter;
     private List<ProductDTO> products;
-    // private Long count;
+    private Long count;
 
     public ProductResponse() {
-    }
-
-    public ProductResponse(List<ProductDTO> products) {
-        this.products = products;
     }
 
     public ProductResponse(Boolean success, String message) {
@@ -29,12 +24,12 @@ public class ProductResponse {
     public ProductResponse(Boolean success, String message, List<Product> products, Long count) {
         this.success = success;
         this.message = message;
-        // this.count = count;
+        this.count = count;
 
         // ✅ 轉換 `Product` 為 `ProductDTO`
-        // this.products = products.stream()
-        //         .map(ProductDTO::new)
-        //         .collect(Collectors.toList());
+        this.products = products.stream()
+                .map(ProductDTO::new)
+                .collect(Collectors.toList());
     }
 
     public Boolean getSuccess() {
@@ -53,14 +48,6 @@ public class ProductResponse {
         this.message = message;
     }
 
-    // public Long getCount() {
-    //     return count;
-    // }
-
-    // public void setCount(Long count) {
-    //     this.count = count;
-    // }
-
     public ProductDTO getProduct() {
         return product;
     }
@@ -68,14 +55,6 @@ public class ProductResponse {
     public void setProduct(ProductDTO product) {
         this.product = product;
     }
-
-    // public List<Product> getProductfilter() {
-    //     return productfilter;
-    // }
-
-    // public void setProductfilter(List<Product> productfilter) {
-    //     this.productfilter = productfilter;
-    // }
 
     public List<ProductDTO> getProducts() {
         return products;
@@ -85,6 +64,11 @@ public class ProductResponse {
         this.products = products;
     }
 
+    public Long getCount() {
+        return count;
+    }
 
-
+    public void setCount(Long count) {
+        this.count = count;
+    }
 }

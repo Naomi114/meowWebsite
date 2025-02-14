@@ -123,8 +123,8 @@ public class Product {
     public Product(Integer productId, String productName, String description, BigDecimal originalPrice,
             BigDecimal salePrice, Integer stockQuantity, String unit, String status, LocalDate expire,
             LocalDateTime createdAt, LocalDateTime updatedAt, Category category, Admin admin,
-            List<ProductImage> productImages, List<ProductTag> tags, List<InventoryItem> inventoryItems,
-            Set<WishList> wishlists, CartItem cartItem) {
+            List<ProductImage> productImages, Set<ProductTag> tags,
+            List<InventoryItem> inventoryItems, Set<WishList> wishlists) {
         this.productId = productId;
         this.productName = productName;
         this.description = description;
@@ -142,7 +142,6 @@ public class Product {
         this.tags = tags;
         this.inventoryItems = inventoryItems;
         this.wishlists = wishlists;
-        this.cartItem = cartItem;
     }
 
     @Override
@@ -153,22 +152,6 @@ public class Product {
                 + ", updatedAt=" + updatedAt + ", category=" + category + ", adminId=" + admin + ", productImages="
                 + productImages + ", tags=" + tags + ", inventoryItems=" + inventoryItems + ", wishlists=" + wishlists
                 + "]";
-    }
-
-    public List<ProductTag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<ProductTag> tags) {
-        this.tags = tags;
-    }
-
-    public CartItem getCartItem() {
-        return cartItem;
-    }
-
-    public void setCartItem(CartItem cartItem) {
-        this.cartItem = cartItem;
     }
 
     public Integer getProductId() {

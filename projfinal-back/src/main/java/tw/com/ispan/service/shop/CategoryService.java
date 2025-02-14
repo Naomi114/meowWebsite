@@ -143,7 +143,10 @@ public class CategoryService {
             // .collect(Collectors.toList());
 
             // ✅ 設定回應
-            response.setProducts(products);
+            response.setCategoryId(category.getCategoryId());
+            response.setCategoryName(category.getCategoryName());
+            response.setDefaultUnit(category.getDefaultUnit());
+            response.setProducts(productDTOs);
             response.setSuccess(true);
             response.setMessage("查詢成功");
 
@@ -167,9 +170,15 @@ public class CategoryService {
                 response.setMessage("沒有匹配的類別");
                 return response;
             }
+            List<ProductDTO> productDTOs = categories.stream()
+                    .flatMap(category -> category.getProducts().stream()) // 取得所有產品
+                    .map(ProductDTO::new) // 轉換為 DTO，確保包含 images
+                    .collect(Collectors.toList());
+
             response.setSuccess(true);
             response.setMessage("模糊查詢成功");
             response.setCategories(categories);
+            response.setProducts(productDTOs);
         } catch (Exception e) {
             response.setSuccess(false);
             response.setMessage("模糊查詢失敗: " + e.getMessage());
@@ -188,9 +197,15 @@ public class CategoryService {
                 response.setMessage("沒有可用的類別");
                 return response;
             }
+            List<ProductDTO> productDTOs = categories.stream()
+                    .flatMap(category -> category.getProducts().stream()) // 取得所有產品
+                    .map(ProductDTO::new) // 轉換為 DTO，確保包含 images
+                    .collect(Collectors.toList());
+
             response.setSuccess(true);
             response.setMessage("成功獲取類別清單");
             response.setCategories(categories);
+            response.setProducts(productDTOs);
         } catch (Exception e) {
             response.setSuccess(false);
             response.setMessage("獲取類別失敗: " + e.getMessage());

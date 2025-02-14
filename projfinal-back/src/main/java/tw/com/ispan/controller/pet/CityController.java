@@ -16,7 +16,7 @@ import tw.com.ispan.dto.pet.CityDTO;
 import tw.com.ispan.repository.pet.CityRepository;
 import tw.com.ispan.service.pet.VForService;
 
-@CrossOrigin // 允許來自 Vue 前端的請求
+@CrossOrigin(origins = "http://localhost:8080") // 允許來自 Vue 前端的請求
 @RestController
 @RequestMapping("/api")
 public class CityController {
@@ -28,7 +28,7 @@ public class CityController {
 
     // @GetMapping("/cities")
     // public List<CityDTO> getCities() {
-    // return vForService.allCity();
+    //     return vForService.allCity();
     // }
 
     @GetMapping("/districts/{cityId}")
