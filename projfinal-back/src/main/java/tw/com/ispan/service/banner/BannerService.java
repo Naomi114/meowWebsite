@@ -3,6 +3,7 @@ package tw.com.ispan.service.banner;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -190,6 +191,11 @@ public class BannerService {
      */
     public List<Banner> findByBannerType(BannerType bannerType) {
         return bannerRepository.findByBannerType(bannerType);
+    }
+
+    // ✅ 透過 bannerId 查詢對應的案件
+    public Optional<Banner> findCaseByBannerId(Integer bannerId) {
+        return bannerRepository.findBannerWithCaseById(bannerId);
     }
 
     public void deleteBannerByCaseId(Integer caseId, BannerType bannerType) {

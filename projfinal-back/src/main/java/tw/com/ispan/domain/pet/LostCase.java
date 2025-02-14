@@ -81,7 +81,7 @@ public class LostCase {
     private Integer age;
 
     @Column(name = "microChipNumber")
-    private Integer microChipNumber;
+    private String microChipNumber;
 
     // 關聯到 City 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
@@ -264,11 +264,11 @@ public class LostCase {
         this.age = age;
     }
 
-    public Integer getMicroChipNumber() {
+    public String getMicroChipNumber() {
         return microChipNumber;
     }
 
-    public void setMicroChipNumber(Integer microChipNumber) {
+    public void setMicroChipNumber(String microChipNumber) {
         this.microChipNumber = microChipNumber;
     }
 

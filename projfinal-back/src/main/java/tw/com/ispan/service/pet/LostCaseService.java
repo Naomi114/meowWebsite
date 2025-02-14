@@ -173,8 +173,17 @@ public class LostCaseService {
         lostCase.setName(param.getString("petName"));
         lostCase.setGender(param.optString("gender", null));
         lostCase.setSterilization(param.getString("sterilization"));
-        lostCase.setAge(param.optInt("age", -1));
-        lostCase.setMicroChipNumber(param.optInt("microChipNumber", -1));
+        lostCase.setAge(param.optInt("age"));
+        // lostCase.setMicroChipNumber(param.optInt("microChipNumber"));
+        // ✅ Debug: 記錄收到的 microChipNumber
+        if (param.has("microChipNumber")) {
+            System.out.println("📌 收到的 microChipNumber: " + param.get("microChipNumber"));
+        } else {
+            System.out.println("⚠️ 沒有 microChipNumber 參數");
+        }
+
+        lostCase.setMicroChipNumber(param.optString("microChipNumber", null));
+
         // lostCase.setLatitude(param.getDouble("latitude"));
         // lostCase.setLongitude(param.getDouble("longitude"));
         lostCase.setDonationAmount(param.optInt("donationAmount", 0));
@@ -242,7 +251,7 @@ public class LostCaseService {
         lostCase.setSterilization(param.optString("sterilization", lostCase.getSterilization()));
         lostCase.setAge(param.has("age") ? param.getInt("age") : lostCase.getAge());
         lostCase.setMicroChipNumber(
-                param.has("microChipNumber") ? param.getInt("microChipNumber") : lostCase.getMicroChipNumber());
+                param.has("microChipNumber") ? param.optString("microChipNumber") : lostCase.getMicroChipNumber());
         // lostCase.setLatitude(param.has("latitude") ? param.getDouble("latitude") :
         // lostCase.getLatitude());
         // lostCase.setLongitude(param.has("longitude") ? param.getDouble("longitude") :
