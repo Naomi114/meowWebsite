@@ -1,21 +1,18 @@
 package tw.com.ispan.controller.pet;
 
-import java.util.List;
+import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tw.com.ispan.domain.pet.AdoptionCase;
@@ -29,50 +26,55 @@ public class AdoptionCaseController {
     @Autowired
     private AdoptionCaseService adoptionCaseService;
 
-    // System.out.println() 和 e.printStackTrace() 可能被日誌框架攔截
-    // 🔹 問題
-
-    // Spring Boot 默認使用 SLF4J + Logback 來處理日誌。
-    // System.out.println() 和 e.printStackTrace() 可能被 Logback 覆蓋，導致 Console 沒有輸出
-    private static final Logger logger = LoggerFactory.getLogger(AdoptionCaseController.class);
-
     // 創建新的 AdoptionCase
-    @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<?> createAdoptionCase(@RequestBody AdoptioncaseDTO dto) {
-        try {
-            System.out.println("收到的 JSON: " + dto);
-            AdoptionCase createdAdoptionCase = adoptionCaseService.createAdoptionCase(dto);
-            return new ResponseEntity<>(createdAdoptionCase, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @PostMapping("/create")
+    public ResponseEntity<AdoptionCase> createAdoptionCase(@RequestBody String json) {
+        System.out.println("接收到的 AdoptionCase: " + json);
+        JSONObject param = new JSONObject(json);
+        AdoptionCase createAdoptionCase = adoptionCaseService.createAdoptionCase(param);
+        return ResponseEntity.ok(createAdoptionCase);
     }
 
     // 更新註記 status 和 note
-    @PutMapping("/{adoptionCaseId}")
+    @PutMapping("/note/{adoptionCaseId}")
     public AdoptionCase updateAdoptionCase(@PathVariable Integer adoptionCaseId,
             @RequestBody AdoptioncaseDTO dto) {
         return adoptionCaseService.updateAdoptionCaseStatusAndNote(adoptionCaseId, dto);
     }
 
     // 查詢
-    @GetMapping("/search")
-    public List<AdoptionCase> searchAdoptionCases(
-            @RequestParam(value = "cityId", required = false) Long cityId,
-            @RequestParam(value = "districtAreaId", required = false) Long districtAreaId,
-            @RequestParam(value = "caseStateId", required = false) Long caseStateId,
-            @RequestParam(value = "speciesId", required = false) Long speciesId,
-            @RequestParam(value = "gender", required = false) String gender) {
-        return adoptionCaseService.searchAdoptionCases(cityId, districtAreaId, caseStateId, speciesId, gender);
+    @PostMapping("/search")
+    public ResponseEntity<Page<AdoptionCase>> AdoptionCases(@RequestBody String json) {
+        JSONObject param = new JSONObject(json);
+        Page<AdoptionCase> cases = adoptionCaseService.searchAdoptionCases(param);
+        return ResponseEntity.ok(cases);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        logger.error("請求格式錯誤: {}", ex.getMessage());
-        return ResponseEntity.badRequest().body("請求格式錯誤: " + ex.getMessage());
+    // 更新資料
+    @PutMapping("/{adoptionCaseId}")
+    public ResponseEntity<AdoptionCase> update(
+            @PathVariable Integer adoptionCaseId,
+            @RequestBody String json) {
+
+        JSONObject param = new JSONObject(json);
+        AdoptionCase updateadoptionCase = adoptionCaseService.modify(adoptionCaseId, param);
+
+        return ResponseEntity.ok(updateadoptionCase);
     }
+
+    // 刪除
+    @DeleteMapping("/{adoptionCaseId}")
+    public ResponseEntity<Void> delete(@PathVariable Integer adoptionCaseId) {
+        adoptionCaseService.delete(adoptionCaseId);
+        return ResponseEntity.noContent().build(); // 204 No Content
+    }
+
+    // 查詢一筆
+    @GetMapping("/{adoptionCaseId}")
+    public ResponseEntity<AdoptionCase> getAdoptionCaseIdById(@PathVariable Integer adoptionCaseId) {
+        Optional<AdoptionCase> adoptionCase = adoptionCaseService.findById(adoptionCaseId);
+        return adoptionCase.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
 }

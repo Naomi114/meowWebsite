@@ -140,6 +140,7 @@ public class MemberService {
                 .collect(Collectors.toList());
     }
 
+    // 刪除會員(ID)
     public boolean deleteMemberById(Integer memberId) {
         if (memberRepository.existsById(memberId)) {
             memberRepository.deleteById(memberId); // 根據 memberId 刪除會員
@@ -173,7 +174,6 @@ public class MemberService {
         if (memberDto.getPassword() != null && !memberDto.getPassword().isEmpty()) {
             member.setPassword(memberDto.getPassword()); // 如果提供了新密碼，才更新
         }
-        member.setName(memberDto.getName());
         member.setEmail(memberDto.getEmail());
         member.setPhone(memberDto.getPhone());
         member.setAddress(memberDto.getAddress());
