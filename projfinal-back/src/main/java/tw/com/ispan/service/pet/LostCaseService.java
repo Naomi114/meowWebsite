@@ -31,7 +31,7 @@ import tw.com.ispan.repository.pet.DistrictAreaRepository;
 import tw.com.ispan.repository.pet.FurColorRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.SpeciesRepository;
-import tw.com.ispan.service.banner.BannerService;
+//import tw.com.ispan.service.banner.BannerService;
 
 @Service
 @Transactional
@@ -68,6 +68,16 @@ public class LostCaseService {
 
     public void saveLostCase(LostCase lostCase) {
         lostCaseRepository.save(lostCase);
+    }
+
+    /**
+     * 根據會員 ID 查詢對應的 LostCases
+     *
+     * @param memberId 會員 ID
+     * @return 該會員的 LostCase 列表
+     */
+    public List<LostCase> findByMemberId(Integer memberId) {
+        return lostCaseRepository.findByMemberId(memberId);
     }
 
     /**
@@ -137,7 +147,7 @@ public class LostCaseService {
     /**
      * 創建 LostCase 並自動創建對應的 Banner
      */
-    public LostCase create(JSONObject param) {
+    public LostCase create(JSONObject param, List<CasePicture> casePictures) {
         LostCase lostCase = new LostCase();
         lostCase.setCaseTitle(param.getString("caseTitle"));
 
@@ -164,7 +174,7 @@ public class LostCaseService {
         lostCase.setGender(param.optString("gender", null));
         lostCase.setSterilization(param.getString("sterilization"));
         lostCase.setAge(param.optInt("age"));
-        lostCase.setMicroChipNumber(param.optInt("microChipNumber"));
+        lostCase.setMicroChipNumber(param.optString("microChipNumber"));
         // lostCase.setLatitude(param.getDouble("latitude"));
         // lostCase.setLongitude(param.getDouble("longitude"));
         lostCase.setDonationAmount(param.optInt("donationAmount", 0));
@@ -232,7 +242,7 @@ public class LostCaseService {
         lostCase.setSterilization(param.optString("sterilization", lostCase.getSterilization()));
         lostCase.setAge(param.has("age") ? param.getInt("age") : lostCase.getAge());
         lostCase.setMicroChipNumber(
-                param.has("microChipNumber") ? param.getInt("microChipNumber") : lostCase.getMicroChipNumber());
+                param.has("microChipNumber") ? param.optString("microChipNumber") : lostCase.getMicroChipNumber());
         // lostCase.setLatitude(param.has("latitude") ? param.getDouble("latitude") :
         // lostCase.getLatitude());
         // lostCase.setLongitude(param.has("longitude") ? param.getDouble("longitude") :

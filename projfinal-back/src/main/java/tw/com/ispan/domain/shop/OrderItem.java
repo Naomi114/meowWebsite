@@ -13,7 +13,6 @@ public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderItemId; // 訂單項目 ID
-    private Integer orderItemId; // 訂單項目 ID
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_orderId", nullable = false)
@@ -29,14 +28,11 @@ public class OrderItem {
 
     @Column(nullable = false)
     private Integer orderQuantity; // 訂購數量
-    private Integer orderQuantity; // 訂購數量
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal purchasedPrice; // 當前購買時的價格
-    private BigDecimal purchasedPrice; // 當前購買時的價格
 
     @Column(nullable = false)
-    private String status; // 訂單狀態（如："備貨中"、"已發貨"）
     private String status; // 訂單狀態（如："備貨中"、"已發貨"）
 
     // **新增方法**：提供商品名稱，確保前端可以獲取
@@ -49,12 +45,8 @@ public class OrderItem {
     public OrderItem() {
     }
 
-    public OrderItem() {
-    }
-
     // 全部欄位建構子
     public OrderItem(Integer orderItemId, Orders order, Product product, Integer orderQuantity,
-            BigDecimal purchasedPrice, String status) {
             BigDecimal purchasedPrice, String status) {
         this.orderItemId = orderItemId;
         this.order = order;
@@ -138,23 +130,6 @@ public class OrderItem {
                 ", orderQuantity=" + orderQuantity +
                 ", purchasedPrice=" + purchasedPrice +
                 ", status=" + status + "]";
-        return "OrderItem [orderItemId=" + orderItemId +
-                ", order=" + (order != null ? order.getOrderId() : "null") +
-                ", product=" + (product != null ? product.getProductId() : "null") +
-                ", productName=" + getProductName() +
-                ", orderQuantity=" + orderQuantity +
-                ", purchasedPrice=" + purchasedPrice +
-                ", status=" + status + "]";
-    }
-
-    public void setCartId(Integer cartId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setCartId'");
-    }
-
-    // 修正的 getQuantity 方法，應該返回 orderQuantity
-    public int getQuantity() {
-        return this.orderQuantity; // 正確引用 orderQuantity 屬性
     }
 
     public void setCartId(Integer cartId) {

@@ -29,7 +29,7 @@ public class CategoryService {
     @Autowired
     private ProductRepository productRepository;
 
-    // 單筆新增或更新 (為必填欄位)
+    // 單筆新增或更新
     public CategoryResponse createOrUpdateCategory(CategoryRequest request) {
         CategoryResponse response = new CategoryResponse();
         try {
@@ -54,7 +54,7 @@ public class CategoryService {
                 category.setCategoryDescription(request.getCategoryDescription());
                 category.setDefaultUnit(request.getDefaultUnit());
 
-                // 驗證必填欄位
+                // 驗證必要屬性是否設置
                 if (category.getCategoryName() == null || category.getDefaultUnit() == null) {
                     throw new IllegalArgumentException("類別名稱或預設單位不能為空");
                 }
@@ -76,14 +76,8 @@ public class CategoryService {
         CategoryResponse response = new CategoryResponse();
         try {
             Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
-
             if (categoryOpt.isPresent()) {
-                // 刪除 Category 時，不會影響 Product，將 categoryId 設為 NULL，避免 null 錯誤！
-                // 先將所有關聯的產品分類設為 NULL
-                categoryRepository.removeCategoryFromProducts(categoryId);
-
-                // 然後刪除分類
-                categoryRepository.deleteById(categoryId);
+                categoryRepository.delete(categoryOpt.get());
                 response.setSuccess(true);
                 response.setMessage("類別刪除成功");
             } else {
@@ -143,10 +137,7 @@ public class CategoryService {
             // .collect(Collectors.toList());
 
             // ✅ 設定回應
-            response.setCategoryId(category.getCategoryId());
-            response.setCategoryName(category.getCategoryName());
-            response.setDefaultUnit(category.getDefaultUnit());
-            response.setProducts(productDTOs);
+            response.setProducts(products);
             response.setSuccess(true);
             response.setMessage("查詢成功");
 
@@ -170,15 +161,9 @@ public class CategoryService {
                 response.setMessage("沒有匹配的類別");
                 return response;
             }
-            List<ProductDTO> productDTOs = categories.stream()
-                    .flatMap(category -> category.getProducts().stream()) // 取得所有產品
-                    .map(ProductDTO::new) // 轉換為 DTO，確保包含 images
-                    .collect(Collectors.toList());
-
             response.setSuccess(true);
             response.setMessage("模糊查詢成功");
             response.setCategories(categories);
-            response.setProducts(productDTOs);
         } catch (Exception e) {
             response.setSuccess(false);
             response.setMessage("模糊查詢失敗: " + e.getMessage());
@@ -197,15 +182,9 @@ public class CategoryService {
                 response.setMessage("沒有可用的類別");
                 return response;
             }
-            List<ProductDTO> productDTOs = categories.stream()
-                    .flatMap(category -> category.getProducts().stream()) // 取得所有產品
-                    .map(ProductDTO::new) // 轉換為 DTO，確保包含 images
-                    .collect(Collectors.toList());
-
             response.setSuccess(true);
             response.setMessage("成功獲取類別清單");
             response.setCategories(categories);
-            response.setProducts(productDTOs);
         } catch (Exception e) {
             response.setSuccess(false);
             response.setMessage("獲取類別失敗: " + e.getMessage());
