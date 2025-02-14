@@ -32,6 +32,7 @@ import tw.com.ispan.dto.shop.ProductDTO;
 import tw.com.ispan.dto.shop.ProductFilter;
 import tw.com.ispan.dto.shop.ProductRequest;
 import tw.com.ispan.dto.shop.ProductResponse;
+import tw.com.ispan.repository.admin.AdminRepository;
 import tw.com.ispan.repository.shop.CartItemRepository;
 import tw.com.ispan.repository.shop.CategoryRepository;
 import tw.com.ispan.repository.shop.InventoryItemRepository;
@@ -60,6 +61,9 @@ public class ProductService {
 
 	@PersistenceContext
 	private EntityManager entityManager;
+
+	@Autowired
+	private AdminRepository adminRepository;
 
 	@Autowired
 	private ProductRepository productRepository;
@@ -263,7 +267,6 @@ public class ProductService {
 	}
 
 	// 單筆刪除
-	@Transactional
 	public ProductResponse deleteSingle(Integer productId) {
 		ProductResponse response = new ProductResponse();
 		Optional<Product> productOpt = productRepository.findById(productId);
@@ -292,15 +295,24 @@ public class ProductService {
 						"您購物車或願望清單內的商品 [" + product.getProductName() + "] 已被刪除，請更新您的購物車或願望清單。");
 			}
 
-			// (4) 刪除關聯數據
-			wishlistRepository.deleteByProductId(productId);
+			// (4) 刪除商品前，先刪除關聯數據
+			// @ManyToOne
+			adminRepository.removeAdminFromProduct(productId);
+			categoryRepository.removeCategoryFromProducts(productId);
+
+			// @OneToMany
+			productImageRepository.deleteImagesByProductId(productId);
+			inventoryItemRepository.removeInventoryItemByProductId(productId);
+			wishlistRepository.removeWishListByProductId(productId);
+
+			// @ManyToMany
+			productTagRepository.deleteTagsByProductId(productId);
+
+			// @OneToOne
 			cartItemRepository.deleteByProductId(productId);
-			productImageRepository.deleteByProductId(productId);
-			productTagRepository.deleteTagsByProductId(productId); // 確保標籤刪除
 
 			// product.getTags().clear(); 只是清空關聯，但不會實際刪除 product_tag 關聯表的數據
 			// product.getTags().clear();
-			productTagRepository.deleteTagsByProductId(productId);
 
 			// **(5) 刪除商品**
 			productRepository.deleteById(productId); // 改成 `deleteById()` 確保刪除

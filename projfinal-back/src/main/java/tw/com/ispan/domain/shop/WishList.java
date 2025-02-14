@@ -22,13 +22,13 @@ public class WishList {
     private Integer wishlistId;
 
     @ManyToOne
-    @JoinColumn(name = "memberId", nullable = false)
+    @JoinColumn(name = "FK_memberId", nullable = false)
     @JsonManagedReference("wishlists")
     private Member member;
 
     @ManyToOne
-    @JoinColumn(name = "productId", nullable = false)
-    @JsonManagedReference("wishlists")
+    @JoinColumn(name = "FK_productId", nullable = false)
+    @JsonManagedReference("products_wishlists")
     private Product product;
 
     @Column(nullable = false)

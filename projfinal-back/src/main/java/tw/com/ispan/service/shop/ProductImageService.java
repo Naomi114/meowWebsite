@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import tw.com.ispan.config.FileStorageProperties;
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.domain.shop.ProductImage;
@@ -74,15 +74,14 @@ public class ProductImageService {
             return new MockMultipartFile(
                     file.getName(), file.getName(),
                     "image/" + getFileExtension(file.getName()),
-                    IOUtils.toByteArray(input)
-            );
+                    IOUtils.toByteArray(input));
         } catch (IOException e) {
             throw new RuntimeException("無法讀取圖片檔案: " + file.getAbsolutePath(), e);
         }
     }
 
-    //驗證&取得檔案副檔名
-    private String getFileExtension(String fileName) throws IOException{
+    // 驗證&取得檔案副檔名
+    private String getFileExtension(String fileName) throws IOException {
         // 驗證圖片名稱及格式
         if (fileName == null || fileName.isBlank()) {
             throw new IllegalArgumentException("至少提供一個圖片檔");
