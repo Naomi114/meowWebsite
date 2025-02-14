@@ -1,0 +1,181 @@
+[
+  {
+    "memberId": 1,
+    "caseTitle": "馬路旁兩隻小奶貓",
+    "speciesId":  2 ,
+    "breedId":  1 ,
+    "furColorId":  4 ,
+    "gender": "母",
+    "sterilization": null,
+    "age": null,
+    "microChipNumber": null,
+    "suspLost": false,
+    "cityId": 3 ,
+    "districtAreaId":  20 ,
+    "street": "仁愛路120巷",
+    "latitude": 25.0418,
+    "longitude": 121.5501,
+    "donationAmount": 0,
+    "viewCount": 76,
+    "follow":0,
+    "tag": "幼貓，親人",
+    "rescueReason": "體態偏瘦懷疑營養不良，僅愛媽餵食",
+    "caseStateId":   3 ,
+    "caseUrl": "https://example.com/case/124",
+    "casePictures": [
+      { "url": "${final-upload-dir}examplecase1.png" }
+    ],
+    "rescueDemands": [
+      { "rescueDemandId": 1 },
+      { "rescueDemandId": 2 }
+    ],
+    "canAffords": [
+      { "canAffordId": 4 },
+      { "canAffordId": 5 }
+    ],
+    "isHidden": false
+  },
+  {
+    "memberId": 2,
+    "caseTitle": "全身很髒瘦到快變皮包骨急需救援的貓",
+    "speciesId":  2 ,
+    "breedId":  1 ,
+    "furColorId":  6 ,
+    "gender": null,
+    "sterilization": null,
+    "age": null,
+    "microChipNumber": null,
+    "suspLost": false,
+    "cityId":  3 ,
+    "districtAreaId": 25 ,
+    "street": "和平東路200號",
+    "latitude": 24.9930,
+    "longitude": 121.3051,
+    "donationAmount": 1000,
+    "viewCount": 80,
+    "follow": 0,
+    "tag": "急救,貓咪",
+    "rescueReason": "全身髒兮兮疑似有被其他隻貓咪欺負，身材極瘦不確定是否有口炎導致食不下嚥，看起來急需盡快就醫",
+    "caseStateId":  3 ,
+    "caseUrl": "https://example.com/case/125",
+    "casePictures": [
+      { "url": "${final-upload-dir}examplecase2.png" }
+    ],
+    "rescueDemands": [
+      { "rescueDemandId": 2 },
+      { "rescueDemandId": 3 },
+      { "rescueDemandId": 4 }
+    ],
+    "canAffords": [
+      { "canAffordId": 1 },
+      { "canAffordId": 4 },
+      { "canAffordId": 5 }
+    ],
+    "isHidden": false
+  },
+  {
+    "memberId": 3,
+    "caseTitle": "疑似被棄養的米克斯混柴犬",
+    "speciesId":  1 ,
+    "breedId": 55 ,
+    "furColorId":  1 ,
+    "gender": null,
+    "sterilization": null,
+    "age": null,
+    "microChipNumber": null,
+    "suspLost": true,
+    "cityId": 3 ,
+    "districtAreaId": 30 ,
+    "street": "中正路",
+    "latitude": 25.1515915,
+    "longitude": 121.7677591,
+    "donationAmount": 300,
+    "viewCount": 50,
+    "follow": 0,
+    "tag": "混柴犬，救援",
+    "rescueReason": "疑似被棄養 身旁放一帶飼料 附近居民沒看過 說當天才第一次見到他 會被附近放養的狗追咬",
+    "caseStateId":3 ,
+    "caseUrl": "https://example.com/case/126",
+    "casePictures": [
+      { "url": "${final-upload-dir}examplecase3.png" }
+    ],
+    "rescueDemands": [
+      { "rescueDemandId": 2 }
+    ],
+    "canAffords": [
+      { "canAffordId": 3 }
+    ],
+    "isHidden": false
+  },
+  {
+    "memberId": 4,
+    "caseTitle": "發現疑似被車撞到腳受傷，嘴巴也無法閉合的虎斑狗",
+    "speciesId": 1 ,
+    "breedId": 55 ,
+    "furColorId": 3 ,
+    "gender": "公",
+    "sterilization": null,
+    "age": null,
+    "microChipNumber": null,
+    "suspLost": false,
+    "cityId": 1 ,
+    "districtAreaId": 6 ,
+    "street": "貴陽街二段116號",
+    "latitude": 25.0399114,
+    "longitude":121.5001497,
+    "donationAmount": 1000,
+    "viewCount": 26,
+    "follow": 0,
+    "tag": "車禍",
+    "rescueReason": "觀察過他在跟其他流浪狗搶食時，通常都會搶輸，長久下來不利生存",
+    "caseStateId": 3 ,
+    "caseUrl": "https://example.com/case/127",
+    "casePictures": [
+      { "url": "${final-upload-dir}examplecase4.png" }
+    ],
+    "rescueDemands": [
+      { "rescueDemandId": 3 },
+      { "rescueDemandId": 4 }
+    ],
+    "canAffords": [
+      { "canAffordId": 1},
+      { "canAffordId": 4 }
+    ],
+    "isHidden": false
+  },
+  {
+    "memberId": 5,
+    "caseTitle": "想要收編餵食一段時間的浪浪",
+    "speciesId":  2 ,
+    "breedId": 1 ,
+    "furColorId":  5 ,
+    "gender": "母",
+    "sterilization": null,
+    "age": null,
+    "microChipNumber": null,
+    "suspLost": false,
+    "cityId": 1 ,
+    "districtAreaId": 3 ,
+    "street": "中山北路一段135巷",
+    "latitude": 25.043766,  
+    "longitude": 121.5245141,
+    "donationAmount": 0,
+    "viewCount": 12,
+    "follow": 0,
+    "tag": "貓,救援",
+    "rescueReason": "家裡樓下有一隻餵食一段時間的浪貓，因為他都會固定時間來吃飯，也覺得真的蠻有緣分的，想要收編，曾嘗試用貓籠想要帶他回家，但好像沒有什麼用",
+    "caseStateId":  3 ,
+    "caseUrl": "https://example.com/case/128",
+    "casePictures": [
+      { "url": "${final-upload-dir}examplecase5.png" }
+    ],
+    "rescueDemands": [
+      { "rescueDemandId": 4 }
+    ],
+    "canAffords": [
+      { "canAffordId": 1 },
+      { "canAffordId": 2 }
+    ],
+    "isHidden": false
+  }
+]
