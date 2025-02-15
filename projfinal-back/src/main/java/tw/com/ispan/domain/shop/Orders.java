@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
@@ -20,7 +19,6 @@ public class Orders {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "FK_memberId", nullable = false) // Link to Member
-    @JsonProperty("member_id")
     @JsonBackReference // Prevents infinite recursion when serializing
     private Member member; // Member
 
@@ -30,7 +28,6 @@ public class Orders {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_discountId")
-    @JsonProperty("discount_id")
     private Discount discount; // Discount applied to the order
 
     @Column(nullable = false)
@@ -199,31 +196,4 @@ public class Orders {
     public String getCustomerEmail() {
         return this.member.getEmail(); // Assuming 'member' has a method 'getEmail()'
     }
-
-    public void setCartId(int cartId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setCartId'");
-    }
-
-    public void setMemberId(int memberId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setMemberId'");
-    }
-
-    private List<Integer> selectedItems;
-
-    // 其他屬性和方法
-
-    public List<Integer> getSelectedItems() {
-        return selectedItems;
-    }
-
-    public void setSelectedItems(List<Integer> selectedItems) {
-        this.selectedItems = selectedItems;
-    }
-
-    public Integer getMemberId() {
-        return this.member != null ? this.member.getId() : null; // 如果 member 为 null，则返回 null
-    }
-
 }

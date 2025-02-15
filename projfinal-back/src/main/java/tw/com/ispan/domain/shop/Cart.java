@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -33,7 +32,6 @@ public class Cart implements Serializable {
 
     @OneToOne // One member can only have one cart
     @JoinColumn(name = "FK_memberId", nullable = false)
-    @JsonProperty("member_id")
     private Member member; // The member related to this cart
 
     @Column(name = "lastUpdatedDate", nullable = false)

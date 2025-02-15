@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
@@ -35,6 +37,7 @@ import tw.com.ispan.domain.pet.banner.Banner;
 })
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "lostCaseId")
 // 使用lostCaseId作為唯一標識符
+@JsonIgnoreProperties({ "member", "casePictures", "follows", "reportCases" })
 public class LostCase {
 
     @Id
@@ -47,6 +50,7 @@ public class LostCase {
     // 關聯到 Member 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "memberId", nullable = true, foreignKey = @ForeignKey(name = "FK_LostCase_Member"))
+    // @JsonIgnore
     private Member member;
 
     // 關聯到 Species 表，雙向多對一
@@ -77,7 +81,7 @@ public class LostCase {
     private Integer age;
 
     @Column(name = "microChipNumber")
-    private Integer microChipNumber;
+    private String microChipNumber;
 
     // 關聯到 City 表，雙向多對一
     @ManyToOne(cascade = { CascadeType.PERSIST })
@@ -132,10 +136,10 @@ public class LostCase {
     private String featureDescription;
 
     // 必填
-    // 關聯到CasePicture表，單向一對多，註釋在這但rescueCaseId外鍵會在CasePicture表中
+    // 關聯到CasePicture表，單向一對多，註釋在這但lostCaseId外鍵會在CasePicture表中
     // 當初設計一個case需放多張圖，由於想要減少表格數??? 把不同case的圖都放在同一張表，因此雖然設立3個case外鍵，但都須設為null
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "lostCase", foreignKey = @ForeignKey(name = "FK_CasePicture_LostCase"))
+    @JoinColumn(name = "lostCaseId", foreignKey = @ForeignKey(name = "FK_CasePicture_LostCase"))
     private List<CasePicture> casePictures;
 
     // 關聯到follow表(為會員和案件的追蹤中介表) 雙向一對多
@@ -155,6 +159,7 @@ public class LostCase {
     private String caseUrl;
 
     @OneToOne(mappedBy = "lostCase", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Banner banner;
 
     @Column(name = "isHidden", nullable = false)
@@ -259,11 +264,11 @@ public class LostCase {
         this.age = age;
     }
 
-    public Integer getMicroChipNumber() {
+    public String getMicroChipNumber() {
         return microChipNumber;
     }
 
-    public void setMicroChipNumber(Integer microChipNumber) {
+    public void setMicroChipNumber(String microChipNumber) {
         this.microChipNumber = microChipNumber;
     }
 

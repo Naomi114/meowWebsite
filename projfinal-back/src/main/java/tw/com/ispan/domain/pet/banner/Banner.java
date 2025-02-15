@@ -26,15 +26,15 @@ public class Banner {
     private BannerType bannerType;
 
     @OneToOne
-    @JoinColumn(name = "lostCaseId", nullable = true)
+    @JoinColumn(name = "lostCaseId", nullable = true, foreignKey = @ForeignKey(name = "FK_Banner_LostCase"))
     private LostCase lostCase;
 
     @OneToOne
-    @JoinColumn(name = "adoptionCaseId", nullable = true)
+    @JoinColumn(name = "adoptionCaseId", nullable = true, foreignKey = @ForeignKey(name = "FK_Banner_AdoptionCase"))
     private AdoptionCase adoptionCase;
 
     @OneToOne
-    @JoinColumn(name = "rescueCaseId", nullable = true)
+    @JoinColumn(name = "rescueCaseId", nullable = true, foreignKey = @ForeignKey(name = "FK_Banner_RescueCase"))
     private RescueCase rescueCase;
 
     @Column(name = "isHidden", nullable = false)
