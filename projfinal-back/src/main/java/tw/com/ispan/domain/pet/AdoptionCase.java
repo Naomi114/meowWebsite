@@ -117,7 +117,7 @@ public class AdoptionCase {
 
     // 關聯到CasePicture表，單向一對多，外鍵在一方
     @OneToMany
-    @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_CasePicture_AdoptionCase"), nullable = true)
+    @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_CasePicture_AdoptionCase"))
     private List<CasePicture> casePictures;
 
     // 雙向一對多，對應follow表

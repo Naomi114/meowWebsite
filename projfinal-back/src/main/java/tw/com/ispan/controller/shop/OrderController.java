@@ -67,6 +67,17 @@ public class OrderController {
         }
     }
 
+    @PostMapping("/cancel")
+    public ResponseEntity<String> cancelOrder(@RequestParam int orderId) {
+        boolean success = orderService.cancelOrder(orderId);
+
+        if (success) {
+            return ResponseEntity.ok("訂單已成功取消");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("訂單無法取消，只有待支付的訂單可以取消");
+        }
+    }
+
     /**
      * 取得訂單詳情
      */

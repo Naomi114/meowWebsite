@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "order_item")
+@Table(name = "OrderItem")
 public class OrderItem {
 
     @Id
@@ -15,12 +15,12 @@ public class OrderItem {
     private Integer orderItemId; // 訂單項目 ID
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
+    @JoinColumn(name = "FK_orderId", nullable = false)
     @JsonBackReference // 防止序列化時的循環引用
     private Orders order; // 關聯到 Orders
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "FK_productId", nullable = false)
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" }) // 避免 Hibernate 懶加載問題
     private Product product; // 關聯到商品
 

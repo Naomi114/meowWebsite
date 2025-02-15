@@ -20,7 +20,7 @@ import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 
 @Entity
-@Table(name = "cart")
+@Table(name = "Cart")
 // @JsonIgnoreProperties({ "cart", "member" })
 
 public class Cart implements Serializable {
@@ -31,7 +31,7 @@ public class Cart implements Serializable {
     private Integer cartId; // This is the primary key field
 
     @OneToOne // One member can only have one cart
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "FK_memberId", nullable = false)
     private Member member; // The member related to this cart
 
     @Column(name = "lastUpdatedDate", nullable = false)
