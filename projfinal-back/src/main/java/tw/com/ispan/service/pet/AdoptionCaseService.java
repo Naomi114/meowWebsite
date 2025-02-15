@@ -80,8 +80,8 @@ public class AdoptionCaseService {
                 adoptionCase.setSterilization(param.getString("sterilization"));
                 adoptionCase.setAge(param.optInt("age", -1));
                 adoptionCase.setMicroChipNumber(param.optInt("microChipNumber", -1));
-                adoptionCase.setLatitude(param.getDouble("latitude"));
-                adoptionCase.setLongitude(param.getDouble("longitude"));
+                // adoptionCase.setLatitude(param.getDouble("latitude"));
+                // adoptionCase.setLongitude(param.getDouble("longitude"));
 
                 adoptionCase.setCaseState(caseStateRepository.findById(5)
                                 .orElseThrow(() -> new IllegalArgumentException("案件狀態不存在")));

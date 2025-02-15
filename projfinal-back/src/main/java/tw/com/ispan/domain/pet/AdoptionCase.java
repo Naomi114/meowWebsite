@@ -94,7 +94,7 @@ public class AdoptionCase {
     @Column(columnDefinition = "NVARCHAR(10)", name = "name")
     private String name;
     // 10位數，8位小數
-    @Column(name = "latitude", precision = 10, nullable = false)
+    @Column(name = "latitude", precision = 10, nullable = true)
     private Double latitude;
 
     @Column(name = "isHidden", nullable = true)
@@ -102,7 +102,7 @@ public class AdoptionCase {
 
     // 必填
     // 11位數，8位小數
-    @Column(name = "longitude", precision = 11, nullable = false)
+    @Column(name = "longitude", precision = 11, nullable = true)
     private Double longitude;
 
     @Column(name = "viewCount")
