@@ -64,13 +64,13 @@ public class LostCase {
     @JoinColumn(name = "furColorId", foreignKey = @ForeignKey(name = "FK_LostCase_FurColor"))
     private FurColor furColor;
 
-    @Column(columnDefinition = "NVARCHAR(5)", name = "petName")
+    @Column(columnDefinition = "NVARCHAR(10)", name = "petName")
     private String name;
 
     @Column(columnDefinition = "NVARCHAR(5)", name = "gender")
     private String gender;
 
-    @Column(columnDefinition = "NVARCHAR(5)", name = "sterilization", nullable = false)
+    @Column(columnDefinition = "NVARCHAR(5)", name = "sterilization")
     private String sterilization;
 
     @Column(name = "age")

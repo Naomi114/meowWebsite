@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.dto.shop.CategoryRequest;
@@ -132,9 +132,9 @@ public class CategoryService {
             List<Product> products = productRepository.findByCategory(category);
 
             // ✅ 確保包含 images[]，轉換 Product 為 ProductDTO
-            List<ProductDTO> productDTOs = products.stream()
-                    .map(ProductDTO::new) // 使用 ProductDTO 構造函數轉換，確保 images[] 存在
-                    .collect(Collectors.toList());
+            // List<ProductDTO> productDTOs = products.stream()
+            // .map(ProductDTO::new) // 使用 ProductDTO 構造函數轉換，確保 images[] 存在
+            // .collect(Collectors.toList());
 
             // ✅ 設定回應
             response.setCategoryId(category.getCategoryId());

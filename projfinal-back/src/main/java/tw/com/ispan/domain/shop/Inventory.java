@@ -39,7 +39,7 @@ public class Inventory {
     private LocalDateTime endAt;
 
     @ManyToOne
-    @JoinColumn(name = "adminId", nullable = false)
+    @JoinColumn(name = "FK_adminId", nullable = false)
     private Admin admin;
 
     // 單向一對多關聯
