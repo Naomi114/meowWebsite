@@ -476,4 +476,21 @@ public class ProductService {
 
 		return new ProductResponse(true, "查詢成功", productDTOs);
 	}
+
+	public void decreaseStock(Integer productId, int quantity) {
+		// 確認商品存在
+		Product product = productRepository.findById(productId)
+				.orElseThrow(() -> new RuntimeException("商品不存在，ID: " + productId));
+
+		// 檢查庫存是否足夠
+		if (product.getStockQuantity() < quantity) {
+			throw new RuntimeException("庫存不足，無法扣除 " + quantity + " 數量");
+		}
+
+		// 扣除庫存
+		product.setStockQuantity(product.getStockQuantity() - quantity);
+		productRepository.save(product); // 儲存變更到資料庫
+
+		System.out.println("成功扣除商品 " + product.getProductName() + " 的 " + quantity + " 數量");
+	}
 }
