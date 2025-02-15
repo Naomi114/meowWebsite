@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import tw.com.ispan.domain.shop.Product;
 import tw.com.ispan.domain.shop.ProductImage;
 
-// 用於封裝 Product 的資料，確保 imageUrls 存在
+// 用於封裝 Product 的資料，確保 imageUrls、categoryId 存在
 public class ProductDTO {
     private Integer productId;
     private String productName;
@@ -18,7 +18,9 @@ public class ProductDTO {
     private String unit;
     private String status;
     private LocalDate expire;
-    private List<String> imageUrls; // ✅ 用於 API 回應圖片 URL
+    private List<String> imageUrls;
+    private Integer categoryId; // ✅ 直接回傳 categoryId
+    private List<TagDTO> tags; // ✅ 加入標籤列
 
     // ✅ 透過 Product Entity 建立 DTO
     public ProductDTO(Product product) {
@@ -34,6 +36,14 @@ public class ProductDTO {
 
         // ✅ 取得最多 5 張圖片 URL
         this.imageUrls = extractImageUrls(product);
+
+        // ✅ 取得 categoryId
+        this.categoryId = product.getCategory() != null ? product.getCategory().getCategoryId() : null;
+
+        // ✅ 轉換 tags
+        this.tags = product.getTags() != null
+                ? product.getTags().stream().map(TagDTO::new).collect(Collectors.toList())
+                : null;
     }
 
     // ✅ 取得 `imageUrls`
@@ -125,6 +135,22 @@ public class ProductDTO {
 
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public List<TagDTO> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<TagDTO> tags) {
+        this.tags = tags;
     }
 
 }

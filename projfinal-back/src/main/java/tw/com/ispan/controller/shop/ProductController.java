@@ -55,17 +55,16 @@ public class ProductController {
     private ProductRepository productRepository;
 
     // public ProductController(ProductService productService) {
-    //     this.productService = productService;
+    // this.productService = productService;
     // }
 
     // 分頁及價格排序
     @GetMapping("/paged")
     public ResponseEntity<?> getPagedProducts(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "productName") String sortBy,
-        @RequestParam(defaultValue = "asc") String order
-    ) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "productName") String sortBy,
+            @RequestParam(defaultValue = "asc") String order) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sortBy));
         Page<Product> productPage = productRepository.findAll(pageable);
 
@@ -77,7 +76,6 @@ public class ProductController {
 
         return ResponseEntity.ok(response);
     }
-
 
     // 新增商品
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -136,41 +134,41 @@ public class ProductController {
     // 使用 List<ProductDTO> 來封裝回應 → 確保前端可以接收多個商品
     // @PostMapping("/search")
     // public ProductResponse findBatch(@RequestBody ProductFilter filter) {
-    //     // ✅ 使用 Service 查詢 `List<Product>`
-    //     List<Product> filteredProducts = productService.findProductsByFilter(filter);
+    // // ✅ 使用 Service 查詢 `List<Product>`
+    // List<Product> filteredProducts = productService.findProductsByFilter(filter);
 
-    //     // ✅ 轉換 `List<Product>` 為 `List<ProductDTO>`
-    //     List<ProductDTO> productDTOs = filteredProducts.stream()
-    //         .map(ProductDTO::new)  // ✅ 使用 `ProductDTO` 建構子進行轉換
-    //         .collect(Collectors.toList());
+    // // ✅ 轉換 `List<Product>` 為 `List<ProductDTO>`
+    // List<ProductDTO> productDTOs = filteredProducts.stream()
+    // .map(ProductDTO::new) // ✅ 使用 `ProductDTO` 建構子進行轉換
+    // .collect(Collectors.toList());
 
-    //     return ProductResponse.ok(productDTOs);
+    // return ProductResponse.ok(productDTOs);
     // }
-
-    @PostMapping("/search")
-    public ProductResponse findBatch(@RequestBody ProductFilter filter) {
-        List<ProductDTO> filteredProducts = productService.findProductsByFilter(filter);
-        return new ProductResponse(filteredProducts); // ✅ 確保回傳前端 { products: [...] }
-    }
 
     // @PostMapping("/search")
     // public ProductResponse findBatch(@RequestBody ProductFilter filter) {
-    //     ProductResponse response = new ProductResponse();
-        
-    //     // ✅ 調用 Service 層來處理篩選
-    //     List<Product> filteredProducts = productService.searchProducts(filter);
-        
-    //     response.setProductfilter(filteredProducts);
-    //     return response;
+    // List<ProductDTO> filteredProducts =
+    // productService.findProductsByFilter(filter);
+    // return new ProductResponse(filteredProducts); // ✅ 確保回傳前端 { products: [...] }
     // }
 
+    // 搜尋商品:商品關鍵字+價格區間+類別+標籤
+    @PostMapping("/search")
+    public ResponseEntity<ProductResponse> findBatch(@RequestBody ProductFilter filter) {
+        List<ProductDTO> filteredProducts = productService.findProductsByFilter(filter);
 
-    // 搜尋所有商品 (by Mark)
+        if (filteredProducts.isEmpty()) {
+            return ResponseEntity.ok(new ProductResponse(false, "未找到符合條件的商品"));
+        }
+
+        return ResponseEntity.ok(new ProductResponse(true, "查詢成功", filteredProducts));
+    }
+
+    // 查詢所有商品: 改為傳回 ProductDTO格式(包含類別和標籤陣列) by Noami
     @GetMapping
     public ResponseEntity<ProductResponse> getAllProducts() {
-        ProductResponse response = productService.findAll();
-        return response.getSuccess() ? ResponseEntity.ok(response)
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        ProductResponse response = productService.getAllProducts();
+        return ResponseEntity.ok(response);
     }
 
 }

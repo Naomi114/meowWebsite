@@ -2,22 +2,17 @@ package tw.com.ispan.dto.shop;
 
 import java.util.List;
 
-import tw.com.ispan.domain.shop.Category;
-import tw.com.ispan.domain.shop.Product;
-
 public class CategoryResponse {
     private Boolean success;
     private String message;
-    private List<Product> products;
-    private List<Category> categories;
+    private List<CategoryDTO> categories;
 
     public CategoryResponse() {
     }
 
-    public CategoryResponse(Boolean success, String message, List<Product> products, List<Category> categories) {
+    public CategoryResponse(Boolean success, String message, List<CategoryDTO> categories) {
         this.success = success;
         this.message = message;
-        this.products = products;
         this.categories = categories;
     }
 
@@ -37,19 +32,11 @@ public class CategoryResponse {
         this.message = message;
     }
 
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
-
-    public List<Category> getCategories() {
+    public List<CategoryDTO> getCategories() {
         return categories;
     }
 
-    public void setCategories(List<Category> categories) {
+    public void setCategories(List<CategoryDTO> categories) {
         this.categories = categories;
     }
 
