@@ -180,7 +180,7 @@ public class LostCaseService {
         lostCase.setLastUpdateTime(LocalDateTime.now());
 
         // **關聯圖片**
-        lostCase.setCasePictures(casePictures);
+        // lostCase.setCasePictures(casePictures);
 
         // **先存儲 LostCase**
         LostCase savedLostCase = lostCaseRepository.save(lostCase);
