@@ -24,7 +24,7 @@ import tw.com.ispan.service.pet.LostCaseService;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/lostcases")
+@RequestMapping("/api/lostcases")
 public class LostCaseController {
     @Autowired
     private LostCaseService lostCaseService;
