@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/pages/ecpay") // ECPay 路徑
+@RequestMapping("/api/pages/ecpay") // ECPay 路徑
 public class EcpayController {
 
     @Autowired
