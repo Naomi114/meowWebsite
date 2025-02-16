@@ -138,12 +138,12 @@ public class CategoryService {
             List<Product> products = productRepository.findByCategory(category);
 
             // 確保包含 images[]，轉換 Product 為 ProductDTO
-            List<ProductDTO> productDTOs = products.stream()
-                    .map(ProductDTO::new) // 使用 ProductDTO 構造函數轉換，確保 images[] 存在
-                    .collect(Collectors.toList());
+            // List<ProductDTO> productDTOs = products.stream()
+            // .map(ProductDTO::new) // 使用 ProductDTO 構造函數轉換，確保 images[] 存在
+            // .collect(Collectors.toList());
 
             // 轉換為 CategoryDTO
-            CategoryDTO categoryDTO = new CategoryDTO(category, productDTOs);
+            CategoryDTO categoryDTO = new CategoryDTO(category);
 
             // 設置 Response
             response.setCategories(Collections.singletonList(categoryDTO));
@@ -176,11 +176,11 @@ public class CategoryService {
             List<CategoryDTO> categoryDTOs = categories.stream()
                     .map(category -> {
                         // 🔹 查詢該類別的商品並轉換為 `ProductDTO`
-                        List<ProductDTO> productDTOs = category.getProducts().stream()
-                                .map(ProductDTO::new) // 確保 `ProductDTO` 正確轉換
-                                .collect(Collectors.toList());
+                        // List<ProductDTO> productDTOs = category.getProducts().stream()
+                        // .map(ProductDTO::new) // 確保 `ProductDTO` 正確轉換
+                        // .collect(Collectors.toList());
 
-                        return new CategoryDTO(category, productDTOs);
+                        return new CategoryDTO(category);
                     })
                     .collect(Collectors.toList());
 
@@ -213,11 +213,11 @@ public class CategoryService {
             List<CategoryDTO> categoryDTOs = categories.stream()
                     .map(category -> {
                         // 🔹 查詢該類別的商品並轉換為 `ProductDTO`
-                        List<ProductDTO> productDTOs = category.getProducts().stream()
-                                .map(ProductDTO::new) // 確保 `ProductDTO` 正確轉換
-                                .collect(Collectors.toList());
+                        // List<ProductDTO> productDTOs = category.getProducts().stream()
+                        // .map(ProductDTO::new) // 確保 `ProductDTO` 正確轉換
+                        // .collect(Collectors.toList());
 
-                        return new CategoryDTO(category, productDTOs);
+                        return new CategoryDTO(category);
                     })
                     .collect(Collectors.toList());
 

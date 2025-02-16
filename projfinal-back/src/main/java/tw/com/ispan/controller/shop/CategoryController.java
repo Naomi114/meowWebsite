@@ -21,7 +21,7 @@ import tw.com.ispan.dto.shop.CategoryResponse;
 import tw.com.ispan.service.shop.CategoryService;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/api/categories")
 @CrossOrigin
 public class CategoryController {
 
