@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
+import tw.com.ispan.dto.shop.CategoryDTO;
 import tw.com.ispan.dto.shop.CategoryRequest;
 import tw.com.ispan.dto.shop.CategoryResponse;
 import tw.com.ispan.dto.shop.ProductDTO;
@@ -60,7 +61,10 @@ public class CategoryService {
                 }
                 categoryRepository.saveAndFlush(category); // ✅ 確保立即儲存，避免 ID 遺失
             }
-            response.setCategories(Collections.singletonList(category)); // category 物件轉成 List
+            Category updatedCategory = categoryRepository.save(category);
+
+            CategoryDTO categoryDTO = new CategoryDTO(updatedCategory); // 將 category 轉換為 CategoryDTO
+            response.setCategories(Collections.singletonList(categoryDTO));
             response.setSuccess(true);
             response.setMessage("類別操作成功");
         } catch (Exception e) {
@@ -102,10 +106,12 @@ public class CategoryService {
                 category.setCategoryName(request.getCategoryName());
                 category.setCategoryDescription(request.getCategoryDescription());
                 category.setDefaultUnit(request.getDefaultUnit());
+
                 Category updatedCategory = categoryRepository.save(category);
 
-                // 設置返回
-                response.setCategories(Collections.singletonList(updatedCategory));
+                // ✅ 修正這裡，將 category 轉換為 CategoryDTO
+                CategoryDTO categoryDTO = new CategoryDTO(updatedCategory);
+                response.setCategories(Collections.singletonList(categoryDTO));
                 response.setSuccess(true);
                 response.setMessage("類別描述更新成功");
             } else {
@@ -131,13 +137,16 @@ public class CategoryService {
             // 取得該類別下的所有商品
             List<Product> products = productRepository.findByCategory(category);
 
-            // ✅ 確保包含 images[]，轉換 Product 為 ProductDTO
+            // 確保包含 images[]，轉換 Product 為 ProductDTO
             // List<ProductDTO> productDTOs = products.stream()
             // .map(ProductDTO::new) // 使用 ProductDTO 構造函數轉換，確保 images[] 存在
             // .collect(Collectors.toList());
 
-            // ✅ 設定回應
-            response.setProducts(products);
+            // 轉換為 CategoryDTO
+            CategoryDTO categoryDTO = new CategoryDTO(category);
+
+            // 設置 Response
+            response.setCategories(Collections.singletonList(categoryDTO));
             response.setSuccess(true);
             response.setMessage("查詢成功");
 
@@ -154,6 +163,7 @@ public class CategoryService {
     public CategoryResponse findCategoriesWithProducts(String keyword) {
         CategoryResponse response = new CategoryResponse();
         try {
+            // 1️⃣ 查詢名稱符合關鍵字的類別
             List<Category> categories = categoryRepository.findByCategoryNameContaining(keyword);
 
             if (categories.isEmpty()) {
@@ -161,20 +171,36 @@ public class CategoryService {
                 response.setMessage("沒有匹配的類別");
                 return response;
             }
+
+            // 2️⃣ 將 `Category` 轉為 `CategoryDTO`
+            List<CategoryDTO> categoryDTOs = categories.stream()
+                    .map(category -> {
+                        // 🔹 查詢該類別的商品並轉換為 `ProductDTO`
+                        // List<ProductDTO> productDTOs = category.getProducts().stream()
+                        // .map(ProductDTO::new) // 確保 `ProductDTO` 正確轉換
+                        // .collect(Collectors.toList());
+
+                        return new CategoryDTO(category);
+                    })
+                    .collect(Collectors.toList());
+
+            // 3️⃣ 設置回應
             response.setSuccess(true);
             response.setMessage("模糊查詢成功");
-            response.setCategories(categories);
+            response.setCategories(categoryDTOs);
         } catch (Exception e) {
             response.setSuccess(false);
             response.setMessage("模糊查詢失敗: " + e.getMessage());
+            e.printStackTrace();
         }
         return response;
     }
 
-    // 獲取所有類別
+    // 查詢所有類別
     public CategoryResponse getAllCategories() {
         CategoryResponse response = new CategoryResponse();
         try {
+            // 1️⃣ 查詢所有類別
             List<Category> categories = categoryRepository.findAll();
 
             if (categories.isEmpty()) {
@@ -182,12 +208,27 @@ public class CategoryService {
                 response.setMessage("沒有可用的類別");
                 return response;
             }
+
+            // 2️⃣ 轉換 `Category` → `CategoryDTO`
+            List<CategoryDTO> categoryDTOs = categories.stream()
+                    .map(category -> {
+                        // 🔹 查詢該類別的商品並轉換為 `ProductDTO`
+                        // List<ProductDTO> productDTOs = category.getProducts().stream()
+                        // .map(ProductDTO::new) // 確保 `ProductDTO` 正確轉換
+                        // .collect(Collectors.toList());
+
+                        return new CategoryDTO(category);
+                    })
+                    .collect(Collectors.toList());
+
+            // 3️⃣ 設置回應
             response.setSuccess(true);
             response.setMessage("成功獲取類別清單");
-            response.setCategories(categories);
+            response.setCategories(categoryDTOs);
         } catch (Exception e) {
             response.setSuccess(false);
             response.setMessage("獲取類別失敗: " + e.getMessage());
+            e.printStackTrace();
         }
         return response;
     }

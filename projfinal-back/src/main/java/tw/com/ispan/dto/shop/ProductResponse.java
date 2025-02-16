@@ -1,40 +1,38 @@
 package tw.com.ispan.dto.shop;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
-import tw.com.ispan.domain.shop.Product;
 
 // 輸出DTO: 返回給前端的數據，經過計算或格式化
 public class ProductResponse {
     private Boolean success;
     private String message;
-    private ProductDTO product;
-    // private List<Product> productfilter;
-    private List<ProductDTO> products;
-    // private Long count;
+    private ProductDTO product; // ✅ 單筆商品時使用
+    private List<ProductDTO> products; // ✅ 多筆商品時使用
 
     public ProductResponse() {
     }
 
-    public ProductResponse(List<ProductDTO> products) {
-        this.products = products;
-    }
-
+    // 無 product 的建構子: 適用 product 為 null 的狀況
     public ProductResponse(Boolean success, String message) {
         this.success = success;
         this.message = message;
+        this.product = null;
     }
 
-    public ProductResponse(Boolean success, String message, List<Product> products, Long count) {
+    // 單筆商品建構子
+    public ProductResponse(Boolean success, String message, ProductDTO product) {
         this.success = success;
         this.message = message;
-        // this.count = count;
+        this.product = product;
+        this.products = null; // 確保不會有兩個屬性同時存在
+    }
 
-        // ✅ 轉換 `Product` 為 `ProductDTO`
-        // this.products = products.stream()
-        //         .map(ProductDTO::new)
-        //         .collect(Collectors.toList());
+    // 多筆商品建構子
+    public ProductResponse(Boolean success, String message, List<ProductDTO> products) {
+        this.success = success;
+        this.message = message;
+        this.products = products;
+        this.product = null; // 確保不會有兩個屬性同時存在
     }
 
     public Boolean getSuccess() {
@@ -53,14 +51,6 @@ public class ProductResponse {
         this.message = message;
     }
 
-    // public Long getCount() {
-    //     return count;
-    // }
-
-    // public void setCount(Long count) {
-    //     this.count = count;
-    // }
-
     public ProductDTO getProduct() {
         return product;
     }
@@ -69,14 +59,6 @@ public class ProductResponse {
         this.product = product;
     }
 
-    // public List<Product> getProductfilter() {
-    //     return productfilter;
-    // }
-
-    // public void setProductfilter(List<Product> productfilter) {
-    //     this.productfilter = productfilter;
-    // }
-
     public List<ProductDTO> getProducts() {
         return products;
     }
@@ -84,7 +66,5 @@ public class ProductResponse {
     public void setProducts(List<ProductDTO> products) {
         this.products = products;
     }
-
-
 
 }

@@ -91,8 +91,10 @@ public class AdoptionCase {
     @Column(name = "street", columnDefinition = "NVARCHAR(50)")
     private String street;
 
+    @Column(columnDefinition = "NVARCHAR(10)", name = "name")
+    private String name;
     // 10位數，8位小數
-    @Column(name = "latitude", precision = 10, nullable = false)
+    @Column(name = "latitude", precision = 10, nullable = true)
     private Double latitude;
 
     @Column(name = "isHidden", nullable = true)
@@ -100,7 +102,7 @@ public class AdoptionCase {
 
     // 必填
     // 11位數，8位小數
-    @Column(name = "longitude", precision = 11, nullable = false)
+    @Column(name = "longitude", precision = 11, nullable = true)
     private Double longitude;
 
     @Column(name = "viewCount")
@@ -177,6 +179,7 @@ public class AdoptionCase {
                 ", age=" + age +
                 ", microChipNumber=" + microChipNumber +
                 ", applytitle=" + applytitle +
+                ", name=" + name +
                 ", city=" + city +
                 ", districtArea=" + districtArea +
                 ", street=" + street +
@@ -307,6 +310,14 @@ public class AdoptionCase {
 
     public Integer getMicroChipNumber() {
         return microChipNumber;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setMicroChipNumber(Integer microChipNumber) {

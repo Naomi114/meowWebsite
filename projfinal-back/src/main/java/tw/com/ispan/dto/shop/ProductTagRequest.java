@@ -1,9 +1,7 @@
 package tw.com.ispan.dto.shop;
 
 public class ProductTagRequest {
-
     private String tagName;
-
     private String tagDescription;
 
     public ProductTagRequest() {

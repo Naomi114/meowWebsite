@@ -347,18 +347,13 @@ public class ProductService {
 
 	// 單筆查詢
 	public ProductResponse findSingle(Integer productId) {
-		ProductResponse response = new ProductResponse();
-
 		Optional<Product> productOpt = productRepository.findById(productId);
+
 		if (productOpt.isPresent()) {
-			response.setSuccess(true);
-			response.setProduct(new ProductDTO(productOpt.get()));
-			response.setMessage("查詢成功");
+			return new ProductResponse(true, "查詢成功", new ProductDTO(productOpt.get()));
 		} else {
-			response.setSuccess(false);
-			response.setMessage("商品不存在");
+			return new ProductResponse(false, "商品不存在");
 		}
-		return response;
 	}
 
 	// 動態多條件查詢: Specification類的應用 (沒用到?)
@@ -465,20 +460,21 @@ public class ProductService {
 				.collect(Collectors.toList());
 	}
 
-	// 查詢所有商品 (by Mark)
-	public ProductResponse findAll() {
-		ProductResponse response = new ProductResponse();
+	// 查詢所有商品: 改為傳回 ProductDTO格式(包含類別和標籤陣列) by Noami
+	public ProductResponse getAllProducts() {
 		List<Product> products = productRepository.findAll();
-		List<ProductDTO> productDTOs = new ArrayList<>();
-		for (Product product : products) {
-			productDTOs.add(new ProductDTO(product));
+
+		// 檢查是否有商品
+		if (products.isEmpty()) {
+			return new ProductResponse(false, "沒有找到任何商品", new ArrayList<>());
 		}
 
-		response.setSuccess(!products.isEmpty());
-		response.setProducts(productDTOs);
-		response.setMessage(products.isEmpty() ? "未找到任何商品" : "商品查詢成功");
+		// 轉換為 DTO
+		List<ProductDTO> productDTOs = products.stream()
+				.map(ProductDTO::new)
+				.collect(Collectors.toList());
 
-		return response;
+		return new ProductResponse(true, "查詢成功", productDTOs);
 	}
 
 	public void decreaseStock(Integer productId, int quantity) {
