@@ -77,5 +77,10 @@ public class Cart implements Serializable {
         this.cartItems = cartItems;
     }
 
+    public int getMemberId() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getMemberId'");
+    }
+
   
 }

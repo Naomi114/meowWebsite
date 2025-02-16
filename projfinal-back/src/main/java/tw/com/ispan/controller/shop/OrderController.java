@@ -225,11 +225,7 @@ public ResponseEntity<?> submitOrder(@RequestBody Map<String, Object> requestBod
             memberId = getMemberIdFromSessionStorage(); // 實現從 sessionStorage 取得的邏輯
         }
 
-        // Ensure the cartId belongs to the correct memberId
-        if (!cartService.isCartOwner(cartId, memberId)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("提交失敗: 購物車與會員ID不匹配");
-        }
+       
 
         // 從 requestBody 中獲取選擇的商品
         Object itemsObj = requestBody.get("selectedItems");
