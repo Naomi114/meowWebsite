@@ -17,7 +17,8 @@ import tw.com.ispan.service.pet.ImageService;
 
 //案件單個圖片上傳(冠)
 @RestController
-@RequestMapping(path = { "/Case" })
+
+@RequestMapping(path = { "/api/Case" })
 public class UploadImageController {
 
 	@Autowired
@@ -32,16 +33,18 @@ public class UploadImageController {
 	@PostMapping("/uploadImage")
 	public ResponseEntity<Map<String, String>> uploadImage(@RequestHeader("Authorization") String token,
 			@RequestPart("file") MultipartFile file) throws IOException {
+		System.out.println("接收到的檔案: " + file.getOriginalFilename());
 
 		Map<String, String> response = new HashMap<>();
-
+		System.out.println("response" + response);
 		// 1. 驗證token
+		System.out.println("file" + file);
 
 		// 2. 驗證圖檔格式
 		if (file.isEmpty()) {
 			response.put("status", "400");
 			response.put("message", "檔案不得為空");
-			return ResponseEntity.badRequest().body(response); 
+			return ResponseEntity.badRequest().body(response);
 		}
 		String contentType = file.getContentType();
 		if (contentType == null || !contentType.startsWith("image/")) { // image開頭包含image/jpeg、image/png、image/gif

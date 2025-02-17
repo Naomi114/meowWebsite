@@ -187,7 +187,9 @@ public class Discount {
 
     @Override
     public String toString() {
-        return "Discount [discountId=" + discountId + ", admin=" + admin + ", discountStartTime=" + discountStartTime
+        return "Discount [discountId=" + discountId +
+                ", admin=" + admin +
+                ", discountStartTime=" + discountStartTime
                 + ", discountEndTime=" + discountEndTime + ", minAmount=" + minAmount + ", minQuantity=" + minQuantity
                 + ", priority=" + priority + ", discountStatus=" + discountStatus + ", discountType=" + discountType
                 + ", discountValue=" + discountValue + "]";

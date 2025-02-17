@@ -1,5 +1,6 @@
 package tw.com.ispan.controller.pet;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tw.com.ispan.domain.pet.AdoptionCase;
@@ -20,7 +22,7 @@ import tw.com.ispan.dto.pet.AdoptioncaseDTO;
 import tw.com.ispan.service.pet.AdoptionCaseService;
 
 @RestController
-@RequestMapping("/adoptionsearch")
+@RequestMapping("/api/adoptionsearch")
 public class AdoptionCaseController {
 
     @Autowired
@@ -75,6 +77,18 @@ public class AdoptionCaseController {
         Optional<AdoptionCase> adoptionCase = adoptionCaseService.findById(adoptionCaseId);
         return adoptionCase.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // 获取 AdoptionCase 的数量
+    @GetMapping("/count")
+    public long getAdoptionCaseCountByMemberId(@RequestParam Integer memberId) {
+        return adoptionCaseService.countAdoptionCasesByMemberId(memberId);
+    }
+
+    // 提供获取所有认养案件的 API
+    @GetMapping
+    public List<AdoptionCase> getAdoptionCases() {
+        return adoptionCaseService.getAllAdoptionCases();
     }
 
 }

@@ -39,15 +39,14 @@ public class AdoptionCaseService {
         @Autowired
         private FurColorRepository furColorRepository;
         @Autowired
-        private CityRepository cityRepository; // 新的 City repository
+        private CityRepository cityRepository;
         @Autowired
-        private DistrictAreaRepository districtAreaRepository; // 新的 districtArea repository
+        private DistrictAreaRepository districtAreaRepository;
         @Autowired
         private MemberRepository memberRepository;
         @Autowired
         private SpeciesRepository speciesRepository;
 
-        // 新增
         // 新增
         public AdoptionCase createAdoptionCase(JSONObject param) {
                 System.out.println("接收到的 AdoptionCase: " + param);
@@ -75,7 +74,7 @@ public class AdoptionCaseService {
                                 .orElseThrow(() -> new IllegalArgumentException("無效的 districtAreaId"));
                 adoptionCase.setDistrictArea(districtArea);
 
-                adoptionCase.setStreet(param.getString("street"));
+                // adoptionCase.setStreet(param.getString("street"));
                 adoptionCase.setGender(param.optString("gender", null));
                 adoptionCase.setSterilization(param.getString("sterilization"));
                 adoptionCase.setAge(param.optInt("age", -1));
@@ -99,7 +98,6 @@ public class AdoptionCaseService {
                 adoptionCase.setPublicationTime(LocalDateTime.now());
                 adoptionCase.setLastUpdateTime(LocalDateTime.now());
 
-                // **先存儲 LostCase**
                 AdoptionCase savedAdoptionCase = adoptionCaseRepository.save(adoptionCase);
 
                 return savedAdoptionCase;
@@ -218,12 +216,14 @@ public class AdoptionCaseService {
                                 : adoptionCase.getMicroChipNumber());
 
                 // 修改 latitude
-                adoptionCase.setLatitude(
-                                param.has("latitude") ? param.getDouble("latitude") : adoptionCase.getLatitude());
+                // adoptionCase.setLatitude(
+                // param.has("latitude") ? param.getDouble("latitude") :
+                // adoptionCase.getLatitude());
 
                 // 修改 longitude
-                adoptionCase.setLongitude(
-                                param.has("longitude") ? param.getDouble("longitude") : adoptionCase.getLongitude());
+                // adoptionCase.setLongitude(
+                // param.has("longitude") ? param.getDouble("longitude") :
+                // adoptionCase.getLongitude());
 
                 // 修改 donationAmount
                 adoptionCase.setDonationAmount(param.has("donationAmount") ? param.getInt("donationAmount")
@@ -253,4 +253,15 @@ public class AdoptionCaseService {
         public Optional<AdoptionCase> findById(Integer adoptionCaseId) {
                 return adoptionCaseRepository.findById(adoptionCaseId);
         }
+
+        // 根据 memberId 获取 AdoptionCase 的数量
+        public long countAdoptionCasesByMemberId(Integer memberId) {
+                return adoptionCaseRepository.countByMemberId(memberId);
+        }
+
+        // 获取所有认养案件
+        public List<AdoptionCase> getAllAdoptionCases() {
+                return adoptionCaseRepository.findAll();
+        }
+
 }

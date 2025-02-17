@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,16 +16,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import tw.com.ispan.domain.pet.CasePicture;
 import tw.com.ispan.domain.pet.LostCase;
+import tw.com.ispan.dto.pet.LostSearchCriteria;
 import tw.com.ispan.service.pet.ImageService;
 import tw.com.ispan.service.pet.LostCaseService;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/lostcases")
+@RequestMapping("/api/lostcases")
 public class LostCaseController {
     @Autowired
     private LostCaseService lostCaseService;
@@ -116,12 +120,33 @@ public class LostCaseController {
     }
 
     /**
-     * 查詢符合條件的 LostCase（支援模糊查詢、分頁與排序）
+     * 🔍 搜尋失蹤案件（支援關鍵字模糊查詢 + 篩選條件）
      */
     @PostMapping("/search")
-    public ResponseEntity<Page<LostCase>> searchLostCases(@RequestBody String json) {
-        JSONObject param = new JSONObject(json);
-        Page<LostCase> cases = lostCaseService.searchLostCases(param);
-        return ResponseEntity.ok(cases);
+    public ResponseEntity<Page<LostCase>> searchLostCases(@RequestBody @Valid LostSearchCriteria criteria) {
+        try {
+            System.out.println("🔎 收到搜尋請求：" + criteria.toString());
+            Page<LostCase> result = lostCaseService.searchLostCases(criteria);
+
+            if (result.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            System.err.println("❌ 查詢失敗：" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    /**
+     * 取得所有遺失案件（支援排序）
+     *
+     * @param dir 排序方向 (true = desc, false = asc)
+     * @return 遺失案件列表
+     */
+    @GetMapping("/all")
+    public List<LostCase> getAllLostCases(@RequestParam(defaultValue = "true") boolean dir) {
+        return lostCaseService.getAll(dir);
     }
 }
