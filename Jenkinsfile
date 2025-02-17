@@ -36,7 +36,7 @@ pipeline {
             steps {
                 sh "docker image prune -f"
                 sh '''
-                IMAGES=$(docker images -q leekuanju/meowfrontend)
+                IMAGES=$(docker images -q leekuanju/meowbackend)
                 if [ -n "$IMAGES" ]; then
                     echo "刪除舊的 Docker 映像檔: $IMAGES"
                     echo "$IMAGES" | xargs -r docker rmi -f
