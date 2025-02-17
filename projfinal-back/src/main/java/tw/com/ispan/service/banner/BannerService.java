@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import tw.com.ispan.domain.pet.AdoptionCase;
+import tw.com.ispan.domain.pet.CasePicture;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.domain.pet.banner.Banner;
@@ -33,8 +34,6 @@ public class BannerService {
     private RescueCaseRepository rescueCaseRepository;
     @Autowired
     private AdoptionCaseRepository adoptionCaseRepository;
-    // @Autowired
-    // private CasePictureRepository casePictureRepository;
 
     public List<BannerDTO> getAllBanners() {
         List<Banner> banners = bannerRepository.findAll();
@@ -49,38 +48,57 @@ public class BannerService {
     private BannerDTO mapToBannerDTO(Banner banner) {
         BannerDTO dto = new BannerDTO();
         dto.setBannerId(banner.getBannerId());
-        dto.setBannerType(banner.getBannerType().name()); // ✅ Enum 轉 String
+        dto.setBannerType(banner.getBannerType().name());
         dto.setOnlineDate(banner.getOnlineDate());
 
-        // ✅ 根據 bannerType 取對應的 caseTitle 和 imageUrl
-        switch (banner.getBannerType().name()) {
-            case "LOST":
-                lostCaseRepository.findById(banner.getLostCaseId()).ifPresent(lostCase -> {
-                    dto.setCaseTitle(lostCase.getCaseTitle());
-                    // casePictureRepository.findByLostCaseId(lostCase.getLostCaseId())
-                    // .ifPresent(casePicture -> dto.setPictureUrl(casePicture.getPictureUrl())); //
-                    // ✅ 取得圖片
-                });
+        // ✅ 根據 bannerType 設定對應的 caseId、caseTitle 和 picture
+        switch (banner.getBannerType()) {
+            case LOST:
+                if (banner.getLostCase() != null) {
+                    dto.setLostCaseId(banner.getLostCase().getLostCaseId()); // ✅ 設定 LostCaseId
+                    dto.setCaseTitle(banner.getLostCase().getCaseTitle());
+
+                    // 🔹 取得 CasePictures 列表的第一張圖片
+                    if (banner.getLostCase().getCasePictures() != null
+                            && !banner.getLostCase().getCasePictures().isEmpty()) {
+                        CasePicture firstPicture = banner.getLostCase().getCasePictures().get(0);
+                        dto.setPictureUrl(firstPicture.getPictureUrl());
+                        dto.setPictureId(firstPicture.getCasePictureId());
+                    }
+                }
                 break;
 
-            case "RESCUE":
-                rescueCaseRepository.findById(banner.getRescueCaseId()).ifPresent(rescueCase -> {
-                    dto.setCaseTitle(rescueCase.getCaseTitle());
-                    // casePictureRepository.findByRescueCaseId(rescueCase.getRescueCaseId())
-                    // .ifPresent(casePicture -> dto.setPictureUrl(casePicture.getPictureUrl())); //
-                    // ✅ 取得圖片
-                });
+            case RESCUE:
+                if (banner.getRescueCase() != null) {
+                    dto.setRescueCaseId(banner.getRescueCase().getRescueCaseId()); // ✅ 設定 RescueCaseId
+                    dto.setCaseTitle(banner.getRescueCase().getCaseTitle());
+
+                    // 🔹 取得 CasePictures 列表的第一張圖片
+                    if (banner.getRescueCase().getCasePictures() != null
+                            && !banner.getRescueCase().getCasePictures().isEmpty()) {
+                        CasePicture firstPicture = banner.getRescueCase().getCasePictures().get(0);
+                        dto.setPictureUrl(firstPicture.getPictureUrl());
+                        dto.setPictureId(firstPicture.getCasePictureId());
+                    }
+                }
                 break;
 
-            case "ADOPT":
-                adoptionCaseRepository.findById(banner.getAdoptionCaseId()).ifPresent(adoptCase -> {
-                    dto.setCaseTitle(adoptCase.getCaseTitle());
-                    // casePictureRepository.findByAdoptionCaseId(adoptCase.getAdoptionCaseId())
-                    // .ifPresent(casePicture -> dto.setPictureUrl(casePicture.getPictureUrl())); //
-                    // ✅ 取得圖片
-                });
+            case ADOPTION:
+                if (banner.getAdoptionCase() != null) {
+                    dto.setAdoptionCaseId(banner.getAdoptionCase().getAdoptionCaseId()); // ✅ 設定 AdoptionCaseId
+                    dto.setCaseTitle(banner.getAdoptionCase().getCaseTitle());
+
+                    // 🔹 取得 CasePictures 列表的第一張圖片
+                    if (banner.getAdoptionCase().getCasePictures() != null
+                            && !banner.getAdoptionCase().getCasePictures().isEmpty()) {
+                        CasePicture firstPicture = banner.getAdoptionCase().getCasePictures().get(0);
+                        dto.setPictureUrl(firstPicture.getPictureUrl());
+                        dto.setPictureId(firstPicture.getCasePictureId());
+                    }
+                }
                 break;
         }
+
         return dto;
     }
 
