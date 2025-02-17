@@ -17,7 +17,7 @@ import tw.com.ispan.dto.GoogleLoginResponseDTO;
 import tw.com.ispan.service.google.GoogleOAuthService;
 
 @RestController
-@RequestMapping("/ajax/secure")
+@RequestMapping("/api/ajax/secure")
 public class GoogleLoginController {
 
     @Autowired

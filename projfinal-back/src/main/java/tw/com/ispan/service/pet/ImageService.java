@@ -125,6 +125,7 @@ public class ImageService {
 				// 移動檔案
 				Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
 				System.out.println("檔案已成功移動到：" + targetPath);
+
 				finalUrl.add(targetPath.toString().replace("\\", "/")); // 確保使用 `/`
 
 			} catch (IOException e) {

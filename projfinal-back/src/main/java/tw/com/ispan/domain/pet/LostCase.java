@@ -123,16 +123,14 @@ public class LostCase {
     @Column(name = "lastUpdateTime", nullable = false)
     private LocalDateTime lastUpdateTime;
 
-    @Lob
-    @Column(name = "lostExperience", nullable = false)
+    // ✅ CLOB 轉換為 VARCHAR(2000) 以確保關鍵字搜尋可用
+    @Column(columnDefinition = "TEXT", name = "lostExperience", nullable = false)
     private String lostExperience;
 
-    @Lob
-    @Column(name = "contactInformation")
+    @Column(columnDefinition = "TEXT", name = "contactInformation")
     private String contactInformation;
 
-    @Lob
-    @Column(name = "featureDescription", nullable = false)
+    @Column(columnDefinition = "TEXT", name = "featureDescription", nullable = false)
     private String featureDescription;
 
     // 必填

@@ -20,7 +20,7 @@ import tw.com.ispan.dto.pet.AdoptioncaseDTO;
 import tw.com.ispan.service.pet.AdoptionCaseService;
 
 @RestController
-@RequestMapping("/adoptionsearch")
+@RequestMapping("/api/adoptionsearch")
 public class AdoptionCaseController {
 
     @Autowired
