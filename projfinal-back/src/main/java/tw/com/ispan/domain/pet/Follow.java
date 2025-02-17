@@ -42,9 +42,6 @@ public class Follow {
 	@Column(name = "followDate")
 	private LocalDateTime followDate;
 
-	@Column(name = "notifications_enabled")
-	private Boolean notificationsEnabled;
-
 	// getter & setter
 	public Integer getFollowId() {
 		return followId;
@@ -92,14 +89,6 @@ public class Follow {
 
 	public void setFollowDate(LocalDateTime followDate) {
 		this.followDate = followDate;
-	}
-
-	public Boolean getNotificationsEnabled() {
-		return notificationsEnabled;
-	}
-
-	public void setNotificationsEnabled(Boolean notificationsEnabled) {
-		this.notificationsEnabled = notificationsEnabled;
 	}
 
 }

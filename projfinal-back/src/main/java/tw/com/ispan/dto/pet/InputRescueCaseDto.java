@@ -1,10 +1,8 @@
 package tw.com.ispan.dto.pet;
 
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.validator.constraints.Length;
-import org.springframework.lang.Nullable;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -16,19 +14,19 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-public class ModifyRescueCaseDto {
+public class InputRescueCaseDto {
 
-	// 接收使用者填的修改案件資料
+	// 接收使用者填的新增案件資料
 
 	@NotNull(message = "案件標題必填")
-	@Length(min = 1, max = 30) // 限制小於30字
+	@Length(min = 1, max = 30) // 限制小於15字
 	private String caseTitle;
 
 	@Min(value = 1, message = "物種id不能小於1")
 	@Max(value = 2, message = "物種id不能大於2")
 	@Positive(message = "物種ID必須為正數")
 	@NotNull(message = "物種必填")
-	// 如果填的是固定值建議可用建立Enum類別與驗證，但先不用
+	// 如果填的是固定值建議可用建立Enum類別與驗證
 	private Integer speciesId;
 
 	@Min(value = 1, message = "品種id不能小於1")
@@ -39,26 +37,21 @@ public class ModifyRescueCaseDto {
 	@Min(value = 1, message = "毛色id不能小於 1")
 	@Max(value = 7, message = "毛色id不能大於 7")
 	private Integer furColorId;
-	
-	@Nullable
+
 	@Pattern(regexp = "^(公|母)$", message = "性別必須為公或母")
 	private String gender;
 
-	@Nullable
 	@Pattern(regexp = "^(已絕育|未絕育)$", message = "絕育狀態必須為已絕育或未絕育")
 	private String sterilization;
-	
-	@Nullable
+
 	@Min(value = 0, message = "年齡不能小於 0")
 	@Max(value = 30, message = "年齡不能大於30") // 只能輸入0~30
 	private Integer age;
-	
-	@Nullable
+
 	@DecimalMin("1000000000") // 晶片號碼為10位數字
 	@DecimalMax("10000000000")
 	private Integer microChipNumber;
-	
-	
+
 	@NotNull(message = "是否遺失為必填")
 	private Boolean suspLost;
 
@@ -70,10 +63,10 @@ public class ModifyRescueCaseDto {
 
 	@Min(value = 1, message = "區域id不得小於1")
 	@Max(value = 374, message = "區域id不得大於374")
+	@Positive(message = "區域ID必須為正數")
 	@NotNull(message = "區域為必填")
 	private Integer districtAreaId;
-	
-	@Nullable
+
 	private String street;
 
 	@NotNull(message = "區域為必填")
@@ -82,23 +75,21 @@ public class ModifyRescueCaseDto {
 	@Min(value = 1, message = "案件狀態ID不得小於1")
 	@Max(value = 9, message = "案件狀態ID不得大於9")
 	@Positive(message = "案件狀態ID必須為正數")
-	private Integer caseStateId; // 初次添加時使用者不會填所以可為null，但修改時則必填，應用到@validated分組驗證會更好，但這裡直接分成兩種dto來用
-	
-	@Nullable
+	private Integer caseStateId; // 初次添加時使用者不會填所以可為null，但修改時則必填，應用到@validated分組驗證
+
 	@Length(min = 0, max = 50) // 限制不得超過50字
 	private String tag;
+
+	// 前端傳遞照片暫存url給後端處理，因為前端只會有3個上傳檔案功能所以也只會收到3個url
+	@NotEmpty(message = "照片為必填")
+	@Size(min = 1, max = 3) // 至少一張，至多三張
+	private List<String> casePictures;
 
 	@NotEmpty(message = "救援需求為必填")
 	private List<Integer> rescueDemands;
 
 	@NotEmpty(message = "可負擔資助為必填")
 	private List<Integer> canAffords;
-
-	// 用於處理修改案件圖片時，要將對應修改圖片id和暫存url一起傳進來
-	// 後端接收Jackson在反序列化JSON對象時，預設會將其轉換為HashMap
-	@NotEmpty(message = "照片為必填")
-	@Size(min = 1, max = 3) // 至少一張，至多三張
-	private List<Map<String, String>> casePictures;
 
 	// getter & setter
 	public String getCaseTitle() {
@@ -205,6 +196,14 @@ public class ModifyRescueCaseDto {
 		this.rescueReason = rescueReason;
 	}
 
+	public List<String> getCasePictures() {
+		return casePictures;
+	}
+
+	public void setCasePictures(List<String> casePictures) {
+		this.casePictures = casePictures;
+	}
+
 	public List<Integer> getRescueDemands() {
 		return rescueDemands;
 	}
@@ -225,6 +224,10 @@ public class ModifyRescueCaseDto {
 		return caseStateId;
 	}
 
+	public void setCaseStateId(Integer caseStateId) {
+		this.caseStateId = caseStateId;
+	}
+
 	public String getTag() {
 		return tag;
 	}
@@ -233,28 +236,14 @@ public class ModifyRescueCaseDto {
 		this.tag = tag;
 	}
 
-
-	public List<Map<String, String>> getCasePictures() {
-		return casePictures;
-	}
-
-	public void setCasePictures(List<Map<String, String>> casePictures) {
-		this.casePictures = casePictures;
-	}
-
-	public void setCaseStateId(Integer caseStateId) {
-		this.caseStateId = caseStateId;
-	}
-
 	@Override
 	public String toString() {
 		return "RescueCaseDto [caseTitle=" + caseTitle + ", speciesId=" + speciesId + ", breedId=" + breedId
 				+ ", furColorId=" + furColorId + ", gender=" + gender + ", sterilization=" + sterilization + ", age="
 				+ age + ", microChipNumber=" + microChipNumber + ", suspLost=" + suspLost + ", cityId=" + cityId
 				+ ", districtAreaId=" + districtAreaId + ", street=" + street + ", rescueReason=" + rescueReason
-				+ ", caseStateId=" + caseStateId + ", tag=" + tag + ", rescueDemands=" + rescueDemands + ", canAffords="
-				+ canAffords + ", casePictures=" + casePictures
-				+ "]";
+				+ ", caseStateId=" + caseStateId + ", tag=" + tag + ", casePictures=" + casePictures
+				+ ", rescueDemands=" + rescueDemands + ", canAffords=" + canAffords + "]";
 	}
 
 }

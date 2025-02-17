@@ -44,6 +44,8 @@ public class Cart implements Serializable {
     @JsonManagedReference("cart") // by Naomi
     private List<CartItem> cartItems; // List of cart items related to this cart
 
+    private int memberId;
+
     // Getters and Setters
     public Integer getCartId() {
         return cartId;
@@ -78,9 +80,7 @@ public class Cart implements Serializable {
     }
 
     public int getMemberId() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMemberId'");
+        return this.memberId; // Return the member ID
     }
 
-  
 }

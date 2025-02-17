@@ -15,9 +15,10 @@ public class StateRedisService {
 	    private StringRedisTemplate redisTemplate;
 
 	    // 儲存 state 到 Redis，並設置過期時間
-	    public void saveState(String state) {
-	        redisTemplate.opsForValue().set(state, "valid", 10, TimeUnit.MINUTES); // 10 分鐘過期
-	    }
+	  public void saveState(String state) {
+		    redisTemplate.opsForHash().put("stateMap", state, "valid"); // 存入 Hash
+		    redisTemplate.expire("stateMap", 10, TimeUnit.MINUTES); // 設置整個 Hash 過期
+		}
 	    
 	    //同時儲存state和memberId
 	    public void saveStateWithMemberId(String state, Integer memberId) {
@@ -32,23 +33,36 @@ public class StateRedisService {
 			}
 	    }
 	    
-	    //透過state找到memberId
 	    public Integer getMemberIdByState(String state) {
+	        // 從 Redis 取得 state 的值
 	        Object value = redisTemplate.opsForHash().get("stateMap", state);
-			if (value instanceof Integer) {
-				Integer memberId = (Integer) value;
-				return memberId;
-			} else if (value instanceof String) {
-				Integer memberId = Integer.parseInt((String) value);
-				return memberId;
-			}
-			return null;
+
+	        // 如果 state 不存在，直接返回 null
+	        if (value == null) {
+	            System.out.println("State " + state + " 不存在於 Redis");
+	            return null;
+	        }
+
+	        // 如果 state 值是 "valid"，代表這是非會員狀態，返回 null
+	        if ("valid".equals(value)) {
+	            System.out.println("State " + state + " 為 'valid'，代表非會員，返回 null");
+	            return null;
+	        }
+
+	        // 嘗試解析 memberId
+	        try {
+	            return Integer.parseInt(value.toString());  // 轉換為數字格式
+	        } catch (NumberFormatException e) {
+	            System.err.println("無法解析 state " + state + " 的值：" + value);
+	            return null;
+	        }
 	    }
+
 
 	    // 驗證 state 是否存在且有效
 	    public boolean validateState(String state) {
 	        Boolean exists = redisTemplate.opsForHash().hasKey("stateMap", state); // 檢查哈希結構中的鍵
-			System.out.println("要驗證囉" + state);
+	        System.out.println("要驗證的 state：" + state + " 是否存在於 stateMap：" + exists);
 	        return exists != null && exists;
 	    }
 

@@ -20,11 +20,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.transaction.Transactional;
 import tw.com.ispan.domain.pet.CasePicture;
 import tw.com.ispan.repository.pet.CasePictureRepository;
 
-//冠
 @Service
 @Transactional
 public class ImageService {
@@ -32,7 +31,7 @@ public class ImageService {
 	@Autowired
 	private CasePictureRepository casePictureRepository;
 
-	@Value("${back.domainName.url}") // http://localhost:8080
+	@Value("${back.domainName.url}") // 開發時為http://localhost:8080
 	private String domainName;
 
 	// 後端暫存路徑
@@ -125,7 +124,6 @@ public class ImageService {
 				// 移動檔案
 				Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
 				System.out.println("檔案已成功移動到：" + targetPath);
-
 				finalUrl.add(targetPath.toString().replace("\\", "/")); // 確保使用 `/`
 
 			} catch (IOException e) {
@@ -203,12 +201,14 @@ public class ImageService {
 		List<CasePicture> updatedPictures = new ArrayList<>();
 		List<Integer> receivedPictureIds = new ArrayList<>();
 
+		System.out.println("要來更新圖片囉111");
 		// 1. 遍歷新的圖片資料
 		for (Map<String, String> newPic : casePictures) {
 			Integer casePictureId = newPic.get("casePictureId") != null ? Integer.parseInt(newPic.get("casePictureId"))
 					: null;
 			String pictureUrl = newPic.get("pictureUrl");
 
+			System.out.println("要來更新圖片囉222");
 			if (casePictureId != null) {
 				// 2. 檢查舊的圖片是否仍然存在
 				Optional<CasePicture> existingPicOpt = casePictureRepository.findById(casePictureId);
@@ -229,11 +229,13 @@ public class ImageService {
 				updatedPictures.add(casePictureRepository.save(newPicObj));
 			}
 		}
+		System.out.println("要來更新圖片囉333");
 
 		// 5. **刪除未在請求中的舊圖片**
 		List<CasePicture> toDelete = oldPictures.stream()
 				.filter(oldPic -> !receivedPictureIds.contains(oldPic.getCasePictureId()))
 				.collect(Collectors.toList());
+		System.out.println("要來更新圖片囉444");
 		casePictureRepository.deleteAll(toDelete); // 確保 Hibernate 移除
 
 		return updatedPictures;
