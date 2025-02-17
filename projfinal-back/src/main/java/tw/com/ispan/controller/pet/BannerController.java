@@ -19,7 +19,7 @@ import tw.com.ispan.service.banner.BannerService;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/banners")
+@RequestMapping("/api/banners")
 public class BannerController {
 
     @Autowired

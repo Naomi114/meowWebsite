@@ -38,7 +38,7 @@ import tw.com.ispan.repository.shop.ProductRepository;
 import tw.com.ispan.service.shop.ProductService;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/products")
 @CrossOrigin
 public class ProductController {
 

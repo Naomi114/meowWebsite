@@ -11,28 +11,19 @@ public class CategoryDTO {
     private String categoryName;
     private String categoryDescription;
     private String defaultUnit;
-    private List<ProductDTO> products;
+    private List<Integer> productIds; // 只存 `productId`，避免循環關聯
 
     public CategoryDTO() {
     }
 
-    // ✅ 建構子: 接收 Category 和 ProductDTO 陣列
-    public CategoryDTO(Category category, List<ProductDTO> productDTOs) {
-        this.categoryId = category.getCategoryId();
-        this.categoryName = category.getCategoryName();
-        this.categoryDescription = category.getCategoryDescription();
-        this.defaultUnit = category.getDefaultUnit();
-        this.products = productDTOs;
-    }
-
-    // ✅ 建構子: 只接收 Category (無商品列表)
+    // ✅ 建構子: 只接收 Category (轉換 productId)
     public CategoryDTO(Category category) {
         this.categoryId = category.getCategoryId();
         this.categoryName = category.getCategoryName();
         this.categoryDescription = category.getCategoryDescription();
         this.defaultUnit = category.getDefaultUnit();
-        this.products = category.getProducts().stream()
-                .map(ProductDTO::new) // 確保商品被轉為 ProductDTO
+        this.productIds = category.getProducts().stream()
+                .map(Product::getProductId) // ✅ 只存 productId
                 .collect(Collectors.toList());
     }
 
@@ -68,12 +59,12 @@ public class CategoryDTO {
         this.defaultUnit = defaultUnit;
     }
 
-    public List<ProductDTO> getProducts() {
-        return products;
+    public List<Integer> getProductIds() {
+        return productIds;
     }
 
-    public void setProducts(List<ProductDTO> products) {
-        this.products = products;
+    public void setProductIds(List<Integer> productIds) {
+        this.productIds = productIds;
     }
 
 }

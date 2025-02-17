@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 public class OrderController {
 
     @Autowired
@@ -203,48 +203,66 @@ public class OrderController {
     }
 
     @PostMapping("/submit")
-    public ResponseEntity<?> submitOrder(@RequestBody Map<String, Object> requestBody) {
-        try {
-            if (!requestBody.containsKey("cartId") || !requestBody.containsKey("member")
-                    || !requestBody.containsKey("creditCard") || !requestBody.containsKey("shippingAddress")
-                    || !requestBody.containsKey("selectedItems")) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("提交失敗: 缺少必要參數 (cartId, member, creditCard, shippingAddress, selectedItems)");
-            }
-
-            int cartId = Integer.parseInt(requestBody.get("cartId").toString());
-            int memberId = Integer.parseInt(requestBody.get("member").toString());
-            String creditCard = requestBody.get("creditCard").toString();
-            String shippingAddress = requestBody.get("shippingAddress").toString();
-
-            Object itemsObj = requestBody.get("selectedItems");
-            if (!(itemsObj instanceof List)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("提交失敗: selectedItems 應為列表");
-            }
-
-            List<?> selectedItemsRaw = (List<?>) itemsObj;
-            List<Integer> selectedItems = selectedItemsRaw.stream()
-                    .filter(item -> item instanceof Map)
-                    .map(item -> (Map<?, ?>) item)
-                    .filter(map -> map.containsKey("productId"))
-                    .map(map -> Integer.parseInt(map.get("productId").toString()))
-                    .collect(Collectors.toList());
-
-            if (selectedItems.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("提交失敗: 必須選擇至少一個商品");
-            }
-            if (creditCard.trim().isEmpty() || shippingAddress.trim().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("提交失敗: 信用卡資訊或送貨地址不能為空");
-            }
-
-            boolean isSubmitted = orderService.submitOrder(cartId, memberId, creditCard, shippingAddress,
-                    selectedItems);
-
-            return isSubmitted ? ResponseEntity.ok("訂單已成功提交")
-                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("無法提交訂單: 訂單處理失敗");
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("提交訂單時發生錯誤: " + e.getMessage());
+public ResponseEntity<?> submitOrder(@RequestBody Map<String, Object> requestBody) {
+    try {
+        // Validate required fields
+        if (!requestBody.containsKey("cartId") || !requestBody.containsKey("creditCard") || 
+            !requestBody.containsKey("shippingAddress") || !requestBody.containsKey("selectedItems")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("提交失敗: 缺少必要參數 (cartId, creditCard, shippingAddress, selectedItems)");
         }
+
+        int cartId = Integer.parseInt(requestBody.get("cartId").toString());
+        String creditCard = requestBody.get("creditCard").toString();
+        String shippingAddress = requestBody.get("shippingAddress").toString();
+
+        // 從 localStorage 或 sessionStorage 取得 memberId
+        int memberId = 0;
+        if (requestBody.containsKey("memberId")) {
+            memberId = Integer.parseInt(requestBody.get("memberId").toString());
+        } else {
+            // 使用 JavaScript 或前端邏輯來補上 memberId
+            memberId = getMemberIdFromSessionStorage(); // 實現從 sessionStorage 取得的邏輯
+        }
+
+       
+
+        // 從 requestBody 中獲取選擇的商品
+        Object itemsObj = requestBody.get("selectedItems");
+        if (!(itemsObj instanceof List)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("提交失敗: selectedItems 應為列表");
+        }
+
+        List<?> selectedItemsRaw = (List<?>) itemsObj;
+        List<Integer> selectedItems = selectedItemsRaw.stream()
+                .filter(item -> item instanceof Map)
+                .map(item -> (Map<?, ?>) item)
+                .filter(map -> map.containsKey("productId"))
+                .map(map -> Integer.parseInt(map.get("productId").toString()))
+                .collect(Collectors.toList());
+
+        if (selectedItems.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("提交失敗: 必須選擇至少一個商品");
+        }
+
+        if (creditCard.trim().isEmpty() || shippingAddress.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("提交失敗: 信用卡資訊或送貨地址不能為空");
+        }
+
+        boolean isSubmitted = orderService.submitOrder(cartId, memberId, creditCard, shippingAddress, selectedItems);
+
+        return isSubmitted ? ResponseEntity.ok("訂單已成功提交")
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("無法提交訂單: 訂單處理失敗");
+
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("提交訂單時發生錯誤: " + e.getMessage());
     }
+}
+
+// 假設此方法從 sessionStorage 取得 memberId
+private int getMemberIdFromSessionStorage() {
+    // 假設在前端可以傳遞 sessionStorage 的資料到後端
+    // 實際操作取決於前端的實現
+    return 123; // 範例返回固定的 memberId，根據實際情況來實現
+}
 }

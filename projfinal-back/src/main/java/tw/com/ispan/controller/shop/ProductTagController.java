@@ -21,7 +21,7 @@ import tw.com.ispan.dto.shop.ProductTagResponse;
 import tw.com.ispan.service.shop.ProductTagService;
 
 @RestController
-@RequestMapping("/tags")
+@RequestMapping("/api/tags")
 @CrossOrigin
 public class ProductTagController {
 

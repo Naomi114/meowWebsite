@@ -71,6 +71,18 @@ public class LostCaseService {
     }
 
     /**
+     * 取得所有遺失案件，並支援排序（新到舊、舊到新）
+     *
+     * @param sortDirection 排序方向 (true = desc, false = asc)
+     * @return 遺失案件列表
+     */
+    public List<LostCase> getAll(boolean sortDirection) {
+        Sort sort = sortDirection ? Sort.by(Sort.Direction.DESC, "lostCaseId")
+                : Sort.by(Sort.Direction.ASC, "lostCaseId");
+        return lostCaseRepository.findAll(sort);
+    }
+
+    /**
      * 根據會員 ID 查詢對應的 LostCases
      *
      * @param memberId 會員 ID

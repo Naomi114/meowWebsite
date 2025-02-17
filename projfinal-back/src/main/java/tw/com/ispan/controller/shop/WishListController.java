@@ -19,7 +19,7 @@ import tw.com.ispan.dto.shop.WishListResponse;
 import tw.com.ispan.service.shop.WishListService;
 
 @RestController
-@RequestMapping("/wishlists")
+@RequestMapping("/api/wishlists")
 @CrossOrigin
 public class WishListController {
 

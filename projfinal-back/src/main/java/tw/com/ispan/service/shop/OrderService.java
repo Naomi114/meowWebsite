@@ -368,81 +368,94 @@ public class OrderService implements IOrderService {
     }
 
     @Transactional
-    public boolean submitOrder(int cartId, int memberId, String creditCard, String shippingAddress,
-            List<Integer> selectedItems) {
-        try {
-            // 确保 selectedItems 不是 null
-            if (selectedItems == null || selectedItems.isEmpty()) {
-                throw new RuntimeException("未選擇商品");
-            }
-
-            // 查询购物车
-            Cart cart = cartRepository.findById(cartId)
-                    .orElseThrow(() -> new RuntimeException("找不到購物車"));
-
-            // 查询用户
-            Member member = memberRepository.findById(memberId)
-                    .orElseThrow(() -> new RuntimeException("找不到會員"));
-
-            // 过滤出被选中的商品
-            List<CartItem> cartItems = cart.getCartItems().stream()
-                    .filter(item -> selectedItems.contains(item.getProduct().getProductId())) // 只保留被选中的商品
-                    .toList();
-
-            if (cartItems.isEmpty()) {
-                throw new RuntimeException("未選擇有效的商品");
-            }
-
-            // 计算订单总金额
-            double totalPrice = cartItems.stream()
-                    .mapToDouble(item -> item.getProduct().getSalePrice().doubleValue() * item.getQuantity())
-                    .sum();
-
-            // 创建订单
-            Orders newOrder = new Orders();
-            newOrder.setMember(member);
-            newOrder.setShippingAddress(shippingAddress);
-            newOrder.setCreditCard(creditCard);
-            newOrder.setOrderDate(LocalDateTime.now());
-            newOrder.setOrderStatus("待支付");
-            newOrder.setSubtotalPrice(totalPrice);
-            newOrder.setFinalPrice(totalPrice);
-
-            Orders savedOrder = orderRepository.save(newOrder);
-
-            // 添加订单项
-            for (CartItem item : cartItems) {
-                OrderItem orderItem = new OrderItem();
-                orderItem.setOrder(savedOrder);
-                orderItem.setProduct(item.getProduct());
-                orderItem.setOrderQuantity(item.getQuantity());
-                orderItem.setPurchasedPrice(item.getProduct().getSalePrice());
-                orderItem.setStatus("待出貨");
-                orderItemRepository.save(orderItem);
-            }
-
-            // 从购物车中删除已选中的商品
-            cartItemRepository.deleteAll(cartItems);
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+public boolean submitOrder(int cartId, int memberId, String creditCard, String shippingAddress,
+        List<Integer> selectedItems) {
+    try {
+        // 确保 selectedItems 不是 null
+        if (selectedItems == null || selectedItems.isEmpty()) {
+            throw new RuntimeException("未選擇商品");
         }
-    }
 
-    public Orders processPayment(int orderId, PaymentRequest paymentRequest) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'processPayment'");
-    }
+        // 查询购物车
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("找不到購物車"));
 
-    public List<Orders> getOrdersByMemberId(int memberId) {
-        try {
-            // Fetch orders by memberId directly, referencing member's memberId
-            return orderRepository.findByMember_MemberId(memberId);
-        } catch (Exception e) {
-            // Handle the exception and throw a RuntimeException with the error message
-            throw new RuntimeException("Error fetching orders: " + e.getMessage(), e);
+        // 查询用户
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("找不到會員"));
+
+        // 确保购物车属于该会员
+        if (cart.getMember().getMemberId() != memberId) {
+            throw new RuntimeException("購物車與會員ID不匹配");
         }
+
+        // 过滤出被选中的商品
+        List<CartItem> cartItems = cart.getCartItems().stream()
+                .filter(item -> selectedItems.contains(item.getProduct().getProductId())) // 只保留被选中的商品
+                .toList();
+
+        if (cartItems.isEmpty()) {
+            throw new RuntimeException("未選擇有效的商品");
+        }
+
+        // 计算订单总金额
+        double totalPrice = cartItems.stream()
+                .mapToDouble(item -> item.getProduct().getSalePrice().doubleValue() * item.getQuantity())
+                .sum();
+
+        // 创建订单
+        Orders newOrder = new Orders();
+        newOrder.setMember(member);
+        newOrder.setShippingAddress(shippingAddress);
+        newOrder.setCreditCard(creditCard);
+        newOrder.setOrderDate(LocalDateTime.now());
+        newOrder.setOrderStatus("待支付");
+        newOrder.setSubtotalPrice(totalPrice);
+        newOrder.setFinalPrice(totalPrice);
+
+        Orders savedOrder = orderRepository.save(newOrder);
+
+        // 添加订单项
+        for (CartItem item : cartItems) {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(savedOrder);
+            orderItem.setProduct(item.getProduct());
+            orderItem.setOrderQuantity(item.getQuantity());
+            orderItem.setPurchasedPrice(item.getProduct().getSalePrice());
+            orderItem.setStatus("待出貨");
+            orderItemRepository.save(orderItem);
+        }
+
+        // 从购物车中删除已选中的商品
+        cartItemRepository.deleteAll(cartItems);
+
+        return true;
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
     }
+}
+
+public Orders processPayment(int orderId, PaymentRequest paymentRequest) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'processPayment'");
+}
+
+public List<Orders> getOrdersByMemberId(int memberId) {
+    try {
+        // Fetch orders by memberId directly, referencing member's memberId
+        return orderRepository.findByMember_MemberId(memberId);
+    } catch (Exception e) {
+        // Handle the exception and throw a RuntimeException with the error message
+        throw new RuntimeException("Error fetching orders: " + e.getMessage(), e);
+    }
+}
+public void submitOrder(Map<String, Object> requestBody, int memberId, Cart cart) {
+    // 這裡處理提交訂單邏輯
+    // 可以利用傳入的 memberId 和 cart 來處理訂單相關的操作
+
+    // 範例：假設根據 memberId 和 cartId 進行訂單創建
+    System.out.println("Submitting order for member ID: " + memberId);
+    System.out.println("Cart details: " + cart);
+}
 }

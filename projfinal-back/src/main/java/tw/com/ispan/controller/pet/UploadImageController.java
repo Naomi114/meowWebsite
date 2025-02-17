@@ -17,7 +17,7 @@ import tw.com.ispan.service.pet.ImageService;
 
 //案件單個圖片上傳(冠)
 @RestController
-@RequestMapping(path = { "/Case" })
+@RequestMapping(path = { "/api/Case" })
 public class UploadImageController {
 
 	@Autowired

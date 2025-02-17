@@ -2,6 +2,7 @@ package tw.com.ispan.dto.shop;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import tw.com.ispan.domain.shop.Product;
@@ -18,9 +19,11 @@ public class ProductDTO {
     private String unit;
     private String status;
     private LocalDate expire;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private List<String> imageUrls;
-    private Integer categoryId; // ✅ 直接回傳 categoryId
-    private List<TagDTO> tags; // ✅ 加入標籤列
+    private CategoryDTO category; // ✅ 直接加入 `CategoryDTO`
+    private List<TagDTO> tags; // ✅ 加入標籤
 
     // ✅ 透過 Product Entity 建立 DTO
     public ProductDTO(Product product) {
@@ -33,17 +36,19 @@ public class ProductDTO {
         this.unit = product.getUnit();
         this.status = product.getStatus();
         this.expire = product.getExpire();
+        this.createdAt = product.getCreatedAt();
+        this.updatedAt = product.getCreatedAt();
+
+        // ✅ 取得 `CategoryDTO`
+        this.category = product.getCategory() != null ? new CategoryDTO(product.getCategory()) : null;
 
         // ✅ 取得最多 5 張圖片 URL
         this.imageUrls = extractImageUrls(product);
 
-        // ✅ 取得 categoryId
-        this.categoryId = product.getCategory() != null ? product.getCategory().getCategoryId() : null;
-
         // ✅ 轉換 tags
         this.tags = product.getTags() != null
                 ? product.getTags().stream().map(TagDTO::new).collect(Collectors.toList())
-                : null;
+                : List.of(); // ✅ 若 `tags` 為 `null`，回傳空陣列
     }
 
     // ✅ 取得 `imageUrls`
@@ -133,16 +138,24 @@ public class ProductDTO {
         this.expire = expire;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
-    }
-
-    public Integer getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
     }
 
     public List<TagDTO> getTags() {
@@ -151,6 +164,14 @@ public class ProductDTO {
 
     public void setTags(List<TagDTO> tags) {
         this.tags = tags;
+    }
+
+    public CategoryDTO getCategory() {
+        return category;
+    }
+
+    public void setCategory(CategoryDTO category) {
+        this.category = category;
     }
 
 }

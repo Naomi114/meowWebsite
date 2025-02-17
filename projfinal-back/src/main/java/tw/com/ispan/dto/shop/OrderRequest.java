@@ -93,7 +93,6 @@ public class OrderRequest {
                 ", merchantTradeNo='" + merchantTradeNo + '\'' +
                 '}';
     }
-
     public int getMemberId() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getMemberId'");
@@ -103,4 +102,5 @@ public class OrderRequest {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setMemberId'");
     }
+    
 }

@@ -139,4 +139,14 @@ public class OrderItem {
     public int getQuantity() {
         return this.orderQuantity; // 正確引用 orderQuantity 屬性
     }
+
+    public void setQuantity(int i) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setQuantity'");
+    }
+
+    public void setPrice(Object price) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setPrice'");
+    }
 }
