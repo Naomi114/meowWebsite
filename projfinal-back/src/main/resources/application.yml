@@ -74,14 +74,21 @@ spring:
       max-file-size: 5MB
       max-request-size: 20MB
 
-#商城圖片下載路徑 (動態路徑)
+
 file:
   storage:
     uploadDir: C:/meowWebsite/images #指向實際的存儲目錄
     baseUrl: ${BASE_URL:http://localhost:8080/images} #對應圖片的訪問 URL
 
+  petUpload: #在webconfig中設定前後端對應的靜態圖片路徑
+    path: C:/upload/
+    path2: C:/upload #用在rescueController...
+  shopUpload:
+    path: C:/meowWebsite/images/   #商城圖片下載路徑 (動態路徑)
   tmp-upload-dir: C:/upload/tmp/pet/images/ #寵物圖片暫存路徑(冠)
+
   final-upload-dir: C:/upload/final/pet/images/ #寵物圖片上傳路徑(冠)
+
 
   #conosle顏色
   output:
@@ -124,10 +131,10 @@ back:
   domainName:
     url: http://localhost:8080
 
-#前端讀取後端圖片的路徑，用在init的案件資料controller中
+#前端讀取後端圖片的路徑，用在init的案件資料controller中(冠)
 image:
   base:
-    url: http://localhost:8080/upload/final/pet/images/
+    url: ${back.domainName.url}/upload/final/pet/images/
 
 #用在後端圖片路徑轉前端路徑的rescueService檔案中
 serverAddress-serverPort: localhost:8080
@@ -142,7 +149,7 @@ lineBot: https://line.me/R/ti/p/@310pndih
 #line login相關設定(冠)
 line:
   login:
-    redirect-uri: ${back.domainName.url}/line/callback
+    redirect-uri: ${back.domainName.url}/api/line/callback
     channel-id: 2006807062
     channel-secret: 1f781b9cf730b0c4decdeba7eead6778
 
