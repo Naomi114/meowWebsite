@@ -30,6 +30,12 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private AuthenticationInterceptor authenticationInterceptor; // 注入 AuthenticationInterceptor
 
+    @Value("${file.petUpload.path}") // 讀取 application-*.properties 中的 file.upload.path
+    private String petUploadPath;
+
+    @Value("${file.shopUpload.path}") // 讀取 application-*.properties 中的 file.upload.path
+    private String shopUploadPath;
+
     // 全局 CORS 配置
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -46,10 +52,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/upload/**")
-                .addResourceLocations("file:C:/upload/");
+                .addResourceLocations("file:" + petUploadPath);
 
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:C:/meowWebsite/images/"); // ✅ 確保這裡是圖片存放的實際路徑
+                .addResourceLocations("file:" + shopUploadPath); // ✅ 確保這裡是圖片存放的實際路徑
     }
 
     @Override

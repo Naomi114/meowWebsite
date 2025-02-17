@@ -1,10 +1,14 @@
 package tw.com.ispan.controller.line;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.Map;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,12 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletResponse;
 import tw.com.ispan.dto.pet.LineUserProfile;
+import tw.com.ispan.jwt.JsonWebTokenUtility;
 import tw.com.ispan.service.line.LineLoginService;
 import tw.com.ispan.service.line.StateRedisService;
 
 @CrossOrigin // 允許前端不同的主機或埠運行下可訪問這個contorller
 @RestController
-@RequestMapping("/line")
+@RequestMapping("/api/line")
 public class LineLoginController {
 
 	@Value("${line.login.channel-id}")
@@ -31,13 +36,18 @@ public class LineLoginController {
 	@Value("${line.login.redirect-uri}")
 	private String redirectUri;
 
+	@Value("${front.domainName.url}") // front.domainName.url
+	private String frontDomainName;
+
 	@Autowired
 	private StateRedisService stateRedisService;
 	@Autowired
 	private LineLoginService loginService;
+	@Autowired
+	private JsonWebTokenUtility jsonWebTokenUtility;
 
 	// 用於頁面載時產生用戶授權給line連結，回傳給前端
-	// 在此分為兩種情境，如果用戶已註冊過，就連帶把memberId傳進來去和state綁再redis中，如果沒註冊過，就不傳進來
+	// 在此分為兩種情境，如果用戶已註冊過，就連帶把memberId傳進來去和state綁再redis中，如果沒註冊過，就不傳memberId進來
 	@GetMapping("/authorize")
 	public ResponseEntity<String> authorizeUser(@RequestParam(required = false) Integer memberId) {
 
@@ -56,9 +66,10 @@ public class LineLoginController {
 		return ResponseEntity.ok(authorizeUrl); // 超連結返回給前端
 	}
 
-	// 此為用戶點擊授權連結後，line會發出一個callback
+	// 此為用戶點擊授權連結後，LINE 平台本身不會主動發送 /line/callback，它只是將用戶重定向 (redirect) 到你的後端
+	// /line/callback
 	// request(自定義於平台中)，url中夾帶code(line生成的)和state(我生成的)
-	// https://yourdomain.com/callback?code=abcd1234&state=xyz789
+	// 如https://yourdomain.com/callback?code=abcd1234&state=xyz789
 	// state是OAuth 2.0和OpenID Connect授權流程中的一個安全機制，旨在防止跨站請求偽造（CSRF）攻擊，並確保授權請求的完整性
 	@GetMapping("/callback")
 	public ResponseEntity<String> handleCallback(@RequestParam String code, @RequestParam String state,
@@ -76,10 +87,23 @@ public class LineLoginController {
 		// 驗證成功且獲取memberId使用完後，刪除 state
 		stateRedisService.deleteState(state);
 
-		// 處理授權碼邏輯，換取accessToken
-		String accessToken = loginService.exchangeCodeForAccessToken(code);
+		// 處理授權碼邏輯，換取accessToken和id_token
+		Map<String, Object> tokenData = loginService.exchangeCodeForTokens(code);
+		if (tokenData == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to obtain tokens");
+		}
+
+		// 解析出id_token，從中拿取sub(即userid), pic, 暱稱等資料
+		String idToken = (String) tokenData.get("id_token");
+		Map<String, Object> idTokenData = loginService.decodeIdToken(idToken);
+		if (idTokenData == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to decode id_token");
+		}
+
+		// 顯式轉換 access_token
+		String accessToken = (String) tokenData.get("access_token");
 		if (accessToken == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to obtain access token");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access token is missing");
 		}
 		// 使用 Access Token 獲取用戶信息(lineid, displayname, picture)
 		LineUserProfile profile = loginService.getUserProfile(accessToken);
@@ -103,9 +127,26 @@ public class LineLoginController {
 			}
 		}
 
-		// 需要把獲取到的line accessToken拿去前端儲存?(可以此從Line拿用戶資訊))，並讓用戶跳轉回原登入頁面
-		String indexUri = "http://localhost:5173?token=" + accessToken;
-		response.sendRedirect(indexUri);
-		return ResponseEntity.ok("登入成功，歡迎 " + profile.getDisplayName());
+		// 會員資料新增後，透過 LINE userId 查找 memberId
+		memberId = loginService.findMemberIdByLineUserId(profile.getUserId());
+		if (memberId == null) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("會員建立成功，但無法取得 memberId");
+		}
+
+		// 用戶登入後找尋到該用戶的memberid儲存進產生的jwt token回傳給前端
+		JSONObject responseJson = new JSONObject();
+		JSONObject user = new JSONObject()
+				.put("memberId", memberId);
+		String token = jsonWebTokenUtility.createToken(user.toString());
+		responseJson.put("success", true);
+		responseJson.put("token", token);
+
+		// 改為讓後端返回一個 API，而不是直接跳轉。前端在收到後端的登入成功響應後，將 token 儲存然後透過前端執行跳轉。
+		// response.sendRedirect("http://localhost:5173/");
+		// **透過 URL Redirect，讓用戶帶著 Token 回首頁**
+		response.sendRedirect(frontDomainName + "/advanced-settings?token=" + token);
+		return null;
 	}
+
+	// 處理line登入完用戶頁面跳轉
 }
