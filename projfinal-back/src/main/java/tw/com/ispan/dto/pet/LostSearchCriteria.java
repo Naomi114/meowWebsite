@@ -7,6 +7,9 @@ import jakarta.validation.constraints.Positive;
 public class LostSearchCriteria {
 
     private String keyword; // 關鍵字
+    private String gender;
+    private String sterilization;
+    private String microChipNumber;
 
     @Min(value = 1, message = "案件狀態ID不得小於1")
     @Max(value = 9, message = "案件狀態ID不得大於9")
@@ -91,9 +94,34 @@ public class LostSearchCriteria {
         this.furColorId = furColorId;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getSterilization() {
+        return sterilization;
+    }
+
+    public void setSterilization(String sterilization) {
+        this.sterilization = sterilization;
+    }
+
+    public String getMicroChipNumber() {
+        return microChipNumber;
+    }
+
+    public void setMicroChipNumber(String microChipNumber) {
+        this.microChipNumber = microChipNumber;
+    }
+
     @Override
     public String toString() {
-        return "RescueSearchCriteria [keyword=" + keyword + ", caseStateId=" + caseStateId + ", cityId=" + cityId
+        return "LostSearchCriteria [keyword=" + keyword + ", gender=" + gender + ", sterilization=" + sterilization
+                + ", microChipNumber=" + microChipNumber + ", caseStateId=" + caseStateId + ", cityId=" + cityId
                 + ", districtAreaId=" + districtAreaId + ", speciesId=" + speciesId + ", breedId=" + breedId
                 + ", furColorId=" + furColorId + "]";
     }
