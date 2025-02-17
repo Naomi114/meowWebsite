@@ -108,6 +108,9 @@ EOF"""
                             docker rm mssql || true
                             docker rm redis || true
 
+                            # 創建放假資料圖的 Docker Volume（如果尚未建立）
+                            docker volume create $IMAGE_VOLUME || true
+
 
                              #  啟動 MSSQL 資料庫 (掛載 volume 以保存資料庫內資料) (restart always可以讓VM每次重新啟動，此container也重啟)
                             docker run -d --name mssql \\
