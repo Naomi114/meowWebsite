@@ -13,7 +13,7 @@ import tw.com.ispan.dto.pet.AdoptionCaseApplyDTO;
 import tw.com.ispan.service.pet.AdoptionCaseApplyService;
 
 @RestController
-@RequestMapping("/apply/create")
+@RequestMapping("/api/apply/create")
 public class AdoptionCaseApplyController {
 
     @Autowired
