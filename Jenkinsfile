@@ -33,7 +33,12 @@ pipeline {
         stage('清理舊的 Docker Image') {
             steps {
                 sh "docker image prune -f"
-                sh "docker rmi -f \$(docker images -q leekuanju/Meowbackend | tail -n +2) || true"
+                sh '''
+                IMAGES=$(docker images -q leekuanju/Meowfrontend | tail -n +2)
+                if [ -n "$IMAGES" ]; then
+                    docker rmi -f $IMAGES
+                fi
+                '''
             }
         }
 
