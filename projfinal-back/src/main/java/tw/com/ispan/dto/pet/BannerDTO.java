@@ -2,9 +2,6 @@ package tw.com.ispan.dto.pet;
 
 import java.time.LocalDateTime;
 
-import lombok.Data;
-
-@Data
 public class BannerDTO {
     private Integer bannerId;
     private String bannerType;
@@ -15,6 +12,38 @@ public class BannerDTO {
     private String caseTitle;
     private String pictureUrl;
     private Integer pictureId; // ✅ 確保能返回圖片 ID
+
+    public Integer getBannerId() {
+        return bannerId;
+    }
+
+    public void setBannerId(Integer bannerId) {
+        this.bannerId = bannerId;
+    }
+
+    public String getBannerType() {
+        return bannerType;
+    }
+
+    public void setBannerType(String bannerType) {
+        this.bannerType = bannerType;
+    }
+
+    public LocalDateTime getOnlineDate() {
+        return onlineDate;
+    }
+
+    public void setOnlineDate(LocalDateTime onlineDate) {
+        this.onlineDate = onlineDate;
+    }
+
+    public String getCaseTitle() {
+        return caseTitle;
+    }
+
+    public void setCaseTitle(String caseTitle) {
+        this.caseTitle = caseTitle;
+    }
 
     public String getPictureUrl() {
         return pictureUrl;
