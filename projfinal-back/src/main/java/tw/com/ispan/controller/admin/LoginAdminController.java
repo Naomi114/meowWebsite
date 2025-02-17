@@ -22,7 +22,7 @@ public class LoginAdminController {
     @Autowired
     private JsonWebTokenUtility jsonWebTokenUtility;
 
-    @PostMapping("/secure/loginadmin")
+    @PostMapping("/api/secure/loginadmin")
     public String login(@RequestBody String entity) {
         JSONObject responseJson = new JSONObject();
 
