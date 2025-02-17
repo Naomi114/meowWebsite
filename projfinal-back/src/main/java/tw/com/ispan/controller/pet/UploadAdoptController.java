@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import tw.com.ispan.service.pet.ImageService;
 
 @RestController
-@RequestMapping(path = { "/Try" })
+@RequestMapping(path = { "/api/Try" })
 public class UploadAdoptController {
 
     @Autowired

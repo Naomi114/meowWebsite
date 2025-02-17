@@ -253,4 +253,15 @@ public class AdoptionCaseService {
         public Optional<AdoptionCase> findById(Integer adoptionCaseId) {
                 return adoptionCaseRepository.findById(adoptionCaseId);
         }
+
+        // 根据 memberId 获取 AdoptionCase 的数量
+        public long countAdoptionCasesByMemberId(Integer memberId) {
+                return adoptionCaseRepository.countByMemberId(memberId);
+        }
+
+        // 获取所有认养案件
+        public List<AdoptionCase> getAllAdoptionCases() {
+                return adoptionCaseRepository.findAll();
+        }
+
 }
