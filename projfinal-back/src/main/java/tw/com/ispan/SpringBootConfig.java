@@ -11,7 +11,7 @@ public class SpringBootConfig implements WebMvcConfigurer {
         // 允許的來源網址
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:5173") // 允許前端的 Vue 地址
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
                 .allowedHeaders("*")
                 .allowCredentials(true); // 允許攜帶憑證（cookies）
     }

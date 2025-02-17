@@ -184,8 +184,8 @@ public class ProductService {
 		return response;
 	}
 
-	// 一次修改多屬性
-	public ProductResponse updateSingle(Integer productId, ProductRequest request, List<MultipartFile> images) {
+	// 修改: 除了圖片欄位以外，的所有欄位
+	public ProductResponse updateSingle(Integer productId, ProductRequest request) {
 		ProductResponse response = new ProductResponse();
 
 		Optional<Product> productOpt = productRepository.findById(productId);
@@ -213,6 +213,10 @@ public class ProductService {
 			}
 			if (request.getExpire() != null) {
 				product.setExpire(request.getExpire());
+			}
+			if (request.getStatus() != null) {
+				System.out.println("🔹 變更商品狀態：" + request.getStatus()); // ✅ 檢查 status 是否有值
+				product.setStatus(request.getStatus());
 			}
 
 			// 更新類別
@@ -247,17 +251,38 @@ public class ProductService {
 				productTagService.processProductTags(product, request.getTags());
 			}
 
-			// 更新圖片
-			if (images != null && !images.isEmpty()) {
-				productImageService.processProductImage(product, images);
-			}
-
 			product.setUpdatedAt(LocalDateTime.now()); // 更新時間
 			Product updatedProduct = productRepository.save(product);
 
 			response.setSuccess(true);
 			response.setProduct(new ProductDTO(updatedProduct));
 			response.setMessage("商品更新成功");
+		} else {
+			response.setSuccess(false);
+			response.setMessage("商品不存在");
+		}
+
+		return response;
+	}
+
+	// 修改: 圖片欄位
+	public ProductResponse updateProductImages(Integer productId, List<MultipartFile> images) {
+		ProductResponse response = new ProductResponse();
+		Optional<Product> productOpt = productRepository.findById(productId);
+
+		if (productOpt.isPresent()) {
+			Product product = productOpt.get();
+
+			if (images != null && !images.isEmpty()) {
+				productImageService.processProductImage(product, images);
+			}
+
+			product.setUpdatedAt(LocalDateTime.now());
+			productRepository.save(product);
+
+			response.setSuccess(true);
+			response.setProduct(new ProductDTO(product));
+			response.setMessage("商品圖片更新成功");
 		} else {
 			response.setSuccess(false);
 			response.setMessage("商品不存在");
