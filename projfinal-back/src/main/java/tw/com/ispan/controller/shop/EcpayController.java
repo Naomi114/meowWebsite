@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/pages/ecpay") // ECPay 路徑
+@RequestMapping("/api/pages/ecpay") // ECPay 路徑
 public class EcpayController {
 
     @Autowired
@@ -76,7 +76,7 @@ public class EcpayController {
                             .append("<p>您的訂單 <strong>").append(merchantTradeNo).append("</strong> 已成功付款！</p>")
                             .append("<p>交易編號：" + ecpayTransactionId + "</p>")
                             .append("<p>訂單金額：NT$ " + order.getFinalPrice() + "</p>")
-                            .append("<p>會員ID：" + order.getOrderId() + "</p>")
+                            .append("<p>交易ID：" + order.getOrderId() + "</p>")
                             .append("<p>訂單狀態：" + order.getOrderStatus() + "</p>")
                             .append("<p>出貨狀態：").append(order.getOrderItems().stream()
                                     .map(item -> item.getStatus()) // 顯示商品的出貨狀態

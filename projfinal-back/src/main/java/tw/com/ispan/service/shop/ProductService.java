@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,18 +16,30 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.shop.Category;
 import tw.com.ispan.domain.shop.Product;
+import tw.com.ispan.domain.shop.ProductTag;
 import tw.com.ispan.dto.shop.ProductDTO;
+import tw.com.ispan.dto.shop.ProductFilter;
 import tw.com.ispan.dto.shop.ProductRequest;
 import tw.com.ispan.dto.shop.ProductResponse;
+import tw.com.ispan.repository.admin.AdminRepository;
 import tw.com.ispan.repository.shop.CartItemRepository;
 import tw.com.ispan.repository.shop.CategoryRepository;
 import tw.com.ispan.repository.shop.InventoryItemRepository;
 import tw.com.ispan.repository.shop.OrderItemRepository;
 import tw.com.ispan.repository.shop.ProductImageRepository;
 import tw.com.ispan.repository.shop.ProductRepository;
+import tw.com.ispan.repository.shop.ProductTagRepository;
 import tw.com.ispan.repository.shop.WishListRepository;
 import tw.com.ispan.specification.ProductSpecifications;
 
@@ -46,6 +59,12 @@ import tw.com.ispan.specification.ProductSpecifications;
 @Transactional
 public class ProductService {
 
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	@Autowired
+	private AdminRepository adminRepository;
+
 	@Autowired
 	private ProductRepository productRepository;
 
@@ -57,6 +76,9 @@ public class ProductService {
 
 	@Autowired
 	private WishListRepository wishlistRepository;
+
+	@Autowired
+	private ProductTagRepository productTagRepository;
 
 	@Autowired
 	private InventoryItemRepository inventoryItemRepository;
@@ -245,7 +267,6 @@ public class ProductService {
 	}
 
 	// 單筆刪除
-	@Transactional
 	public ProductResponse deleteSingle(Integer productId) {
 		ProductResponse response = new ProductResponse();
 		Optional<Product> productOpt = productRepository.findById(productId);
@@ -254,27 +275,19 @@ public class ProductService {
 			Product product = productOpt.get();
 
 			// **(1) 若商品已在訂單內，則禁止刪除並通知管理員**
-			if (orderItemRepository.existsByProduct(product)) {
-				notificationService.notifyAdmin(
-						"刪除商品失敗",
-						"商品 [" + product.getProductName() + "] 已有會員下單，無法刪除。");
+			if (orderItemRepository.existsByProductId(productId)) {
+				notificationService.notifyAdmin("刪除商品失敗", "商品 [" + product.getProductName() + "] 已有會員下單，無法刪除。");
 				response.setSuccess(false);
 				response.setMessage("商品已被訂購，無法刪除");
 				return response;
 			}
 
-			// **(2) 查詢受影響的會員**
+			// (2) 查詢受影響的會員
 			List<Member> affectedMembers = new ArrayList<>();
+			affectedMembers.addAll(cartItemRepository.findMembersByProduct(product));
+			affectedMembers.addAll(wishlistRepository.findMembersByProduct(product));
 
-			// 取得購物車內的會員
-			List<Member> cartMembers = cartItemRepository.findMembersByProduct(product);
-			affectedMembers.addAll(cartMembers);
-
-			// 取得願望清單內的會員
-			List<Member> wishlistMembers = wishlistRepository.findMembersByProduct(product);
-			affectedMembers.addAll(wishlistMembers);
-
-			// **(3) 發送通知給會員**
+			// (3) 發送通知給會員**
 			for (Member member : affectedMembers) {
 				notificationService.notifyMember(
 						member,
@@ -282,15 +295,29 @@ public class ProductService {
 						"您購物車或願望清單內的商品 [" + product.getProductName() + "] 已被刪除，請更新您的購物車或願望清單。");
 			}
 
-			// **(4) 刪除關聯數據**
-			wishlistRepository.deleteByProduct(product);
-			cartItemRepository.deleteByProduct(product);
-			productImageRepository.deleteByProduct(product);
-			product.getTags().clear();
+			// (4) 刪除商品前，先刪除關聯數據
+			// @ManyToOne
+			adminRepository.removeAdminFromProduct(productId);
+			categoryRepository.removeCategoryFromProducts(productId);
+
+			// @OneToMany
+			productImageRepository.deleteImagesByProductId(productId);
+			inventoryItemRepository.removeInventoryItemByProductId(productId);
+			wishlistRepository.removeWishListByProductId(productId);
+
+			// @ManyToMany
+			productTagRepository.deleteTagsByProductId(productId);
+
+			// @OneToOne
+			cartItemRepository.deleteByProductId(productId);
+
+			// product.getTags().clear(); 只是清空關聯，但不會實際刪除 product_tag 關聯表的數據
+			// product.getTags().clear();
 
 			// **(5) 刪除商品**
-			productRepository.delete(product);
-			productRepository.flush();
+			productRepository.deleteById(productId); // 改成 `deleteById()` 確保刪除
+			// flush() 只會強制同步 SQL，但如果 交易沒有提交 (commit)，刪除動作可能不會被永久應用。
+			// productRepository.flush();
 
 			response.setSuccess(true);
 			response.setMessage("商品刪除成功，已通知相關會員");
@@ -320,33 +347,34 @@ public class ProductService {
 
 	// 單筆查詢
 	public ProductResponse findSingle(Integer productId) {
-		ProductResponse response = new ProductResponse();
-
 		Optional<Product> productOpt = productRepository.findById(productId);
+
 		if (productOpt.isPresent()) {
-			response.setSuccess(true);
-			response.setProduct(new ProductDTO(productOpt.get()));
-			response.setMessage("查詢成功");
+			return new ProductResponse(true, "查詢成功", new ProductDTO(productOpt.get()));
 		} else {
-			response.setSuccess(false);
-			response.setMessage("商品不存在");
+			return new ProductResponse(false, "商品不存在");
 		}
-		return response;
 	}
 
-	// 動態多條件查詢: Specification類的應用
-	public ProductResponse findBatch(String query, Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice) {
+	// 動態多條件查詢: Specification類的應用 (沒用到?)
+	public ProductResponse findBatch(String query, Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice,
+			List<String> tags) {
 		ProductResponse response = new ProductResponse();
 
 		try {
 			Specification<Product> spec = Specification.where(null);
 
+			// ✅ 依據商品名稱篩選
 			if (query != null && !query.trim().isEmpty()) {
 				spec = spec.and(ProductSpecifications.hasProductName(query));
 			}
+
+			// ✅ 依據價格篩選
 			if (minPrice != null && maxPrice != null) {
 				spec = spec.and(ProductSpecifications.priceBetween(minPrice, maxPrice));
 			}
+
+			// ✅ 依據類別篩選
 			if (categoryId != null) {
 				Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
 				if (categoryOpt.isPresent()) {
@@ -358,6 +386,12 @@ public class ProductService {
 				}
 			}
 
+			// ✅ 依據標籤篩選
+			if (tags != null && !tags.isEmpty()) {
+				spec = spec.and(ProductSpecifications.hasTags(tags));
+			}
+
+			// 🔍 查詢商品
 			List<Product> products = productRepository.findAll(spec);
 			List<ProductDTO> productDTOs = products.stream().map(ProductDTO::new).toList();
 
@@ -372,20 +406,91 @@ public class ProductService {
 		return response;
 	}
 
-	// 查詢所有商品 (by Mark)
-	public ProductResponse findAll() {
-		ProductResponse response = new ProductResponse();
-		List<Product> products = productRepository.findAll();
-		List<ProductDTO> productDTOs = new ArrayList<>();
-		for (Product product : products) {
-			productDTOs.add(new ProductDTO(product));
+	// 因為前端資料傳輸，多條件查詢改用下面這組方法: Criteria API
+	// (因為@Qurery mssql無法解析IN、LIKE等關鍵字)
+	public List<ProductDTO> findProductsByFilter(ProductFilter filter) {
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Product> query = cb.createQuery(Product.class);
+		Root<Product> root = query.from(Product.class);
+
+		List<Predicate> predicates = new ArrayList<>();
+
+		// 🔹 1️⃣ 搜索關鍵字
+		if (filter.getQuery() != null && !filter.getQuery().trim().isEmpty()) {
+			predicates.add(cb.like(root.get("productName"), "%" + filter.getQuery() + "%"));
 		}
 
-		response.setSuccess(!products.isEmpty());
-		response.setProducts(productDTOs);
-		response.setMessage(products.isEmpty() ? "未找到任何商品" : "商品查詢成功");
+		// 🔹 2️⃣ 類別過濾
+		if (filter.getCategoryId() != null) {
+			predicates.add(cb.equal(root.get("category").get("id"), filter.getCategoryId()));
+		}
 
-		return response;
+		// 🔹 3️⃣ 價格區間過濾
+		if (filter.getMinPrice() != null) {
+			predicates.add(cb.greaterThanOrEqualTo(
+					root.get("salePrice"),
+					BigDecimal.valueOf(filter.getMinPrice().doubleValue()) // ✅ 確保 `BigDecimal` 過濾有效
+			));
+		}
+		if (filter.getMaxPrice() != null) {
+			predicates.add(cb.lessThanOrEqualTo(
+					root.get("salePrice"),
+					BigDecimal.valueOf(filter.getMaxPrice().doubleValue()) // ✅ 轉換成 `BigDecimal`
+			));
+		}
+
+		// 🔹 4️⃣ 確保 `salePrice` 不是 `NULL`
+		predicates.add(cb.isNotNull(root.get("salePrice"))); // ✅ 防止 `salePrice` 為 `NULL`
+
+		// 🔹 5️⃣ 過濾 `tags`
+		if (filter.getTagIds() != null && !filter.getTagIds().isEmpty()) {
+			Join<Product, ProductTag> tagJoin = root.join("tags", JoinType.INNER);
+			predicates.add(tagJoin.get("tagId").in(filter.getTagIds())); // ✅ 正確比對 `tagId`
+		}
+
+		// 🔹 6️⃣ 設置 `WHERE` 條件
+		query.where(cb.and(predicates.toArray(new Predicate[0])));
+
+		// 🔹 7️⃣ 執行查詢
+		List<Product> products = entityManager.createQuery(query).getResultList();
+
+		// 🔹 8️⃣ 轉換 `List<Product>` 為 `List<ProductDTO>`
+		return products.stream()
+				.map(product -> new ProductDTO(product))
+				.collect(Collectors.toList());
 	}
 
+	// 查詢所有商品: 改為傳回 ProductDTO格式(包含類別和標籤陣列) by Noami
+	public ProductResponse getAllProducts() {
+		List<Product> products = productRepository.findAll();
+
+		// 檢查是否有商品
+		if (products.isEmpty()) {
+			return new ProductResponse(false, "沒有找到任何商品", new ArrayList<>());
+		}
+
+		// 轉換為 DTO
+		List<ProductDTO> productDTOs = products.stream()
+				.map(ProductDTO::new)
+				.collect(Collectors.toList());
+
+		return new ProductResponse(true, "查詢成功", productDTOs);
+	}
+
+	public void decreaseStock(Integer productId, int quantity) {
+		// 確認商品存在
+		Product product = productRepository.findById(productId)
+				.orElseThrow(() -> new RuntimeException("商品不存在，ID: " + productId));
+
+		// 檢查庫存是否足夠
+		if (product.getStockQuantity() < quantity) {
+			throw new RuntimeException("庫存不足，無法扣除 " + quantity + " 數量");
+		}
+
+		// 扣除庫存
+		product.setStockQuantity(product.getStockQuantity() - quantity);
+		productRepository.save(product); // 儲存變更到資料庫
+
+		System.out.println("成功扣除商品 " + product.getProductName() + " 的 " + quantity + " 數量");
+	}
 }

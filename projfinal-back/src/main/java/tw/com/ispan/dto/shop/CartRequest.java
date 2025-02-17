@@ -1,22 +1,17 @@
 package tw.com.ispan.dto.shop;
 
 import java.util.List;
-import javax.validation.constraints.NotNull;
 import tw.com.ispan.domain.shop.CartItem;
 
 public class CartRequest {
     private List<CartItem> items;
 
-    @NotNull(message = "Member ID cannot be null") // 加入非空校验
     private Integer memberId;
 
-    @NotNull(message = "Product ID cannot be null") // 加入非空校验
     private Integer productId;
 
-    @NotNull(message = "Quantity cannot be null") // 加入非空校验
     private Integer quantity;
 
-    @NotNull(message = "Cart Item ID cannot be null") // 加入非空校验
     private Integer cartItemId;
 
     // Getters and Setters

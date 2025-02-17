@@ -1,23 +1,19 @@
 package tw.com.ispan.dto.shop;
 
-import javax.validation.constraints.NotBlank;
-
 public class CategoryRequest {
     private Integer categoryId;
 
-    @NotBlank(message = "類別名稱不能為空")
     private String categoryName;
 
     private String categoryDescription;
 
-    @NotBlank(message = "新建類別單位不能為空")
     private String defaultUnit;
 
     public CategoryRequest() {
     }
 
-    public CategoryRequest(Integer categoryId, @NotBlank(message = "類別名稱不能為空") String categoryName,
-            String categoryDescription, @NotBlank(message = "新建類別單位不能為空") String defaultUnit) {
+    public CategoryRequest(Integer categoryId, String categoryName,
+            String categoryDescription, String defaultUnit) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.categoryDescription = categoryDescription;

@@ -46,7 +46,7 @@ public class Admin {
 	// One-to-many relationship with Product
 	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
 			CascadeType.REFRESH }, mappedBy = "admin", orphanRemoval = true)
-	@JsonManagedReference("admin") // Unique reference for Products
+	@JsonManagedReference("admin_products") // Unique reference for Products
 	private Set<Product> products = new HashSet<>();
 
 	public Admin() {

@@ -19,7 +19,7 @@ import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.service.shop.NotificationService;
 
 @RestController
-@RequestMapping("/notifications")
+@RequestMapping("/api/notifications")
 @CrossOrigin
 public class NotificationController {
 

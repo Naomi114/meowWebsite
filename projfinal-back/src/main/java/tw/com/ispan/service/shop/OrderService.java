@@ -22,6 +22,7 @@ import tw.com.ispan.domain.shop.OrderItem;
 import tw.com.ispan.domain.shop.Orders;
 import tw.com.ispan.dto.shop.OrderDTO;
 import tw.com.ispan.dto.shop.OrderItemDTO;
+import tw.com.ispan.dto.shop.OrderRequest;
 import tw.com.ispan.dto.shop.PaymentRequest;
 import tw.com.ispan.repository.shop.CartItemRepository;
 import tw.com.ispan.repository.shop.CartRepository;
@@ -29,7 +30,6 @@ import tw.com.ispan.repository.shop.IOrderService;
 import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.shop.OrderItemRepository;
 import tw.com.ispan.repository.shop.OrderRepository;
-import tw.com.ispan.repository.shop.OrderRequest;
 import tw.com.ispan.repository.shop.ProductRepository;
 
 @Service
@@ -114,51 +114,63 @@ public class OrderService implements IOrderService {
         return savedOrder;
     }
 
-    // 处理支付
+    // 更新订单状态并发送邮件
     @Transactional
-    public Orders processPayment(Integer orderId, PaymentRequest paymentRequest) throws MessagingException {
+    public Orders updateOrderStatus(Integer orderId, String status) throws MessagingException {
         Orders order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
-
-        if ("success".equals(paymentRequest.getPaymentStatus())) {
-            order.setOrderStatus("已付款");
-        } else {
-            order.setOrderStatus("付款失敗");
-        }
+                .orElseThrow(() -> new RuntimeException("订单未找到: " + orderId));
 
         // 更新訂單狀態
-        orderRepository.save(order);
+        order.setOrderStatus(status);
+        Orders updatedOrder = orderRepository.save(order);
 
-        // 準備郵件內容
-        String emailContent = generateEmailContent(order);
+        // 如果狀態變更為「已支付」、「備貨中」或「出貨中」，則發送郵件
+        if (status.equals("已支付") || status.equals("備貨中") || status.equals("出貨中")) {
+            // 準備郵件內容
+            String emailContent = generateEmailContent(updatedOrder, status);
 
-        emailService.sendEmail(order.getMember().getEmail(), "交易明細", emailContent);
-
-        return order;
-    }
-
-    // 根據訂單生成郵件內容
-    private String generateEmailContent(Orders order) {
-        StringBuilder emailContent = new StringBuilder();
-        emailContent.append("<h3>您的訂單已處理</h3>");
-        emailContent.append("<p>訂單編號: " + order.getOrderId() + "</p>");
-        emailContent.append("<p>訂單狀態: " + order.getOrderStatus() + "</p>");
-        emailContent.append("<p>訂單總金額: NT$" + order.getFinalPrice() + "</p>");
-        emailContent.append("<p>訂單詳情：</p>");
-        emailContent.append("<table border='1'><tr><th>商品名稱</th><th>數量</th><th>單價</th><th>金額</th></tr>");
-
-        // 生成訂單項目
-        for (OrderItem item : order.getOrderItems()) {
-            emailContent.append("<tr>")
-                    .append("<td>").append(item.getProduct().getProductName()).append("</td>")
-                    .append("<td>").append(item.getOrderQuantity()).append("</td>")
-                    .append("<td>").append(item.getPurchasedPrice()).append("</td>")
-                    .append("<td>").append(item.getPurchasedPrice().multiply(new BigDecimal(item.getOrderQuantity())))
-                    .append("</td>")
-                    .append("</tr>");
+            // 發送郵件並處理錯誤
+            try {
+                emailService.sendEmail(updatedOrder.getMember().getEmail(), "訂單狀態更新", emailContent);
+            } catch (Exception e) {
+                // 打印出錯信息以便調試
+                e.printStackTrace();
+                throw new MessagingException("郵件發送失敗: " + e.getMessage());
+            }
         }
 
-        emailContent.append("</table>");
+        return updatedOrder;
+    }
+
+    // 根據訂單和狀態生成郵件內容
+    private String generateEmailContent(Orders order, String status) {
+        StringBuilder emailContent = new StringBuilder();
+        emailContent.append("<h3>您的訂單狀態已更新</h3>");
+        emailContent.append("<p>訂單編號: " + order.getOrderId() + "</p>");
+        emailContent.append("<p>訂單狀態: " + status + "</p>");
+
+        if (status.equals("已支付")) {
+            emailContent.append("<p>訂單總金額: NT$" + order.getFinalPrice() + "</p>");
+            emailContent.append("<p>訂單詳情：</p>");
+            emailContent.append("<table border='1'><tr><th>商品名稱</th><th>數量</th><th>單價</th><th>金額</th></tr>");
+
+            // 生成訂單項目
+            for (OrderItem item : order.getOrderItems()) {
+                emailContent.append("<tr>")
+                        .append("<td>").append(item.getProduct().getProductName()).append("</td>")
+                        .append("<td>").append(item.getOrderQuantity()).append("</td>")
+                        .append("<td>").append(item.getPurchasedPrice()).append("</td>")
+                        .append("<td>")
+                        .append(item.getPurchasedPrice().multiply(new BigDecimal(item.getOrderQuantity())))
+                        .append("</td>")
+                        .append("</tr>");
+            }
+
+            emailContent.append("</table>");
+        } else {
+            emailContent.append("<p>您的訂單正在處理中，將很快更新為下一步狀態。</p>");
+        }
+
         return emailContent.toString();
     }
 
@@ -206,15 +218,6 @@ public class OrderService implements IOrderService {
             e.printStackTrace();
             return false;
         }
-    }
-
-    // 更新订单状态
-    @Transactional
-    public Orders updateOrderStatus(Integer orderId, String status) {
-        Orders order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("订单未找到: " + orderId));
-        order.setOrderStatus(status);
-        return orderRepository.save(order);
     }
 
     // 获取订单信息
@@ -363,4 +366,96 @@ public class OrderService implements IOrderService {
         order.setMerchantTradeNo(merchantTradeNo);
         orderRepository.save(order); // Save the updated order
     }
+
+    @Transactional
+public boolean submitOrder(int cartId, int memberId, String creditCard, String shippingAddress,
+        List<Integer> selectedItems) {
+    try {
+        // 确保 selectedItems 不是 null
+        if (selectedItems == null || selectedItems.isEmpty()) {
+            throw new RuntimeException("未選擇商品");
+        }
+
+        // 查询购物车
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("找不到購物車"));
+
+        // 查询用户
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("找不到會員"));
+
+        // 确保购物车属于该会员
+        if (cart.getMember().getMemberId() != memberId) {
+            throw new RuntimeException("購物車與會員ID不匹配");
+        }
+
+        // 过滤出被选中的商品
+        List<CartItem> cartItems = cart.getCartItems().stream()
+                .filter(item -> selectedItems.contains(item.getProduct().getProductId())) // 只保留被选中的商品
+                .toList();
+
+        if (cartItems.isEmpty()) {
+            throw new RuntimeException("未選擇有效的商品");
+        }
+
+        // 计算订单总金额
+        double totalPrice = cartItems.stream()
+                .mapToDouble(item -> item.getProduct().getSalePrice().doubleValue() * item.getQuantity())
+                .sum();
+
+        // 创建订单
+        Orders newOrder = new Orders();
+        newOrder.setMember(member);
+        newOrder.setShippingAddress(shippingAddress);
+        newOrder.setCreditCard(creditCard);
+        newOrder.setOrderDate(LocalDateTime.now());
+        newOrder.setOrderStatus("待支付");
+        newOrder.setSubtotalPrice(totalPrice);
+        newOrder.setFinalPrice(totalPrice);
+
+        Orders savedOrder = orderRepository.save(newOrder);
+
+        // 添加订单项
+        for (CartItem item : cartItems) {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(savedOrder);
+            orderItem.setProduct(item.getProduct());
+            orderItem.setOrderQuantity(item.getQuantity());
+            orderItem.setPurchasedPrice(item.getProduct().getSalePrice());
+            orderItem.setStatus("待出貨");
+            orderItemRepository.save(orderItem);
+        }
+
+        // 从购物车中删除已选中的商品
+        cartItemRepository.deleteAll(cartItems);
+
+        return true;
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+public Orders processPayment(int orderId, PaymentRequest paymentRequest) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'processPayment'");
+}
+
+public List<Orders> getOrdersByMemberId(int memberId) {
+    try {
+        // Fetch orders by memberId directly, referencing member's memberId
+        return orderRepository.findByMember_MemberId(memberId);
+    } catch (Exception e) {
+        // Handle the exception and throw a RuntimeException with the error message
+        throw new RuntimeException("Error fetching orders: " + e.getMessage(), e);
+    }
+}
+public void submitOrder(Map<String, Object> requestBody, int memberId, Cart cart) {
+    // 這裡處理提交訂單邏輯
+    // 可以利用傳入的 memberId 和 cart 來處理訂單相關的操作
+
+    // 範例：假設根據 memberId 和 cartId 進行訂單創建
+    System.out.println("Submitting order for member ID: " + memberId);
+    System.out.println("Cart details: " + cart);
+}
 }

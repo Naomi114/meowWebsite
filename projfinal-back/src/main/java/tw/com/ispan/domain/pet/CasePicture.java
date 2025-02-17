@@ -10,7 +10,7 @@ public class CasePicture {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer casePictureId;
 
-	@Column(name = "pictureUrl", length = 255, nullable = false)
+	@Column(name = "pictureUrl", length = 255, nullable = true)
 	private String pictureUrl;
 
 	// Constructor

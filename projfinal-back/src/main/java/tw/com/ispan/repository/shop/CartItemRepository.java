@@ -1,9 +1,11 @@
 package tw.com.ispan.repository.shop;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.shop.CartItem;
@@ -35,10 +37,16 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     // 刪除指定的 CartItem
     void deleteAllByCartItemIdIn(List<Integer> cartItemId);
 
-    // 刪除商品時，若購物車中存在該商品(by Naomi)
-    void deleteByProduct(Product product);
-
     // 刪除商品時，確認受到影響的會員(by Naomi)
     @Query("SELECT c.cart.member FROM CartItem c WHERE c.product = :product")
     List<Member> findMembersByProduct(@Param("product") Product product);
+
+    // 刪除商品時，若購物車中存在該商品(by Naomi)
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM CartItem w WHERE w.product.id = :productId")
+    void deleteByProductId(@Param("productId") Integer productId);
+
+  
+
 }

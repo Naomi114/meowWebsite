@@ -1,13 +1,9 @@
 package tw.com.ispan.dto.shop;
 
-import javax.validation.constraints.NotNull;
-
 public class WishListRequest {
 
-    @NotNull(message = "會員編號不能為空")
     private Integer memberId;
 
-    @NotNull(message = "商品編號不能為空")
     private Integer productId;
 
     public Integer getMemberId() {

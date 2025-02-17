@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,18 +16,26 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.pet.forAdopt.AdoptionCaseApply;
 
 @Entity
-@Table(name = "AdoptionCase")
+@Table(name = "AdoptionCase", indexes = {
+        @Index(name = "idx_species", columnList = "speciesId"),
+        @Index(name = "idx_breed", columnList = "breedId"),
+        @Index(name = "idx_furColor", columnList = "furColorId"),
+        @Index(name = "idx_city", columnList = "cityId"),
+        @Index(name = "idx_districtArea", columnList = "districtAreaId")
+})
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "adoptionCaseId")
+// 使用lostCaseId作為唯一標識符
 public class AdoptionCase {
 
     @Id
@@ -42,6 +53,7 @@ public class AdoptionCase {
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_Species"))
     private Species species;
+
     // 雙向多對一,外鍵,對應breed表
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "breedId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_Breed"))
@@ -51,7 +63,7 @@ public class AdoptionCase {
     @JoinColumn(name = "furColorId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_FurColor"))
     private FurColor furColor;
 
-    @Column(name = "gender", columnDefinition = "nvarchar(10)")
+    @Column(columnDefinition = "NVARCHAR(5)", name = "gender")
     private String gender;
 
     @Column(name = "sterilization", columnDefinition = "nvarchar(5)")
@@ -63,8 +75,8 @@ public class AdoptionCase {
     @Column(name = "microChipNumber")
     private Integer microChipNumber;
 
-    @Column(name = "susLost", nullable = false)
-    private Boolean susLost;
+    @Column(name = "applytitle", nullable = true, columnDefinition = "nvarchar(50)")
+    private String applytitle;
 
     // 雙向多對一,外鍵,對應city表
     @ManyToOne(cascade = { CascadeType.PERSIST })
@@ -76,57 +88,73 @@ public class AdoptionCase {
     @JoinColumn(name = "districtAreaId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_DistrictArea"))
     private DistrictArea districtArea;
 
-    @Column(name = "street", columnDefinition = "NVARCHAR(10)")
+    @Column(name = "street", columnDefinition = "NVARCHAR(50)")
     private String street;
 
+    @Column(columnDefinition = "NVARCHAR(10)", name = "name")
+    private String name;
     // 10位數，8位小數
-    @Column(name = "latitude", precision = 10, scale = 8, nullable = true)
-    private BigDecimal latitude;
+    @Column(name = "latitude", precision = 10, nullable = true)
+    private Double latitude;
 
-    @Column(name = "longitude", precision = 11, scale = 8, nullable = true)
-    private BigDecimal longitude;
+    @Column(name = "isHidden", nullable = true)
+    private Boolean isHidden = false; // 默認為不隱藏
+
+    // 必填
+    // 11位數，8位小數
+    @Column(name = "longitude", precision = 11, nullable = true)
+    private Double longitude;
 
     @Column(name = "viewCount")
-    private Integer viewCount;
+    private Integer viewCount = 0;
+
+    @Column(name = "donationAmount")
+    private Integer donationAmount = 0;
 
     @Column(name = "follow")
-    private Integer follow;
+    private Integer follow = 0;
 
-    @Column(name = "publicationTime", nullable = false)
+    @Column(name = "caseUrl", length = 255)
+    private String caseUrl;
+
+    @Column(name = "tag", nullable = true, columnDefinition = "nvarchar(100)")
+    private String tag;
+
+    @Column(name = "publicationTime", nullable = true)
     private LocalDateTime publicationTime;
 
-    @Column(name = "lastUpdateTime", nullable = false)
+    @Column(name = "lastUpdateTime", nullable = true)
     private LocalDateTime lastUpdateTime;
 
-    @Column(name = "story", columnDefinition = "NVARCHAR(max)", nullable = false)
+    @Column(name = "story", columnDefinition = "NVARCHAR(max)", nullable = true)
     private String story;
 
-    @Column(name = "healthCondition", columnDefinition = "NVARCHAR(max)", nullable = false)
+    @Column(name = "healthCondition", columnDefinition = "NVARCHAR(max)", nullable = true)
     private String healthCondition;
 
-    @Column(name = "adoptedCondition", columnDefinition = "NVARCHAR(max)", nullable = false)
+    @Column(name = "adoptedCondition", columnDefinition = "NVARCHAR(max)", nullable = true)
     private String adoptedCondition;
 
-    @Column(name = "note", columnDefinition = "NVARCHAR(max)")
+    @Column(name = "note", columnDefinition = "NVARCHAR(max)", nullable = true)
     private String note;
 
     // 單向多對一,外鍵,對應CaseState表
-    @ManyToOne(cascade = { CascadeType.PERSIST })
-    @JoinColumn(name = "caseStateId", nullable = false, foreignKey = @ForeignKey(name = "FK__AdoptionCaseState"))
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinColumn(name = "caseStateId", nullable = false, foreignKey = @ForeignKey(name = "FK__Adoption_CaseState"))
     private CaseState caseState;
 
     // 關聯到CasePicture表，單向一對多，外鍵在一方
-    @OneToMany
-    @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_CasePicture_AdoptionCase"), nullable = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "adoptionCaseId", foreignKey = @ForeignKey(name = "FK_CasePicture_AdoptionCase"))
     private List<CasePicture> casePictures;
 
     // 雙向一對多，對應follow表
     @OneToMany(mappedBy = "adoptionCase", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Follow> follows;
+    private List<Follow> follows;
 
     // 關聯到ReportCase表，單向一對多
     // 無外鍵，怕爛掉，測試版
-    @OneToMany(mappedBy = "adoptionCase", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "adoptionCase", cascade = CascadeType.PERSIST)
     private List<ReportCase> reportCase;
 
     // 與AdoptionCaseApply 多對多
@@ -138,58 +166,42 @@ public class AdoptionCase {
 
     }
 
-    public AdoptionCase(Integer adoptionCaseId, String caseTitle, Member member, Species species, Breed breed,
-            FurColor furColor, String gender, String sterilization, Integer age, Integer microChipNumber,
-            Boolean susLost, City city, DistrictArea districtArea, String street, BigDecimal latitude,
-            BigDecimal longitude, Integer viewCount, Integer follow, LocalDateTime publicationTime,
-            LocalDateTime lastUpdateTime, String story, String healthCondition, String adoptedCondition, Integer status,
-            String note,
-            List<CasePicture> casePictures, Set<Follow> follows, List<ReportCase> reportCase,
-            Set<AdoptionCaseApply> adoptionCaseApply, CaseState caseState) {
-        this.adoptionCaseId = adoptionCaseId;
-        this.caseTitle = caseTitle;
-        this.member = member;
-        this.species = species;
-        this.breed = breed;
-        this.furColor = furColor;
-        this.gender = gender;
-        this.sterilization = sterilization;
-        this.age = age;
-        this.microChipNumber = microChipNumber;
-        this.susLost = susLost;
-        this.city = city;
-        this.districtArea = districtArea;
-        this.street = street;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.viewCount = viewCount;
-        this.follow = follow;
-        this.publicationTime = publicationTime;
-        this.lastUpdateTime = lastUpdateTime;
-        this.story = story;
-        this.healthCondition = healthCondition;
-        this.adoptedCondition = adoptedCondition;
-
-        this.note = note;
-        this.casePictures = casePictures;
-        this.follows = follows;
-        this.reportCase = reportCase;
-        this.adoptionCaseApply = adoptionCaseApply;
-        this.caseState = caseState; // 確保在構造時就初始化 caseState
-    }
-
     @Override
     public String toString() {
-        return "AdoptionCase [adoptionCaseId=" + adoptionCaseId + ", caseTitle=" + caseTitle + ", member=" + member
-                + ", species=" + species + ", breed=" + breed + ", furColor=" + furColor + ", gender=" + gender
-                + ", sterilization=" + sterilization + ", age=" + age + ", microChipNumber=" + microChipNumber
-                + ", susLost=" + susLost + ", city=" + city + ", districtArea=" + districtArea + ", street=" + street
-                + ", latitude=" + latitude + ", longitude=" + longitude + ", viewCount=" + viewCount + ", follow="
-                + follow + ", publicationTime=" + publicationTime + ", lastUpdateTime=" + lastUpdateTime + ", story="
-                + story + ", healthCondition=" + healthCondition + ", adoptedCondition="
-                + adoptedCondition + ", note=" + note + ", caseState=" + caseState + ", casePictures=" + casePictures
-                + ", follows=" + follows + ", reportCase=" + reportCase + ", adoptionCaseApply=" + adoptionCaseApply
-                + "]";
+        return "AdoptionCase [adoptionCaseId=" + adoptionCaseId +
+                ", caseTitle=" + caseTitle +
+                ", member=" + member +
+                ", species=" + species +
+                ", breed=" + breed +
+                ", furColor=" + furColor +
+                ", gender=" + gender +
+                ", sterilization=" + sterilization +
+                ", age=" + age +
+                ", microChipNumber=" + microChipNumber +
+                ", applytitle=" + applytitle +
+                ", name=" + name +
+                ", city=" + city +
+                ", districtArea=" + districtArea +
+                ", street=" + street +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", viewCount=" + viewCount +
+                ", donationAmount=" + donationAmount +
+                ", follow=" + follow +
+                ", caseUrl=" + caseUrl +
+                ", tag=" + tag +
+                ", publicationTime=" + publicationTime +
+                ", lastUpdateTime=" + lastUpdateTime +
+                ", story=" + story +
+                ", healthCondition=" + healthCondition +
+                ", adoptedCondition=" + adoptedCondition +
+                ", note=" + note +
+                ", caseState=" + caseState +
+                ", casePictures=" + casePictures +
+                ", follows=" + follows +
+                ", reportCase=" + reportCase +
+                ", isHidden=" + isHidden +
+                ", adoptionCaseApply=" + adoptionCaseApply + "]";
     }
 
     public Integer getAdoptionCaseId() {
@@ -232,6 +244,38 @@ public class AdoptionCase {
         this.breed = breed;
     }
 
+    public Boolean getIsHidden() {
+        return isHidden;
+    }
+
+    public void setIsHidden(Boolean isHidden) {
+        this.isHidden = isHidden;
+    }
+
+    public Integer getDonationAmount() {
+        return donationAmount;
+    }
+
+    public void setDonationAmount(Integer donationAmount) {
+        this.donationAmount = donationAmount;
+    }
+
+    public String getCaseUrl() {
+        return caseUrl;
+    }
+
+    public void setCaseUrl(String caseUrl) {
+        this.caseUrl = caseUrl;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
     public FurColor getFurColor() {
         return furColor;
     }
@@ -268,16 +312,24 @@ public class AdoptionCase {
         return microChipNumber;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setMicroChipNumber(Integer microChipNumber) {
         this.microChipNumber = microChipNumber;
     }
 
-    public Boolean getSusLost() {
-        return susLost;
+    public String getApplyTitle() {
+        return applytitle;
     }
 
-    public void setSusLost(Boolean susLost) {
-        this.susLost = susLost;
+    public void setApplyTitle(String applytitle) {
+        this.applytitle = applytitle;
     }
 
     public City getCity() {
@@ -304,19 +356,19 @@ public class AdoptionCase {
         this.street = street;
     }
 
-    public BigDecimal getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(BigDecimal latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public BigDecimal getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(BigDecimal longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
@@ -400,11 +452,11 @@ public class AdoptionCase {
         this.casePictures = casePictures;
     }
 
-    public Set<Follow> getFollows() {
+    public List<Follow> getFollows() {
         return follows;
     }
 
-    public void setFollows(Set<Follow> follows) {
+    public void setFollows(List<Follow> follows) {
         this.follows = follows;
     }
 

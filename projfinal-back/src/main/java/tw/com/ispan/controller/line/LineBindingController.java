@@ -23,7 +23,7 @@ import tw.com.ispan.service.line.LineNotificationService;
 import tw.com.ispan.service.line.RedisService;
 
 //用來檢查用戶是否line登入、追蹤平台商家
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/line")
 public class LineBindingController {

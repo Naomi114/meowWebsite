@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
+import jakarta.persistence.EntityNotFoundException;
 import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.domain.shop.Cart;
 import tw.com.ispan.domain.shop.CartItem;
@@ -159,7 +161,26 @@ public class CartService {
     }
 
     public CartItem getCartItemById(Integer cartItemId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCartItemById'");
+        // 查詢資料庫是否存在該 cartItemId
+        Optional<CartItem> cartItem = cartItemRepository.findById(cartItemId);
+        if (cartItem.isPresent()) {
+            return cartItem.get();
+        } else {
+            throw new EntityNotFoundException("Cart item not found for ID: " + cartItemId);
+        }
     }
+
+    // 根據訂單 ID 移除購物車中的商品
+    public void removeItemsByOrderId(int orderId) {
+        // 查詢該訂單下的所有 cartItems
+        List<CartItem> cartItems = cartItemRepository.findByOrder_OrderId(orderId);
+        if (cartItems != null && !cartItems.isEmpty()) {
+            // 刪除所有與該訂單相關的購物車商品
+            cartItemRepository.deleteAll(cartItems);
+        } else {
+            throw new EntityNotFoundException("No cart items found for order ID: " + orderId);
+        }
+    }
+
+    
 }

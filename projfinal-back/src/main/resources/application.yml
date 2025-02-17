@@ -1,19 +1,19 @@
 server:
   port: 8080
   error:
-    include-message: always  # 確保錯誤訊息包含在回應中
-    include-binding-errors: always  # 顯示參數驗證錯誤
-    include-stacktrace: always  # 顯示完整錯誤堆疊
+    include-message: always # 確保錯誤訊息包含在回應中
+    include-binding-errors: always # 顯示參數驗證錯誤
+    include-stacktrace: always # 顯示完整錯誤堆疊
 
 spring:
   application:
     name: projfinal-back
-  
+
   #Spring Boot 啟動時應加載的基礎包
   main:
     sources:
       - tw.com.ispan
-      
+
   #Docker環境下的設定
   profiles:
     active: "dev"
@@ -27,17 +27,17 @@ spring:
   #靜態檔案存取路徑: 分為專案內外部
   web:
     resources:
-      static-locations: 
+      static-locations:
         - classpath:/static/
         - file:C:/meowWebsite/images/
-  
+
   #json格式
   jackson:
     date-format: "yyyy-MM-dd"
     time-zone: Asia/Taipei
     serialization:
       fail-on-empty-beans: false
-  
+
   #資料庫連線設定
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -52,7 +52,7 @@ spring:
       hibernate.format_sql: true
     database-platform: org.hibernate.dialect.SQLServerDialect
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
@@ -96,6 +96,8 @@ jwt:
 google:
   api:
     key: AIzaSyATLMpyW2m1qnNAAQf0rZSpcl6TadBobBg
+  client:
+    id: 687382637987-mac1n2c8aakto95j4o56keqblhst1j1u.apps.googleusercontent.com
 
 #message API(冠)
 Channel:
@@ -109,10 +111,10 @@ logging:
     org:
       springframework:
         web:
-          client:
-            RestTemplate: DEBUG
-      apache:
-        http: DEBUG
+          client: DEBUG         # 設置為 debug，捕捉 web 客戶端級別的日誌
+    apache:
+      http: DEBUG            # 設置 Apache HTTP 客戶端日誌級別
+    org.springframework.web.client.RestTemplate: DEBUG   # 針對 RestTemplate 設置日誌級別
 #Domain Name(冠)
 front:
   domainName:
