@@ -2,7 +2,7 @@ pipeline {
     agent any  // 讓 Jenkins 在任意可用節點上執行
 
     environment {
-        BACKEND_IMAGE = 'leekuanju/Meowbackend:latest'
+        BACKEND_IMAGE = 'leekuanju/meowbackend:latest'
         MSSQL_IMAGE = "mcr.microsoft.com/mssql/server:2022-latest"
         REDIS_IMAGE = "redis:latest"
         DOCKER_CREDENTIALS_ID = 'petfinder'    //已於在jenkins中設定可以登入dokcer-hub的帳密和使用id
