@@ -33,7 +33,7 @@ pipeline {
 
         stage('建構後端 Docker 映像檔') {
             steps {
-                sh "docker build -t $BACKEND_IMAGE ./Meowbackend/projfinal-back"
+                sh "docker build -t $BACKEND_IMAGE ./projfinal-back""
             }
         }
 
