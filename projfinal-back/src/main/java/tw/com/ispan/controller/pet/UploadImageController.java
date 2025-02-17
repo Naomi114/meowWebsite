@@ -17,6 +17,7 @@ import tw.com.ispan.service.pet.ImageService;
 
 //案件單個圖片上傳(冠)
 @RestController
+
 @RequestMapping(path = { "/api/Case" })
 public class UploadImageController {
 
@@ -44,7 +45,6 @@ public class UploadImageController {
 			response.put("status", "400");
 			response.put("message", "檔案不得為空");
 			return ResponseEntity.badRequest().body(response);
-
 		}
 		String contentType = file.getContentType();
 		if (contentType == null || !contentType.startsWith("image/")) { // image開頭包含image/jpeg、image/png、image/gif
