@@ -30,18 +30,6 @@ pipeline {
             }
         }
 
-        stage('清理舊的 Docker Image') {
-            steps {
-                sh "docker image prune -f"
-                sh '''
-                IMAGES=$(docker images -q leekuanju/Meowfrontend | tail -n +2)
-                if [ -n "$IMAGES" ]; then
-                    docker rmi -f $IMAGES
-                fi
-                '''
-            }
-        }
-
 
         stage('建構後端 Docker 映像檔') {
             steps {
