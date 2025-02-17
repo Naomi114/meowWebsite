@@ -3,7 +3,6 @@ package tw.com.ispan.controller.shop;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +44,7 @@ public class CartController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
     @GetMapping("/memberId")
     public ResponseEntity<?> getMemberId(HttpSession session) {
         Integer memberId = (Integer) session.getAttribute("memberId");
@@ -53,6 +53,7 @@ public class CartController {
         }
         return ResponseEntity.ok(Map.of("memberId", memberId));
     }
+
     // ✅ 2. 查詢購物車內容
     @GetMapping(value = "/list/{memberId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CartItem>> getCartByMemberId(@PathVariable Integer memberId) {
@@ -68,28 +69,26 @@ public class CartController {
 
     // ✅ 3. 新增商品至購物車
     @PostMapping("/add")
-    public ResponseEntity<CartResponse> addCart(@RequestBody @Valid CartRequest request) {
+    public ResponseEntity<CartResponse> addCart(@RequestBody CartRequest request) {
         try {
             // 確保傳入的 memberId 不為 null 且有效
             if (request.getMemberId() == null || request.getMemberId() <= 0) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new CartResponse(false, "Invalid member ID"));
             }
-    
+
             // 執行購物車添加商品的邏輯
             CartResponse response = cartService.addCartItem(request);
-    
+
             // 返回添加結果
-            return response.isSuccess() ? 
-                ResponseEntity.status(HttpStatus.CREATED).body(response) :
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return response.isSuccess() ? ResponseEntity.status(HttpStatus.CREATED).body(response)
+                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (Exception e) {
             log.error("Error adding item to cart", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new CartResponse(false, "Failed to add item to cart"));
         }
     }
-    
 
     // ✅ 4. 刪除購物車內的單筆商品
     @DeleteMapping("/delete/{cartItemId}")
