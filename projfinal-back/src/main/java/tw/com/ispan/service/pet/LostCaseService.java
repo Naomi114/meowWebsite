@@ -114,23 +114,33 @@ public class LostCaseService {
 
         return lostCaseRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-
-            // ✅ 全域模糊查詢
+            // ✅ 文字欄位支援模糊查詢
             if (criteria.getKeyword() != null && !criteria.getKeyword().trim().isEmpty()) {
-                String likePattern = "%" + criteria.getKeyword().trim().toLowerCase() + "%";
+                String likePattern = "%" + criteria.getKeyword().trim() + "%";
                 predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("caseTitle")), likePattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("featureDescription")), likePattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("lostExperience")), likePattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("contactInformation")), likePattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("species").get("species")), likePattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("breed").get("breed")), likePattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("furColor").get("furColor")), likePattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("city").get("city")), likePattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("districtArea").get("districtAreaName")),
-                                likePattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("street")), likePattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("microChipNumber")), likePattern)));
+                        criteriaBuilder.like(root.get("caseTitle"), likePattern),
+                        criteriaBuilder.like(root.get("street"), likePattern),
+                        criteriaBuilder.like(root.get("petName"), likePattern),
+                        criteriaBuilder.like(root.get("gender"), likePattern),
+                        criteriaBuilder.like(root.get("featureDescription"), likePattern),
+                        criteriaBuilder.like(root.get("contactInformation"), likePattern),
+                        criteriaBuilder.like(root.get("lostExperience"), likePattern)));
+            }
+
+            // ✅ `gender` 性別篩選
+            if (criteria.getGender() != null && !criteria.getGender().isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("gender"), criteria.getGender()));
+            }
+
+            // ✅ `sterilization` 絕育狀態篩選
+            if (criteria.getSterilization() != null && !criteria.getSterilization().isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("sterilization"), criteria.getSterilization()));
+            }
+
+            // ✅ `microchip` 10碼晶片篩選
+            if ("0123456789".equals(criteria.getMicroChipNumber())) {
+                predicates.add(criteriaBuilder.isNotNull(root.get("microChipNumber")));
+                predicates.add(criteriaBuilder.notEqual(root.get("microChipNumber"), ""));
             }
 
             // ✅ 支援單一 speciesId 查詢
