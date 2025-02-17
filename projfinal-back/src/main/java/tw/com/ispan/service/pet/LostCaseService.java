@@ -25,6 +25,7 @@ import tw.com.ispan.domain.pet.DistrictArea;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.banner.Banner;
 import tw.com.ispan.domain.pet.banner.BannerType;
+import tw.com.ispan.dto.pet.LostSearchCriteria;
 import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.pet.BannerRepository;
 import tw.com.ispan.repository.pet.BreedRepository;
@@ -95,18 +96,17 @@ public class LostCaseService {
         return lostCaseRepository.findByMemberId(memberId);
     }
 
-    @Transactional()
-    public Page<LostCase> searchLostCases(JSONObject param) {
-        int start = param.optInt("start", 0);
-        int rows = param.optInt("rows", 10);
-        String sortField = param.optString("sort", "lostCaseId");
-        boolean sortDirection = param.optBoolean("dir", false);
-        lostCaseRepository.flush();
+    @Transactional
+    public Page<LostCase> searchLostCases(LostSearchCriteria criteria) {
+        int start = 0;
+        int rows = 10;
+        String sortField = "lostCaseId";
+        boolean sortDirection = false; // 預設升序
 
-        // ✅ 限制排序欄位，防止錯誤排序
+        // ✅ 確保排序欄位合法
         List<String> validSortFields = Arrays.asList("lostCaseId", "speciesId", "breedId", "caseStateId");
-        if (!validSortFields.contains(sortField)) {
-            sortField = "lostCaseId";
+        if (criteria.getKeyword() != null && validSortFields.contains(criteria.getKeyword())) {
+            sortField = criteria.getKeyword();
         }
 
         Sort sort = sortDirection ? Sort.by(sortField).descending() : Sort.by(sortField).ascending();
@@ -115,56 +115,57 @@ public class LostCaseService {
         return lostCaseRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // ✅ 支援模糊查詢 caseTitle + description
-            if (param.has("keyword")) {
-                String likePattern = "%" + param.getString("keyword") + "%";
+            // ✅ 全域模糊查詢
+            if (criteria.getKeyword() != null && !criteria.getKeyword().trim().isEmpty()) {
+                String likePattern = "%" + criteria.getKeyword().trim().toLowerCase() + "%";
                 predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.like(root.get("caseTitle"), likePattern),
-                        criteriaBuilder.like(root.get("description"), likePattern)));
-                System.out.println("🔎 查詢條件：" + param.toString());
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("caseTitle")), likePattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("featureDescription")), likePattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("lostExperience")), likePattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("contactInformation")), likePattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("species").get("species")), likePattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("breed").get("breed")), likePattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("furColor").get("furColor")), likePattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("city").get("city")), likePattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("districtArea").get("districtAreaName")),
+                                likePattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("street")), likePattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("microChipNumber")), likePattern)));
             }
 
             // ✅ 支援單一 speciesId 查詢
-            if (param.has("speciesId")) {
-                int speciesId = param.optInt("speciesId", -1);
-                if (speciesId > 0) {
-                    predicates.add(criteriaBuilder.equal(root.get("species").get("speciesId"), speciesId));
-                }
+            if (criteria.getSpeciesId() != null && criteria.getSpeciesId() > 0) {
+                predicates.add(criteriaBuilder.equal(root.get("species").get("speciesId"), criteria.getSpeciesId()));
             }
 
-            // ✅ 支援多個 speciesIds 查詢
-            if (param.has("speciesIds")) {
-                JSONArray speciesIds = param.getJSONArray("speciesIds");
-                CriteriaBuilder.In<Integer> inClause = criteriaBuilder.in(root.get("species").get("speciesId"));
-                for (int i = 0; i < speciesIds.length(); i++) {
-                    inClause.value(speciesIds.getInt(i));
-                }
-                predicates.add(inClause);
-            }
+            // ✅ 支援多個 speciesIds 查詢（未來擴展）
+            // if (criteria.getSpeciesIds() != null && !criteria.getSpeciesIds().isEmpty())
+            // {
+            // CriteriaBuilder.In<Integer> inClause =
+            // criteriaBuilder.in(root.get("species").get("speciesId"));
+            // for (Integer speciesId : criteria.getSpeciesIds()) {
+            // inClause.value(speciesId);
+            // }
+            // predicates.add(inClause);
+            // }
 
             // ✅ 其他篩選條件
-            if (param.has("breedId")) {
-                predicates.add(criteriaBuilder.equal(root.get("breed").get("breedId"), param.getInt("breedId")));
-                System.out.println("🔎 查詢條件：" + param.toString());
+            if (criteria.getBreedId() != null && criteria.getBreedId() > 0) {
+                predicates.add(criteriaBuilder.equal(root.get("breed").get("breedId"), criteria.getBreedId()));
             }
-            if (param.has("furColorId")) {
-                predicates
-                        .add(criteriaBuilder.equal(root.get("furColor").get("furColorId"), param.getInt("furColorId")));
-                System.out.println("🔎 查詢條件：" + param.toString());
+            if (criteria.getFurColorId() != null && criteria.getFurColorId() > 0) {
+                predicates.add(criteriaBuilder.equal(root.get("furColor").get("furColorId"), criteria.getFurColorId()));
             }
-            if (param.has("cityId")) {
-                predicates.add(criteriaBuilder.equal(root.get("city").get("cityId"), param.getInt("cityId")));
-                System.out.println("🔎 查詢條件：" + param.toString());
+            if (criteria.getCityId() != null && criteria.getCityId() > 0) {
+                predicates.add(criteriaBuilder.equal(root.get("city").get("cityId"), criteria.getCityId()));
             }
-            if (param.has("districtAreaId")) {
+            if (criteria.getDistrictAreaId() != null && criteria.getDistrictAreaId() > 0) {
                 predicates.add(criteriaBuilder.equal(root.get("districtArea").get("districtAreaId"),
-                        param.getInt("districtAreaId")));
-                System.out.println("🔎 查詢條件：" + param.toString());
+                        criteria.getDistrictAreaId()));
             }
-            if (param.has("caseStateId")) {
+            if (criteria.getCaseStateId() != null && criteria.getCaseStateId() > 0) {
                 predicates.add(
-                        criteriaBuilder.equal(root.get("caseState").get("caseStateId"), param.getInt("caseStateId")));
-                System.out.println("🔎 查詢條件：" + param.toString());
+                        criteriaBuilder.equal(root.get("caseState").get("caseStateId"), criteria.getCaseStateId()));
             }
 
             // ✅ 只查詢未隱藏案件
