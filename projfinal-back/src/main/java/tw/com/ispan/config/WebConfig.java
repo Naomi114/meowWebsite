@@ -28,8 +28,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private CartActionInterceptor cartActionInterceptor;
 
-    @Autowired
-    private AuthenticationInterceptor authenticationInterceptor; // 注入 AuthenticationInterceptor
+    // @Autowired
+    // private AuthenticationInterceptor authenticationInterceptor; // 注入
+    // AuthenticationInterceptor
 
     @Value("${file.petUpload.path}") // 讀取 application-*.properties 中的 file.upload.path
     private String petUploadPath;
@@ -65,9 +66,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/pages/cart/list/**"); // ✅ 指定攔截購物車 API
 
         // 註冊身份驗證攔截器
-        registry.addInterceptor(authenticationInterceptor)
-                .addPathPatterns("/api/**") // 設定攔截 /api/** 路徑的所有請求
-                .excludePathPatterns("/api/login", "/api/register"); // 排除不需要身份驗證的路徑，例如登入和註冊
+        // registry.addInterceptor(authenticationInterceptor)
+        // .addPathPatterns("/api/**") // 設定攔截 /api/** 路徑的所有請求
+        // .excludePathPatterns("/api/login", "/api/register"); // 排除不需要身份驗證的路徑，例如登入和註冊
     }
 
     @Override
