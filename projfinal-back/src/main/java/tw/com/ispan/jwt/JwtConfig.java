@@ -23,6 +23,6 @@ public class JwtConfig implements WebMvcConfigurer {
                         "/api/casePicture/**", "/api/RescueCase/rescueProgress/{caseId}", "/api/caseView/**") // 查詢、點閱案件功能為非會員也能使用(冠)
                 .excludePathPatterns("/api/RescueCase/analysis") // 管理員後台(冠)
                 .excludePathPatterns("/api/line/authorize", "/api/line/callback") // line登入相關功能(冠)
-                .excludePathPatterns("/"); // 排除首頁
+                .excludePathPatterns("/", "/api/ajax/secure/login", "/api/secure/loginadmin"); // 排除首頁
     }
 }
