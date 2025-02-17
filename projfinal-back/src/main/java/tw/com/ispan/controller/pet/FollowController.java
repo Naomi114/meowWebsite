@@ -15,9 +15,8 @@ import tw.com.ispan.service.pet.FollowService;
 
 //此為會員追蹤某案件
 @RestController
-@RequestMapping(path = { "/Case/follow" })
+@RequestMapping(path = { "/api/Case/follow" })
 public class FollowController {
-
 
 	@Autowired
 	private MemberRepository memberRepository;
@@ -29,7 +28,8 @@ public class FollowController {
 	private FollowService followService;
 
 	// 會員追蹤或取消追蹤某案件(重複按就會追蹤或取消追蹤)
-	// 當按下follow要能區分使用者是對rescue, lost還是adoption case執行追蹤，因為相同caseId在這三表中都有，要查對表。caseType數據會藏在前端的按鈕中
+	// 當按下follow要能區分使用者是對rescue, lost還是adoption
+	// case執行追蹤，因為相同caseId在這三表中都有，要查對表。caseType數據會藏在前端的按鈕中
 	@PutMapping("/add")
 	public RescueCaseResponse followCase(@RequestHeader("Authorization") String token,
 			@RequestAttribute("memberId") Integer memberId, @RequestParam Integer caseId,

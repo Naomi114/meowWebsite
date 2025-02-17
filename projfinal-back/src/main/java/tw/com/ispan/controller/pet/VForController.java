@@ -21,7 +21,7 @@ import tw.com.ispan.service.pet.VForService;
 //用於表列對應表中所有資料(物種、縣市、區域等，做下拉選單
 //已將"/pet/**"排除於token驗證"
 @RestController
-@RequestMapping(path = { "/pet" })
+@RequestMapping(path = { "/api/pet" })
 public class VForController {
 
     @Autowired
