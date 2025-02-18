@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EcpayFunctions {
     private static final String ACTION_URL = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5";
-    private static final String RETURN_URL = "https://5ade-1-160-0-24.ngrok-free.app/api/pages/ecpay/return";
+    private static final String RETURN_URL = "https://petfinder.duckdns.org/api/pages/ecpay/return";
     private static final String MERCHANT_ID = "2000132";
     private static final String HASH_KEY = "5294y06JbISpM5x9";
     private static final String HASH_IV = "v77hoKGq4kWxNNIS";
