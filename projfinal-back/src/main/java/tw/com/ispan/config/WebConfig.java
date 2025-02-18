@@ -47,10 +47,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/upload/**")
-                .addResourceLocations("file:C:/upload/");
+                .addResourceLocations("file:" + petUploadPath);
 
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:C:/meowWebsite/images/"); // ✅ 確保這裡是圖片存放的實際路徑
+                .addResourceLocations("file:" + shopUploadPath); // ✅ 確保這裡是圖片存放的實際路徑
     }
 
     @Override
