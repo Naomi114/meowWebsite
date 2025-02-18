@@ -58,7 +58,7 @@ public class RescueCase {
 
 	// 必填
 	// 關聯到species表，雙向多對一
-	@ManyToOne(cascade = { CascadeType.PERSIST })  	
+	@ManyToOne(cascade = { CascadeType.PERSIST })
 	@JoinColumn(name = "speciesId", nullable = false, foreignKey = @ForeignKey(name = "FK_RescueCase_Species"))
 	private Species species;
 
@@ -114,7 +114,7 @@ public class RescueCase {
 	private Double longitude;
 
 	@Column(name = "donationAmount")
-	private Integer donationAmount= 0;
+	private Integer donationAmount = 0;
 
 	@Column(name = "viewCount")
 	private Integer viewCount = 0;
@@ -467,5 +467,4 @@ public class RescueCase {
 		this.isHidden = isHidden;
 	}
 
-	
 }

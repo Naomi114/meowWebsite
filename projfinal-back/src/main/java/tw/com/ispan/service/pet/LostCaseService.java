@@ -1,7 +1,5 @@
 package tw.com.ispan.service.pet;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -40,7 +36,6 @@ import tw.com.ispan.repository.pet.FurColorRepository;
 import tw.com.ispan.repository.pet.LostCaseRepository;
 import tw.com.ispan.repository.pet.SpeciesRepository;
 //import tw.com.ispan.service.banner.BannerService;
-import tw.com.ispan.util.LatLng;
 
 @Service
 @Transactional
@@ -68,8 +63,6 @@ public class LostCaseService {
 
     @Autowired
     private CaseStateRepository caseStateRepository;
-    @Autowired
-    private GeocodingService geocodingService;
 
     // @Autowired
     // private BannerService bannerService;
@@ -237,27 +230,6 @@ public class LostCaseService {
         lostCase.setCaseUrl(param.optString("caseUrl", null));
         lostCase.setPublicationTime(LocalDateTime.now());
         lostCase.setLastUpdateTime(LocalDateTime.now());
-
-        // 設置經緯度
-        String adress = city.getCity() + districtArea.getDistrictAreaName()
-                + param.getString("street");
-        System.out.println(adress);
-        try {
-            LatLng latLng = geocodingService.getCoordinatesFromAddress(adress);
-            if (latLng != null) {
-                lostCase.setLatitude(latLng.getLat());
-                lostCase.setLongitude(latLng.getLng());
-            }
-        } catch (JsonProcessingException e) {
-            System.out.println("請求座標API失敗");
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            System.out.println("不支援編碼");
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            System.out.println("編碼格式錯誤");
-            e.printStackTrace();
-        }
 
         // **關聯圖片**
         lostCase.setCasePictures(casePictures);
