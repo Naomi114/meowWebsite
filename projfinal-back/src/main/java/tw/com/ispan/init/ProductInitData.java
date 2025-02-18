@@ -29,7 +29,7 @@ import tw.com.ispan.service.shop.ProductTagService;
 
 @Component
 @Order(2)
-@Profile("dev") // 分離測試和開發環境
+// @Profile("dev") // 分離測試和開發環境
 public class ProductInitData implements CommandLineRunner {
 
     @Autowired
