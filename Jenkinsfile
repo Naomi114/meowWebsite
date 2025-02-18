@@ -30,6 +30,21 @@ pipeline {
             }
         }
 
+         stage('清理舊的 Docker Image') {
+            steps {
+                sh "docker image prune -f"
+                sh '''
+                IMAGES=$(docker images -q leekuanju/meowbackend)
+                if [ -n "$IMAGES" ]; then
+                    echo "刪除舊的 Docker 映像檔: $IMAGES"
+                    echo "$IMAGES" | xargs -r docker rmi -f
+                else
+                    echo "沒有舊的映像檔需要刪除"
+                fi
+                '''
+            }
+        }
+
 
         stage('建構後端 Docker 映像檔') {
             steps {
