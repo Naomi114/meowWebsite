@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -30,6 +31,12 @@ public class WebConfig implements WebMvcConfigurer {
     // @Autowired
     // private AuthenticationInterceptor authenticationInterceptor; // 注入
     // AuthenticationInterceptor
+
+    @Value("${file.petUpload.path}") // 讀取 application-*.properties 中的 file.upload.path
+    private String petUploadPath;
+
+    @Value("${file.shopUpload.path}") // 讀取 application-*.properties 中的 file.upload.path
+    private String shopUploadPath;
 
     // 全局 CORS 配置
     @Override
