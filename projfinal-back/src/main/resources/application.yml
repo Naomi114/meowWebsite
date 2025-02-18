@@ -42,8 +42,8 @@ spring:
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     url: jdbc:sqlserver://localhost:1433;database=meowdb;trustServerCertificate=true
-    username: ${DB_USERNAME:admin}
-    password: ${DB_PASSWORD:a123}
+    username: admin
+    password: a123
 
   #Hibernate/JPA的相關設定
   jpa:

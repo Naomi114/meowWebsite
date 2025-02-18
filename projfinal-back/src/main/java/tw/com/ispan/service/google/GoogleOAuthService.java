@@ -28,7 +28,7 @@ public class GoogleOAuthService {
 
         // 設定 Authorization 標頭
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken); // 使用 access token 作為 Bearer Token
+        headers.set("Authorization", "Bearer " + accessToken); // 使用 access token 作為Bearer Token
 
         // 建立 HTTP 請求的實體
         HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -44,7 +44,8 @@ public class GoogleOAuthService {
             // 返回 JSON 字串
             return response.getBody();
         } catch (HttpClientErrorException e) {
-            throw new IOException("Error while calling Google People API: " + e.getMessage(), e);
+            throw new IOException("Error while calling Google People API: " +
+                    e.getMessage(), e);
         }
     }
 

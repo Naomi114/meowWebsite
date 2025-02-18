@@ -56,18 +56,21 @@ public class GoogleLoginController {
         String profilePicture = (String) payload.get("picture"); // 取得使用者的頭像
 
         // 返回成功的回應
-        GoogleLoginResponseDTO response = createSuccessResponse(email, nickname, userId, profilePicture);
+        GoogleLoginResponseDTO response = createSuccessResponse(email, nickname,
+                userId, profilePicture);
         return ResponseEntity.ok(response);
     }
 
     // Helper 方法：創建成功的回應
     private GoogleLoginResponseDTO createSuccessResponse(String email, String nickname, String userId,
             String profilePicture) {
-        return new GoogleLoginResponseDTO(true, "登入成功", email, nickname, userId, profilePicture);
+        return new GoogleLoginResponseDTO(true, "登入成功", email, nickname, userId,
+                profilePicture);
     }
 
     // Helper 方法：創建錯誤的回應
     private GoogleLoginResponseDTO createErrorResponse(String errorMessage) {
-        return new GoogleLoginResponseDTO(false, errorMessage, null, null, null, null);
+        return new GoogleLoginResponseDTO(false, errorMessage, null, null, null,
+                null);
     }
 }
