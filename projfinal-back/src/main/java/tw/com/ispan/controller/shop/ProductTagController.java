@@ -1,5 +1,7 @@
 package tw.com.ispan.controller.shop;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +30,7 @@ public class ProductTagController {
 
     // 新增標籤
     @PostMapping
-    public ResponseEntity<ProductTagResponse> createTag(@RequestBody ProductTagRequest request) {
+    public ResponseEntity<ProductTagResponse> createTag(@RequestBody @Valid ProductTagRequest request) {
         ProductTagResponse response = productTagService.createTag(request);
         if (response == null) {
             throw new IllegalArgumentException("標籤新增失敗，返回值為空");
@@ -39,7 +41,7 @@ public class ProductTagController {
     // 修改標籤
     @PutMapping("/{id}")
     public ResponseEntity<ProductTagResponse> updateTag(@PathVariable Integer id,
-            @RequestBody ProductTagRequest request) {
+            @RequestBody @Valid ProductTagRequest request) {
         ProductTagResponse response = productTagService.updateTag(id, request);
         if (response == null) {
             throw new IllegalArgumentException("標籤修改失敗，返回值為空");

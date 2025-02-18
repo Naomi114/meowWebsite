@@ -1,5 +1,7 @@
 package tw.com.ispan.controller.shop;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,14 +28,14 @@ public class WishListController {
 
     // 新增商品到願望清單
     @PostMapping
-    public ResponseEntity<WishListResponse> addToWishList(@RequestBody WishListRequest request) {
+    public ResponseEntity<WishListResponse> addToWishList(@RequestBody @Valid WishListRequest request) {
         WishListResponse response = wishListService.addWishList(request);
         return ResponseEntity.ok(response);
     }
 
     // 從願望清單移除商品
     @DeleteMapping
-    public ResponseEntity<WishListResponse> removeFromWishList(@RequestBody WishListRequest request) {
+    public ResponseEntity<WishListResponse> removeFromWishList(@RequestBody @Valid WishListRequest request) {
         WishListResponse response = wishListService.removeWishList(request);
         return response.getSuccess()
                 ? ResponseEntity.ok(response)

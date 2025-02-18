@@ -196,9 +196,5 @@ public class Orders {
     public String getCustomerEmail() {
         return this.member.getEmail(); // Assuming 'member' has a method 'getEmail()'
     }
-
-    // Removed the direct memberId field since it's not necessary.
-    public Integer getMemberId() {
-        return member.getMemberId(); // Use memberId from the Member class
-    }
+    
 }

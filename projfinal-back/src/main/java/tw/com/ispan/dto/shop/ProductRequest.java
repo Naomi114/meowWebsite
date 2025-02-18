@@ -42,9 +42,9 @@ public class ProductRequest {
 
     private String unit;
 
-    // 自動生成：上架中、已售完 (寫入ProductService)
+    // 自動生成：上架中、已售完 (20250116 寫入ProductService)
     // 手動調整：隱藏 (未完成)--應該寫入 adminService
-    private String status;
+    // private String status;
 
     private LocalDate expire;
 
@@ -99,13 +99,13 @@ public class ProductRequest {
         this.unit = unit;
     }
 
-    public String getStatus() {
-        return status;
-    }
+    // public String getStatus() {
+    // return status;
+    // }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    // public void setStatus(String status) {
+    // this.status = status;
+    // }
 
     public LocalDate getExpire() {
         return expire;

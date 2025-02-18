@@ -132,13 +132,13 @@ public class PetDataInitializer implements CommandLineRunner {
 		if (!furColorRepository.existsById(1))
 
 		{
-			furColorRepository.save(new FurColor("土黃色"));
+			furColorRepository.save(new FurColor("土黃"));
 		}
 		if (!furColorRepository.existsById(2)) {
-			furColorRepository.save(new FurColor("白色"));
+			furColorRepository.save(new FurColor("白"));
 		}
 		if (!furColorRepository.existsById(3)) {
-			furColorRepository.save(new FurColor("黑色"));
+			furColorRepository.save(new FurColor("黑"));
 		}
 		if (!furColorRepository.existsById(4)) {
 			furColorRepository.save(new FurColor("橘白貓"));

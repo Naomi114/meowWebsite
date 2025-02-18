@@ -8,14 +8,14 @@ public class RescueCaseResponse {
 	private Boolean success;
     private String message;
     private List<RescueCase> list;
-    private Integer count;  //紀錄資料比數
+    private Long count;
 	
     
     public RescueCaseResponse() {
 		super();
 	}
 
-	public RescueCaseResponse(Boolean success, String message, List<RescueCase> list, Integer count) {
+	public RescueCaseResponse(Boolean success, String message, List<RescueCase> list, Long count) {
 		super();
 		this.success = success;
 		this.message = message;
@@ -47,11 +47,11 @@ public class RescueCaseResponse {
 		this.list = list;
 	}
 
-	public Integer getCount() {
+	public Long getCount() {
 		return count;
 	}
 
-	public void setCount(Integer count) {
+	public void setCount(Long count) {
 		this.count = count;
 	}
 

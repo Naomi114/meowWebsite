@@ -19,7 +19,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "Species")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "speciesId")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Species {
 
     @Id
@@ -29,15 +29,15 @@ public class Species {
 
     @Column(name = "species", nullable = false, length = 10)
     private String species;
-    
+
     @JsonIgnore
     @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
     private List<LostCase> lostCases;
-    
+
     @JsonIgnore
     @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
     private List<RescueCase> rescueCases;
-    
+
     @JsonIgnore
     @OneToMany(mappedBy = "species", cascade = CascadeType.ALL)
     private List<AdoptionCase> adoptionCase;
@@ -94,7 +94,7 @@ public class Species {
 
     @Override
     public String toString() {
-        return "Species [speciesId=" + speciesId + ", species=" + species +"]";
+        return "Species [speciesId=" + speciesId + ", species=" + species + "]";
     }
 
 }

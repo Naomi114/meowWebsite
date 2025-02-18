@@ -9,7 +9,7 @@ import com.linecorp.bot.client.LineMessagingClient;
 @Configuration
 public class LineMessagingConfig {
 
-	// message API的Channel Access Token(冠)
+	// message API的Channel Access Token
 	@Value("${Channel.Access.Token}")
 	private String channelAccessToken;
 
