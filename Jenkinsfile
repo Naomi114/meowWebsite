@@ -115,6 +115,7 @@ EOF"""
                             # 創建 Docker 網路 (確保 MSSQL、Redis、後端在同一個網路，可互相連通，其他不在 petfinder_network 內的容器無法存取 MSSQL & Redis)
                             docker network create petfinder_network || true
                             
+                            
                             # 拉取最新的 Docker 映像檔
                             docker pull $BACKEND_IMAGE
                             docker pull $MSSQL_IMAGE
@@ -130,7 +131,7 @@ EOF"""
 
                             # 創建放假資料圖的 Docker Volume（如果尚未建立）
                             docker volume create $IMAGE_VOLUME || true
-
+                            docker volume create $PRODUCT_IMAGE_VOLUME || true
 
                              #  啟動 MSSQL 資料庫 (掛載 volume 以保存資料庫內資料) (restart always可以讓VM每次重新啟動，此container也重啟)
                             docker run -d --name mssql \\
