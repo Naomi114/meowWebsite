@@ -52,7 +52,7 @@ spring:
       hibernate.format_sql: true
     database-platform: org.hibernate.dialect.SQLServerDialect
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
@@ -74,7 +74,6 @@ spring:
       max-file-size: 5MB
       max-request-size: 20MB
 
-
 file:
   storage:
     uploadDir: C:/meowWebsite/images #指向實際的存儲目錄
@@ -84,11 +83,10 @@ file:
     path: C:/upload/
     path2: C:/upload #用在rescueController...
   shopUpload:
-    path: C:/meowWebsite/images/   #商城圖片下載路徑 (動態路徑)
+    path: C:/meowWebsite/images/ #商城圖片下載路徑 (動態路徑)
   tmp-upload-dir: C:/upload/tmp/pet/images/ #寵物圖片暫存路徑(冠)
 
   final-upload-dir: C:/upload/final/pet/images/ #寵物圖片上傳路徑(冠)
-
 
   #conosle顏色
   output:
@@ -118,10 +116,10 @@ logging:
     org:
       springframework:
         web:
-          client: DEBUG         # 設置為 debug，捕捉 web 客戶端級別的日誌
+          client: DEBUG # 設置為 debug，捕捉 web 客戶端級別的日誌
     apache:
-      http: DEBUG            # 設置 Apache HTTP 客戶端日誌級別
-    org.springframework.web.client.RestTemplate: DEBUG   # 針對 RestTemplate 設置日誌級別
+      http: DEBUG # 設置 Apache HTTP 客戶端日誌級別
+    org.springframework.web.client.RestTemplate: DEBUG # 針對 RestTemplate 設置日誌級別
 #Domain Name(冠)
 front:
   domainName:
