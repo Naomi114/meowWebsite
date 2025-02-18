@@ -28,7 +28,7 @@ import tw.com.ispan.service.shop.ProductImageService;
 import tw.com.ispan.service.shop.ProductTagService;
 
 @Component
-@Order(2)
+@Order(4)
 // @Profile("dev") // 分離測試和開發環境
 public class ProductInitData implements CommandLineRunner {
 
