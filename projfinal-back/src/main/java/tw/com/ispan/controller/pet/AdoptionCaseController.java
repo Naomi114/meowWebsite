@@ -85,10 +85,11 @@ public class AdoptionCaseController {
         return adoptionCaseService.countAdoptionCasesByMemberId(memberId);
     }
 
-    // 提供获取所有认养案件的 API
+    // 获取所有认养案件
     @GetMapping
-    public List<AdoptionCase> getAdoptionCases() {
-        return adoptionCaseService.getAllAdoptionCases();
+    public ResponseEntity<List<AdoptionCase>> getAllAdoptionCases() {
+        List<AdoptionCase> adoptionCases = adoptionCaseService.getAllAdoptionCases();
+        return ResponseEntity.ok(adoptionCases);
     }
 
 }
