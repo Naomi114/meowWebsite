@@ -111,7 +111,7 @@
     "memberId": 4,
     "caseTitle": "發現疑似被車撞到腳受傷，嘴巴也無法閉合的虎斑狗",
     "speciesId": 1 ,
-    "breedId": 55 ,
+    "breedId": 54 ,
     "furColorId": 3 ,
     "gender": "公",
     "sterilization": null,
@@ -271,7 +271,7 @@
     "follow": 0,
     "tag": "",
     "rescueReason": "母貓將幼貓生於垃圾堆裡，已觀察兩天未見母貓返回照顧幼貓，家裡僅有老人，幼貓無人可照顧，尋求幼貓安置",
-    "caseStateId":  3 ,
+    "caseStateId":  4 ,
     "caseUrl": "https://example.com/case/128",
     "casePictures": [
       { "url": "${final-upload-dir}examplecase9.png" },
@@ -325,5 +325,148 @@
       { "canAffordId": 5 }
     ],
     "isHidden": false
+  },
+  {
+    "memberId": 1,
+    "caseTitle": "右後大腿受傷的黑貓",
+    "speciesId":  2 ,
+    "breedId": 1 ,
+    "furColorId":  3 ,
+    "gender": null,
+    "sterilization": null,
+    "age": null,
+    "microChipNumber": null,
+    "suspLost": false,
+    "cityId": 7 ,
+    "districtAreaId": 67,
+    "street": "南大路",
+    "latitude": 24.803141244961857, 
+    "longitude":120.97588163024815,  
+    "donationAmount": 0,
+    "viewCount": 0,
+    "follow": 0,
+    "tag": "",
+    "rescueReason": "貓咪有點警戒心無法太靠近，遠處觀察為明顯粉紅色傷口，較近一點觀察似乎無持續流血情況，傷口周遭似乎有一點結痂跡象，貓咪活動力無明顯降低",
+    "caseStateId":  3 ,
+    "caseUrl": "null",
+    "casePictures": [
+      { "url": "${final-upload-dir}examplecase14.png" },
+      { "url": "${final-upload-dir}examplecase15.png" }
+    ],
+    "rescueDemands": [
+      { "rescueDemandId": 3 }
+    ],
+    "canAffords": [
+      { "canAffordId": 4 }
+    ],
+    "isHidden": false
+  },
+  {
+    "memberId": 3,
+    "caseTitle": "發現好像被遺棄的狗，在同一個位置處等待主人即使淋雨也不走",
+    "speciesId":  1 ,
+    "breedId": 54 ,
+    "furColorId":  3 ,
+    "gender": null,
+    "sterilization": null,
+    "age": null,
+    "microChipNumber": null,
+    "suspLost": false,
+    "cityId": 8 ,
+    "districtAreaId": 77,
+    "street": "康寧街89號",
+    "latitude": 24.737455373426712,  
+    "longitude":121.08712307716418,  
+    "donationAmount": 0,
+    "viewCount": 0,
+    "follow": 0,
+    "tag": "",
+    "rescueReason": "貓咪有點警戒心無法太靠近，遠處觀察為明顯粉紅色傷口，較近一點觀察似乎無持續流血情況，傷口周遭似乎有一點結痂跡象，貓咪活動力無明顯降低",
+    "caseStateId":  3 ,
+    "caseUrl": "null",
+    "casePictures": [
+      { "url": "${final-upload-dir}examplecase16.png" },
+      { "url": "${final-upload-dir}examplecase17.png" }
+    ],
+    "rescueDemands": [
+      { "rescueDemandId": 2 },
+      { "rescueDemandId": 4 }
+    ],
+    "canAffords": [
+      { "canAffordId": 3 }
+    ],
+    "isHidden": false
+  },
+  {
+    "memberId": 2,
+    "caseTitle": "公貓 肚子很大 呼吸困難 進食狀況不佳",
+    "speciesId":  2,
+    "breedId": 1 ,
+    "furColorId":  6 ,
+    "gender": null,
+    "sterilization": null,
+    "age": null,
+    "microChipNumber": null,
+    "suspLost": false,
+    "cityId": 18 ,
+    "districtAreaId": 284,
+    "street": "中山路249號",
+    "latitude": 22.628433654129612,   
+    "longitude":120.35510706826304,  
+    "donationAmount": 0,
+    "viewCount": 0,
+    "follow": 0,
+    "tag": "呼吸困難",
+    "rescueReason": "我們一直都有在喂食附近浪貓近期發現這隻公貓肚子變好大，但變很瘦，食物也吃不太下去，感覺肚子裡面都是水呼吸都喘很大力也不知道該怎麼幫助他他每天都會來我們店門口，看到我們就會叫，希望可以幫忙他一下",
+    "caseStateId":  3 ,
+    "caseUrl": "null",
+    "casePictures": [
+      { "url": "${final-upload-dir}examplecase18.png" },
+      { "url": "${final-upload-dir}examplecase19.png" }
+    ],
+    "rescueDemands": [
+      { "rescueDemandId": 3 },
+      { "rescueDemandId": 4 }
+    ],
+    "canAffords": [
+      { "canAffordId": 3 }
+    ],
+    "isHidden": false
+  },
+  {
+    "memberId": 4,
+    "caseTitle": "在自家附近發現一隻帶著項圈的牛頭梗",
+    "speciesId":  1,
+    "breedId": 54 ,
+    "furColorId":  6 ,
+    "gender": null,
+    "sterilization": null,
+    "age": null,
+    "microChipNumber": null,
+    "suspLost": true,
+    "cityId": 9 ,
+    "districtAreaId": 95,
+    "street": "宏昌街",
+    "latitude": 25.03307515609309,  
+    "longitude": 121.25625236752792, 
+    "donationAmount": 0,
+    "viewCount": 0,
+    "follow": 0,
+    "tag": "牛頭梗",
+    "rescueReason": "疑似被任意丟棄，擔心狗狗四處亂跑會影響交通以及狗狗生命安全",
+    "caseStateId":  3 ,
+    "caseUrl": "null",
+    "casePictures": [
+      { "url": "${final-upload-dir}examplecase20.png" }
+    ],
+    "rescueDemands": [
+      { "rescueDemandId": 2 },
+      { "rescueDemandId": 4 }
+    ],
+    "canAffords": [
+      { "canAffordId": 3 }
+    ],
+    "isHidden": false
   }
+
 ]
