@@ -8,6 +8,7 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'petfinder'    //已於在jenkins中設定可以登入dokcer-hub的帳密和使用id
         AZURE_VM = 'KuanJu@20.2.146.70'    //username@vm公開ip
         IMAGE_VOLUME = "petfinder_images"  // VM 中 Docker Volume 名稱，拿來放冠假資料圖片
+        PRODUCT_IMAGE_VOLUME = "product_images"   // VM 中 Docker Volume 名稱，拿來放商城資料圖片
     }
 
     stages {
@@ -77,13 +78,32 @@ pipeline {
                         # -r：遞歸複製（確保目錄結構不變）-n：不覆蓋已存在的檔案（確保不會重複塞入相同圖片）
                         ssh -i /var/jenkins_home/.ssh/jenkins_azure_key -o StrictHostKeyChecking=no $AZURE_VM <<EOF
                             sudo mkdir -p /var/lib/docker/volumes/$IMAGE_VOLUME/_data/final/pet/images
-                            sudo cp -rn /tmp/images/* /var/lib/docker/volumes/$IMAGE_VOLUME/_data/final/pet/images/
+                            sudo cp -r /tmp/images/* /var/lib/docker/volumes/$IMAGE_VOLUME/_data/final/pet/images/
                             sudo rm -rf /tmp/images
 EOF"""
                     }
                 }
             }
         }
+
+
+        stage('上傳產品假圖片到 Azure VM') {
+            steps {
+                script {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'petFinder', keyFileVariable: 'SSH_KEY')]) {
+                        sh """
+                        rsync -avz -e "ssh -i /var/jenkins_home/.ssh/jenkins_azure_key -o StrictHostKeyChecking=no" --ignore-existing /var/jenkins_home/meowWebsite/images/ $AZURE_VM:/tmp/product_images/
+                        
+                        ssh -i /var/jenkins_home/.ssh/jenkins_azure_key -o StrictHostKeyChecking=no $AZURE_VM <<EOF
+                            sudo mkdir -p /var/lib/docker/volumes/$PRODUCT_IMAGE_VOLUME/_data/
+                            sudo cp -r /tmp/product_images/* /var/lib/docker/volumes/$PRODUCT_IMAGE_VOLUME/_data/
+                            sudo rm -rf /tmp/product_images
+EOF"""
+                    }
+                }
+            }
+        }
+        
         
         stage('部署到 Azure VM') { 
             steps {
@@ -94,6 +114,7 @@ EOF"""
 
                             # 創建 Docker 網路 (確保 MSSQL、Redis、後端在同一個網路，可互相連通，其他不在 petfinder_network 內的容器無法存取 MSSQL & Redis)
                             docker network create petfinder_network || true
+                            
                             
                             # 拉取最新的 Docker 映像檔
                             docker pull $BACKEND_IMAGE
@@ -110,7 +131,7 @@ EOF"""
 
                             # 創建放假資料圖的 Docker Volume（如果尚未建立）
                             docker volume create $IMAGE_VOLUME || true
-
+                            docker volume create $PRODUCT_IMAGE_VOLUME || true
 
                              #  啟動 MSSQL 資料庫 (掛載 volume 以保存資料庫內資料) (restart always可以讓VM每次重新啟動，此container也重啟)
                             docker run -d --name mssql \\
@@ -140,6 +161,7 @@ EOF"""
                                 --network petfinder_network \\
                                 -e "SPRING_PROFILES_ACTIVE=production" \\
                                 -v $IMAGE_VOLUME:/usr/local/tomcat/upload \\
+                                -v $PRODUCT_IMAGE_VOLUME:/usr/local/tomcat/meowWebsite/images/ \\
                                 --restart always \\
                                 \$BACKEND_IMAGE
 EOF"""
