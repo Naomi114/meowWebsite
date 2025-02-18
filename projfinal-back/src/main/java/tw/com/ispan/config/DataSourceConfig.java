@@ -6,7 +6,7 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 
 import jakarta.annotation.PostConstruct;
 
-//指定不同repository使用的資料庫，記得yml要改手動配置，不然還是自動掃描配置
+//指定不同repository使用的資料庫，記得yml要改手動配置，不然還是自動掃描配置(冠)
 @Configuration
 @EnableJpaRepositories(basePackages = {
 		"tw.com.ispan.repository.admin",
