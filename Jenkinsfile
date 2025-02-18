@@ -95,8 +95,8 @@ EOF"""
                         rsync -avz -e "ssh -i /var/jenkins_home/.ssh/jenkins_azure_key -o StrictHostKeyChecking=no" --ignore-existing /var/jenkins_home/meowWebsite/images/ $AZURE_VM:/tmp/product_images/
                         
                         ssh -i /var/jenkins_home/.ssh/jenkins_azure_key -o StrictHostKeyChecking=no $AZURE_VM <<EOF
-                            sudo mkdir -p /var/lib/docker/volumes/$PRODUCT_IMAGE_VOLUME/_data/final/product/images
-                            sudo cp -r /tmp/product_images/* /var/lib/docker/volumes/$PRODUCT_IMAGE_VOLUME/_data/final/product/images/
+                            sudo mkdir -p /var/lib/docker/volumes/$PRODUCT_IMAGE_VOLUME/_data/
+                            sudo cp -r /tmp/product_images/* /var/lib/docker/volumes/$PRODUCT_IMAGE_VOLUME/_data/
                             sudo rm -rf /tmp/product_images
 EOF"""
                     }
