@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -96,21 +98,44 @@ public class ProductController {
         }
     }
 
-    // 修改商品
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ProductResponse> updateProduct(
-            @PathVariable Integer id,
-            @RequestPart("productRequest") String productRequestJson,
-            @RequestPart(value = "productImages", required = false) List<MultipartFile> productImages) {
+    /*
+     * 修改商品
+     * 
+     * @ModelAttribute 支援 multipart/form-data，並且可以解析 JSON + 圖片
+     * 但 @PutMapping 不適合解析 @ModelAttribute，因為 PUT 請求通常是 application/json
+     * ==> 解法: 將修改圖片和其他欄位拆成兩支 api
+     */
 
-        try {
-            ProductRequest productRequest = objectMapper.readValue(productRequestJson, ProductRequest.class);
-            ProductResponse response = productService.updateSingle(id, productRequest, productImages);
-            return response.getSuccess() ? ResponseEntity.ok(response)
-                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ProductResponse(false, "更新失敗: " + e.getMessage()));
-        }
+    // @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // public ResponseEntity<ProductResponse> updateSingle(
+    // @PathVariable("id") Integer productId,
+    // @ModelAttribute ProductRequest request,
+    // @RequestParam(value = "images", required = false) List<MultipartFile> images)
+    // {
+
+    // ProductResponse response = productService.updateSingle(productId, request,
+    // images);
+    // return ResponseEntity.ok(response);
+    // }
+
+    // 修改: 除了圖片欄位以外，的所有欄位
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProductResponse> updateProductInfo(
+            @PathVariable("id") Integer productId,
+            @RequestBody ProductRequest request) { // ✅ 使用 JSON 格式
+
+        ProductResponse response = productService.updateSingle(productId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    // 修改: 圖片欄位
+    @PatchMapping(value = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductResponse> updateProductImages(
+            @PathVariable("id") Integer productId,
+            @RequestParam("images") List<MultipartFile> images) { // ✅ 只處理圖片
+
+        ProductResponse response = productService.updateProductImages(productId, images);
+        return ResponseEntity.ok(response);
     }
 
     // 刪除商品

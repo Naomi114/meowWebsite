@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
@@ -47,7 +46,6 @@ public class AdoptionCase {
     private String caseTitle;
 
     // 雙向多對一,外鍵,對應member表
-    @JsonIgnoreProperties("adoptionCase")
     @ManyToOne(cascade = { CascadeType.PERSIST })
     @JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(name = "FK_AdoptionCase_Member"))
     private Member member;

@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin(origins = "http://localhost:5173")
+//冠儒設置
+@CrossOrigin
 @RestController
 public class TokenController {
 
-    @PostMapping("/validateToken")
+    @PostMapping("/api/validateToken")
     public ResponseEntity<Map<String, Object>> validateToken(
             @RequestAttribute("memberId") Integer memberId) {
 

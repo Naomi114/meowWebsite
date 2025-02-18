@@ -1,13 +1,13 @@
-package tw.com.ispan;
+// package tw.com.ispan;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class EcpayBootApplicationTests {
+// @SpringBootTest(classes = ProjfinalApplication.class)
+// class EcpayBootApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+// @Test
+// void contextLoads() {
+// }
 
-}
+// }

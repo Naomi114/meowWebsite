@@ -19,7 +19,7 @@ import tw.com.ispan.service.line.LineNotificationService;
 //記得這個功能因為要用公開網域來讓Line連到我的後端，因此要先用ngrok開放這個專案運行的本地網域
 //有時ngrok開不起來要先檢查是否有其他正在運行 再使用 ngrok http 8080 開放
 @RestController
-@RequestMapping("/webhook")
+@RequestMapping("/api/webhook")
 public class LineWebhookController {
 
     @Value("${front.domainName.url}")
@@ -53,7 +53,6 @@ public class LineWebhookController {
 
                 // 將member表中followed改為true
                 lineBindingService.updateFollowed(lineId);
-               
 
                 // line中發送跳轉連結給用戶 (網頁用戶則此追蹤line qrcode是新開一個分頁)
                 String returnUrl = frontIndex; // 替換為元網頁的 URL
@@ -68,23 +67,22 @@ public class LineWebhookController {
     }
 }
 
-
 // 回傳HTTP response，LINE平台需要接收到HTTP
 // 200回應已確定Webhook請求處理成功。如果LINE平台未收到成功回應，將視為事件處理失敗，並可能重試推送
 
-//當用戶點選案件變更訊息的察看按鈕，會回傳此給後端
-//{
-//	  "events": [
-//	    {
-//	      "type": "postback",
-//	      "replyToken": "xxxxxxxxxxxxxxxx",
-//	      "source": {
-//	        "userId": "Uxxxxxxxxxxxxxxxxxxxxx",
-//	        "type": "user"
-//	      },
-//	      "postback": {
-//	        "data": "action=view_case&caseId=123"
-//	      }
-//	    }
-//	  ]
-//	}
+// 當用戶點選案件變更訊息的察看按鈕，會回傳此給後端
+// {
+// "events": [
+// {
+// "type": "postback",
+// "replyToken": "xxxxxxxxxxxxxxxx",
+// "source": {
+// "userId": "Uxxxxxxxxxxxxxxxxxxxxx",
+// "type": "user"
+// },
+// "postback": {
+// "data": "action=view_case&caseId=123"
+// }
+// }
+// ]
+// }

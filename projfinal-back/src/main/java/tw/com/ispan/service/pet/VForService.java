@@ -60,8 +60,6 @@ public class VForService {
         return cityRepository.findAll();
     }
 
-    
-
     // 依據cityId尋找對應districtArea
     public List<DistrictArea> getDistrictsByCity(Integer cityId) {
         return districtAreaRepository.findByCity_CityId(cityId);
