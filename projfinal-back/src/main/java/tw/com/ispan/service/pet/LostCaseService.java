@@ -120,7 +120,7 @@ public class LostCaseService {
                 predicates.add(criteriaBuilder.or(
                         criteriaBuilder.like(root.get("caseTitle"), likePattern),
                         criteriaBuilder.like(root.get("street"), likePattern),
-                        criteriaBuilder.like(root.get("petName"), likePattern),
+                        criteriaBuilder.like(root.get("name"), likePattern),
                         criteriaBuilder.like(root.get("gender"), likePattern),
                         criteriaBuilder.like(root.get("featureDescription"), likePattern),
                         criteriaBuilder.like(root.get("contactInformation"), likePattern),
