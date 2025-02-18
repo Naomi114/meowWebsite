@@ -160,7 +160,7 @@ EOF"""
                                 --network petfinder_network \\
                                 -e "SPRING_PROFILES_ACTIVE=production" \\
                                 -v $IMAGE_VOLUME:/usr/local/tomcat/upload \\
-                                -v $PRODUCT_IMAGE_VOLUME:/usr/local/tomcat/upload \\
+                                -v $PRODUCT_IMAGE_VOLUME:/usr/local/tomcat/meowWebsite\images/ \\
                                 --restart always \\
                                 \$BACKEND_IMAGE
 EOF"""
