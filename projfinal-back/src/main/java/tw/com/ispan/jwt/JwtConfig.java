@@ -20,7 +20,8 @@ public class JwtConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/line/**") // line綁定相關功能(冠)
                 .addPathPatterns("/api/validateToken") // 進行前端token時效、持有驗證(冠)
                 .excludePathPatterns("/api/RescueCase/search/**", "/api/pet/**", "/api/RescueCase/getLocations/**",
-                        "/api/casePicture/**", "/api/RescueCase/rescueProgress/{caseId}", "/api/caseView/**") // 查詢、點閱案件功能為非會員也能使用(冠)
+                        "/api/casePicture/**", "/api/RescueCase/rescueProgress/{caseId}", "/api/caseView/**",
+                        "/api/RescueCase/search/infinite") // 查詢、點閱案件功能為非會員也能使用(冠)
                 .excludePathPatterns("/api/RescueCase/analysis") // 管理員後台(冠)
                 .excludePathPatterns("/api/line/authorize", "/api/line/callback") // line登入相關功能(冠)
                 .excludePathPatterns("/", "/api/ajax/secure/login", "/api/secure/loginadmin"); // 排除首頁
