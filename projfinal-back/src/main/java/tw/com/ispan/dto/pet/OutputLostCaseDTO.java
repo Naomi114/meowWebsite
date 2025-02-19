@@ -1,6 +1,8 @@
 package tw.com.ispan.dto.pet;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,12 +21,8 @@ public class OutputLostCaseDTO {
 	private boolean isHidden;
 	private List<Map<String, String>> casePictures;
 
-	// private Integer cityId;
 	private String cityName;
-
-	// private Integer districtAreaId;
 	private String districtAreaName;
-
 	private String street;
 	private Double latitude;
 	private Double longitude;
@@ -39,7 +37,7 @@ public class OutputLostCaseDTO {
 	private String furColor;
 
 	private String memberNickName;
-	private Integer memberId; // 用於讓用戶想要進入頁面可以編輯時，去對應前端用戶token以及案件回傳的memberId
+	private Integer memberId;
 	private LocalDateTime publicationTime;
 	private LocalDateTime lastUpdateTime;
 
@@ -47,11 +45,16 @@ public class OutputLostCaseDTO {
 	private String featureDescription;
 	private String lostExperience;
 
-	// DTO 建構子：將 lostCase 轉換為 OutputlostCaseDTO
+	// ✅ 取得後端 API Base URL，從環境變數或使用預設雲端主機
+	private static final String BASE_URL = System.getenv("VITE_API_BASE_URL") != null
+			? System.getenv("VITE_API_BASE_URL")
+			: "https://petfinder.duckdns.org";
+
+	// DTO 建構子：將 lostCase 轉換為 OutputLostCaseDTO
 	public OutputLostCaseDTO(LostCase lostCase) {
 		this.lostCaseId = lostCase.getLostCaseId();
-		this.caseTitle = lostCase.getName();
-		this.name = lostCase.getCaseTitle();
+		this.caseTitle = lostCase.getCaseTitle();
+		this.name = lostCase.getName();
 		this.age = lostCase.getAge();
 		this.gender = lostCase.getGender();
 		this.sterilization = lostCase.getSterilization();
@@ -59,12 +62,10 @@ public class OutputLostCaseDTO {
 		this.isHidden = lostCase.getIsHidden();
 
 		if (lostCase.getCity() != null) {
-			// this.cityId = lostCase.getCity().getCityId();
 			this.cityName = lostCase.getCity().getCity();
 		}
 
 		if (lostCase.getDistrictArea() != null) {
-			// this.districtAreaId = lostCase.getDistrictArea().getDistrictAreaId();
 			this.districtAreaName = lostCase.getDistrictArea().getDistrictAreaName();
 		}
 
@@ -94,6 +95,7 @@ public class OutputLostCaseDTO {
 
 		if (lostCase.getMember() != null) {
 			this.memberNickName = lostCase.getMember().getNickName();
+			this.memberId = lostCase.getMember().getMemberId();
 		}
 
 		this.publicationTime = lostCase.getPublicationTime();
@@ -102,6 +104,35 @@ public class OutputLostCaseDTO {
 		this.contactInformation = lostCase.getContactInformation();
 		this.featureDescription = lostCase.getFeatureDescription();
 		this.lostExperience = lostCase.getLostExperience();
+		// ✅ 轉換 `casePictures` 為前端可用的 URL
+		if (lostCase.getCasePictures() != null && !lostCase.getCasePictures().isEmpty()) {
+			this.casePictures = lostCase.getCasePictures().stream()
+					.map(pic -> {
+						String filePath = pic.getPictureUrl().replace("\\", "/"); // 確保 "/" 格式
+
+						// 如果是本機存放 (`C:/upload/final/...`)，轉換為雲端 URL
+						if (filePath.startsWith("C:/upload/final/")) {
+							filePath = filePath.replace("C:/upload/final/", "/upload/final/");
+						} else if (filePath.startsWith("http://localhost:8080/images/default.png")) {
+							// 如果是本機的預設圖片，改成雲端的預設圖片
+							filePath = "/upload/final/images/default.png";
+						}
+
+						// 完整的 HTTP URL
+						String imageUrl = BASE_URL + filePath;
+
+						Map<String, String> imageMap = new HashMap<>();
+						imageMap.put("pictureUrl", imageUrl);
+						return imageMap;
+					})
+					.collect(Collectors.toList());
+		} else {
+			// 沒有圖片時，使用雲端的預設圖片
+			Map<String, String> defaultImage = new HashMap<>();
+			defaultImage.put("pictureUrl", BASE_URL + "/upload/final/images/default.png");
+			this.casePictures = Collections.singletonList(defaultImage);
+		}
+
 	}
 
 	public Integer getLostCaseId() {
@@ -327,5 +358,7 @@ public class OutputLostCaseDTO {
 	public void setLostExperience(String lostExperience) {
 		this.lostExperience = lostExperience;
 	}
+
+	// Getters 和 Setters
 
 }

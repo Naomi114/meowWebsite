@@ -50,13 +50,17 @@ public interface CaseViewRepository extends JpaRepository<CaseView, Integer> {
                         "GROUP BY c.adoptionCase.id ORDER BY COUNT(c) ASC LIMIT 10")
         List<Object[]> findBottomViewedAdoptionCases();
 
-        // 獲得單一案件在特定時間內的瀏覽人次，讓查詢的 viewTime 只顯示日期 (YYYY-MM-DD)，並且按日期統計瀏覽人數
+        // 分析頁面獲得單一案件在特定時間內的瀏覽人次，讓查詢的 viewTime 只顯示日期 (YYYY-MM-DD)，並且按日期統計瀏覽人數
         @Query("SELECT FORMAT(cv.viewTime, 'yyyy-MM-dd'), COUNT(cv) " +
-        	       "FROM CaseView cv " +
-        	       "WHERE (cv.rescueCase.rescueCaseId = :caseId AND :caseType = 'rescue') " +
-        	       "   OR (cv.lostCase.lostCaseId = :caseId AND :caseType = 'lost') " +
-        	       "   OR (cv.adoptionCase.adoptionCaseId = :caseId AND :caseType = 'adoption') " +
-        	       "GROUP BY FORMAT(cv.viewTime, 'yyyy-MM-dd') " +
-        	       "ORDER BY FORMAT(cv.viewTime, 'yyyy-MM-dd')")
-        	List<Object[]> findCaseViewTrend(@Param("caseType") String caseType, @Param("caseId") Integer caseId);
+                        "FROM CaseView cv " +
+                        "WHERE (cv.rescueCase.rescueCaseId = :caseId AND :caseType = 'rescue') " +
+                        "   OR (cv.lostCase.lostCaseId = :caseId AND :caseType = 'lost') " +
+                        "   OR (cv.adoptionCase.adoptionCaseId = :caseId AND :caseType = 'adoption') " +
+                        "GROUP BY FORMAT(cv.viewTime, 'yyyy-MM-dd') " +
+                        "ORDER BY FORMAT(cv.viewTime, 'yyyy-MM-dd')")
+        List<Object[]> findCaseViewTrend(@Param("caseType") String caseType, @Param("caseId") Integer caseId);
+
+        // 幫助計算特定案件被瀏覽的次數
+        @Query("SELECT COUNT(c) FROM CaseView c WHERE c.rescueCase.rescueCaseId =:caseId")
+        int countByRescueCaseId(@Param("caseId") Integer caseId);
 }

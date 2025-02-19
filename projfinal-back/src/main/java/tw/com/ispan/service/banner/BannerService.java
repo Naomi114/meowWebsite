@@ -1,8 +1,11 @@
 package tw.com.ispan.service.banner;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -45,61 +48,100 @@ public class BannerService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * ✅ 根據 Banner 類型 (LOST / RESCUE / ADOPTION) 設定對應的 CaseId、CaseTitle 和
+     * CasePictures
+     */
     private BannerDTO mapToBannerDTO(Banner banner) {
         BannerDTO dto = new BannerDTO();
         dto.setBannerId(banner.getBannerId());
         dto.setBannerType(banner.getBannerType().name());
         dto.setOnlineDate(banner.getOnlineDate());
 
-        // ✅ 根據 bannerType 設定對應的 caseId、caseTitle 和 picture
+        // ✅ 根據 Banner 類型處理不同的案件
         switch (banner.getBannerType()) {
             case LOST:
                 if (banner.getLostCase() != null) {
-                    dto.setLostCaseId(banner.getLostCase().getLostCaseId()); // ✅ 設定 LostCaseId
+                    dto.setLostCaseId(banner.getLostCase().getLostCaseId());
                     dto.setCaseTitle(banner.getLostCase().getCaseTitle());
-
-                    // 🔹 取得 CasePictures 列表的第一張圖片
-                    if (banner.getLostCase().getCasePictures() != null
-                            && !banner.getLostCase().getCasePictures().isEmpty()) {
-                        CasePicture firstPicture = banner.getLostCase().getCasePictures().get(0);
-                        dto.setPictureUrl(firstPicture.getPictureUrl());
-                        dto.setPictureId(firstPicture.getCasePictureId());
-                    }
+                    dto.setCasePictures(convertCasePictures(banner.getLostCase().getCasePictures()));
                 }
                 break;
 
             case RESCUE:
                 if (banner.getRescueCase() != null) {
-                    dto.setRescueCaseId(banner.getRescueCase().getRescueCaseId()); // ✅ 設定 RescueCaseId
+                    dto.setRescueCaseId(banner.getRescueCase().getRescueCaseId());
                     dto.setCaseTitle(banner.getRescueCase().getCaseTitle());
-
-                    // 🔹 取得 CasePictures 列表的第一張圖片
-                    if (banner.getRescueCase().getCasePictures() != null
-                            && !banner.getRescueCase().getCasePictures().isEmpty()) {
-                        CasePicture firstPicture = banner.getRescueCase().getCasePictures().get(0);
-                        dto.setPictureUrl(firstPicture.getPictureUrl());
-                        dto.setPictureId(firstPicture.getCasePictureId());
-                    }
+                    dto.setCasePictures(convertCasePictures(banner.getRescueCase().getCasePictures()));
                 }
                 break;
 
             case ADOPTION:
                 if (banner.getAdoptionCase() != null) {
-                    dto.setAdoptionCaseId(banner.getAdoptionCase().getAdoptionCaseId()); // ✅ 設定 AdoptionCaseId
+                    dto.setAdoptionCaseId(banner.getAdoptionCase().getAdoptionCaseId());
                     dto.setCaseTitle(banner.getAdoptionCase().getCaseTitle());
-
-                    // 🔹 取得 CasePictures 列表的第一張圖片
-                    if (banner.getAdoptionCase().getCasePictures() != null
-                            && !banner.getAdoptionCase().getCasePictures().isEmpty()) {
-                        CasePicture firstPicture = banner.getAdoptionCase().getCasePictures().get(0);
-                        dto.setPictureUrl(firstPicture.getPictureUrl());
-                        dto.setPictureId(firstPicture.getCasePictureId());
-                    }
+                    dto.setCasePictures(convertCasePictures(banner.getAdoptionCase().getCasePictures()));
                 }
                 break;
         }
 
         return dto;
+    }
+
+    /**
+     * ✅ 將 `CasePictures` 轉換為前端可用的 URL
+     */
+    private List<Map<String, String>> convertCasePictures(List<CasePicture> casePictures) {
+        // ✅ 取得 API Base URL，確保適應本機與雲端
+        String baseURL = System.getenv("VITE_API_BASE_URL") != null
+                ? System.getenv("VITE_API_BASE_URL")
+                : "http://localhost:8080";
+
+        if (casePictures == null || casePictures.isEmpty()) {
+            // ✅ 若無圖片，則提供預設圖片
+            Map<String, String> defaultImage = new HashMap<>();
+            defaultImage.put("pictureUrl", baseURL + "/images/default.png");
+            return Collections.singletonList(defaultImage);
+        }
+
+        return casePictures.stream()
+                .map(pic -> {
+                    String filePath = pic.getPictureUrl().replace("\\", "/"); // 確保 `/` 格式一致
+                    filePath = convertBackendPath(filePath, baseURL);
+
+                    Map<String, String> imageMap = new HashMap<>();
+                    imageMap.put("pictureUrl", filePath);
+                    return imageMap;
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * ✅ 將後端的本機路徑 (`C:/upload/final/...`) 轉換為雲端可讀取的 URL
+     */
+    private String convertBackendPath(String path, String baseURL) {
+        if (path == null || path.isEmpty()) {
+            return baseURL + "/images/default.png";
+        }
+
+        path = path.replace("\\", "/"); // ✅ 確保所有 `/` 格式統一（Windows & Linux）
+
+        if (path.startsWith("C:/upload/final/")) {
+            // ✅ 第一步：將 Windows 本機路徑轉換成 `localhost:8080`
+            path = path.replace("C:/upload/final", "http://localhost:8080/upload/final");
+        }
+
+        if (path.startsWith("http://localhost:8080")) {
+            // ✅ 第二步：將 `localhost:8080` 替換為 `petfinder.duckdns.org`
+            path = path.replace("http://localhost:8080", "https://petfinder.duckdns.org");
+        }
+
+        if (path.startsWith("/upload/final/")) {
+            // ✅ 第三步：如果仍是相對路徑，補上 `BASE_URL`
+            path = baseURL + path;
+        }
+
+        return path;
     }
 
     /**

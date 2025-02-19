@@ -1,6 +1,8 @@
 package tw.com.ispan.dto.pet;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 public class BannerDTO {
     private Integer bannerId;
@@ -10,8 +12,7 @@ public class BannerDTO {
     private Integer rescueCaseId;
     private Integer adoptionCaseId;
     private String caseTitle;
-    private String pictureUrl;
-    private Integer pictureId; // ✅ 確保能返回圖片 ID
+    private List<Map<String, String>> casePictures;
 
     public Integer getBannerId() {
         return bannerId;
@@ -45,22 +46,6 @@ public class BannerDTO {
         this.caseTitle = caseTitle;
     }
 
-    public String getPictureUrl() {
-        return pictureUrl;
-    }
-
-    public void setPictureUrl(String pictureUrl) {
-        this.pictureUrl = pictureUrl;
-    }
-
-    public Integer getPictureId() {
-        return pictureId;
-    }
-
-    public void setPictureId(Integer pictureId) {
-        this.pictureId = pictureId;
-    }
-
     public Integer getLostCaseId() {
         return lostCaseId;
     }
@@ -83,5 +68,13 @@ public class BannerDTO {
 
     public void setAdoptionCaseId(Integer adoptionCaseId) {
         this.adoptionCaseId = adoptionCaseId;
+    }
+
+    public List<Map<String, String>> getCasePictures() {
+        return casePictures;
+    }
+
+    public void setCasePictures(List<Map<String, String>> casePictures) {
+        this.casePictures = casePictures; // ✅ 直接存儲 `casePictures`，不做 URL 轉換
     }
 }

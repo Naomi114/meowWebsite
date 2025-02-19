@@ -5,11 +5,12 @@ import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,13 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import tw.com.ispan.domain.pet.CasePicture;
 import tw.com.ispan.domain.pet.CaseState;
 import tw.com.ispan.domain.pet.City;
 import tw.com.ispan.domain.pet.DistrictArea;
 import tw.com.ispan.domain.pet.LostCase;
+import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.domain.pet.banner.Banner;
 import tw.com.ispan.domain.pet.banner.BannerType;
 import tw.com.ispan.dto.pet.LostSearchCriteria;
@@ -94,7 +95,7 @@ public class LostCaseService {
                 : Sort.by(Sort.Direction.ASC, "lostCaseId");
 
         return lostCaseRepository.findAll(sort).stream()
-                .map(OutputLostCaseDTO::new) // 轉換成 DTO
+                .map(OutputLostCaseDTO::new) // ✅ 直接使用 DTO 建構子，讓它處理圖片與會員資訊
                 .collect(Collectors.toList());
     }
 
@@ -291,7 +292,7 @@ public class LostCaseService {
      */
     public Optional<OutputLostCaseDTO> findById(Integer lostCaseId) {
         return lostCaseRepository.findById(lostCaseId)
-                .map(OutputLostCaseDTO::new); // 轉換成 DTO
+                .map(OutputLostCaseDTO::new); // ✅ 直接使用 DTO 建構子，讓它處理圖片與會員資訊
     }
 
     /**
@@ -350,5 +351,10 @@ public class LostCaseService {
         lostCase.setLastUpdateTime(LocalDateTime.now());
 
         return lostCaseRepository.save(lostCase);
+    }
+
+    // 不分頁查詢所有案件(給googlemap使用)
+    public List<LostCase> getAllCases() {
+        return lostCaseRepository.findAll();
     }
 }
