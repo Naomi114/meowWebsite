@@ -26,11 +26,14 @@ import tw.com.ispan.domain.pet.DistrictArea;
 import tw.com.ispan.domain.pet.FurColor;
 import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.domain.pet.Species;
+import tw.com.ispan.domain.pet.banner.Banner;
+import tw.com.ispan.domain.pet.banner.BannerType;
 import tw.com.ispan.domain.pet.forRescue.CanAfford;
 import tw.com.ispan.domain.pet.forRescue.RescueDemand;
 import tw.com.ispan.init.pet.CityDto;
 import tw.com.ispan.init.pet.fakeRescueCaseDto;
 import tw.com.ispan.repository.admin.MemberRepository;
+import tw.com.ispan.repository.pet.BannerRepository;
 import tw.com.ispan.repository.pet.BreedRepository;
 import tw.com.ispan.repository.pet.CaseStateRepository;
 import tw.com.ispan.repository.pet.CityRepository;
@@ -69,6 +72,8 @@ public class PetDataInitializer implements CommandLineRunner {
 	private MemberRepository memberRepository;
 	@Autowired
 	private ImageService imageService;
+	@Autowired
+	private BannerRepository bannerRepository;
 
 	public void saveSpeciesData() {
 		if (!speciesRepository.existsById(1)) {
@@ -243,7 +248,7 @@ public class PetDataInitializer implements CommandLineRunner {
 			}
 		}
 
-		// 塞入5筆救援案件假資料以及更新圖片表
+		// 塞入13筆救援案件假資料以及更新圖片表(只能用create模式第一次完整塞入)
 
 		if (rescueCaseRepository.count() < 5) {
 
@@ -327,7 +332,16 @@ public class PetDataInitializer implements CommandLineRunner {
 				rescueCase.setCasePictures(casePictures);
 
 				// 保存 RescueCase 到資料庫
-				rescueCaseRepository.save(rescueCase);
+				RescueCase savedRescueCase = rescueCaseRepository.save(rescueCase);
+
+				// 確保 RescueCase 建立後自動產生 Banner(banner展示邏輯 卓穎說是最新的五個)
+				Banner banner = new Banner();
+				banner.setRescueCase(savedRescueCase);
+				banner.setBannerType(BannerType.RESCUE);
+				banner.setOnlineDate(LocalDateTime.now());
+				banner.setDueDate(LocalDateTime.now().plusDays(30));
+				banner.setIsHidden(false);
+				bannerRepository.save(banner);
 			}
 		}
 	}

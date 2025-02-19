@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,8 @@ import tw.com.ispan.domain.pet.DistrictArea;
 import tw.com.ispan.domain.pet.FurColor;
 import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.domain.pet.Species;
+import tw.com.ispan.domain.pet.banner.Banner;
+import tw.com.ispan.domain.pet.banner.BannerType;
 import tw.com.ispan.domain.pet.forRescue.CanAfford;
 import tw.com.ispan.domain.pet.forRescue.RescueDemand;
 import tw.com.ispan.dto.pet.EditSearchDTO;
@@ -41,6 +44,7 @@ import tw.com.ispan.dto.pet.OutputRescueCaseDTO;
 import tw.com.ispan.dto.pet.RescueSearchCriteria;
 import tw.com.ispan.jwt.JsonWebTokenUtility;
 import tw.com.ispan.repository.admin.MemberRepository;
+import tw.com.ispan.repository.pet.BannerRepository;
 import tw.com.ispan.repository.pet.BreedRepository;
 import tw.com.ispan.repository.pet.CaseStateRepository;
 import tw.com.ispan.repository.pet.CityRepository;
@@ -102,6 +106,8 @@ public class RescueCaseService {
 	private ImageService imageService;
 	@Autowired
 	private FollowRepository followRepository;
+	@Autowired
+	private BannerRepository bannerRepository;
 
 	// 新增案件:手動將傳進來的dto轉回entity，才能丟進jpa增刪修方法
 	public RescueCase convertToEntity(InputRescueCaseDto dto, Integer memberId) {
@@ -215,8 +221,19 @@ public class RescueCaseService {
 		}
 
 		// 存進資料庫中
-		if (rescueCaseRepository.save(rescueCase) != null) {
+		RescueCase savedRescueCase = rescueCaseRepository.save(rescueCase);
+		if (savedRescueCase != null) {
 			System.out.println("新增成功");
+
+			// 確保 RescueCase 建立後自動產生 Banner(banner展示邏輯 卓穎說是最新的五個)
+			Banner banner = new Banner();
+			banner.setRescueCase(savedRescueCase);
+			banner.setBannerType(BannerType.RESCUE);
+			banner.setOnlineDate(LocalDateTime.now());
+			banner.setDueDate(LocalDateTime.now().plusDays(30));
+			banner.setIsHidden(false);
+			bannerRepository.save(banner);
+
 			return rescueCase;
 		}
 		System.out.println("新增失敗");
