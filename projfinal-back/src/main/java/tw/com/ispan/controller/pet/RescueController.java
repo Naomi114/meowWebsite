@@ -448,4 +448,11 @@ public class RescueController {
 
 		return ResponseEntity.ok(response);
 	}
+
+	// 用於在進入案件詳情頁時，統計 `caseView` 並更新 `rescueCase`
+	@PostMapping("/{caseId}/updateViewCount")
+	public ResponseEntity<Void> updateRescueCaseViewCount(@PathVariable Integer caseId) {
+		rescueCaseService.updateRescueCaseViewCount(caseId);
+		return ResponseEntity.ok().build();
+	}
 }

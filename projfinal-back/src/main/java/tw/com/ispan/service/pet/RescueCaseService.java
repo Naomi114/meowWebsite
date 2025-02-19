@@ -47,6 +47,7 @@ import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.pet.BannerRepository;
 import tw.com.ispan.repository.pet.BreedRepository;
 import tw.com.ispan.repository.pet.CaseStateRepository;
+import tw.com.ispan.repository.pet.CaseViewRepository;
 import tw.com.ispan.repository.pet.CityRepository;
 import tw.com.ispan.repository.pet.DistrictAreaRepository;
 import tw.com.ispan.repository.pet.FollowRepository;
@@ -108,6 +109,8 @@ public class RescueCaseService {
 	private FollowRepository followRepository;
 	@Autowired
 	private BannerRepository bannerRepository;
+	@Autowired
+	private CaseViewRepository caseViewRepository;
 
 	// 新增案件:手動將傳進來的dto轉回entity，才能丟進jpa增刪修方法
 	public RescueCase convertToEntity(InputRescueCaseDto dto, Integer memberId) {
@@ -665,6 +668,13 @@ public class RescueCaseService {
 		}
 
 		return response;
+	}
+
+	// 更新 `rescueCase.viewCount` 為 `caseView` 中該案件的總數
+	@Transactional
+	public void updateRescueCaseViewCount(Integer caseId) {
+		int viewCount = caseViewRepository.countByRescueCaseId(caseId);
+		rescueCaseRepository.updateViewCount(caseId, viewCount);
 	}
 
 }
