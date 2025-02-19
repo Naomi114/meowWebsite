@@ -5,11 +5,12 @@ import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import tw.com.ispan.domain.pet.CasePicture;
 import tw.com.ispan.domain.pet.CaseState;
@@ -94,25 +94,7 @@ public class LostCaseService {
                 : Sort.by(Sort.Direction.ASC, "lostCaseId");
 
         return lostCaseRepository.findAll(sort).stream()
-                .map(lostCase -> {
-                    OutputLostCaseDTO dto = new OutputLostCaseDTO(lostCase);
-
-                    // ✅ 確保 casePictures 不為 null，取第一張圖片
-                    if (lostCase.getCasePictures() != null && !lostCase.getCasePictures().isEmpty()) {
-                        dto.setPictureUrl(lostCase.getCasePictures().get(0).getPictureUrl());
-                    }
-
-                    // ✅ 確保 memberId 不為 null
-                    if (lostCase.getMember() != null) {
-                        dto.setMemberId(lostCase.getMember().getMemberId());
-                        dto.setMemberNickName(lostCase.getMember().getNickName());
-                    } else {
-                        dto.setMemberId(-1); // 設定預設值，確保不為 null
-                        dto.setMemberNickName("未知會員");
-                    }
-
-                    return dto;
-                })
+                .map(OutputLostCaseDTO::new) // ✅ 直接使用 DTO 建構子，讓它處理圖片與會員資訊
                 .collect(Collectors.toList());
     }
 
@@ -309,25 +291,7 @@ public class LostCaseService {
      */
     public Optional<OutputLostCaseDTO> findById(Integer lostCaseId) {
         return lostCaseRepository.findById(lostCaseId)
-                .map(lostCase -> {
-                    OutputLostCaseDTO dto = new OutputLostCaseDTO(lostCase);
-
-                    // ✅ 確保 casePictures 不為 null
-                    if (lostCase.getCasePictures() != null && !lostCase.getCasePictures().isEmpty()) {
-                        dto.setPictureUrl(lostCase.getCasePictures().get(0).getPictureUrl()); // 取第一張圖片
-                    }
-
-                    // ✅ 確保 memberId 不為 null
-                    if (lostCase.getMember() != null) {
-                        dto.setMemberId(lostCase.getMember().getMemberId());
-                        dto.setMemberNickName(lostCase.getMember().getNickName());
-                    } else {
-                        dto.setMemberId(-1); // 設定預設值，確保不為 null
-                        dto.setMemberNickName("未知會員");
-                    }
-
-                    return dto;
-                });
+                .map(OutputLostCaseDTO::new); // ✅ 直接使用 DTO 建構子，讓它處理圖片與會員資訊
     }
 
     /**
