@@ -35,16 +35,23 @@ public class CategoryService {
         CategoryResponse response = new CategoryResponse();
         try {
             Optional<Category> existingCategory = categoryRepository.findByCategoryName(request.getCategoryName());
+
             Category category;
+
             if (existingCategory.isPresent()) {
                 // 更新類別
                 category = existingCategory.get();
+
                 if (request.getCategoryId() != null) {
                     category.setCategoryId(request.getCategoryId());
                 }
+
                 if (request.getDefaultUnit() != null && !request.getDefaultUnit().isEmpty()) {
                     category.setDefaultUnit(request.getDefaultUnit());
+                } else if (category.getDefaultUnit() == null || category.getDefaultUnit().isEmpty()) {
+                    throw new IllegalArgumentException("類別的預設單位未設置");
                 }
+
                 if (request.getCategoryDescription() != null) {
                     category.setCategoryDescription(request.getCategoryDescription());
                 }
@@ -253,12 +260,12 @@ public class CategoryService {
             product.setCategory(category);
 
             // 設定商品單位
-            String unit = categoryRequest.getDefaultUnit();
+            String unit = categoryRequest.getDefaultUnit(); // **先使用前端傳入的 defaultUnit**
             if (unit == null || unit.isEmpty()) {
-                unit = category.getDefaultUnit(); // 直接從資料庫讀取
-                if (unit == null || unit.isEmpty()) {
-                    throw new IllegalArgumentException("類別的預設單位未設置或提供");
-                }
+                unit = category.getDefaultUnit(); // **若前端沒傳入，則使用資料庫內的 defaultUnit**
+            }
+            if (unit == null || unit.isEmpty()) {
+                throw new IllegalArgumentException("類別的預設單位未設置或提供");
             }
             product.setUnit(unit);
         }

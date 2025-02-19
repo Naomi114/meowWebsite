@@ -6,7 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import tw.com.ispan.util.BigDecimalDeserializer;
 
 /*  ProductRequest 的責任
     1. 包含商品的整體數據（包括基本信息、價格、庫存等）。
@@ -34,8 +36,10 @@ public class ProductRequest {
 
     private String tagDescription;
 
+    @JsonDeserialize(using = BigDecimalDeserializer.class)
     private BigDecimal originalPrice;
 
+    @JsonDeserialize(using = BigDecimalDeserializer.class)
     private BigDecimal salePrice;
 
     private Integer stockQuantity;
@@ -49,7 +53,9 @@ public class ProductRequest {
     private LocalDate expire;
 
     // 前端為多選: 1~5張圖片；不能為空值
-    private List<MultipartFile> productImages;
+    // ✅ 確保不在這裡宣告 `List<MultipartFile>`，因為 MultipartFile 應該由 @RequestPart 接收
+    // private List<MultipartFile> productImages;
+    private List<String> productImages; // ✅ 只存圖片名稱，不存 MultipartFile
 
     public String getProductName() {
         return productName;
@@ -134,16 +140,24 @@ public class ProductRequest {
         this.tags = tags;
     }
 
-    public List<MultipartFile> getProductImages() {
-        return productImages;
-    }
+    // public List<MultipartFile> getProductImages() {
+    // return productImages;
+    // }
 
-    public void setProductImages(List<MultipartFile> productImages) {
-        this.productImages = productImages;
-    }
+    // public void setProductImages(List<MultipartFile> productImages) {
+    // this.productImages = productImages;
+    // }
 
     public String getCategoryDescription() {
         return categoryDescription;
+    }
+
+    public List<String> getProductImages() {
+        return productImages;
+    }
+
+    public void setProductImages(List<String> productImages) {
+        this.productImages = productImages;
     }
 
     public void setCategoryDescription(String categoryDescription) {

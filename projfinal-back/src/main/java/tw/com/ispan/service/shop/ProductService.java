@@ -115,7 +115,11 @@ public class ProductService {
 			product.setDescription(request.getDescription());
 
 			// 處理類別(1種)
-			categoryService.processCategory(product, Set.of(categoryService.buildCategoryRequestFromProduct(request)));
+
+			// 優化再做: 顯示預設單位 or 自訂單位
+			// categoryService.processCategory(product,
+			// Set.of(categoryService.buildCategoryRequestFromProduct(request)));
+			product.setUnit(request.getUnit());
 
 			// 處理標籤(0~N個)
 			productTagService.processProductTags(product, request.getTags());
