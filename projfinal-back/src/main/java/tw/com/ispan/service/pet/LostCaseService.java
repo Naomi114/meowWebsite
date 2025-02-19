@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,6 +31,7 @@ import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.domain.pet.banner.Banner;
 import tw.com.ispan.domain.pet.banner.BannerType;
 import tw.com.ispan.dto.pet.LostSearchCriteria;
+import tw.com.ispan.dto.pet.OutputLostCaseDTO;
 import tw.com.ispan.repository.admin.MemberRepository;
 import tw.com.ispan.repository.pet.BannerRepository;
 import tw.com.ispan.repository.pet.BreedRepository;
@@ -85,12 +87,15 @@ public class LostCaseService {
      * 取得所有遺失案件，並支援排序（新到舊、舊到新）
      *
      * @param sortDirection 排序方向 (true = desc, false = asc)
-     * @return 遺失案件列表
+     * @return 遺失案件列表 (DTO)
      */
-    public List<LostCase> getAll(boolean sortDirection) {
+    public List<OutputLostCaseDTO> getAll(boolean sortDirection) {
         Sort sort = sortDirection ? Sort.by(Sort.Direction.DESC, "lostCaseId")
                 : Sort.by(Sort.Direction.ASC, "lostCaseId");
-        return lostCaseRepository.findAll(sort);
+
+        return lostCaseRepository.findAll(sort).stream()
+                .map(OutputLostCaseDTO::new) // 轉換成 DTO
+                .collect(Collectors.toList());
     }
 
     /**
@@ -103,6 +108,7 @@ public class LostCaseService {
         return lostCaseRepository.findByMemberId(memberId);
     }
 
+    // 查詢全部
     @Transactional
     public Page<LostCase> searchLostCases(LostSearchCriteria criteria) {
         int start = 0;
@@ -278,10 +284,14 @@ public class LostCaseService {
     }
 
     /**
-     * 根據 ID 查詢 LostCase
+     * 根據 ID 查詢 LostCase，並轉換為 DTO
+     *
+     * @param lostCaseId 遺失案件 ID
+     * @return Optional<OutputLostCaseDTO> (如果找不到則返回空)
      */
-    public Optional<LostCase> findById(Integer lostCaseId) {
-        return lostCaseRepository.findById(lostCaseId);
+    public Optional<OutputLostCaseDTO> findById(Integer lostCaseId) {
+        return lostCaseRepository.findById(lostCaseId)
+                .map(OutputLostCaseDTO::new); // 轉換成 DTO
     }
 
     /**
