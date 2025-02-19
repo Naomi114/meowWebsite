@@ -61,4 +61,7 @@ public interface RescueCaseRepository extends JpaRepository<RescueCase, Integer>
 	@Query("UPDATE RescueCase r SET r.viewCount = :viewCount WHERE r.rescueCaseId = :caseId")
 	void updateViewCount(@Param("caseId") Integer caseId, @Param("viewCount") int viewCount);
 
+	// 給資料初始化程式使用
+	List<RescueCase> findByRescueCaseIdBetween(int start, int end);
+
 }
