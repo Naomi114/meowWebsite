@@ -17,7 +17,8 @@ public class OutputLostCaseDTO {
 	private String sterilization;
 	private String microChipNumber;
 	private boolean isHidden;
-	private List<Map<String, String>> casePictures;
+	private String pictureUrl;
+	private Integer pictureId; // ✅ 確保能返回圖片 ID
 
 	// private Integer cityId;
 	private String cityName;
@@ -168,12 +169,20 @@ public class OutputLostCaseDTO {
 		this.isHidden = isHidden;
 	}
 
-	public List<Map<String, String>> getCasePictures() {
-		return casePictures;
+	public String getPictureUrl() {
+		return pictureUrl;
 	}
 
-	public void setCasePictures(List<Map<String, String>> casePictures) {
-		this.casePictures = casePictures;
+	public void setPictureUrl(String pictureUrl) {
+		this.pictureUrl = pictureUrl;
+	}
+
+	public Integer getPictureId() {
+		return pictureId;
+	}
+
+	public void setPictureId(Integer pictureId) {
+		this.pictureId = pictureId;
 	}
 
 	public String getCityName() {

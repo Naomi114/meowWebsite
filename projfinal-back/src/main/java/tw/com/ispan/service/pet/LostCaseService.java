@@ -94,7 +94,25 @@ public class LostCaseService {
                 : Sort.by(Sort.Direction.ASC, "lostCaseId");
 
         return lostCaseRepository.findAll(sort).stream()
-                .map(OutputLostCaseDTO::new) // 轉換成 DTO
+                .map(lostCase -> {
+                    OutputLostCaseDTO dto = new OutputLostCaseDTO(lostCase);
+
+                    // ✅ 確保 casePictures 不為 null，取第一張圖片
+                    if (lostCase.getCasePictures() != null && !lostCase.getCasePictures().isEmpty()) {
+                        dto.setPictureUrl(lostCase.getCasePictures().get(0).getPictureUrl());
+                    }
+
+                    // ✅ 確保 memberId 不為 null
+                    if (lostCase.getMember() != null) {
+                        dto.setMemberId(lostCase.getMember().getMemberId());
+                        dto.setMemberNickName(lostCase.getMember().getNickName());
+                    } else {
+                        dto.setMemberId(-1); // 設定預設值，確保不為 null
+                        dto.setMemberNickName("未知會員");
+                    }
+
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -291,7 +309,25 @@ public class LostCaseService {
      */
     public Optional<OutputLostCaseDTO> findById(Integer lostCaseId) {
         return lostCaseRepository.findById(lostCaseId)
-                .map(OutputLostCaseDTO::new); // 轉換成 DTO
+                .map(lostCase -> {
+                    OutputLostCaseDTO dto = new OutputLostCaseDTO(lostCase);
+
+                    // ✅ 確保 casePictures 不為 null
+                    if (lostCase.getCasePictures() != null && !lostCase.getCasePictures().isEmpty()) {
+                        dto.setPictureUrl(lostCase.getCasePictures().get(0).getPictureUrl()); // 取第一張圖片
+                    }
+
+                    // ✅ 確保 memberId 不為 null
+                    if (lostCase.getMember() != null) {
+                        dto.setMemberId(lostCase.getMember().getMemberId());
+                        dto.setMemberNickName(lostCase.getMember().getNickName());
+                    } else {
+                        dto.setMemberId(-1); // 設定預設值，確保不為 null
+                        dto.setMemberNickName("未知會員");
+                    }
+
+                    return dto;
+                });
     }
 
     /**
