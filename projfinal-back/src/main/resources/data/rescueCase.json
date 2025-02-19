@@ -59,7 +59,8 @@
     "caseStateId":  3 ,
     "caseUrl": "https://example.com/case/125",
     "casePictures": [
-      { "url": "${final-upload-dir}examplecase2.png" }
+      { "url": "${final-upload-dir}examplecase2.png" },
+      { "url": "${final-upload-dir}examplecase21.png" }
     ],
     "rescueDemands": [
       { "rescueDemandId": 2 },
