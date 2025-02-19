@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import tw.com.ispan.domain.pet.RescueCase;
 
-
 public class OutputRescueCaseDTO {
 
 	private Integer rescueCaseId;
@@ -22,10 +21,10 @@ public class OutputRescueCaseDTO {
 	private boolean isHidden;
 	private List<Map<String, String>> casePictures;
 
-//	private Integer cityId;
+	// private Integer cityId;
 	private String cityName;
 
-//	private Integer districtAreaId;
+	// private Integer districtAreaId;
 	private String districtAreaName;
 
 	private String street;
@@ -43,76 +42,77 @@ public class OutputRescueCaseDTO {
 	private String furColor;
 
 	private String memberNickName;
-	private Integer memberId;      //用於讓用戶想要進入頁面可以編輯時，去對應前端用戶token以及案件回傳的memberId
+	private Integer memberId; // 用於讓用戶想要進入頁面可以編輯時，去對應前端用戶token以及案件回傳的memberId
 	private LocalDateTime publicationTime;
 	private LocalDateTime lastUpdateTime;
 
 	private List<String> rescueDemands;
 	private List<String> canAffords;
-	
+
 	// DTO 建構子：將 RescueCase 轉換為 OutputRescueCaseDTO
-    public OutputRescueCaseDTO(RescueCase rescueCase) {
-        this.rescueCaseId = rescueCase.getRescueCaseId();
-        this.caseTitle = rescueCase.getCaseTitle();
-        this.caseUrl = rescueCase.getCaseUrl();
-        this.age = rescueCase.getAge();
-        this.gender = rescueCase.getGender();
-        this.sterilization = rescueCase.getSterilization();
-        this.microChipNumber = rescueCase.getMicroChipNumber();
-        this.rescueReason = rescueCase.getRescueReason();
-        this.suspLost = rescueCase.getSuspLost();
-        this.isHidden = rescueCase.getIsHidden();
+	public OutputRescueCaseDTO(RescueCase rescueCase) {
+		this.memberId = rescueCase.getMember().getMemberId();
+		this.rescueCaseId = rescueCase.getRescueCaseId();
+		this.caseTitle = rescueCase.getCaseTitle();
+		this.caseUrl = rescueCase.getCaseUrl();
+		this.age = rescueCase.getAge();
+		this.gender = rescueCase.getGender();
+		this.sterilization = rescueCase.getSterilization();
+		this.microChipNumber = rescueCase.getMicroChipNumber();
+		this.rescueReason = rescueCase.getRescueReason();
+		this.suspLost = rescueCase.getSuspLost();
+		this.isHidden = rescueCase.getIsHidden();
 
-        if (rescueCase.getCity() != null) {
-//            this.cityId = rescueCase.getCity().getCityId();
-            this.cityName = rescueCase.getCity().getCity();
-        }
+		if (rescueCase.getCity() != null) {
+			// this.cityId = rescueCase.getCity().getCityId();
+			this.cityName = rescueCase.getCity().getCity();
+		}
 
-        if (rescueCase.getDistrictArea() != null) {
-//            this.districtAreaId = rescueCase.getDistrictArea().getDistrictAreaId();
-            this.districtAreaName = rescueCase.getDistrictArea().getDistrictAreaName();
-        }
+		if (rescueCase.getDistrictArea() != null) {
+			// this.districtAreaId = rescueCase.getDistrictArea().getDistrictAreaId();
+			this.districtAreaName = rescueCase.getDistrictArea().getDistrictAreaName();
+		}
 
-        this.street = rescueCase.getStreet();
-        this.latitude = rescueCase.getLatitude();
-        this.longitude = rescueCase.getLongitude();
+		this.street = rescueCase.getStreet();
+		this.latitude = rescueCase.getLatitude();
+		this.longitude = rescueCase.getLongitude();
 
-        this.donationAmount = rescueCase.getDonationAmount();
-        this.viewCount = rescueCase.getViewCount();
-        this.follow = rescueCase.getFollow();
-        this.tag = rescueCase.getTag();
+		this.donationAmount = rescueCase.getDonationAmount();
+		this.viewCount = rescueCase.getViewCount();
+		this.follow = rescueCase.getFollow();
+		this.tag = rescueCase.getTag();
 
-        if (rescueCase.getCaseState() != null) {
-            this.caseState = rescueCase.getCaseState().getCaseStatement();
-        }
+		if (rescueCase.getCaseState() != null) {
+			this.caseState = rescueCase.getCaseState().getCaseStatement();
+		}
 
-        if (rescueCase.getSpecies() != null) {
-            this.species = rescueCase.getSpecies().getSpecies();
-        }
+		if (rescueCase.getSpecies() != null) {
+			this.species = rescueCase.getSpecies().getSpecies();
+		}
 
-        if (rescueCase.getBreed() != null) {
-            this.breed = rescueCase.getBreed().getBreed();
-        }
+		if (rescueCase.getBreed() != null) {
+			this.breed = rescueCase.getBreed().getBreed();
+		}
 
-        if (rescueCase.getFurColor() != null) {
-            this.furColor = rescueCase.getFurColor().getFurColor();
-        }
+		if (rescueCase.getFurColor() != null) {
+			this.furColor = rescueCase.getFurColor().getFurColor();
+		}
 
-        if (rescueCase.getMember() != null) {
-            this.memberNickName = rescueCase.getMember().getNickName();
-        }
+		if (rescueCase.getMember() != null) {
+			this.memberNickName = rescueCase.getMember().getNickName();
+		}
 
-        this.publicationTime = rescueCase.getPublicationTime();
-        this.lastUpdateTime = rescueCase.getLastUpdateTime();
+		this.publicationTime = rescueCase.getPublicationTime();
+		this.lastUpdateTime = rescueCase.getLastUpdateTime();
 
-        this.rescueDemands = rescueCase.getRescueDemands().stream()
-                .map(demand -> demand.getRescueDemand())
-                .collect(Collectors.toList());
+		this.rescueDemands = rescueCase.getRescueDemands().stream()
+				.map(demand -> demand.getRescueDemand())
+				.collect(Collectors.toList());
 
-        this.canAffords = rescueCase.getCanAffords().stream()
-                .map(afford -> afford.getCanAfford())
-                .collect(Collectors.toList());
-    }
+		this.canAffords = rescueCase.getCanAffords().stream()
+				.map(afford -> afford.getCanAfford())
+				.collect(Collectors.toList());
+	}
 
 	public Integer getRescueCaseId() {
 		return rescueCaseId;
@@ -353,8 +353,5 @@ public class OutputRescueCaseDTO {
 	public void setMemberId(Integer memberId) {
 		this.memberId = memberId;
 	}
-    
-	
-    
-	
+
 }
