@@ -77,7 +77,7 @@ spring:
 file:
   storage:
     uploadDir: C:/meowWebsite/images #指向實際的存儲目錄
-    baseUrl: ${BASE_URL:http://localhost:8080/images} #對應圖片的訪問 URL
+    baseUrl: ${back.domainName.url}/images #對應圖片的訪問 URL
 
   petUpload: #在webconfig中設定前後端對應的靜態圖片路徑
     path: C:/upload/

@@ -23,6 +23,7 @@ import jakarta.validation.Valid;
 import tw.com.ispan.domain.pet.CasePicture;
 import tw.com.ispan.domain.pet.LostCase;
 import tw.com.ispan.dto.pet.LostSearchCriteria;
+import tw.com.ispan.dto.pet.OutputLostCaseDTO;
 import tw.com.ispan.service.pet.ImageService;
 import tw.com.ispan.service.pet.LostCaseService;
 
@@ -81,20 +82,16 @@ public class LostCaseController {
 
     /**
      * 根據 ID 查詢 LostCase
-     * 
+     *
      * @param lostCaseId 走失案件的 ID
-     * @return LostCase 的資料
+     * @return LostCase 的資料 (DTO)
      */
     @GetMapping("/{lostCaseId}")
-    public ResponseEntity<LostCase> getLostCaseById(@PathVariable Integer lostCaseId) {
-        Optional<LostCase> lostCase = lostCaseService.findById(lostCaseId);
+    public ResponseEntity<OutputLostCaseDTO> getLostCaseById(@PathVariable Integer lostCaseId) {
+        Optional<OutputLostCaseDTO> lostCaseDTO = lostCaseService.findById(lostCaseId);
 
-        if (lostCase.isPresent()) {
-            LostCase caseData = lostCase.get();
-            return ResponseEntity.ok(caseData);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return lostCaseDTO.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -143,10 +140,10 @@ public class LostCaseController {
      * 取得所有遺失案件（支援排序）
      *
      * @param dir 排序方向 (true = desc, false = asc)
-     * @return 遺失案件列表
+     * @return 遺失案件列表 (DTO)
      */
     @GetMapping("/all")
-    public List<LostCase> getAllLostCases(@RequestParam(defaultValue = "true") boolean dir) {
+    public List<OutputLostCaseDTO> getAllLostCases(@RequestParam(defaultValue = "true") boolean dir) {
         return lostCaseService.getAll(dir);
     }
 }
