@@ -50,8 +50,8 @@ public class OutputLostCaseDTO {
 	// DTO 建構子：將 lostCase 轉換為 OutputLostCaseDTO
 	public OutputLostCaseDTO(LostCase lostCase) {
 		this.lostCaseId = lostCase.getLostCaseId();
-		this.caseTitle = lostCase.getName();
-		this.name = lostCase.getCaseTitle();
+		this.caseTitle = lostCase.getCaseTitle();
+		this.name = lostCase.getName();
 		this.age = lostCase.getAge();
 		this.gender = lostCase.getGender();
 		this.sterilization = lostCase.getSterilization();
