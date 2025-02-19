@@ -467,6 +467,10 @@ public class RescueCaseService {
 
 	// 刪除案件------------------------------------------------------------------------------------------
 	public boolean delete(Integer id) {
+
+		// 先刪除 caseViews 中的關聯記錄
+		caseViewRepository.deleteByRescueCaseId(id);
+
 		if (id != null && rescueCaseRepository.existsById(id)) {
 			rescueCaseRepository.deleteById(id); // 沒有返回值
 			return true;

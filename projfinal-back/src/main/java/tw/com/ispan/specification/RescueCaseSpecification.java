@@ -26,10 +26,10 @@ public class RescueCaseSpecification {
 				// 一對多的關聯，需另外先建立 Join 從 RescueCase 到 RescueProgress (會自動找尋對應id的資料)，改從此為基底出發作查詢
 				// SELECT rc.* FROM RescueCase rc JOIN RescueProgress rp ON rc.id =
 				// rp.rescueCaseId WHERE rp.content LIKE '%keyword%';
-				
-				
-				//JoinType.LEFT表LEFT JOIN，即使該RescueCase 沒有對應的 RescueProgress，則這些欄位的值會是 NULL，但該案件仍然會出現在查詢結果中
-				 Join<RescueCase, RescueProgress> rescueProgressJoin = root.join("rescueProgresses", JoinType.LEFT);
+
+				// JoinType.LEFT表LEFT JOIN，即使該RescueCase 沒有對應的 RescueProgress，則這些欄位的值會是
+				// NULL，但該案件仍然會出現在查詢結果中
+				Join<RescueCase, RescueProgress> rescueProgressJoin = root.join("rescueProgresses", JoinType.LEFT);
 
 				// cb.or()組裝WHERE條件 (caseTitle LIKE '%<keyword>%' OR species LIKE '%<keyword>%'
 				// OR...)
@@ -68,7 +68,13 @@ public class RescueCaseSpecification {
 			}
 
 			// 以下為精準查詢
-			// 救援狀態  通常後端會將前端傳來空字符串解析為 null
+
+			// 案件 ID 精準查詢**
+			if (criteria.getCaseId() != null) {
+				predicate = cb.and(predicate, cb.equal(root.get("rescueCaseId"), criteria.getCaseId()));
+			}
+
+			// 救援狀態 通常後端會將前端傳來空字符串解析為 null
 			if (criteria.getCaseStateId() != null) {
 				predicate = cb.and(predicate,
 						cb.equal(root.get("caseState").get("caseStateId"), criteria.getCaseStateId()));
@@ -87,7 +93,7 @@ public class RescueCaseSpecification {
 
 			// 物種 (支援多選) 使用in
 			if (criteria.getSpeciesId() != null && !criteria.getSpeciesId().isEmpty()) {
-			    predicate = cb.and(predicate, root.get("species").get("speciesId").in(criteria.getSpeciesId()));
+				predicate = cb.and(predicate, root.get("species").get("speciesId").in(criteria.getSpeciesId()));
 			}
 
 			// 品種

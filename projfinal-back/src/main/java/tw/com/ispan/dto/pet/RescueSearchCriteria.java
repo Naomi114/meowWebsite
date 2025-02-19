@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Positive;
 
 public class RescueSearchCriteria {
 	@Nullable
-	private String caseId;
+	private Integer caseId;
 
 	@Nullable
 	private String keyword; // 關鍵字
@@ -120,6 +120,14 @@ public class RescueSearchCriteria {
 		return "RescueSearchCriteria [keyword=" + keyword + ", caseStateId=" + caseStateId + ", cityId=" + cityId
 				+ ", districtAreaId=" + districtAreaId + ", speciesId=" + speciesId + ", breedId=" + breedId
 				+ ", furColorId=" + furColorId + ", suspectLost=" + suspLost + "]";
+	}
+
+	public Integer getCaseId() {
+		return caseId;
+	}
+
+	public void setCaseId(Integer caseId) {
+		this.caseId = caseId;
 	}
 
 }
