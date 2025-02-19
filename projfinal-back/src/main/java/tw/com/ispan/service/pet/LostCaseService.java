@@ -28,6 +28,7 @@ import tw.com.ispan.domain.pet.CaseState;
 import tw.com.ispan.domain.pet.City;
 import tw.com.ispan.domain.pet.DistrictArea;
 import tw.com.ispan.domain.pet.LostCase;
+import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.domain.pet.banner.Banner;
 import tw.com.ispan.domain.pet.banner.BannerType;
 import tw.com.ispan.dto.pet.LostSearchCriteria;
@@ -350,5 +351,10 @@ public class LostCaseService {
         lostCase.setLastUpdateTime(LocalDateTime.now());
 
         return lostCaseRepository.save(lostCase);
+    }
+
+    // 不分頁查詢所有案件(給googlemap使用)
+    public List<LostCase> getAllCases() {
+        return lostCaseRepository.findAll();
     }
 }

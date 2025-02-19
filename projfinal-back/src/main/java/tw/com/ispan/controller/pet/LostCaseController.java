@@ -1,10 +1,14 @@
 package tw.com.ispan.controller.pet;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import tw.com.ispan.domain.pet.CasePicture;
 import tw.com.ispan.domain.pet.LostCase;
+import tw.com.ispan.domain.pet.RescueCase;
 import tw.com.ispan.dto.pet.LostSearchCriteria;
 import tw.com.ispan.dto.pet.OutputLostCaseDTO;
 import tw.com.ispan.service.pet.ImageService;
@@ -36,6 +41,12 @@ public class LostCaseController {
 
     @Autowired
     private ImageService imageService;
+
+    @Value("${back.domainName.url}")
+    private String backDomainName;
+
+    @Value("${file.petUpload.path}")
+    private String petUploadPath;
 
     /**
      * 根據會員 ID 查詢對應的 LostCases
@@ -146,4 +157,42 @@ public class LostCaseController {
     public List<OutputLostCaseDTO> getAllLostCases(@RequestParam(defaultValue = "true") boolean dir) {
         return lostCaseService.getAll(dir);
     }
+
+    // 給GOOGLEMAP使用
+    @GetMapping("/getLocations")
+    public List<Map<String, Object>> getLostCasesLocations() {
+        List<LostCase> cases = lostCaseService.getAllCases();
+
+        List<Map<String, Object>> response = new ArrayList<>();
+        for (LostCase lostCase : cases) {
+            Map<String, Object> caseData = new HashMap<>();
+            caseData.put("caseTitle", lostCase.getCaseTitle());
+            caseData.put("latitude", lostCase.getLatitude());
+            caseData.put("longitude", lostCase.getLongitude());
+            caseData.put("rescueReason", lostCase.getFeatureDescription());
+            caseData.put("publicationTime", lostCase.getPublicationTime());
+            caseData.put("city", lostCase.getCity().getCity());
+            caseData.put("district", lostCase.getDistrictArea().getDistrictAreaName());
+            caseData.put("caseState", lostCase.getCaseState());
+            caseData.put("caseId", lostCase.getLostCaseId());
+            caseData.put("caseType", "lostCase");
+
+            // 修正 casePictures 中的 pictureUrl，確保前端可以訪問
+            List<Map<String, String>> fixedCasePictures = new ArrayList<>();
+            for (CasePicture picture : lostCase.getCasePictures()) {
+                Map<String, String> pictureData = new HashMap<>();
+                String originalPath = picture.getPictureUrl(); // 取得原始路徑
+                String fixedPath = originalPath.replace(petUploadPath, backDomainName + "/upload/"); // 替換成可訪問 URL
+                pictureData.put("pictureUrl", fixedPath);
+                fixedCasePictures.add(pictureData);
+            }
+
+            caseData.put("casePictures", fixedCasePictures); // 更新處理後的圖片路徑
+
+            response.add(caseData);
+        }
+
+        return response;
+    }
+
 }
