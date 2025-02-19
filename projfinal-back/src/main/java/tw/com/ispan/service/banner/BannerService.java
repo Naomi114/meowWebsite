@@ -124,17 +124,24 @@ public class BannerService {
             return baseURL + "/images/default.png";
         }
 
+        path = path.replace("\\", "/"); // ✅ 確保所有 `/` 格式統一（Windows & Linux）
+
         if (path.startsWith("C:/upload/final/")) {
-            // ✅ 轉換本機路徑為雲端 URL
-            return path.replace("C:/upload/final", baseURL + "/upload/final");
-        } else if (path.startsWith("/upload/final/")) {
-            // ✅ 若是相對路徑，補上 `baseURL`
-            return baseURL + path;
-        } else if (path.startsWith("http")) {
-            // ✅ 若已經是完整 URL，則不修改
-            return path;
+            // ✅ 第一步：將 Windows 本機路徑轉換成 `localhost:8080`
+            path = path.replace("C:/upload/final", "http://localhost:8080/upload/final");
         }
-        return baseURL + "/images/default.png"; // 若發生錯誤，返回預設圖片
+
+        if (path.startsWith("http://localhost:8080")) {
+            // ✅ 第二步：將 `localhost:8080` 替換為 `petfinder.duckdns.org`
+            path = path.replace("http://localhost:8080", "https://petfinder.duckdns.org");
+        }
+
+        if (path.startsWith("/upload/final/")) {
+            // ✅ 第三步：如果仍是相對路徑，補上 `BASE_URL`
+            path = baseURL + path;
+        }
+
+        return path;
     }
 
     /**

@@ -1,7 +1,10 @@
 package tw.com.ispan.dto.pet;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import tw.com.ispan.domain.pet.LostCase;
@@ -42,10 +45,10 @@ public class OutputLostCaseDTO {
 	private String featureDescription;
 	private String lostExperience;
 
-	// ✅ 取得後端 API Base URL，從環境變數 VITE_API_BASE_URL 或使用預設本機開發網址
+	// ✅ 取得後端 API Base URL，從環境變數或使用預設雲端主機
 	private static final String BASE_URL = System.getenv("VITE_API_BASE_URL") != null
 			? System.getenv("VITE_API_BASE_URL")
-			: "http://localhost:8080";
+			: "https://petfinder.duckdns.org";
 
 	// DTO 建構子：將 lostCase 轉換為 OutputLostCaseDTO
 	public OutputLostCaseDTO(LostCase lostCase) {
@@ -101,7 +104,6 @@ public class OutputLostCaseDTO {
 		this.contactInformation = lostCase.getContactInformation();
 		this.featureDescription = lostCase.getFeatureDescription();
 		this.lostExperience = lostCase.getLostExperience();
-
 		// ✅ 轉換 `casePictures` 為前端可用的 URL
 		if (lostCase.getCasePictures() != null && !lostCase.getCasePictures().isEmpty()) {
 			this.casePictures = lostCase.getCasePictures().stream()
@@ -111,6 +113,9 @@ public class OutputLostCaseDTO {
 						// 如果是本機存放 (`C:/upload/final/...`)，轉換為雲端 URL
 						if (filePath.startsWith("C:/upload/final/")) {
 							filePath = filePath.replace("C:/upload/final/", "/upload/final/");
+						} else if (filePath.startsWith("http://localhost:8080/images/default.png")) {
+							// 如果是本機的預設圖片，改成雲端的預設圖片
+							filePath = "/upload/final/images/default.png";
 						}
 
 						// 完整的 HTTP URL
@@ -122,11 +127,12 @@ public class OutputLostCaseDTO {
 					})
 					.collect(Collectors.toList());
 		} else {
-			// 沒有圖片時，使用預設圖片 `/images/default.png`
+			// 沒有圖片時，使用雲端的預設圖片
 			Map<String, String> defaultImage = new HashMap<>();
-			defaultImage.put("pictureUrl", BASE_URL + "/images/default.png");
+			defaultImage.put("pictureUrl", BASE_URL + "/upload/final/images/default.png");
 			this.casePictures = Collections.singletonList(defaultImage);
 		}
+
 	}
 
 	public Integer getLostCaseId() {
