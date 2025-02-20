@@ -1,5 +1,6 @@
 package tw.com.ispan.service.shop;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -175,4 +176,17 @@ public class ProductTagService {
         }
         return response;
     }
+
+    // 初始化查詢實體 ProductTagResponse => ProductTag
+    public List<ProductTag> findTagEntities(List<Integer> tagIds) {
+        List<ProductTag> tags = productTagRepository.findAllById(tagIds);
+
+        // 不強制拋出錯誤，只警告
+        if (tags.size() != tagIds.size()) {
+            System.err.println("警告: 部分標籤不存在: " + tagIds);
+        }
+
+        return tags; // 直接回傳找到的標籤
+    }
+
 }
