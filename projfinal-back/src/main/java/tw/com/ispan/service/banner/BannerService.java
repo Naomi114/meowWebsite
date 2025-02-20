@@ -100,7 +100,7 @@ public class BannerService {
         if (casePictures == null || casePictures.isEmpty()) {
             // ✅ 若無圖片，直接使用雲端 `default.png`
             Map<String, String> defaultImage = new HashMap<>();
-            defaultImage.put("pictureUrl", "https://petfinder.duckdns.org/upload/final/assets/default.png");
+            defaultImage.put("pictureUrl", "https://petfinder.duckdns.org/assets/default.png");
             return Collections.singletonList(defaultImage);
         }
 
@@ -121,7 +121,7 @@ public class BannerService {
      */
     private String convertBackendPath(String path, String baseURL) {
         if (path == null || path.isEmpty()) {
-            return baseURL + "/upload/final/assets/default.png"; // ✅ 使用 baseURL 預設圖片
+            return baseURL + "/assets/default.png"; // ✅ 使用 baseURL 預設圖片
         }
 
         path = path.replace("\\", "/"); // ✅ 確保 `/` 格式統一（Windows & Linux）
