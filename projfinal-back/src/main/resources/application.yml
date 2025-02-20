@@ -16,7 +16,7 @@ spring:
 
   #Docker環境下的設定
   profiles:
-    active: "dev"
+    active: "production"
 
   #spring手動設定 HTTP 請求和回應的字符編碼
   encoding:
