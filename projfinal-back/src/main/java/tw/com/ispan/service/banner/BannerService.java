@@ -95,18 +95,18 @@ public class BannerService {
         // ✅ 取得 API Base URL，確保適應本機與雲端
         String baseURL = System.getenv("VITE_API_BASE_URL") != null
                 ? System.getenv("VITE_API_BASE_URL")
-                : "http://localhost:8080";
+                : "https://petfinder.duckdns.org"; // ✅ 預設為雲端 URL
 
         if (casePictures == null || casePictures.isEmpty()) {
-            // ✅ 若無圖片，則提供預設圖片
+            // ✅ 若無圖片，直接使用雲端 `default.png`
             Map<String, String> defaultImage = new HashMap<>();
-            defaultImage.put("pictureUrl", baseURL + "/images/default.png");
+            defaultImage.put("pictureUrl", "https://petfinder.duckdns.org/assets/default.png");
             return Collections.singletonList(defaultImage);
         }
 
         return casePictures.stream()
                 .map(pic -> {
-                    String filePath = pic.getPictureUrl().replace("\\", "/"); // 確保 `/` 格式一致
+                    String filePath = pic.getPictureUrl().replace("\\", "/"); // ✅ 確保 `/` 格式一致
                     filePath = convertBackendPath(filePath, baseURL);
 
                     Map<String, String> imageMap = new HashMap<>();
@@ -121,10 +121,15 @@ public class BannerService {
      */
     private String convertBackendPath(String path, String baseURL) {
         if (path == null || path.isEmpty()) {
-            return baseURL + "/images/default.png";
+            return baseURL + "/assets/default.png"; // ✅ 使用 baseURL 預設圖片
         }
 
-        path = path.replace("\\", "/"); // ✅ 確保所有 `/` 格式統一（Windows & Linux）
+        path = path.replace("\\", "/"); // ✅ 確保 `/` 格式統一（Windows & Linux）
+
+        // ✅ 如果是 `/assets/default.png`，確保它轉換到雲端
+        if (path.contains("/assets/default.png")) {
+            return "https://petfinder.duckdns.org/assets/default.png";
+        }
 
         if (path.startsWith("C:/upload/final/")) {
             // ✅ 第一步：將 Windows 本機路徑轉換成 `localhost:8080`

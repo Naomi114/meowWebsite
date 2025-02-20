@@ -1,8 +1,8 @@
 package tw.com.ispan.repository.pet;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -63,5 +63,8 @@ public interface RescueCaseRepository extends JpaRepository<RescueCase, Integer>
 
 	// 給資料初始化程式使用
 	List<RescueCase> findByRescueCaseIdBetween(int start, int end);
+
+	@Query("SELECT rc FROM RescueCase rc JOIN FETCH rc.member WHERE rc.rescueCaseId = :id")
+	Optional<RescueCase> findByIdWithMember(@Param("id") Integer id);
 
 }

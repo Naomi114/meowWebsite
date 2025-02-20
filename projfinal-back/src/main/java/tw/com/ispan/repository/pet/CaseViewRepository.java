@@ -3,6 +3,7 @@ package tw.com.ispan.repository.pet;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -63,4 +64,9 @@ public interface CaseViewRepository extends JpaRepository<CaseView, Integer> {
         // 幫助計算特定案件被瀏覽的次數
         @Query("SELECT COUNT(c) FROM CaseView c WHERE c.rescueCase.rescueCaseId =:caseId")
         int countByRescueCaseId(@Param("caseId") Integer caseId);
+
+        // 跟著案件刪除一起被刪掉
+        @Modifying
+        @Query("DELETE FROM CaseView cv WHERE cv.rescueCase.rescueCaseId = :rescueCaseId")
+        void deleteByRescueCaseId(@Param("rescueCaseId") Integer rescueCaseId);
 }

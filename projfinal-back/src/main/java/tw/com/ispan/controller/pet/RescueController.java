@@ -302,7 +302,6 @@ public class RescueController {
 		// 呼叫 service 層的方法來獲取數據
 		List<OutputRescueCaseDTO> cases = rescueCaseService.searchRescueCasesInfinite(criteria, offset, limit,
 				sortOrder);
-
 		// 建立回傳格式
 		Map<String, Object> response = new HashMap<>();
 		response.put("cases", cases);

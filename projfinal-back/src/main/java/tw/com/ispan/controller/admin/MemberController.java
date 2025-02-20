@@ -1,20 +1,18 @@
 package tw.com.ispan.controller.admin;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import tw.com.ispan.domain.admin.Member;
 import tw.com.ispan.dto.admin.MemberDto;
+import tw.com.ispan.dto.admin.MemberProfileDto;
 import tw.com.ispan.dto.admin.PasswordDto;
 import tw.com.ispan.service.MemberService;
 
@@ -53,6 +51,17 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An error occurred: " + e.getMessage());
         }
+    }
+
+    // 冠，返回個人頁面資訊
+    @GetMapping("/{memberId}/profile")
+    public ResponseEntity<MemberProfileDto> getMemberProfile(@PathVariable Integer memberId) {
+        Member member = memberService.getMemberById(memberId);
+        if (member == null) {
+            return ResponseEntity.notFound().build();
+        }
+        MemberProfileDto dto = new MemberProfileDto(member.getLineName(), member.getLinePicture(), member.getEmail());
+        return ResponseEntity.ok(dto);
     }
 
 }
