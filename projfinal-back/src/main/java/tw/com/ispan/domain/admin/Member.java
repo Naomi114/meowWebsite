@@ -47,7 +47,7 @@ public class Member {
     @Column(length = 70, nullable = false)
     private String name;
 
-    @Column(unique = true, length = 100, nullable = false)
+    @Column(length = 100, nullable = false)
     private String email;
 
     @Column(length = 10, nullable = false)
@@ -78,21 +78,21 @@ public class Member {
     @Column(nullable = false)
     private boolean userType; // 1表示註冊會員，0表示line登入會員(冠)
 
- 	// 雙向一對多
-     @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST })
-     private List<Activity> activity;
+    // 雙向一對多
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST })
+    private List<Activity> activity;
 
-   // 會員和活動的中介表 雙向一對多
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST }, orphanRemoval = true)
-	private List<ActivityParticipantList> acitvityParticipantLists;
+    // 會員和活動的中介表 雙向一對多
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST }, orphanRemoval = true)
+    private List<ActivityParticipantList> acitvityParticipantLists;
 
-   // 雙向一對多
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST })
-	private List<RescueCase> rescueCases;
+    // 雙向一對多
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST })
+    private List<RescueCase> rescueCases;
 
-  	// 單向一對多
-	@OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
-	private List<Follow> follows;
+    // 單向一對多
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
+    private List<Follow> follows;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<LostCase> lostCase = new ArrayList<>();
@@ -161,8 +161,6 @@ public class Member {
         this.adoptionCaseApply = adoptionCaseApply;
     }
 
-  
-
     public List<Activity> getActivity() {
         return activity;
     }
@@ -194,7 +192,6 @@ public class Member {
     public void setFollows(List<Follow> follows) {
         this.follows = follows;
     }
-
 
     public String getLineId() {
         return lineId;
@@ -243,6 +240,7 @@ public class Member {
     public void setCartActionLog(Set<CartActionLog> cartActionLog) {
         this.cartActionLog = cartActionLog;
     }
+
     public List<LostCase> getLostCase() {
         return lostCase;
     }
@@ -384,8 +382,6 @@ public class Member {
         return this.memberId;
     }
 
-
-    
     @Override
     public String toString() {
         return "Member{" +
