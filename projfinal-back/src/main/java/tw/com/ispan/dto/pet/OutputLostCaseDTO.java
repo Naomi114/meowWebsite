@@ -113,9 +113,9 @@ public class OutputLostCaseDTO {
 						// 如果是本機存放 (`C:/upload/final/...`)，轉換為雲端 URL
 						if (filePath.startsWith("C:/upload/final/")) {
 							filePath = filePath.replace("C:/upload/final/", "/upload/final/");
-						} else if (filePath.startsWith("http://localhost:8080/images/default.png")) {
+						} else if (filePath.startsWith("http://localhost:8080/assets/default.png")) {
 							// 如果是本機的預設圖片，改成雲端的預設圖片
-							filePath = "/upload/final/images/default.png";
+							filePath = "/upload/final/assets/default.png";
 						}
 
 						// 完整的 HTTP URL
@@ -129,7 +129,7 @@ public class OutputLostCaseDTO {
 		} else {
 			// 沒有圖片時，使用雲端的預設圖片
 			Map<String, String> defaultImage = new HashMap<>();
-			defaultImage.put("pictureUrl", BASE_URL + "/upload/final/images/default.png");
+			defaultImage.put("pictureUrl", BASE_URL + "/upload/final/assets/default.png");
 			this.casePictures = Collections.singletonList(defaultImage);
 		}
 
